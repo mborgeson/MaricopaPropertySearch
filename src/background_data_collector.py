@@ -547,6 +547,58 @@ class BackgroundDataCollectionManager(QObject):
         
         return self.worker.add_job(apn, priority)
     
+    def collect_batch_data(self, apns: List[str], priority: JobPriority = JobPriority.HIGH) -> Dict[str, Any]:
+        """Request batch data collection for multiple APNs with comprehensive feedback"""
+        if not self.worker or not self.worker.isRunning():
+            logger.warning("Background worker not running for batch collection")
+            return {
+                'success': False,
+                'error': 'Background worker not running',
+                'jobs_added': 0,
+                'total_requested': len(apns)
+            }
+        
+        if not apns:
+            return {
+                'success': False,
+                'error': 'No APNs provided',
+                'jobs_added': 0,
+                'total_requested': 0
+            }
+        
+        # Filter out duplicates and already processing APNs
+        unique_apns = list(set(apns))  # Remove duplicates
+        valid_apns = []
+        already_processing = 0
+        
+        for apn in unique_apns:
+            if apn in self.worker.active_jobs:
+                already_processing += 1
+                logger.debug(f"APN {apn} already being processed, skipping")
+            else:
+                valid_apns.append(apn)
+        
+        # Add jobs in batch
+        jobs_added = self.worker.add_bulk_jobs(valid_apns, priority)
+        
+        result = {
+            'success': jobs_added > 0,
+            'jobs_added': jobs_added,
+            'total_requested': len(apns),
+            'duplicates_removed': len(apns) - len(unique_apns),
+            'already_processing': already_processing,
+            'valid_apns': valid_apns,
+            'priority': priority.name
+        }
+        
+        if jobs_added > 0:
+            logger.info(f"Batch collection started: {jobs_added} jobs added with {priority.name} priority")
+        else:
+            logger.warning(f"Batch collection failed: no jobs added from {len(apns)} requested APNs")
+            result['error'] = 'No valid APNs could be queued'
+        
+        return result
+    
     def get_collection_status(self) -> Dict[str, Any]:
         """Get current collection status"""
         if not self.worker:

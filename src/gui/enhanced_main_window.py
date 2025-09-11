@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import (
     QHeaderView, QApplication, QStatusBar, QMenuBar, QMenu,
     QAction, QFileDialog, QDialog, QFrame, QSizePolicy
 )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QObject
 from PyQt5.QtGui import QFont, QIcon, QPixmap, QColor, QPalette
 from typing import Dict, List, Optional, Any
 import json
@@ -187,6 +187,85 @@ class EnhancedSearchWorker(QThread):
         return results
 
 
+class BatchCollectionTracker(QObject):
+    """Tracks batch data collection operations"""
+    
+    # Signals for batch progress
+    batch_started = pyqtSignal(int)  # total_properties
+    batch_progress = pyqtSignal(int, int)  # completed, total
+    batch_completed = pyqtSignal(dict)  # results summary
+    
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.batch_active = False
+        self.batch_apns = []
+        self.batch_completed_count = 0
+        self.batch_start_time = None
+        self.batch_results = {}
+        
+    def start_batch(self, apns):
+        """Start tracking a new batch collection"""
+        self.batch_active = True
+        self.batch_apns = list(apns)
+        self.batch_completed_count = 0
+        self.batch_start_time = datetime.now()
+        self.batch_results = {}
+        self.batch_started.emit(len(apns))
+        logger.info(f"Batch collection started for {len(apns)} properties")
+        
+    def update_batch_progress(self, apn, result):
+        """Update progress for a completed APN in the batch"""
+        if not self.batch_active or apn not in self.batch_apns:
+            return
+            
+        self.batch_results[apn] = result
+        self.batch_completed_count += 1
+        self.batch_progress.emit(self.batch_completed_count, len(self.batch_apns))
+        
+        # Check if batch is complete
+        if self.batch_completed_count >= len(self.batch_apns):
+            self._complete_batch()
+    
+    def _complete_batch(self):
+        """Complete the batch operation"""
+        if not self.batch_active:
+            return
+            
+        batch_time = (datetime.now() - self.batch_start_time).total_seconds()
+        
+        # Calculate statistics
+        successful = sum(1 for r in self.batch_results.values() 
+                        if not r.get('error') and not r.get('skipped'))
+        failed = sum(1 for r in self.batch_results.values() 
+                    if r.get('error'))
+        skipped = sum(1 for r in self.batch_results.values() 
+                     if r.get('skipped'))
+        
+        summary = {
+            'total_properties': len(self.batch_apns),
+            'successful': successful,
+            'failed': failed,
+            'skipped': skipped,
+            'batch_time_seconds': batch_time,
+            'results': self.batch_results
+        }
+        
+        self.batch_active = False
+        self.batch_completed.emit(summary)
+        logger.info(f"Batch collection completed: {successful} successful, "
+                   f"{failed} failed, {skipped} skipped in {batch_time:.1f}s")
+    
+    def cancel_batch(self):
+        """Cancel the current batch"""
+        if self.batch_active:
+            self.batch_active = False
+            logger.info("Batch collection cancelled")
+    
+    def is_batch_active(self):
+        """Check if a batch is currently active"""
+        return self.batch_active
+
+
 class BackgroundCollectionStatusWidget(QWidget):
     """Enhanced widget for displaying background collection status with detailed progress"""
     
@@ -196,6 +275,12 @@ class BackgroundCollectionStatusWidget(QWidget):
         
         # Track individual job progress
         self.active_job_widgets = {}  # apn -> progress widget
+        
+        # Track batch operations
+        self.batch_tracker = BatchCollectionTracker(self)
+        self.batch_tracker.batch_started.connect(self._on_batch_started)
+        self.batch_tracker.batch_progress.connect(self._on_batch_progress)
+        self.batch_tracker.batch_completed.connect(self._on_batch_completed)
     
     def setup_ui(self):
         """Setup the enhanced status widget UI"""
@@ -266,15 +351,55 @@ class BackgroundCollectionStatusWidget(QWidget):
         progress_layout.addWidget(self.overall_progress_bar)
         layout.addLayout(progress_layout)
         
+        # Batch collection progress (initially hidden)
+        self.batch_progress_group = QGroupBox("Batch Collection Progress")
+        self.batch_progress_group.setVisible(False)
+        batch_layout = QVBoxLayout(self.batch_progress_group)
+        
+        # Batch progress info
+        batch_info_layout = QHBoxLayout()
+        self.batch_status_label = QLabel("Batch Status: Ready")
+        batch_info_layout.addWidget(self.batch_status_label)
+        
+        # Cancel button for batch operations
+        self.cancel_batch_btn = QPushButton("Cancel Batch")
+        self.cancel_batch_btn.setMaximumWidth(100)
+        self.cancel_batch_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #f44336;
+                color: white;
+                border: none;
+                padding: 4px 8px;
+                border-radius: 3px;
+            }
+            QPushButton:hover {
+                background-color: #d32f2f;
+            }
+        """)
+        batch_info_layout.addWidget(self.cancel_batch_btn)
+        batch_info_layout.addStretch()
+        batch_layout.addLayout(batch_info_layout)
+        
+        # Batch progress bar
+        self.batch_progress_bar = QProgressBar()
+        self.batch_progress_bar.setTextVisible(True)
+        self.batch_progress_bar.setFormat("Collecting %v of %m properties (%p%)")
+        batch_layout.addWidget(self.batch_progress_bar)
+        
+        layout.addWidget(self.batch_progress_group)
+        
         # Active jobs progress area
         self.active_jobs_group = QGroupBox("Active Data Collections")
         self.active_jobs_layout = QVBoxLayout(self.active_jobs_group)
         self.active_jobs_group.setVisible(False)
         layout.addWidget(self.active_jobs_group)
         
+        # Connect cancel button
+        self.cancel_batch_btn.clicked.connect(self.batch_tracker.cancel_batch)
+        
         # Set compact but expandable size
         self.setMinimumHeight(120)
-        self.setMaximumHeight(300)
+        self.setMaximumHeight(400)  # Increased for batch progress
     
     def update_status(self, status_dict: Dict[str, Any]):
         """Update the enhanced status display with detailed progress"""
@@ -407,6 +532,53 @@ class BackgroundCollectionStatusWidget(QWidget):
             # Hide group if no active jobs
             if not self.active_job_widgets:
                 self.active_jobs_group.setVisible(False)
+    
+    def start_batch_tracking(self, apns):
+        """Start tracking a batch collection operation"""
+        self.batch_tracker.start_batch(apns)
+    
+    def update_batch_progress(self, apn, result):
+        """Update batch progress for a completed APN"""
+        self.batch_tracker.update_batch_progress(apn, result)
+    
+    def _on_batch_started(self, total_properties):
+        """Handle batch started signal"""
+        self.batch_progress_group.setVisible(True)
+        self.batch_status_label.setText(f"Collecting data for {total_properties} properties...")
+        self.batch_progress_bar.setRange(0, total_properties)
+        self.batch_progress_bar.setValue(0)
+        logger.info(f"Batch progress display started for {total_properties} properties")
+    
+    def _on_batch_progress(self, completed, total):
+        """Handle batch progress update"""
+        self.batch_progress_bar.setValue(completed)
+        percentage = (completed / total * 100) if total > 0 else 0
+        self.batch_status_label.setText(f"Collecting... {completed}/{total} complete ({percentage:.0f}%)")
+    
+    def _on_batch_completed(self, summary):
+        """Handle batch completion"""
+        total = summary['total_properties']
+        successful = summary['successful']
+        failed = summary['failed']
+        skipped = summary['skipped']
+        time_taken = summary['batch_time_seconds']
+        
+        # Update final status
+        self.batch_status_label.setText(
+            f"Batch Complete: {successful} successful, {failed} failed, "
+            f"{skipped} skipped in {time_taken:.1f}s"
+        )
+        self.batch_progress_bar.setValue(total)
+        
+        # Hide the batch progress group after a delay
+        QTimer.singleShot(5000, self._hide_batch_progress)
+        
+        logger.info(f"Batch collection display completed with summary: {summary}")
+    
+    def _hide_batch_progress(self):
+        """Hide batch progress display"""
+        self.batch_progress_group.setVisible(False)
+        self.batch_status_label.setText("Batch Status: Ready")
 
 
 class PropertyDetailsDialog(QDialog):
@@ -965,8 +1137,30 @@ class EnhancedPropertySearchApp(QMainWindow):
         self.view_details_btn.setEnabled(False)
         controls_layout.addWidget(self.view_details_btn)
         
-        self.collect_all_btn = QPushButton("Auto-Collect All Data")
+        # Batch collection button with enhanced styling
+        self.collect_all_btn = QPushButton("Collect All Data")
         self.collect_all_btn.setEnabled(False)
+        self.collect_all_btn.setStyleSheet("""
+            QPushButton {
+                background-color: #2196F3;
+                color: white;
+                border: none;
+                padding: 8px 16px;
+                font-weight: bold;
+                border-radius: 4px;
+            }
+            QPushButton:hover {
+                background-color: #1976D2;
+            }
+            QPushButton:pressed {
+                background-color: #0D47A1;
+            }
+            QPushButton:disabled {
+                background-color: #CCCCCC;
+                color: #666666;
+            }
+        """)
+        self.collect_all_btn.setToolTip("Collect complete property data for ALL visible search results")
         controls_layout.addWidget(self.collect_all_btn)
         
         controls_layout.addStretch()
@@ -1019,6 +1213,9 @@ class EnhancedPropertySearchApp(QMainWindow):
         
         # Connect to background manager signals for enhanced progress
         self.background_manager.collection_started.connect(self._setup_worker_connections)
+        
+        # Connect batch completion to button reset
+        self.bg_status_widget.batch_tracker.batch_completed.connect(self._on_batch_collection_completed)
     
     def _setup_worker_connections(self):
         """Setup connections to worker signals when collection starts"""
@@ -1308,6 +1505,11 @@ class EnhancedPropertySearchApp(QMainWindow):
         # Remove progress indicator with failure status
         self.bg_status_widget.remove_active_job_progress(apn, "Failed")
         
+        # Update batch progress if this APN is part of a batch
+        if self.bg_status_widget.batch_tracker.is_batch_active():
+            failed_result = {'error': error, 'apn': apn}
+            self.bg_status_widget.update_batch_progress(apn, failed_result)
+        
         # Update results table to show failure
         self._update_table_status_for_apn(apn, "Failed", QColor(255, 200, 200))
         
@@ -1317,6 +1519,10 @@ class EnhancedPropertySearchApp(QMainWindow):
         """Handle background job completion with enhanced feedback"""
         # Remove progress indicator with success status
         self.bg_status_widget.remove_active_job_progress(apn, "Completed")
+        
+        # Update batch progress if this APN is part of a batch
+        if self.bg_status_widget.batch_tracker.is_batch_active():
+            self.bg_status_widget.update_batch_progress(apn, result)
         
         # Refresh the results table for the completed APN
         data_status = self._get_data_collection_status(apn)
@@ -1348,14 +1554,27 @@ class EnhancedPropertySearchApp(QMainWindow):
                 break
     
     def collect_all_data(self):
-        """Queue all current search results for high-priority data collection"""
+        """Queue all current search results for batch data collection with enhanced progress tracking"""
         if not self.current_results:
+            QMessageBox.warning(self, "Warning", "No search results to collect data for.")
             return
+        
+        # Check if batch is already active
+        if self.bg_status_widget.batch_tracker.is_batch_active():
+            reply = QMessageBox.question(self, "Batch Collection", 
+                                       "A batch collection is already in progress. "
+                                       "Do you want to cancel it and start a new one?",
+                                       QMessageBox.Yes | QMessageBox.No)
+            if reply == QMessageBox.Yes:
+                self.bg_status_widget.batch_tracker.cancel_batch()
+            else:
+                return
         
         if not self.background_manager.is_running():
             reply = QMessageBox.question(self, "Background Collection", 
                                        "Background data collection is not running. "
-                                       "Would you like to start it?")
+                                       "Would you like to start it now?",
+                                       QMessageBox.Yes | QMessageBox.No)
             if reply == QMessageBox.Yes:
                 self.background_manager.start_collection()
                 # Give worker time to start
@@ -1366,25 +1585,147 @@ class EnhancedPropertySearchApp(QMainWindow):
             self._do_collect_all_data()
     
     def _do_collect_all_data(self):
-        """Actually perform the bulk data collection"""
+        """Actually perform the batch data collection with smart filtering"""
         if not self.background_manager.worker:
             QMessageBox.warning(self, "Warning", "Background worker not available.")
             return
+        
+        # Get all APNs from current results
+        all_apns = [result.get('apn') for result in self.current_results if result.get('apn')]
+        
+        if not all_apns:
+            QMessageBox.warning(self, "Warning", "No valid APNs found in search results.")
+            return
+        
+        # Filter APNs to avoid duplicates and recent collections
+        apns_to_collect = []
+        skipped_reasons = {'already_processing': 0, 'recent_data': 0, 'already_complete': 0}
+        
+        for apn in all_apns:
+            # Check if already being processed
+            if apn in self.background_manager.worker.active_jobs:
+                skipped_reasons['already_processing'] += 1
+                continue
+                
+            # Check if recently cached
+            if self.background_manager.worker.cache.is_cached(apn):
+                skipped_reasons['recent_data'] += 1
+                continue
+                
+            # Check completeness of existing data
+            try:
+                tax_records = self.db_manager.get_tax_history(apn)
+                sales_records = self.db_manager.get_sales_history(apn)
+                
+                # Skip if we have comprehensive data
+                if len(tax_records) >= 3 and len(sales_records) >= 1:
+                    skipped_reasons['already_complete'] += 1
+                    continue
+                    
+            except Exception as e:
+                logger.warning(f"Error checking data completeness for {apn}: {e}")
             
-        # Queue all APNs for high-priority collection
-        apns = [result.get('apn') for result in self.current_results if result.get('apn')]
-        jobs_added = self.background_manager.worker.add_bulk_jobs(apns, JobPriority.HIGH)
+            apns_to_collect.append(apn)
+        
+        # Show confirmation dialog with details
+        total_properties = len(all_apns)
+        to_collect = len(apns_to_collect)
+        skipped_total = sum(skipped_reasons.values())
+        
+        confirmation_msg = f"""
+        Batch Data Collection Summary:
+        
+        Total Properties: {total_properties}
+        Will Collect: {to_collect}
+        Will Skip: {skipped_total}
+        
+        Skip Reasons:
+        • Already Processing: {skipped_reasons['already_processing']}
+        • Recent Data Available: {skipped_reasons['recent_data']}
+        • Complete Data Available: {skipped_reasons['already_complete']}
+        
+        This will queue {to_collect} properties for high-priority data collection.
+        
+        Proceed with batch collection?
+        """
+        
+        if to_collect == 0:
+            QMessageBox.information(self, "Batch Collection", 
+                                   f"All {total_properties} properties already have current data or are being processed.")
+            return
+        
+        reply = QMessageBox.question(self, "Confirm Batch Collection", confirmation_msg,
+                                   QMessageBox.Yes | QMessageBox.No)
+        
+        if reply != QMessageBox.Yes:
+            return
+        
+        # Disable the button to prevent duplicate requests
+        self.collect_all_btn.setEnabled(False)
+        self.collect_all_btn.setText("Batch Collection Active...")
+        
+        # Start batch tracking
+        self.bg_status_widget.start_batch_tracking(apns_to_collect)
+        
+        # Use the enhanced batch collection method
+        batch_result = self.background_manager.collect_batch_data(apns_to_collect, JobPriority.HIGH)
+        jobs_added = batch_result.get('jobs_added', 0)
         
         if jobs_added > 0:
-            QMessageBox.information(self, "Data Collection", 
-                                   f"Queued {jobs_added} properties for high-priority background data collection. "
-                                   f"Individual progress will be shown in the status panel.")
-            
             # Update status bar
-            self.status_bar.showMessage(f"High-priority collection started for {jobs_added} properties")
+            self.status_bar.showMessage(f"Batch collection started: {jobs_added} properties queued")
+            
+            # Show success message
+            QMessageBox.information(self, "Batch Collection Started", 
+                                   f"Successfully started batch collection for {jobs_added} properties.\n\n"
+                                   f"Progress will be shown in the status panel above.\n"
+                                   f"Individual property statuses will update in the results table.")
+            
+            logger.info(f"Batch collection initiated for {jobs_added} properties")
         else:
-            QMessageBox.information(self, "Data Collection", 
-                                   "All properties already have recent data or are being processed.")
+            QMessageBox.warning(self, "Warning", "No properties were queued for collection.")
+            self._reset_collect_all_button()
+    
+    def _reset_collect_all_button(self):
+        """Reset the collect all button to its default state"""
+        self.collect_all_btn.setEnabled(True)
+        self.collect_all_btn.setText("Collect All Data")
+    
+    def _on_batch_collection_completed(self, summary: Dict):
+        """Handle batch collection completion"""
+        # Reset the button
+        self._reset_collect_all_button()
+        
+        # Show completion summary
+        total = summary['total_properties']
+        successful = summary['successful']
+        failed = summary['failed']
+        skipped = summary['skipped']
+        time_taken = summary['batch_time_seconds']
+        
+        completion_msg = f"""
+        Batch Collection Complete!
+        
+        Total Properties: {total}
+        Successful: {successful}
+        Failed: {failed}
+        Skipped: {skipped}
+        
+        Time Taken: {time_taken:.1f} seconds
+        Average per Property: {(time_taken / max(total, 1)):.1f}s
+        
+        Results table has been updated with the latest data.
+        """
+        
+        # Show non-blocking notification
+        QMessageBox.information(self, "Batch Collection Complete", completion_msg)
+        
+        # Update status bar
+        self.status_bar.showMessage(
+            f"Batch collection completed: {successful} successful, {failed} failed", 10000
+        )
+        
+        logger.info(f"Batch collection completed with summary: {summary}")
     
     def view_property_details(self):
         """View detailed property information with background collection support"""
