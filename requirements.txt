@@ -1,0 +1,22 @@
+# Maricopa Property Search - Required Dependencies
+# Install with: pip install -r requirements.txt
+
+# Database
+psycopg2-binary>=2.9.0
+
+# Web scraping
+selenium>=4.0.0
+requests>=2.25.0
+
+# GUI Framework
+PyQt5>=5.15.0
+
+# Configuration
+python-dotenv>=0.19.0
+
+# Logging and utilities
+pathlib2>=2.3.0
+
+# Optional development dependencies
+pytest>=6.0.0
+pytest-qt>=4.0.0

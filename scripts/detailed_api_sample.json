@@ -1,0 +1,323 @@
+{
+  "valuations": [
+    {
+      "TaxYear": "2025",
+      "FullCashValue": "98465200",
+      "LimitedPropertyValue": "42874309    ",
+      "LegalClassificationCode": "M   ",
+      "LegalClassification": "MIXED LEGAL CLASS",
+      "AssessmentRatioPercentage": "0.1070",
+      "AssessedFCV": "na",
+      "AssessedLPV": "4587551     ",
+      "ValuationSource": "Notice",
+      "PEPropUseDesc": "Multiple Family Residential",
+      "PropertyUseCode": "0377",
+      "TaxAreaCode": "031600",
+      "NoticeOfChangeIndc": "N"
+    },
+    {
+      "TaxYear": "2024",
+      "FullCashValue": "123017600",
+      "LimitedPropertyValue": "40832675    ",
+      "LegalClassificationCode": "M   ",
+      "LegalClassification": "MIXED LEGAL CLASS",
+      "AssessmentRatioPercentage": "0.1070",
+      "AssessedFCV": "na",
+      "AssessedLPV": "4369096     ",
+      "ValuationSource": "Notice",
+      "PEPropUseDesc": "Multiple Family Residential",
+      "PropertyUseCode": "0377",
+      "TaxAreaCode": "031600",
+      "NoticeOfChangeIndc": "N"
+    },
+    {
+      "TaxYear": "2023",
+      "FullCashValue": "79086600",
+      "LimitedPropertyValue": "38888262    ",
+      "LegalClassificationCode": "M   ",
+      "LegalClassification": "MIXED LEGAL CLASS",
+      "AssessmentRatioPercentage": "0.1070",
+      "AssessedFCV": "na",
+      "AssessedLPV": "4161044     ",
+      "ValuationSource": "Notice",
+      "PEPropUseDesc": "Multiple Family Residential",
+      "PropertyUseCode": "0377",
+      "TaxAreaCode": "031600",
+      "NoticeOfChangeIndc": "N"
+    },
+    {
+      "TaxYear": "2022",
+      "FullCashValue": "56700000",
+      "LimitedPropertyValue": "37036440    ",
+      "LegalClassificationCode": "M   ",
+      "LegalClassification": "MIXED LEGAL CLASS",
+      "AssessmentRatioPercentage": "0.1070",
+      "AssessedFCV": "na",
+      "AssessedLPV": "3962899     ",
+      "ValuationSource": "Notice",
+      "PEPropUseDesc": "Multiple Family Residential",
+      "PropertyUseCode": "0377",
+      "TaxAreaCode": "031600",
+      "NoticeOfChangeIndc": "N"
+    },
+    {
+      "TaxYear": "2021",
+      "FullCashValue": "54481558",
+      "LimitedPropertyValue": "54481558    ",
+      "LegalClassificationCode": "M   ",
+      "LegalClassification": "MIXED LEGAL CLASS",
+      "AssessmentRatioPercentage": "0.1070",
+      "AssessedFCV": "na",
+      "AssessedLPV": "5829527     ",
+      "ValuationSource": "Notice",
+      "PEPropUseDesc": "Multiple Family Residential",
+      "PropertyUseCode": "0377",
+      "TaxAreaCode": "031600",
+      "NoticeOfChangeIndc": "N"
+    }
+  ],
+  "residential_details": {
+    "ConstructionYear": "2009",
+    "OriginalConstructionYear": "2009",
+    "LotSize": "185582",
+    "LivableSpace": null,
+    "Detached_Livable_sqft": null,
+    "AssessorMarket": "02",
+    "AreaNeighborhood": "004",
+    "Pool": false,
+    "PEImprovementQualityGrade": "3",
+    "ImprovementQualityGrade": "D",
+    "NumberOfCoveredPatios": 0,
+    "NumberOfUncoveredPatios": 0,
+    "NumberOfPatios": 0,
+    "PatioType": "Uncovered",
+    "ExteriorWalls": "Stud  Eifs (synthetic Stucco)",
+    "RoofType": "",
+    "BathFixtures": 0,
+    "Cooling": null,
+    "Heating": null,
+    "NumberOfGarages": null,
+    "NumberOfCarports": 0,
+    "ParkingDetails": [],
+    "LocationalFactors": "MajInter,",
+    "OtherStructures": "",
+    "ParkingType": null,
+    "CoveredParking": false,
+    "LocationalCharacteristics": "MajInter",
+    "PhysicalCondition": null
+  },
+  "improvements": [
+    {
+      "CCI": "D",
+      "EffectiveAge": "16",
+      "ImprovementDescription": "Clubhouse",
+      "ImprovementNumber": "000102",
+      "ImprovementSquareFootage": "4521",
+      "QualityRank": "3",
+      "Model": "311"
+    },
+    {
+      "CCI": "D",
+      "EffectiveAge": "16",
+      "ImprovementDescription": "Apartment",
+      "ImprovementNumber": "000103",
+      "ImprovementSquareFootage": "92008",
+      "QualityRank": "3",
+      "Model": "300"
+    },
+    {
+      "CCI": "A",
+      "EffectiveAge": "16",
+      "ImprovementDescription": "Apartment",
+      "ImprovementNumber": "000104",
+      "ImprovementSquareFootage": "106961",
+      "QualityRank": "3",
+      "Model": "300"
+    },
+    {
+      "CCI": "D",
+      "EffectiveAge": "16",
+      "ImprovementDescription": "Apartment",
+      "ImprovementNumber": "000105",
+      "ImprovementSquareFootage": "91559",
+      "QualityRank": "3",
+      "Model": "300"
+    },
+    {
+      "CCI": "D",
+      "EffectiveAge": "16",
+      "ImprovementDescription": "Town House, End Unit",
+      "ImprovementNumber": "000202",
+      "ImprovementSquareFootage": "3153",
+      "QualityRank": "3",
+      "Model": "401"
+    },
+    {
+      "CCI": "D",
+      "EffectiveAge": "16",
+      "ImprovementDescription": "Town House, End Unit",
+      "ImprovementNumber": "000302",
+      "ImprovementSquareFootage": "3153",
+      "QualityRank": "3",
+      "Model": "401"
+    },
+    {
+      "CCI": "D",
+      "EffectiveAge": "16",
+      "ImprovementDescription": "Town House, End Unit",
+      "ImprovementNumber": "000402",
+      "ImprovementSquareFootage": "3153",
+      "QualityRank": "3",
+      "Model": "401"
+    },
+    {
+      "CCI": "D",
+      "EffectiveAge": "16",
+      "ImprovementDescription": "Town House, End Unit",
+      "ImprovementNumber": "000502",
+      "ImprovementSquareFootage": "3153",
+      "QualityRank": "3",
+      "Model": "401"
+    },
+    {
+      "CCI": "B",
+      "EffectiveAge": "17",
+      "ImprovementDescription": "Parking Structure",
+      "ImprovementNumber": "000601",
+      "ImprovementSquareFootage": "262390",
+      "QualityRank": "3",
+      "Model": "345"
+    },
+    {
+      "CCI": "D",
+      "EffectiveAge": "16",
+      "ImprovementDescription": "Site Improvements",
+      "ImprovementNumber": "000701",
+      "ImprovementSquareFootage": "1",
+      "QualityRank": "2",
+      "Model": "163"
+    }
+  ],
+  "sketches": {
+    "TotalPages": 0,
+    "Pages": []
+  },
+  "mapids": {
+    "Parcel Maps": [
+      {
+        "FileName": "852240302",
+        "UpdateDate": "19-APR-21",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240302/"
+      }
+    ],
+    "Subdivision Maps": [
+      {
+        "FileName": "852240302",
+        "UpdateDate": "30-APR-08",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240302/"
+      }
+    ],
+    "MCR Maps": [
+      {
+        "FileName": "852240302",
+        "UpdateDate": "30-APR-08",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240302/"
+      }
+    ],
+    "S/T/R Maps": [
+      {
+        "FileName": "852240101",
+        "UpdateDate": "30-APR-08",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240101/"
+      },
+      {
+        "FileName": "852240102",
+        "UpdateDate": "21-AUG-19",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240102/"
+      },
+      {
+        "FileName": "852240103",
+        "UpdateDate": "25-MAR-22",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240103/"
+      },
+      {
+        "FileName": "852240104",
+        "UpdateDate": "20-NOV-24",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240104/"
+      },
+      {
+        "FileName": "852240201",
+        "UpdateDate": "07-DEC-10",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240201/"
+      },
+      {
+        "FileName": "852240202",
+        "UpdateDate": "02-JUL-19",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240202/"
+      },
+      {
+        "FileName": "852240203",
+        "UpdateDate": "23-MAY-22",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240203/"
+      },
+      {
+        "FileName": "852240204",
+        "UpdateDate": "17-APR-24",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240204/"
+      },
+      {
+        "FileName": "852240301",
+        "UpdateDate": "10-APR-25",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240301/"
+      },
+      {
+        "FileName": "852240302",
+        "UpdateDate": "19-APR-21",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240302/"
+      },
+      {
+        "FileName": "852240303",
+        "UpdateDate": "20-APR-18",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240303/"
+      },
+      {
+        "FileName": "852240304",
+        "UpdateDate": "12-JAN-15",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240304/"
+      },
+      {
+        "FileName": "852240401",
+        "UpdateDate": "23-MAR-22",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240401/"
+      },
+      {
+        "FileName": "852240402",
+        "UpdateDate": "10-APR-25",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240402/"
+      },
+      {
+        "FileName": "852240403",
+        "UpdateDate": "24-FEB-20",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240403/"
+      },
+      {
+        "FileName": "852240404",
+        "UpdateDate": "25-APR-14",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240404/"
+      }
+    ],
+    "Book/Map Maps": [
+      {
+        "FileName": "852240302",
+        "UpdateDate": "19-APR-21",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240302/"
+      },
+      {
+        "FileName": "852240303",
+        "UpdateDate": "20-APR-18",
+        "Url": "https://mcassessor.maricopa.gov/getmapid/852240303/"
+      }
+    ]
+  },
+  "rental_details": []
+}
