@@ -12,8 +12,8 @@ project_root = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySea
 sys.path.insert(0, str(project_root / "src"))
 
 # Import modules
-from config_manager import ConfigManager
-from logging_config import (
+from src.config_manager import ConfigManager
+from src.logging_config import (
     setup_logging, get_logger, get_performance_logger, 
     get_api_logger, get_search_logger, log_exception, 
     log_debug_variables

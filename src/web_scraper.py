@@ -18,7 +18,7 @@ from concurrent.futures import ThreadPoolExecutor
 import threading
 
 # Import centralized logging
-from logging_config import get_logger, get_performance_logger, log_exception, log_debug_variables
+from src.logging_config import get_logger, get_performance_logger, log_exception, log_debug_variables
 
 logger = get_logger(__name__)
 perf_logger = get_performance_logger(__name__)

@@ -1,0 +1,12 @@
+aiohttp @ file:///C:/b/abs_d4_gdjffav/croot/aiohttp_1734687146788/work
+pathlib2==2.3.7.post1
+psycopg2-binary==2.9.10
+PyQt5==5.15.10
+PyQt5_sip @ file:///C:/b/abs_d1i1jr9fgt/croot/pyqt-split_1736540551157/work/pyqt_sip
+pytest @ file:///C:/b/abs_9dllqyhfs_/croot/pytest_1738938859288/work
+pytest-qt==4.5.0
+python-dotenv @ file:///C:/b/abs_71cpoh9hpg/croot/python-dotenv_1745613639902/work
+requests @ file:///C:/b/abs_c3508vg8ez/croot/requests_1731000584867/work
+requests-file @ file:///C:/b/abs_804owi11qo/croot/requests-file_1749719355197/work
+requests-toolbelt @ file:///C:/Users/dev-admin/buildout/perseverance-python-buildout/croot/requests-toolbelt_1731731341115/work
+selenium==4.35.0

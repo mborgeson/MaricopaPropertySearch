@@ -1,0 +1,37 @@
+{
+  "overall_success": false,
+  "total_execution_time": 0.3981893062591553,
+  "suites": {
+    "total": 2,
+    "passed": 0,
+    "failed": 2
+  },
+  "tests": {
+    "total": 0,
+    "passed": 0,
+    "failed": 0,
+    "errors": 0
+  },
+  "suite_results": {
+    "unit": {
+      "suite_name": "unit",
+      "exit_code": 4,
+      "execution_time": 0.3297865390777588,
+      "success": false,
+      "timestamp": "2025-09-12T00:07:07.243775",
+      "timeout": 300
+    },
+    "integration": {
+      "suite_name": "integration",
+      "exit_code": 4,
+      "execution_time": 0.0678701400756836,
+      "success": false,
+      "timestamp": "2025-09-12T00:07:07.311644",
+      "timeout": 600
+    }
+  },
+  "timestamp": "2025-09-12T00:07:07.311644",
+  "recommendations": [
+    "Run complete test suite including integration and e2e tests"
+  ]
+}

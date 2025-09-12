@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 
 class ConfigManager:
     def __init__(self):
-        self.project_root = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch")
+        self.project_root = Path(__file__).parent.parent.resolve()
         self.config_file = self.project_root / "config" / "config.ini"
         self.env_file = self.project_root / ".env"
         

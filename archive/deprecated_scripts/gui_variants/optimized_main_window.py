@@ -26,11 +26,11 @@ import traceback
 
 # Import application modules
 from optimized_database_manager import OptimizedDatabaseManager, SearchFilters
-from optimized_search_worker import OptimizedSearchWorker, SearchWorkerPool
-from search_validator import SearchValidator, SearchType, ValidationResult
-from search_cache import SearchCache, SearchHistory
-from api_client import MaricopaAPIClient, MockMaricopaAPIClient
-from web_scraper import WebScraperManager, MockWebScraperManager
+from src.optimized_search_worker import OptimizedSearchWorker, SearchWorkerPool
+from src.search_validator import SearchValidator, SearchType, ValidationResult
+from src.search_cache import SearchCache, SearchHistory
+from src.api_client import MaricopaAPIClient, MockMaricopaAPIClient
+from src.web_scraper import WebScraperManager, MockWebScraperManager
 
 logger = logging.getLogger(__name__)
 

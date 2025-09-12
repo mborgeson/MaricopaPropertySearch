@@ -10,8 +10,8 @@ from PyQt5.QtCore import QThread, pyqtSignal, QMutex, QMutexLocker
 from dataclasses import asdict
 import traceback
 
-from search_cache import SearchCache, SearchHistory
-from search_validator import SearchValidator, SearchType, ValidationResult, SearchFilters
+from src.search_cache import SearchCache, SearchHistory
+from src.search_validator import SearchValidator, SearchType, ValidationResult, SearchFilters
 from optimized_database_manager import OptimizedDatabaseManager
 
 logger = logging.getLogger(__name__)
@@ -29,7 +29,7 @@ class OptimizedSearchWorker(QThread):
     
     def __init__(self, search_term: str, search_type: SearchType, 
                  db_manager: OptimizedDatabaseManager, api_client, scraper,
-                 filters: SearchFilters = None, use_cache: bool = True):
+                 filters: SearchFilters = None, use_cache: bool = True, fresh_data_only: bool = False):
         super().__init__()
         
         self.search_term = search_term
@@ -38,7 +38,8 @@ class OptimizedSearchWorker(QThread):
         self.api_client = api_client
         self.scraper = scraper
         self.filters = filters or SearchFilters()
-        self.use_cache = use_cache
+        self.use_cache = use_cache and not fresh_data_only  # Disable cache if fresh data only
+        self.fresh_data_only = fresh_data_only
         
         # Thread safety
         self._mutex = QMutex()
@@ -75,9 +76,9 @@ class OptimizedSearchWorker(QThread):
             
             self.progress_updated.emit(10)
             
-            # Check cache first
+            # Skip cache check if fresh data only mode is enabled
             cached_results = None
-            if self.use_cache:
+            if self.use_cache and not self.fresh_data_only:
                 self.status_updated.emit("Checking cache...")
                 cached_results = self._check_cache(sanitized_term, search_type)
                 
@@ -95,31 +96,46 @@ class OptimizedSearchWorker(QThread):
                     # Still log to history
                     self.history.add_search(search_type.value, sanitized_term, len(filtered_results))
                     return
+            elif self.fresh_data_only:
+                self.status_updated.emit("Fresh data only mode - skipping cache...")
+                logger.info(f"Fresh data only mode enabled for {search_type.value} search: {sanitized_term}")
             
             self.progress_updated.emit(20)
             
-            # Perform database search
-            db_results, total_count = self._search_database(sanitized_term, search_type)
+            # Perform live external search first if fresh data only, otherwise use database
+            if self.fresh_data_only:
+                self.status_updated.emit("Collecting fresh data from live sources...")
+                db_results = self._search_external_sources_fresh(sanitized_term, search_type)
+                total_count = len(db_results)
+            else:
+                # Perform database search
+                db_results, total_count = self._search_database(sanitized_term, search_type)
             
             if self._is_cancelled:
                 return
             
             self.progress_updated.emit(60)
             
-            # If no database results and it's not an APN search, try external sources
-            if not db_results and search_type != SearchType.APN:
+            # If no database results and it's not an APN search, try external sources (unless fresh data only mode)
+            if not db_results and search_type != SearchType.APN and not self.fresh_data_only:
                 external_results = self._search_external_sources(sanitized_term, search_type)
                 db_results.extend(external_results)
                 total_count = len(db_results)
+            elif not db_results and self.fresh_data_only:
+                # In fresh data only mode, if first attempt failed, show clear message
+                logger.warning(f"Fresh data collection returned no results for {search_type.value}: {sanitized_term}")
+                self.status_updated.emit("No fresh data found from live sources")
             
             if self._is_cancelled:
                 return
             
             self.progress_updated.emit(90)
             
-            # Cache results for future use
-            if self.use_cache and db_results:
+            # Cache results for future use (only if not in fresh data only mode)
+            if self.use_cache and db_results and not self.fresh_data_only:
                 self._cache_results(sanitized_term, search_type, db_results)
+            elif self.fresh_data_only and db_results:
+                logger.info(f"Fresh data only mode - not caching {len(db_results)} results")
             
             # Log search
             self._log_search(search_type, sanitized_term, total_count)
@@ -127,7 +143,8 @@ class OptimizedSearchWorker(QThread):
             self.progress_updated.emit(100)
             search_duration = time.time() - search_start_time
             
-            self.status_updated.emit(f"Found {total_count} properties in {search_duration:.2f}s")
+            data_source_msg = " (fresh data)" if self.fresh_data_only else ""
+            self.status_updated.emit(f"Found {total_count} properties in {search_duration:.2f}s{data_source_msg}")
             self.results_ready.emit(db_results, total_count)
             self.search_completed.emit(search_type.value, sanitized_term, total_count, search_duration)
             
@@ -242,6 +259,67 @@ class OptimizedSearchWorker(QThread):
         
         logger.debug(f"External sources returned {len(external_results)} results")
         return external_results
+    
+    def _search_external_sources_fresh(self, search_term: str, search_type: SearchType) -> List[Dict]:
+        """Search external sources with fresh data priority (no database fallback)"""
+        fresh_results = []
+        
+        try:
+            if self._is_cancelled:
+                return []
+            
+            # Force fresh API search first
+            self.status_updated.emit("Fetching fresh data from API...")
+            self.progress_updated.emit(40)
+            
+            if search_type == SearchType.OWNER:
+                api_results = self.api_client.search_by_owner(search_term, limit=100)
+            elif search_type == SearchType.ADDRESS:
+                api_results = self.api_client.search_by_address(search_term, limit=100)
+            elif search_type == SearchType.APN:
+                # For APN, get comprehensive fresh data
+                api_result = self.api_client.get_comprehensive_property_info(search_term)
+                api_results = [api_result] if api_result else []
+            else:
+                api_results = []
+            
+            fresh_results.extend(api_results)
+            logger.info(f"Fresh API search returned {len(api_results)} results")
+            
+            if self._is_cancelled:
+                return fresh_results
+            
+            # If no API results, try web scraping for additional fresh data
+            if not fresh_results and search_type in [SearchType.OWNER, SearchType.APN]:
+                self.status_updated.emit("Collecting fresh data via web scraping...")
+                self.progress_updated.emit(70)
+                
+                if search_type == SearchType.OWNER:
+                    scrape_results = self.scraper.search_by_owner_name(search_term)
+                else:  # APN
+                    scrape_result = self.scraper.scrape_property_by_apn(search_term)
+                    scrape_results = [scrape_result] if scrape_result else []
+                
+                fresh_results.extend(scrape_results)
+                logger.info(f"Fresh web scraping returned {len(scrape_results)} results")
+            
+            # Save fresh data to database for future reference
+            if fresh_results:
+                self.status_updated.emit("Saving fresh data to database...")
+                for prop in fresh_results:
+                    try:
+                        self.db_manager.insert_property(prop)
+                    except Exception as e:
+                        logger.warning(f"Failed to save fresh property data: {e}")
+                
+                logger.info(f"Saved {len(fresh_results)} fresh properties to database")
+            
+        except Exception as e:
+            logger.error(f"Fresh external search failed: {e}")
+            # In fresh data only mode, we don't fall back to cached data
+        
+        logger.info(f"Fresh data collection returned {len(fresh_results)} total results")
+        return fresh_results
     
     def _apply_client_filters(self, results: List[Dict]) -> List[Dict]:
         """Apply additional client-side filtering to cached results"""
@@ -364,7 +442,7 @@ class SearchWorkerPool:
     
     def submit_search(self, search_term: str, search_type: SearchType,
                      db_manager: OptimizedDatabaseManager, api_client, scraper,
-                     filters: SearchFilters = None, use_cache: bool = True) -> OptimizedSearchWorker:
+                     filters: SearchFilters = None, use_cache: bool = True, fresh_data_only: bool = False) -> OptimizedSearchWorker:
         """Submit a new search request"""
         
         with QMutexLocker(self._mutex):
@@ -387,7 +465,8 @@ class SearchWorkerPool:
                 api_client=api_client,
                 scraper=scraper,
                 filters=filters,
-                use_cache=use_cache
+                use_cache=use_cache,
+                fresh_data_only=fresh_data_only
             )
             
             # Connect cleanup signal

@@ -14,8 +14,8 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 import time
 
-from database_manager import DatabaseManager
-from search_validator import SearchType, ValidationResult
+from src.database_manager import DatabaseManager
+from src.search_validator import SearchType, ValidationResult
 
 logger = logging.getLogger(__name__)
 

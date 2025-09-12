@@ -12,9 +12,10 @@ import re
 from datetime import datetime
 
 # Import centralized logging
-from logging_config import get_logger
+import logging
 
-logger = get_logger(__name__)
+# Set up logger for this module
+logger = logging.getLogger(__name__)
 
 class MaricopaDataCollector:
     """Automatic data collection for any Maricopa County property"""

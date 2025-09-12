@@ -27,10 +27,10 @@ class TestNetworkErrorHandling:
                 
     def test_api_connection_error_fallback(self, app_config, test_database):
         """Test fallback to database when API is unavailable"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
         # Create app with connection error simulation
-        app = PropertySearchApp(app_config)
+        app = EnhancedPropertySearchApp(app_config)
         
         # Mock API client to raise connection error
         with patch.object(app.api_client, 'search_by_owner') as mock_api:
@@ -48,7 +48,7 @@ class TestNetworkErrorHandling:
                 
     def test_partial_data_source_failure(self, app_config):
         """Test handling when some data sources fail but others succeed"""
-        from api_client import MockMaricopaAPIClient
+        from src.api_client import MockMaricopaAPIClient
         from web_scraper import MockWebScraperManager
         
         api_client = MockMaricopaAPIClient(app_config)
@@ -77,7 +77,7 @@ class TestNetworkErrorHandling:
         
     def test_network_recovery_detection(self, app_config, network_simulator):
         """Test that system detects network recovery"""
-        from api_client import MockMaricopaAPIClient
+        from src.api_client import MockMaricopaAPIClient
         
         client = MockMaricopaAPIClient(app_config)
         
@@ -102,7 +102,7 @@ class TestDatabaseErrorHandling:
     
     def test_database_connection_failure_handling(self, app_config):
         """Test handling when database connection fails"""
-        from database_manager import DatabaseManager
+        from src.database_manager import DatabaseManager
         
         # Create database manager with invalid config
         bad_config = app_config
@@ -197,7 +197,7 @@ class TestDataInconsistencyHandling:
     
     def test_malformed_api_response_handling(self, app_config):
         """Test handling when API returns malformed data"""
-        from api_client import MockMaricopaAPIClient
+        from src.api_client import MockMaricopaAPIClient
         
         client = MockMaricopaAPIClient(app_config)
         
@@ -245,7 +245,7 @@ class TestDataInconsistencyHandling:
             
     def test_inconsistent_data_between_sources(self, app_config):
         """Test handling when different data sources return inconsistent information"""
-        from api_client import MockMaricopaAPIClient
+        from src.api_client import MockMaricopaAPIClient
         from web_scraper import MockWebScraperManager
         
         api_client = MockMaricopaAPIClient(app_config)
@@ -320,9 +320,9 @@ class TestUIErrorHandling:
     
     def test_user_friendly_error_messages(self, qt_app, app_config):
         """Test that error messages are user-friendly, not technical"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
-        window = PropertySearchApp(app_config)
+        window = EnhancedPropertySearchApp(app_config)
         window.show()
         qt_app.processEvents()
         
@@ -356,9 +356,9 @@ class TestUIErrorHandling:
         
     def test_error_recovery_workflow(self, qt_app, app_config):
         """Test that users can recover from errors easily"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
-        window = PropertySearchApp(app_config)
+        window = EnhancedPropertySearchApp(app_config)
         window.show()
         qt_app.processEvents()
         
@@ -386,9 +386,9 @@ class TestUIErrorHandling:
         
     def test_partial_results_display(self, qt_app, app_config):
         """Test display of partial results when some operations fail"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
-        window = PropertySearchApp(app_config)
+        window = EnhancedPropertySearchApp(app_config)
         window.show()
         qt_app.processEvents()
         
@@ -422,7 +422,7 @@ class TestSystemRecoveryPatterns:
     
     def test_automatic_retry_with_backoff(self, app_config):
         """Test automatic retry with exponential backoff"""
-        from api_client import MockMaricopaAPIClient
+        from src.api_client import MockMaricopaAPIClient
         
         client = MockMaricopaAPIClient(app_config)
         
@@ -483,8 +483,8 @@ class TestSystemRecoveryPatterns:
             
     def test_resource_cleanup_on_failure(self, app_config):
         """Test that resources are properly cleaned up when operations fail"""
-        from database_manager import DatabaseManager
-        from api_client import MockMaricopaAPIClient
+        from src.database_manager import DatabaseManager
+        from src.api_client import MockMaricopaAPIClient
         
         db = DatabaseManager(app_config)
         client = MockMaricopaAPIClient(app_config)

@@ -16,8 +16,8 @@ from datetime import datetime, timedelta
 import time
 import traceback
 
-from database_manager import DatabaseManager
-from logging_config import get_logger
+from src.database_manager import DatabaseManager
+from src.logging_config import get_logger
 
 logger = get_logger(__name__)
 

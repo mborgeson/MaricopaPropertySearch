@@ -26,11 +26,11 @@ if platform.system() == 'Windows':
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
 # Import configuration and logging
-from config_manager import ConfigManager
-from logging_config import setup_logging, get_logger, log_exception
-from database_manager import DatabaseManager
-from api_client import MaricopaAPIClient
-from web_scraper import WebScraperManager
+from src.config_manager import ConfigManager
+from src.logging_config import setup_logging, get_logger, log_exception
+from src.database_manager import DatabaseManager
+from src.api_client import MaricopaAPIClient
+from src.web_scraper import WebScraperManager
 from gui.main_window import PropertySearchApp
 
 # [Rest of the application code from earlier...]

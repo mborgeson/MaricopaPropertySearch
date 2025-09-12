@@ -40,8 +40,13 @@ class SearchCache:
         cache_json = json.dumps(cache_data, sort_keys=True)
         return hashlib.md5(cache_json.encode()).hexdigest()
     
-    def get(self, search_type: str, search_term: str, filters: Dict = None) -> Optional[List[Dict]]:
+    def get(self, search_type: str, search_term: str, filters: Dict = None, force_fresh: bool = False) -> Optional[List[Dict]]:
         """Get cached search results"""
+        # Return None immediately if force_fresh is requested
+        if force_fresh:
+            logger.debug(f"Force fresh mode - skipping cache lookup for {search_type}: {search_term}")
+            return None
+            
         key = self._generate_key(search_type, search_term, filters)
         
         with self.lock:

@@ -9,7 +9,7 @@ import asyncio
 import time
 import logging
 from unittest.mock import Mock, patch, MagicMock
-from PyQt5.QtWidgets import QApplication
+from PyQt5.QtWidgets import QApplication, QPushButton, QLabel, QTableWidget
 from PyQt5.QtTest import QTest
 from PyQt5.QtCore import Qt, QTimer
 
@@ -19,7 +19,7 @@ from conftest import app_instance, db_manager, mock_api_client, test_config
 # Import application modules
 from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 from src.database_manager import DatabaseManager
-from src.background_data_collector import BackgroundDataCollectionManager
+from src.background_data_collector import BackgroundDataCollectionManager, JobPriority
 from src.automatic_data_collector import MaricopaDataCollector
 
 logger = logging.getLogger(__name__)

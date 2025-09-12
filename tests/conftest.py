@@ -23,7 +23,7 @@ MOCK_API_RESPONSES = PROJECT_ROOT / "tests" / "fixtures" / "mock_api_responses.j
 @pytest.fixture(scope="session")
 def app_config():
     """Provide test configuration manager"""
-    from config_manager import ConfigManager
+    from src.config_manager import ConfigManager
     
     # Create test config
     config = ConfigManager()
@@ -43,7 +43,7 @@ def app_config():
 @pytest.fixture(scope="session")
 def test_database(app_config):
     """Set up test database with sample data"""
-    from database_manager import DatabaseManager
+    from src.database_manager import DatabaseManager
     
     db = DatabaseManager(app_config)
     
@@ -76,7 +76,7 @@ def test_database(app_config):
 @pytest.fixture
 def mock_api_client(app_config):
     """Provide mock API client with predictable responses"""
-    from api_client import MockMaricopaAPIClient
+    from src.api_client import MockMaricopaAPIClient
     
     client = MockMaricopaAPIClient(app_config)
     yield client
@@ -85,7 +85,7 @@ def mock_api_client(app_config):
 @pytest.fixture
 def mock_web_scraper(app_config):
     """Provide mock web scraper for testing"""
-    from web_scraper import MockWebScraperManager
+    from src.web_scraper import MockWebScraperManager
     
     scraper = MockWebScraperManager(app_config)
     yield scraper

@@ -15,9 +15,9 @@ class TestProfessionalAppearance:
     
     def test_application_startup_appearance(self, qt_app, app_config):
         """Test that application appears professional on startup"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
-        window = PropertySearchApp(app_config)
+        window = EnhancedPropertySearchApp(app_config)
         
         # Verify window properties
         assert window.windowTitle() == "Maricopa Property Search"
@@ -44,9 +44,9 @@ class TestProfessionalAppearance:
         
     def test_search_interface_clarity(self, qt_app, app_config):
         """Test that search interface is clear and intuitive"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
-        window = PropertySearchApp(app_config)
+        window = EnhancedPropertySearchApp(app_config)
         window.show()
         qt_app.processEvents()
         
@@ -70,9 +70,9 @@ class TestProfessionalAppearance:
         
     def test_loading_states_professional(self, qt_app, app_config, performance_timer):
         """Test that loading states appear professional and informative"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
-        window = PropertySearchApp(app_config)
+        window = EnhancedPropertySearchApp(app_config)
         window.show()
         qt_app.processEvents()
         
@@ -116,9 +116,9 @@ class TestUserWorkflowExperience:
     
     def test_new_user_first_search_experience(self, qt_app, app_config, test_database):
         """Test the experience for a new user performing their first search"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
-        window = PropertySearchApp(app_config)
+        window = EnhancedPropertySearchApp(app_config)
         window.show()
         qt_app.processEvents()
         
@@ -175,9 +175,9 @@ class TestUserWorkflowExperience:
         
     def test_power_user_rapid_search_experience(self, qt_app, app_config, test_database):
         """Test experience for power users doing rapid sequential searches"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
-        window = PropertySearchApp(app_config)
+        window = EnhancedPropertySearchApp(app_config)
         window.show()
         qt_app.processEvents()
         
@@ -232,9 +232,9 @@ class TestUserWorkflowExperience:
         
     def test_error_recovery_user_experience(self, qt_app, app_config, network_simulator):
         """Test user experience during error conditions"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
-        window = PropertySearchApp(app_config)
+        window = EnhancedPropertySearchApp(app_config)
         window.show()
         qt_app.processEvents()
         
@@ -266,9 +266,9 @@ class TestDataDisplayExperience:
     
     def test_search_results_presentation(self, qt_app, app_config, sample_search_results):
         """Test that search results are presented clearly and professionally"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
-        window = PropertySearchApp(app_config)
+        window = EnhancedPropertySearchApp(app_config)
         window.show()
         qt_app.processEvents()
         
@@ -303,9 +303,9 @@ class TestDataDisplayExperience:
         
     def test_property_details_display(self, qt_app, app_config, sample_property_data):
         """Test detailed property information display"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
-        window = PropertySearchApp(app_config)
+        window = EnhancedPropertySearchApp(app_config)
         window.show()
         qt_app.processEvents()
         
@@ -327,9 +327,9 @@ class TestDataDisplayExperience:
         
     def test_background_enhancement_indication(self, qt_app, app_config):
         """Test that background data enhancement is indicated to user"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
-        window = PropertySearchApp(app_config)
+        window = EnhancedPropertySearchApp(app_config)
         window.show()
         qt_app.processEvents()
         
@@ -360,9 +360,9 @@ class TestResponsivenessExperience:
     
     def test_ui_never_freezes_during_search(self, qt_app, app_config):
         """Test that UI remains responsive during search operations"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
-        window = PropertySearchApp(app_config)
+        window = EnhancedPropertySearchApp(app_config)
         window.show()
         qt_app.processEvents()
         
@@ -403,9 +403,9 @@ class TestResponsivenessExperience:
         
     def test_large_result_set_display_performance(self, qt_app, app_config):
         """Test that large result sets don't freeze the UI"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
-        window = PropertySearchApp(app_config)
+        window = EnhancedPropertySearchApp(app_config)
         window.show()
         qt_app.processEvents()
         

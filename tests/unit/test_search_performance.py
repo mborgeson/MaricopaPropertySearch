@@ -146,9 +146,9 @@ class TestUIResponsiveness:
     
     def test_search_button_response_time(self, qt_app, app_config, performance_timer):
         """Test that UI responds to search button click within 100ms"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
-        window = PropertySearchApp(app_config)
+        window = EnhancedPropertySearchApp(app_config)
         
         # Mock the actual search to focus on UI response
         with patch.object(window, '_perform_search') as mock_search:
@@ -166,9 +166,9 @@ class TestUIResponsiveness:
         
     def test_search_type_change_responsiveness(self, qt_app, app_config, performance_timer):
         """Test that search type dropdown changes are responsive"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
-        window = PropertySearchApp(app_config)
+        window = EnhancedPropertySearchApp(app_config)
         
         performance_timer.start()
         
@@ -183,9 +183,9 @@ class TestUIResponsiveness:
         
     def test_results_table_population_speed(self, qt_app, app_config, sample_search_results, performance_timer):
         """Test that results table populates quickly"""
-        from gui.main_window import PropertySearchApp
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         
-        window = PropertySearchApp(app_config)
+        window = EnhancedPropertySearchApp(app_config)
         
         performance_timer.start()
         
@@ -226,7 +226,7 @@ class TestBackgroundProcessing:
         
     def test_api_enhancement_timeout(self, app_config, performance_timer):
         """Test that API enhancement respects timeout limits"""
-        from api_client import MockMaricopaAPIClient
+        from src.api_client import MockMaricopaAPIClient
         
         client = MockMaricopaAPIClient(app_config)
         

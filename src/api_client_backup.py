@@ -10,7 +10,7 @@ from urllib.parse import urljoin
 import json
 
 # Import centralized logging
-from logging_config import get_logger, get_performance_logger, get_api_logger, log_exception
+from src.logging_config import get_logger, get_performance_logger, get_api_logger, log_exception
 
 logger = get_logger(__name__)
 perf_logger = get_performance_logger(__name__)

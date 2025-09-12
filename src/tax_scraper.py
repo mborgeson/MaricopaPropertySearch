@@ -5,7 +5,7 @@ Maricopa County Treasurer Tax Data Scraper
 
 import re
 from typing import Dict, List, Optional, Any
-from logging_config import get_logger
+from src.logging_config import get_logger
 
 logger = get_logger(__name__)
 
@@ -38,14 +38,51 @@ class MaricopaTaxScraper:
                 logger.error(f"Could not parse APN format: {apn}")
                 return None
             
-            # Fill in parcel number segments
-            playwright_page.get_by_role('textbox', {'name': 'Parcel Number Parcel/Account'}).fill(apn_parts[0])
-            playwright_page.locator('#taxPayerParcelInput #txtParcelNumMap').fill(apn_parts[1])  
-            playwright_page.locator('#taxPayerParcelInput #txtParcelNumItem').fill(apn_parts[2])
-            playwright_page.locator('#taxPayerParcelInput #txtParcelNumSplit').fill(apn_parts[3])
+            # Fill in parcel number segments with error handling
+            try:
+                # Try the standard approach first
+                playwright_page.get_by_role('textbox', name='Parcel Number Parcel/Account').fill(apn_parts[0])
+            except:
+                # Fallback to locator approach
+                try:
+                    playwright_page.locator('input[name*="Parcel"], input[id*="Parcel"]').first.fill(apn_parts[0])
+                except:
+                    logger.warning(f"Could not fill first parcel segment for APN {apn}")
             
-            # Click search
-            playwright_page.get_by_text('Search', {'exact': True}).click()
+            # Fill remaining segments
+            segments = [
+                ('#taxPayerParcelInput #txtParcelNumMap', apn_parts[1]),
+                ('#taxPayerParcelInput #txtParcelNumItem', apn_parts[2]), 
+                ('#taxPayerParcelInput #txtParcelNumSplit', apn_parts[3])
+            ]
+            
+            for selector, value in segments:
+                try:
+                    playwright_page.locator(selector).fill(value)
+                except Exception as e:
+                    logger.debug(f"Could not fill segment {selector} with {value}: {e}")
+            
+            # Click search with fallback options
+            search_clicked = False
+            search_options = [
+                lambda: playwright_page.get_by_text('Search', exact=True).click(),
+                lambda: playwright_page.get_by_text('Search').click(),
+                lambda: playwright_page.locator('input[type="submit"]').click(),
+                lambda: playwright_page.locator('button[type="submit"]').click(),
+                lambda: playwright_page.locator('#btnSearch').click()
+            ]
+            
+            for search_method in search_options:
+                try:
+                    search_method()
+                    search_clicked = True
+                    break
+                except Exception as e:
+                    logger.debug(f"Search method failed: {e}")
+                    
+            if not search_clicked:
+                logger.error(f"Could not click search button for APN {apn}")
+                return None
             
             # Wait for results page to load
             playwright_page.wait_for_load_state('networkidle')

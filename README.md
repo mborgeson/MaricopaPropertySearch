@@ -26,7 +26,14 @@ A comprehensive property research application for Maricopa County, Arizona, feat
 - **Progress Visualization**: Real-time status updates and collection progress
 - **Error Recovery**: Intelligent retry mechanisms with clear user instructions
 
-### Recent Enhancements (December 2024)
+### Recent Enhancements (September 2024)
+
+#### Script Consolidation (September 2024)
+- **Consolidated Structure**: Reduced 68+ scripts to 12 authoritative scripts
+- **Single Application Launcher**: RUN_APPLICATION.py serves as the primary entry point
+- **Organized Script Directory**: Scripts organized by purpose (setup, testing, maintenance, development)
+- **Archive System**: Deprecated scripts moved to archive/ directory for reference
+- **Clear Workflow**: Simplified development and deployment processes
 
 #### Background Data Collection System
 - **Non-Blocking Architecture**: All data collection happens in background threads
@@ -81,14 +88,35 @@ A comprehensive property research application for Maricopa County, Arizona, feat
    # Create PostgreSQL database
    createdb maricopa_property_search
    
-   # Run initial schema setup (see INSTALLATION.md for details)
-   python scripts/setup_database.py
+   # Run initial schema setup
+   python scripts/setup_database_tables.py
    ```
 
 5. **Launch Application**
    ```bash
-   python launch_enhanced_app.py
+   python RUN_APPLICATION.py
    ```
+
+## How to Run
+
+### Primary Method (Recommended)
+```bash
+python RUN_APPLICATION.py
+```
+
+### Windows Users (Easiest)
+Simply double-click:
+```
+RUN_APPLICATION.bat
+```
+
+The application launcher will automatically:
+- ✅ Check all dependencies and environment setup
+- ✅ Verify database connection
+- ✅ Initialize comprehensive logging system
+- ✅ Launch the full-featured GUI application
+
+**Note**: Deprecated launch scripts (launch_app_fixed.py, launch_enhanced_app.py, etc.) have been consolidated into the single RUN_APPLICATION.py launcher as part of the September 2025 consolidation.
 
 ## Usage
 
@@ -313,12 +341,39 @@ python src/database_manager.py
 
 ## Architecture
 
+### Project Structure
+
+```
+MaricopaPropertySearch/
+├── src/                    # Core application modules
+│   ├── api_client.py       # API integration layer
+│   ├── database_manager.py # Database operations
+│   ├── property_gui.py     # Main GUI interface
+│   └── web_scraper.py      # Web automation
+├── scripts/                # Authoritative utility scripts
+│   ├── setup/              # Installation and setup scripts
+│   ├── testing/            # Integration and system tests
+│   ├── maintenance/        # Database and system maintenance
+│   └── development/        # Development utilities
+├── archive/                # Consolidated deprecated scripts
+├── config/                 # Configuration files
+├── logs/                   # Application logs
+└── RUN_APPLICATION.py      # Primary application launcher
+```
+
 ### High-Level Components
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    Enhanced Main Window                     │
+│                    RUN_APPLICATION.py                      │
+│              (Primary Application Launcher)                │
 ├─────────────────────────────────────────────────────────────┤
+│  Environment Check → Database Setup → GUI Launch          │
+└─────────────────────┬───────────────────────────────────────┘
+                      │
+┌─────────────────────┼───────────────────────────────────────┐
+│                Enhanced Main Window                         │
+├─────────────────────┼───────────────────────────────────────┤
 │  Search Interface → Results Table → Background Status      │
 └─────────────────────┬───────────────────────────────────────┘
                       │

@@ -19,8 +19,8 @@ import json
 from PyQt5.QtCore import QThread, pyqtSignal, QObject, QTimer
 from PyQt5.QtWidgets import QApplication
 
-from automatic_data_collector import MaricopaDataCollector
-from logging_config import get_logger
+from src.improved_automatic_data_collector import ImprovedMaricopaDataCollector
+from src.logging_config import get_logger
 
 logger = get_logger(__name__)
 
@@ -47,6 +47,7 @@ class DataCollectionJob:
     """Individual data collection job"""
     apn: str
     priority: JobPriority
+    force_fresh: bool = False
     created_at: datetime = field(default_factory=datetime.now)
     started_at: Optional[datetime] = None
     completed_at: Optional[datetime] = None
@@ -193,7 +194,7 @@ class BackgroundDataWorker(QThread):
         self.active_jobs = {}  # apn -> job
         self.should_stop = Event()
         self.executor = ThreadPoolExecutor(max_workers=max_concurrent_jobs)
-        self.data_collector = MaricopaDataCollector(db_manager)
+        self.data_collector = ImprovedMaricopaDataCollector(db_manager, api_client=None)  # Will be set later
         
         # Statistics and caching
         self.stats = DataCollectionStats()
@@ -205,34 +206,36 @@ class BackgroundDataWorker(QThread):
         
         logger.info(f"Background data worker initialized with {max_concurrent_jobs} concurrent jobs")
     
-    def add_job(self, apn: str, priority: JobPriority = JobPriority.NORMAL) -> bool:
+    def add_job(self, apn: str, priority: JobPriority = JobPriority.NORMAL, force_fresh: bool = False) -> bool:
         """Add a data collection job to the queue"""
         # Check if already in queue or actively being processed
         if apn in self.active_jobs:
             logger.debug(f"Job for APN {apn} already active, skipping")
             return False
         
-        # Check if recently cached
-        if self.cache.is_cached(apn):
+        # Skip cache check if force_fresh is enabled
+        if not force_fresh and self.cache.is_cached(apn):
             logger.debug(f"Data for APN {apn} is cached, skipping")
             self.stats.record_cache_hit()
             return False
+        elif force_fresh:
+            logger.info(f"Force fresh data collection requested for APN {apn}")
             
-        job = DataCollectionJob(apn=apn, priority=priority)
+        job = DataCollectionJob(apn=apn, priority=priority, force_fresh=force_fresh)
         self.job_queue.put(job)
         self.total_jobs_count += 1
         
-        logger.info(f"Added data collection job for APN {apn} with priority {priority.name}")
+        logger.info(f"Added data collection job for APN {apn} with priority {priority.name} (force_fresh: {force_fresh})")
         return True
     
-    def add_bulk_jobs(self, apns: List[str], priority: JobPriority = JobPriority.NORMAL) -> int:
+    def add_bulk_jobs(self, apns: List[str], priority: JobPriority = JobPriority.NORMAL, force_fresh: bool = False) -> int:
         """Add multiple jobs efficiently"""
         added_count = 0
         for apn in apns:
-            if self.add_job(apn, priority):
+            if self.add_job(apn, priority, force_fresh):
                 added_count += 1
         
-        logger.info(f"Added {added_count} bulk jobs out of {len(apns)} APNs")
+        logger.info(f"Added {added_count} bulk jobs out of {len(apns)} APNs (force_fresh: {force_fresh})")
         return added_count
     
     def run(self):
@@ -295,8 +298,12 @@ class BackgroundDataWorker(QThread):
             existing_tax = self.db_manager.get_tax_history(job.apn)
             existing_sales = self.db_manager.get_sales_history(job.apn)
             
+            # Check if this job was requested with force_fresh
+            force_fresh = job.force_fresh
+            
             # Determine if we need to collect data
             needs_collection = (
+                force_fresh or
                 len(existing_tax) == 0 or 
                 len(existing_sales) == 0 or
                 self._is_data_stale(existing_tax, existing_sales)
@@ -311,6 +318,8 @@ class BackgroundDataWorker(QThread):
                     'tax_records_count': len(existing_tax),
                     'sales_records_count': len(existing_sales)
                 }
+            elif force_fresh:
+                logger.info(f"Force fresh data collection for APN {job.apn} - ignoring existing data")
             
             # Perform actual data collection
             self.stats.record_cache_miss()
@@ -539,15 +548,15 @@ class BackgroundDataCollectionManager(QObject):
         logger.info(f"Smart enhancement: queued {len(apns_to_enhance)} of {len(search_results)} properties")
         return len(apns_to_enhance)
     
-    def collect_data_for_apn(self, apn: str, priority: JobPriority = JobPriority.CRITICAL) -> bool:
+    def collect_data_for_apn(self, apn: str, priority: JobPriority = JobPriority.CRITICAL, force_fresh: bool = False) -> bool:
         """Request immediate data collection for a specific APN"""
         if not self.worker or not self.worker.isRunning():
             logger.warning("Background worker not running")
             return False
         
-        return self.worker.add_job(apn, priority)
+        return self.worker.add_job(apn, priority, force_fresh)
     
-    def collect_batch_data(self, apns: List[str], priority: JobPriority = JobPriority.HIGH) -> Dict[str, Any]:
+    def collect_batch_data(self, apns: List[str], priority: JobPriority = JobPriority.HIGH, force_fresh: bool = False) -> Dict[str, Any]:
         """Request batch data collection for multiple APNs with comprehensive feedback"""
         if not self.worker or not self.worker.isRunning():
             logger.warning("Background worker not running for batch collection")
@@ -579,7 +588,7 @@ class BackgroundDataCollectionManager(QObject):
                 valid_apns.append(apn)
         
         # Add jobs in batch
-        jobs_added = self.worker.add_bulk_jobs(valid_apns, priority)
+        jobs_added = self.worker.add_bulk_jobs(valid_apns, priority, force_fresh)
         
         result = {
             'success': jobs_added > 0,
