@@ -31,7 +31,7 @@ from src.logging_config import setup_logging, get_logger, log_exception
 from src.database_manager import DatabaseManager
 from src.api_client import MaricopaAPIClient
 from src.web_scraper import WebScraperManager
-from gui.main_window import PropertySearchApp
+from gui.enhanced_main_window import EnhancedPropertySearchApp
 
 # [Rest of the application code from earlier...]
 
@@ -54,7 +54,7 @@ def main():
         logger.info("Initializing application components...")
         
         # Create main window
-        window = PropertySearchApp(config)
+        window = EnhancedPropertySearchApp(config)
         window.show()
         
         logger.info("Application window displayed successfully")

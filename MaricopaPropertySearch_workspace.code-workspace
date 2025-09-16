@@ -4,5 +4,21 @@
 			"path": "."
 		}
 	],
-	"settings": {}
+	"settings": {
+		"editor.suggest.shareSuggestSelections": true,
+		"launch": {
+
+			"configurations": [],
+			"compounds": []
+		},
+		"terminal.integrated.splitCwd": "workspaceRoot",
+		"terminal.integrated.accessibleViewFocusOnCommandExecution": false,
+		"terminal.integrated.automationProfile.linux": {
+
+		},
+		"terminal.integrated.automationProfile.windows": {
+
+		},
+		"terminal.integrated.defaultProfile.linux": ""
+	}
 }

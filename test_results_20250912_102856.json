@@ -1,0 +1,126 @@
+{
+  "test_timestamp": "2025-09-12T10:28:56.529137",
+  "test_apn": "501-38-034A",
+  "passed_tests": [
+    "Property Details",
+    "Tax Information",
+    "Comprehensive Property Info"
+  ],
+  "failed_tests": [
+    "Error Handling: Some invalid inputs produced unexpected results"
+  ],
+  "warnings": [
+    "API status unclear: {'status': 'Real API', 'version': '2.0', 'rate_limit': {'requests_per_minute': 60, 'remaining': 60}, 'endpoints': ['property', 'tax', 'sales'], 'message': 'Using real Maricopa County Assessor API'}",
+    "No sales history found"
+  ],
+  "detailed_results": {
+    "property_details": {
+      "apn": "501-38-034A",
+      "search_source": "detailed_endpoints_only",
+      "detailed_data": {
+        "sketches": {
+          "TotalPages": 0,
+          "Pages": []
+        },
+        "mapids": {
+          "Parcel Maps": [],
+          "Subdivision Maps": [],
+          "MCR Maps": [],
+          "S/T/R Maps": [],
+          "Book/Map Maps": [
+            {
+              "FileName": "803150100",
+              "UpdateDate": "02-DEC-08",
+              "Url": "https://mcassessor.maricopa.gov/getmapid/803150100/"
+            },
+            {
+              "FileName": "803150200",
+              "UpdateDate": "02-DEC-08",
+              "Url": "https://mcassessor.maricopa.gov/getmapid/803150200/"
+            },
+            {
+              "FileName": "803150300",
+              "UpdateDate": "23-JAN-25",
+              "Url": "https://mcassessor.maricopa.gov/getmapid/803150300/"
+            },
+            {
+              "FileName": "803150400",
+              "UpdateDate": "05-APR-23",
+              "Url": "https://mcassessor.maricopa.gov/getmapid/803150400/"
+            }
+          ]
+        }
+      },
+      "owner_name": null,
+      "property_address": null,
+      "mailing_address": null,
+      "legal_description": null,
+      "land_use_code": null,
+      "bedrooms": null,
+      "raw_data": "'{\"sketches\": {\"TotalPages\": 0, \"Pages\": []}, \"mapids\": {\"Parcel Maps\": [], \"Subdivision Maps\": [], \"MCR Maps\": [], \"S/T/R Maps\": [], \"Book/Map Maps\": [{\"FileName\": \"803150100\", \"UpdateDate\": \"02-DEC-08\", \"Url\": \"https://mcassessor.maricopa.gov/getmapid/803150100/\"}, {\"FileName\": \"803150200\", \"UpdateDate\": \"02-DEC-08\", \"Url\": \"https://mcassessor.maricopa.gov/getmapid/803150200/\"}, {\"FileName\": \"803150300\", \"UpdateDate\": \"23-JAN-25\", \"Url\": \"https://mcassessor.maricopa.gov/getmapid/803150300/\"}, {\"FileName\": \"803150400\", \"UpdateDate\": \"05-APR-23\", \"Url\": \"https://mcassessor.maricopa.gov/getmapid/803150400/\"}]}}'"
+    },
+    "tax_information": {
+      "apn": "501-38-034A",
+      "api_data": null,
+      "scraped_data": {
+        "owner_info": {},
+        "current_tax": {
+          "payment_status": "PAID"
+        },
+        "tax_history": [],
+        "scrape_source": "treasurer.maricopa.gov",
+        "apn": "501-38-034A"
+      },
+      "data_sources": [
+        "scraper"
+      ],
+      "timestamp": 1757698068.018983
+    },
+    "sales_history": [],
+    "comprehensive_info": {
+      "apn": "501-38-034A",
+      "search_source": "detailed_endpoints_only",
+      "detailed_data": {
+        "sketches": {
+          "TotalPages": 0,
+          "Pages": []
+        },
+        "mapids": {
+          "Parcel Maps": [],
+          "Subdivision Maps": [],
+          "MCR Maps": [],
+          "S/T/R Maps": [],
+          "Book/Map Maps": [
+            {
+              "FileName": "803150100",
+              "UpdateDate": "02-DEC-08",
+              "Url": "https://mcassessor.maricopa.gov/getmapid/803150100/"
+            },
+            {
+              "FileName": "803150200",
+              "UpdateDate": "02-DEC-08",
+              "Url": "https://mcassessor.maricopa.gov/getmapid/803150200/"
+            },
+            {
+              "FileName": "803150300",
+              "UpdateDate": "23-JAN-25",
+              "Url": "https://mcassessor.maricopa.gov/getmapid/803150300/"
+            },
+            {
+              "FileName": "803150400",
+              "UpdateDate": "05-APR-23",
+              "Url": "https://mcassessor.maricopa.gov/getmapid/803150400/"
+            }
+          ]
+        }
+      },
+      "owner_name": null,
+      "property_address": null,
+      "mailing_address": null,
+      "legal_description": null,
+      "land_use_code": null,
+      "bedrooms": null,
+      "raw_data": "'{\"sketches\": {\"TotalPages\": 0, \"Pages\": []}, \"mapids\": {\"Parcel Maps\": [], \"Subdivision Maps\": [], \"MCR Maps\": [], \"S/T/R Maps\": [], \"Book/Map Maps\": [{\"FileName\": \"803150100\", \"UpdateDate\": \"02-DEC-08\", \"Url\": \"https://mcassessor.maricopa.gov/getmapid/803150100/\"}, {\"FileName\": \"803150200\", \"UpdateDate\": \"02-DEC-08\", \"Url\": \"https://mcassessor.maricopa.gov/getmapid/803150200/\"}, {\"FileName\": \"803150300\", \"UpdateDate\": \"23-JAN-25\", \"Url\": \"https://mcassessor.maricopa.gov/getmapid/803150300/\"}, {\"FileName\": \"803150400\", \"UpdateDate\": \"05-APR-23\", \"Url\": \"https://mcassessor.maricopa.gov/getmapid/803150400/\"}]}}'"
+    }
+  }
+}
