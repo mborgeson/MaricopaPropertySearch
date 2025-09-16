@@ -56,3 +56,31 @@ class ConfigManager:
     def get_path(self, path_type):
         """Get configured paths"""
         return Path(self.config.get('paths', f'{path_type}_dir'))
+
+    def get_database_enabled(self):
+        """Check if database is enabled in configuration"""
+        try:
+            return self.config.getboolean('database', 'enabled')
+        except:
+            return True  # Default to enabled if not specified
+
+    def get_api_client_type(self):
+        """Get the API client type from configuration"""
+        try:
+            return self.config.get('api', 'client_type')
+        except:
+            return 'real'  # Default to real client
+
+    def get_web_scraper_type(self):
+        """Get the web scraper type from configuration"""
+        try:
+            return self.config.get('scraping', 'type')
+        except:
+            return 'real'  # Default to real scraper
+
+    def get_logging_enabled(self):
+        """Check if logging is enabled in configuration"""
+        try:
+            return self.config.getboolean('logging', 'enabled')
+        except:
+            return True  # Default to enabled if not specified

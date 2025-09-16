@@ -18456,3 +18456,5 @@ TypeError: DatabaseManager.__init__() missing 1 required positional argument: 'c
 2025-09-12 11:47:15 - src.parallel_web_scraper - ERROR - Scraping request failed: tax_information_Addresses: 1811 E APACHE BLVD, 4317 E CALLE FELIZ, 550 E EARLL DRIVE, 10000 W MISSOURI AVE_1757702814 after 15.20s - Could not acquire browser within 15.0 seconds
 2025-09-15 23:56:24 - src.parallel_web_scraper - ERROR - Failed to create browser: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
 
+2025-09-16 00:47:10 - src.parallel_web_scraper - ERROR - Failed to create browser: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+

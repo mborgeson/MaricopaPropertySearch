@@ -1347,6 +1347,7 @@ class EnhancedPropertySearchApp(QMainWindow):
         # Search button
         self.search_btn = QPushButton("Search")
         self.search_btn.setDefault(True)
+        self.search_button = self.search_btn  # Alias for compatibility
         search_layout.addWidget(self.search_btn, 1, 3)
         
         # Progress bar
