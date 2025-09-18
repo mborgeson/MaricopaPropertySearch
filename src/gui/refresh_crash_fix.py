@@ -228,7 +228,7 @@ APPLY THIS FIX TO enhanced_main_window.py:
 3. Ensure proper imports at the top of the file:
    - from PyQt5.QtWidgets import QProgressDialog, QMessageBox
    - from PyQt5.QtCore import Qt
-   - from src.background_data_collector import JobPriority
+   - from background_data_collector import JobPriority
 
 These changes will prevent:
 - Null reference exceptions

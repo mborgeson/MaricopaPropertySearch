@@ -29,7 +29,7 @@ from optimized_database_manager import OptimizedDatabaseManager, SearchFilters
 from src.optimized_search_worker import OptimizedSearchWorker, SearchWorkerPool
 from src.search_validator import SearchValidator, SearchType, ValidationResult
 from src.search_cache import SearchCache, SearchHistory
-from src.api_client import MaricopaAPIClient, MockMaricopaAPIClient
+# MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient, MockMaricopaAPIClient
 from src.web_scraper import WebScraperManager, MockWebScraperManager
 
 logger = logging.getLogger(__name__)
@@ -1173,6 +1173,7 @@ class OptimizedPropertySearchApp(QMainWindow):
             
             # Import the original PropertyDetailsDialog
             from gui.main_window import PropertyDetailsDialog
+from src.api_client_unified import UnifiedMaricopaAPIClient
             dialog = PropertyDetailsDialog(property_data, self.db_manager, self)
             dialog.exec_()
     

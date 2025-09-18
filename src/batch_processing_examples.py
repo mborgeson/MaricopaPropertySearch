@@ -16,19 +16,22 @@ PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from src.config_manager import ConfigManager
-from src.database_manager import DatabaseManager
-from src.api_client import MaricopaAPIClient
-from src.batch_processing_manager import (
+# MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+# MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+from batch_processing_manager import (
     BatchProcessingManager, 
     BatchProcessingJobType, 
     ProcessingMode,
     BatchPriority
 )
-from src.batch_search_engine import BatchSearchEngine, SearchMode
-from src.batch_api_client import BatchAPIClient
-from src.parallel_web_scraper import ParallelWebScraperManager, ScrapingTask, ScrapingRequest
-from src.logging_config import setup_logging, get_logger
+from batch_search_engine import BatchSearchEngine, SearchMode
+# MIGRATED: from batch_api_client import BatchAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+from parallel_web_scraper import ParallelWebScraperManager, ScrapingTask, ScrapingRequest
+from logging_config import setup_logging, get_logger
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.enhanced_config_manager import EnhancedConfigManager
 
 logger = get_logger(__name__)
 
@@ -39,12 +42,12 @@ class BatchProcessingExamples:
     def __init__(self):
         """Initialize with configuration and components"""
         # Load configuration
-        self.config = ConfigManager()
+        self.config = EnhancedConfigManager()
         setup_logging(self.config)
         
         # Initialize core components
-        self.db_manager = DatabaseManager(self.config)
-        self.api_client = MaricopaAPIClient(self.config)
+        self.db_manager = ThreadSafeDatabaseManager(self.config)
+        self.api_client = UnifiedMaricopaAPIClient(self.config)
         
         # Initialize batch processing manager
         self.batch_manager = BatchProcessingManager(

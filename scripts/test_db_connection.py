@@ -13,8 +13,9 @@ PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySea
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 try:
-    from config_manager import ConfigManager
-    config = ConfigManager()
+    # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+from src.enhanced_config_manager import EnhancedConfigManager
+    config = EnhancedConfigManager()
     db_config = config.get_db_config()
     
     print("Testing PostgreSQL connection...")

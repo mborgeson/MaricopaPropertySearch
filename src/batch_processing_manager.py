@@ -19,11 +19,11 @@ import uuid
 
 from PyQt5.QtCore import QThread, pyqtSignal, QObject, QTimer
 
-from src.batch_search_engine import BatchSearchEngine, SearchMode, BatchPriority
-from src.batch_api_client import BatchAPIClient
-from src.parallel_web_scraper import ParallelWebScraperManager, ScrapingTask, ScrapingRequest
-from src.background_data_collector import BackgroundDataCollectionManager
-from src.logging_config import get_logger
+from batch_search_engine import BatchSearchEngine, SearchMode, BatchPriority
+# MIGRATED: from batch_api_client import BatchAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+from parallel_web_scraper import ParallelWebScraperManager, ScrapingTask, ScrapingRequest
+from background_data_collector import BackgroundDataCollectionManager
+from logging_config import get_logger
 
 logger = get_logger(__name__)
 
@@ -103,7 +103,7 @@ class BatchProcessingManager:
             max_concurrent_per_job=5
         )
         
-        self.batch_api_client = BatchAPIClient(
+        self.batch_api_client = UnifiedMaricopaAPIClient(
             base_api_client=api_client,
             max_concurrent_requests=10,
             enable_connection_pooling=True,
@@ -555,7 +555,8 @@ class BatchProcessingManager:
         for identifier in job.identifiers:
             if job.search_type == 'apn':
                 # For APNs, use search_by_apn to validate
-                from src.batch_api_client import BatchAPIRequest
+                # MIGRATED: from batch_api_client import BatchAPIRequest  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.api_client_unified import UnifiedMaricopaAPIClient
                 request = BatchAPIRequest(
                     request_id=f"validate_{identifier}",
                     request_type='search_by_apn',

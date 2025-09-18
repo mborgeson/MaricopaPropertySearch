@@ -13,8 +13,10 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 import requests
 import json
-from config_manager import ConfigManager
-from api_client import MaricopaAPIClient
+# MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.enhanced_config_manager import EnhancedConfigManager
 
 def test_api_with_token():
     """Test the API using our configured token"""
@@ -22,7 +24,7 @@ def test_api_with_token():
     print("=" * 60)
     
     # Load configuration
-    config = ConfigManager()
+    config = EnhancedConfigManager()
     api_config = config.get_api_config()
     
     print(f"Base URL: {api_config['base_url']}")
@@ -110,7 +112,7 @@ def test_api_with_token():
     print("-" * 40)
     
     try:
-        client = MaricopaAPIClient(config)
+        client = UnifiedMaricopaAPIClient(config)
         
         # Test API status
         print("Testing get_api_status()...")

@@ -499,7 +499,7 @@ class PropertySearchApp:
         self.root.title("Maricopa County Property Search Tool - Ultimate Edition")
         self.root.geometry("1200x800")
         
-        self.api = MaricopaAssessorAPI()
+        self.api = UnifiedMaricopaAPIClient()
         
         self.current_property: Optional[PropertyInfo] = None
         self.current_apn: Optional[str] = None

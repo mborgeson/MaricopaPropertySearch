@@ -23,9 +23,9 @@ from pathlib import Path
 from PyQt5.QtCore import QThread, pyqtSignal, QObject, QTimer
 from PyQt5.QtWidgets import QMessageBox, QFileDialog
 
-from src.batch_search_engine import BatchSearchEngine, SearchMode, BatchPriority
-from src.batch_processing_manager import BatchProcessingManager, ProcessingMode, BatchProcessingJobType
-from src.logging_config import get_logger, get_performance_logger
+from batch_search_engine import BatchSearchEngine, SearchMode, BatchPriority
+from batch_processing_manager import BatchProcessingManager, ProcessingMode, BatchProcessingJobType
+from logging_config import get_logger, get_performance_logger
 
 logger = get_logger(__name__)
 perf_logger = get_performance_logger(__name__)

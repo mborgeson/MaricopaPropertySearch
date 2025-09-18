@@ -17,13 +17,13 @@ def test_imports():
     print("Testing module imports...")
     
     try:
-        from config_manager import ConfigManager
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         print("✓ ConfigManager imported")
         
-        from database_manager import DatabaseManager  
+        # MIGRATED: # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  
         print("✓ DatabaseManager imported")
         
-        from api_client import MaricopaAPIClient, MockMaricopaAPIClient
+        # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient, MockMaricopaAPIClient
         print("✓ API clients imported")
         
         from web_scraper import WebScraperManager, MockWebScraperManager
@@ -42,8 +42,8 @@ def test_configuration():
     print("\nTesting configuration...")
     
     try:
-        from config_manager import ConfigManager
-        config = ConfigManager()
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+        config = EnhancedConfigManager()
         
         db_config = config.get_db_config()
         print(f"✓ Database config loaded: {db_config['host']}:{db_config['port']}")
@@ -61,11 +61,11 @@ def test_database():
     print("\nTesting database...")
     
     try:
-        from config_manager import ConfigManager
-        from database_manager import DatabaseManager
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+        # MIGRATED: # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
         
-        config = ConfigManager()
-        db = DatabaseManager(config)
+        config = EnhancedConfigManager()
+        db = ThreadSafeDatabaseManager(config)
         
         if db.test_connection():
             print("✓ Database connection successful")
@@ -103,11 +103,11 @@ def test_mock_clients():
     print("\nTesting mock clients...")
     
     try:
-        from config_manager import ConfigManager
-        from api_client import MockMaricopaAPIClient
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+        # MIGRATED: from api_client import MockMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
         from web_scraper import MockWebScraperManager
         
-        config = ConfigManager()
+        config = EnhancedConfigManager()
         
         # Test mock API client
         api_client = MockMaricopaAPIClient(config)
@@ -142,10 +142,13 @@ def test_gui_creation():
         else:
             app_created = False
         
-        from config_manager import ConfigManager
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         from gui.main_window import PropertySearchApp
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.enhanced_config_manager import EnhancedConfigManager
         
-        config = ConfigManager()
+        config = EnhancedConfigManager()
         
         # Create main window (but don't show it)
         window = PropertySearchApp(config)

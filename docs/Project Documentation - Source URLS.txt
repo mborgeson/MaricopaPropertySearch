@@ -1,0 +1,29 @@
+a.	Maricopa County Assessor API:
+i.	https://mcassessor.maricopa.gov/file/home/MC-Assessor-API-Documentation.pdf
+ii.	https://github.com/request/request
+iii.	https://curl.se/libcurl/c/CURLOPT_HTTPHEADER.html
+
+
+b.	Maricopa County Assessor (Parcel/Address Search):
+i.	https://mcassessor.maricopa.gov/
+ii.	https://mcassessor.maricopa.gov/mcs/?q=20053822&mod=pd#owner
+iii.	https://mcassessor.maricopa.gov/mcs/?q=20053822&mod=pd#valuation
+iv.	https://mcassessor.maricopa.gov/mcs/?q=20053822&mod=pd#addinfo
+
+
+c.	Maricopa County Treasurer (Property Tax):
+i.	https://treasurer.maricopa.gov/Parcel/Summary.aspx
+ii.	https://treasurer.maricopa.gov/Parcel/Summary.aspx?List=All
+iii.	https://treasurer.maricopa.gov/Parcel/Activities.aspx
+iv.	https://treasurer.maricopa.gov/Parcel/Valuations.aspx
+v.	https://treasurer.maricopa.gov/Parcel/DetailedTaxStatement.aspx
+
+
+d.	Maricopa County Recorder (Documents):
+i.	https://recorder.maricopa.gov/recording/document-search.html#tab-research
+ii.	https://recorder.maricopa.gov/recording/document-search.html#tab-map-search
+iii.	https://recorder.maricopa.gov/recording/document-search.html#tab-doc-search
+iv.	https://recorder.maricopa.gov/recording/document-search.html
+v.	https://recorder.maricopa.gov/recording/new-document-codes.html
+vi.	https://recorder.maricopa.gov/information/faqs.html
+vii.	https://recorder.maricopa.gov/

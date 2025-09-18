@@ -51,11 +51,11 @@ def test_database_connectivity():
     print("\n=== Testing Database Connectivity ===")
     
     try:
-        from config_manager import ConfigManager
-        from database_manager import DatabaseManager
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+        # MIGRATED: # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
         
-        config = ConfigManager()
-        db = DatabaseManager(config)
+        config = EnhancedConfigManager()
+        db = ThreadSafeDatabaseManager(config)
         
         # Test connection
         if db.test_connection():
@@ -80,11 +80,11 @@ def test_real_api_client():
     print("\n=== Testing Real API Client ===")
     
     try:
-        from config_manager import ConfigManager
-        from api_client import MaricopaAPIClient
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+        # MIGRATED: # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
         
-        config = ConfigManager()
-        api_client = MaricopaAPIClient(config)
+        config = EnhancedConfigManager()
+        api_client = UnifiedMaricopaAPIClient(config)
         
         # Test API status
         status = api_client.get_api_status()
@@ -114,10 +114,10 @@ def test_web_scraper():
     print("\n=== Testing Real Web Scraper ===")
     
     try:
-        from config_manager import ConfigManager
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         from web_scraper import WebScraperManager
         
-        config = ConfigManager()
+        config = EnhancedConfigManager()
         
         # Note: This will likely fail without Chrome driver setup
         # But we can test the initialization
@@ -188,10 +188,10 @@ def test_gui_components():
         else:
             app_created = False
         
-        from config_manager import ConfigManager
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         from gui.main_window import PropertySearchApp
         
-        config = ConfigManager()
+        config = EnhancedConfigManager()
         
         # Create main window (but don't show it)
         window = PropertySearchApp(config)
@@ -219,12 +219,15 @@ def test_complete_search_flow():
     print("\n=== Testing Complete Search Flow ===")
     
     try:
-        from config_manager import ConfigManager
-        from database_manager import DatabaseManager
-        from api_client import MaricopaAPIClient
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+        # MIGRATED: # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+        # MIGRATED: # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.enhanced_config_manager import EnhancedConfigManager
         
-        config = ConfigManager()
-        db_manager = DatabaseManager(config)
+        config = EnhancedConfigManager()
+        db_manager = ThreadSafeDatabaseManager(config)
         
         # Test database search first
         results = db_manager.search_properties_by_owner("test", limit=1)
@@ -232,7 +235,7 @@ def test_complete_search_flow():
         
         # Test with real API client (may fail if not configured)
         try:
-            api_client = MaricopaAPIClient(config)
+            api_client = UnifiedMaricopaAPIClient(config)
             api_results = api_client.search_by_owner("Smith", limit=1)
             print(f"✓ API search: PASSED - Found {len(api_results)} results")
             api_client.close()

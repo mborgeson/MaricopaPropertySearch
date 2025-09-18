@@ -23,10 +23,10 @@ MOCK_API_RESPONSES = PROJECT_ROOT / "tests" / "fixtures" / "mock_api_responses.j
 @pytest.fixture(scope="session")
 def app_config():
     """Provide test configuration manager"""
-    from src.config_manager import ConfigManager
+    # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
     
     # Create test config
-    config = ConfigManager()
+    config = EnhancedConfigManager()
     
     # Override with test values using correct ConfigParser interface
     config.config.set('database', 'database', 'maricopa_test')
@@ -43,9 +43,9 @@ def app_config():
 @pytest.fixture(scope="session")
 def test_database(app_config):
     """Set up test database with sample data"""
-    from src.database_manager import DatabaseManager
+    # MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
     
-    db = DatabaseManager(app_config)
+    db = ThreadSafeDatabaseManager(app_config)
     
     # Ensure test database exists and is clean
     try:
@@ -76,7 +76,7 @@ def test_database(app_config):
 @pytest.fixture
 def mock_api_client(app_config):
     """Provide mock API client with predictable responses"""
-    from src.api_client import MockMaricopaAPIClient
+    # MIGRATED: from src.api_client import MockMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
     
     client = MockMaricopaAPIClient(app_config)
     yield client
@@ -333,6 +333,9 @@ def network_simulator():
             def mock_request(*args, **kwargs):
                 import time
                 import random
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.enhanced_config_manager import EnhancedConfigManager
                 
                 # Simulate delay
                 if condition['delay'] > 0:

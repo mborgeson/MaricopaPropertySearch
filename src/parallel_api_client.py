@@ -19,7 +19,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
 from functools import lru_cache
 from dataclasses import dataclass
-from src.logging_config import get_api_logger
+from logging_config import get_api_logger
 
 logger = logging.getLogger(__name__)
 api_logger = get_api_logger(__name__)

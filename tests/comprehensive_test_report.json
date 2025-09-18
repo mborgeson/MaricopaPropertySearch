@@ -1,0 +1,230 @@
+{
+  "timestamp": "2025-09-16T08:14:03.036928",
+  "total_tests": 30,
+  "passed_tests": 26,
+  "failed_tests": 4,
+  "test_details": [
+    {
+      "test_name": "Python Version",
+      "status": "PASS",
+      "message": "Python 3.10.18 | packaged by conda-forge | (main, Jun  4 2025, 14:42:04) [MSC v.1943 64 bit (AMD64)]",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.036928"
+    },
+    {
+      "test_name": "Directory src",
+      "status": "PASS",
+      "message": "Found at C:\\Users\\MattBorgeson\\Development\\Work\\MaricopaPropertySearch\\src",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.036928"
+    },
+    {
+      "test_name": "Directory config",
+      "status": "PASS",
+      "message": "Found at C:\\Users\\MattBorgeson\\Development\\Work\\MaricopaPropertySearch\\config",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.036928"
+    },
+    {
+      "test_name": "Directory logs",
+      "status": "PASS",
+      "message": "Found at C:\\Users\\MattBorgeson\\Development\\Work\\MaricopaPropertySearch\\logs",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.036928"
+    },
+    {
+      "test_name": "Directory exports",
+      "status": "PASS",
+      "message": "Found at C:\\Users\\MattBorgeson\\Development\\Work\\MaricopaPropertySearch\\exports",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.036928"
+    },
+    {
+      "test_name": "File RUN_APPLICATION.py",
+      "status": "PASS",
+      "message": "Found",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.036928"
+    },
+    {
+      "test_name": "File config/config.ini",
+      "status": "PASS",
+      "message": "Found",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.036928"
+    },
+    {
+      "test_name": "File src/config_manager.py",
+      "status": "PASS",
+      "message": "Found",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.036928"
+    },
+    {
+      "test_name": "File src/database_manager.py",
+      "status": "PASS",
+      "message": "Found",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.036928"
+    },
+    {
+      "test_name": "File src/gui/enhanced_main_window.py",
+      "status": "PASS",
+      "message": "Found",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.036928"
+    },
+    {
+      "test_name": "Config Loading",
+      "status": "PASS",
+      "message": "Configuration loaded successfully",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.089979"
+    },
+    {
+      "test_name": "Database Config",
+      "status": "PASS",
+      "message": "Database section found",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.089979"
+    },
+    {
+      "test_name": "DB Config host",
+      "status": "PASS",
+      "message": "Found",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.089979"
+    },
+    {
+      "test_name": "DB Config port",
+      "status": "PASS",
+      "message": "Found",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.089979"
+    },
+    {
+      "test_name": "DB Config database",
+      "status": "PASS",
+      "message": "Found",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.089979"
+    },
+    {
+      "test_name": "DB Config user",
+      "status": "PASS",
+      "message": "Found",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.089979"
+    },
+    {
+      "test_name": "DB Config password",
+      "status": "PASS",
+      "message": "Found",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.089979"
+    },
+    {
+      "test_name": "Database Manager",
+      "status": "FAIL",
+      "message": "Error: DatabaseManager.__init__() missing 1 required positional argument: 'config_manager'",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.168143"
+    },
+    {
+      "test_name": "API Client",
+      "status": "FAIL",
+      "message": "Error: cannot import name 'APIClient' from 'api_client' (C:\\Users\\MattBorgeson\\Development\\Work\\MaricopaPropertySearch\\tests\\..\\src\\api_client.py)",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.429483"
+    },
+    {
+      "test_name": "Background Collector",
+      "status": "FAIL",
+      "message": "Error: cannot import name 'BackgroundDataCollector' from 'background_data_collector' (C:\\Users\\MattBorgeson\\Development\\Work\\MaricopaPropertySearch\\tests\\..\\src\\background_data_collector.py)",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.491871"
+    },
+    {
+      "test_name": "PyQt5 Import",
+      "status": "PASS",
+      "message": "PyQt5 available",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.491871"
+    },
+    {
+      "test_name": "Main Window Import",
+      "status": "PASS",
+      "message": "EnhancedMainWindow imported",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.896722"
+    },
+    {
+      "test_name": "Logging Setup",
+      "status": "PASS",
+      "message": "Logging configured successfully",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.896722"
+    },
+    {
+      "test_name": "Log Directory",
+      "status": "PASS",
+      "message": "Log directory exists: C:\\Users\\MattBorgeson\\Development\\Work\\MaricopaPropertySearch\\logs",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.896722"
+    },
+    {
+      "test_name": "Logging System",
+      "status": "FAIL",
+      "message": "Error: 'LoggingConfig' object has no attribute 'info'",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.896722"
+    },
+    {
+      "test_name": "Export Directory",
+      "status": "PASS",
+      "message": "Export directory exists",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.896722"
+    },
+    {
+      "test_name": "Write Permissions",
+      "status": "PASS",
+      "message": "Write permissions verified",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.896722"
+    },
+    {
+      "test_name": "Cache Directory",
+      "status": "PASS",
+      "message": "Cache directory exists",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.896722"
+    },
+    {
+      "test_name": "Memory Usage",
+      "status": "PASS",
+      "message": "Memory usage: 57.2 MB",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:03.915504"
+    },
+    {
+      "test_name": "Config Load Speed",
+      "status": "PASS",
+      "message": "Average load time: 0.010s",
+      "duration": 0,
+      "timestamp": "2025-09-16T08:14:04.012934"
+    }
+  ],
+  "application_health": "FAIR",
+  "critical_issues": [
+    "Database manager error: DatabaseManager.__init__() missing 1 required positional argument: 'config_manager'",
+    "Background data collection error: cannot import name 'BackgroundDataCollector' from 'background_data_collector' (C:\\Users\\MattBorgeson\\Development\\Work\\MaricopaPropertySearch\\tests\\..\\src\\background_data_collector.py)"
+  ],
+  "warnings": [
+    "API client error: cannot import name 'APIClient' from 'api_client' (C:\\Users\\MattBorgeson\\Development\\Work\\MaricopaPropertySearch\\tests\\..\\src\\api_client.py)",
+    "Logging system error: 'LoggingConfig' object has no attribute 'info'"
+  ],
+  "recommendations": [
+    "Address critical issues before production use"
+  ]
+}

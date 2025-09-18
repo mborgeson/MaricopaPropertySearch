@@ -226,7 +226,7 @@ class TestBackgroundProcessing:
         
     def test_api_enhancement_timeout(self, app_config, performance_timer):
         """Test that API enhancement respects timeout limits"""
-        from src.api_client import MockMaricopaAPIClient
+        # MIGRATED: from src.api_client import MockMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
         
         client = MockMaricopaAPIClient(app_config)
         
@@ -302,6 +302,7 @@ class TestApplicationStartupPerformance:
         """Test application cold startup time"""
         import subprocess
         import sys
+from src.api_client_unified import UnifiedMaricopaAPIClient
         
         performance_timer.start()
         

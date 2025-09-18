@@ -12,8 +12,8 @@ project_root = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySea
 sys.path.insert(0, str(project_root / "src"))
 
 # Import modules
-from src.config_manager import ConfigManager
-from src.logging_config import (
+# MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+from logging_config import (
     setup_logging, get_logger, get_performance_logger, 
     get_api_logger, get_search_logger, log_exception, 
     log_debug_variables
@@ -136,7 +136,7 @@ def main():
     
     try:
         # Setup logging
-        config = ConfigManager()
+        config = EnhancedConfigManager()
         logging_config = setup_logging(config)
         
         # Get main logger
@@ -188,6 +188,7 @@ def main():
     except Exception as e:
         print(f"ERROR: {e}")
         import traceback
+from src.enhanced_config_manager import EnhancedConfigManager
         traceback.print_exc()
         return 1
     

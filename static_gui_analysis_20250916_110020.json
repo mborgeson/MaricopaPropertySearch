@@ -1,0 +1,385 @@
+{
+  "timestamp": "2025-09-16T11:00:20.529232",
+  "components": {
+    "import_PyQt5_QtWidgets": "\u2705 FOUND",
+    "import_PyQt5_QtCore": "\u2705 FOUND",
+    "import_PyQt5_QtGui": "\u2705 FOUND",
+    "import_config_manager": "\u2705 FOUND",
+    "import_database_manager": "\u2705 FOUND",
+    "import_background_data_collector": "\u2705 FOUND",
+    "class_PropertySearchEngine": "\u2705 FOUND - inherits from: []",
+    "class_PerformanceMetrics": "\u2705 FOUND - inherits from: []",
+    "class_BackupManager": "\u2705 FOUND - inherits from: []",
+    "class_DataValidator": "\u2705 FOUND - inherits from: []",
+    "class_PropertyDetailsWidget": "\u2705 FOUND - inherits from: ['QWidget']",
+    "class_PerformanceDashboard": "\u2705 FOUND - inherits from: ['QWidget']",
+    "class_SearchHistoryWidget": "\u2705 FOUND - inherits from: ['QWidget']",
+    "class_SystemHealthWidget": "\u2705 FOUND - inherits from: ['QWidget']",
+    "class_BackgroundStatusWidget": "\u2705 FOUND - inherits from: ['QWidget']",
+    "class_DataValidationWidget": "\u2705 FOUND - inherits from: ['QWidget']",
+    "class_CollectionProgressDialog": "\u2705 FOUND - inherits from: ['QDialog']",
+    "class_BatchSearchDialog": "\u2705 FOUND - inherits from: ['QDialog']",
+    "class_ExportDialog": "\u2705 FOUND - inherits from: ['QDialog']",
+    "class_SettingsDialog": "\u2705 FOUND - inherits from: ['QDialog']",
+    "class_BackupRestoreDialog": "\u2705 FOUND - inherits from: ['QDialog']",
+    "class_CollectionQueueViewer": "\u2705 FOUND - inherits from: ['QDialog']",
+    "class_AdvancedFiltersWidget": "\u2705 FOUND - inherits from: ['QWidget']",
+    "class_NotificationArea": "\u2705 FOUND - inherits from: ['QWidget']",
+    "class_StatusIndicator": "\u2705 FOUND - inherits from: ['QWidget']",
+    "class_AnimatedProgressBar": "\u2705 FOUND - inherits from: ['QProgressBar']",
+    "class_SearchMetricsWidget": "\u2705 FOUND - inherits from: ['QWidget']",
+    "class_DatabaseConnectionWidget": "\u2705 FOUND - inherits from: ['QWidget']",
+    "class_RecentSearchesWidget": "\u2705 FOUND - inherits from: ['QWidget']",
+    "class_QuickStatsWidget": "\u2705 FOUND - inherits from: ['QWidget']",
+    "class_EnhancedMainWindow": "\u2705 FOUND - inherits from: ['QMainWindow']",
+    "method___init__": "\u2705 FOUND",
+    "method_setup_ui": "\u2705 FOUND",
+    "method_perform_search": "\u2705 FOUND",
+    "method_start_background_collection": "\u2705 FOUND",
+    "method_show_export_dialog": "\u2705 FOUND",
+    "method_connect_signals": "\u2705 FOUND",
+    "class_check_EnhancedMainWindow": "\u2705 FOUND",
+    "class_check_PropertyDetailsWidget": "\u2705 FOUND",
+    "class_check_NotificationArea": "\u2705 FOUND",
+    "class_check_StatusIndicator": "\u2705 FOUND",
+    "class_check_AdvancedFiltersWidget": "\u2705 FOUND",
+    "signal_connections": "\u2705 FOUND - Signal connections present",
+    "error_handling": "\u2705 FOUND - Error handling present",
+    "threading": "\u2705 FOUND - Threading components present",
+    "database_integration": "\u2705 FOUND - Database integration present",
+    "progress_indicators": "\u2705 FOUND - Progress indicators present"
+  },
+  "methods": {
+    "main": {
+      "lines": 21,
+      "args": 0
+    },
+    "__init__": {
+      "lines": 52,
+      "args": 1
+    },
+    "search_properties": {
+      "lines": 29,
+      "args": 5
+    },
+    "record_search": {
+      "lines": 8,
+      "args": 4
+    },
+    "get_summary": {
+      "lines": 16,
+      "args": 1
+    },
+    "create_backup": {
+      "lines": 28,
+      "args": 1
+    },
+    "validate_all_data": {
+      "lines": 8,
+      "args": 1
+    },
+    "setup_ui": {
+      "lines": 30,
+      "args": 1
+    },
+    "load_property_data": {
+      "lines": 43,
+      "args": 2
+    },
+    "add_search": {
+      "lines": 15,
+      "args": 2
+    },
+    "clear_history": {
+      "lines": 3,
+      "args": 1
+    },
+    "update_status": {
+      "lines": 22,
+      "args": 1
+    },
+    "update_results": {
+      "lines": 17,
+      "args": 2
+    },
+    "run_validation": {
+      "lines": 7,
+      "args": 1
+    },
+    "update_progress": {
+      "lines": 6,
+      "args": 1
+    },
+    "init_ui": {
+      "lines": 64,
+      "args": 1
+    },
+    "clear_filters": {
+      "lines": 9,
+      "args": 1
+    },
+    "get_filters": {
+      "lines": 17,
+      "args": 1
+    },
+    "show_message": {
+      "lines": 18,
+      "args": 3
+    },
+    "set_status": {
+      "lines": 4,
+      "args": 2
+    },
+    "paintEvent": {
+      "lines": 16,
+      "args": 2
+    },
+    "set_animated_value": {
+      "lines": 5,
+      "args": 2
+    },
+    "update_metrics": {
+      "lines": 6,
+      "args": 2
+    },
+    "reset_metrics": {
+      "lines": 3,
+      "args": 1
+    },
+    "_on_item_clicked": {
+      "lines": 3,
+      "args": 2
+    },
+    "update_stats": {
+      "lines": 16,
+      "args": 1
+    },
+    "init_database": {
+      "lines": 16,
+      "args": 1
+    },
+    "init_components": {
+      "lines": 51,
+      "args": 1
+    },
+    "create_left_panel": {
+      "lines": 73,
+      "args": 1
+    },
+    "create_center_panel": {
+      "lines": 25,
+      "args": 1
+    },
+    "create_results_tab": {
+      "lines": 20,
+      "args": 1
+    },
+    "create_right_panel": {
+      "lines": 28,
+      "args": 1
+    },
+    "create_status_tab": {
+      "lines": 70,
+      "args": 1
+    },
+    "setup_results_table": {
+      "lines": 30,
+      "args": 1
+    },
+    "setup_menu_bar": {
+      "lines": 77,
+      "args": 1
+    },
+    "setup_toolbar": {
+      "lines": 31,
+      "args": 1
+    },
+    "setup_status_bar": {
+      "lines": 24,
+      "args": 1
+    },
+    "apply_modern_style": {
+      "lines": 109,
+      "args": 1
+    },
+    "connect_signals": {
+      "lines": 7,
+      "args": 1
+    },
+    "init_background_services": {
+      "lines": 30,
+      "args": 1
+    },
+    "load_settings": {
+      "lines": 19,
+      "args": 1
+    },
+    "save_settings": {
+      "lines": 13,
+      "args": 1
+    },
+    "closeEvent": {
+      "lines": 21,
+      "args": 2
+    },
+    "perform_search": {
+      "lines": 76,
+      "args": 1
+    },
+    "populate_results_table": {
+      "lines": 58,
+      "args": 2
+    },
+    "_get_data_collection_status": {
+      "lines": 56,
+      "args": 2
+    },
+    "_get_last_update_time": {
+      "lines": 8,
+      "args": 2
+    },
+    "handle_search_error": {
+      "lines": 12,
+      "args": 2
+    },
+    "update_search_metrics": {
+      "lines": 15,
+      "args": 4
+    },
+    "start_background_collection": {
+      "lines": 35,
+      "args": 1
+    },
+    "pause_background_collection": {
+      "lines": 8,
+      "args": 1
+    },
+    "stop_background_collection": {
+      "lines": 8,
+      "args": 1
+    },
+    "show_collection_dialog": {
+      "lines": 11,
+      "args": 1
+    },
+    "auto_collect_missing_data": {
+      "lines": 32,
+      "args": 1
+    },
+    "get_selected_apns": {
+      "lines": 17,
+      "args": 1
+    },
+    "update_background_status": {
+      "lines": 12,
+      "args": 2
+    },
+    "check_system_status": {
+      "lines": 35,
+      "args": 1
+    },
+    "on_collection_finished": {
+      "lines": 17,
+      "args": 2
+    },
+    "handle_background_error": {
+      "lines": 4,
+      "args": 2
+    },
+    "refresh_displayed_data": {
+      "lines": 16,
+      "args": 1
+    },
+    "toggle_advanced_search": {
+      "lines": 9,
+      "args": 2
+    },
+    "set_search_term": {
+      "lines": 4,
+      "args": 2
+    },
+    "on_selection_changed": {
+      "lines": 23,
+      "args": 1
+    },
+    "show_results_context_menu": {
+      "lines": 38,
+      "args": 2
+    },
+    "view_property_details": {
+      "lines": 16,
+      "args": 2
+    },
+    "collect_selected_data": {
+      "lines": 23,
+      "args": 1
+    },
+    "prioritize_collection": {
+      "lines": 12,
+      "args": 2
+    },
+    "show_batch_search": {
+      "lines": 9,
+      "args": 1
+    },
+    "handle_batch_search_results": {
+      "lines": 20,
+      "args": 2
+    },
+    "show_export_dialog": {
+      "lines": 14,
+      "args": 1
+    },
+    "export_selected_results": {
+      "lines": 22,
+      "args": 1
+    },
+    "show_settings": {
+      "lines": 10,
+      "args": 1
+    },
+    "apply_settings_changes": {
+      "lines": 8,
+      "args": 1
+    },
+    "show_collection_queue": {
+      "lines": 8,
+      "args": 1
+    },
+    "show_collection_stats": {
+      "lines": 49,
+      "args": 1
+    },
+    "show_backup_restore": {
+      "lines": 8,
+      "args": 1
+    },
+    "validate_data": {
+      "lines": 29,
+      "args": 1
+    },
+    "import_data": {
+      "lines": 9,
+      "args": 1
+    },
+    "show_about": {
+      "lines": 22,
+      "args": 1
+    },
+    "_update_dialog_status": {
+      "lines": 9,
+      "args": 1
+    }
+  },
+  "issues": [
+    "\u26a0\ufe0f Long method detected: apply_modern_style (109 lines)"
+  ],
+  "summary": {
+    "total_components": 47,
+    "passed": 47,
+    "warnings": 0,
+    "failed": 0,
+    "total_issues": 1,
+    "success_rate": 100.0
+  }
+}

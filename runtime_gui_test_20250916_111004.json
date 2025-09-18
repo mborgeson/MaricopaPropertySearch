@@ -1,0 +1,33 @@
+{
+  "timestamp": "2025-09-16T11:10:04.107291",
+  "test_results": {
+    "import_config_manager": "\u2705 PASS",
+    "import_database_manager": "\u2705 PASS",
+    "import_functionality": "\u274c FAIL - Import error: No module named 'selenium'",
+    "component_initialization": "\u274c FAIL - No module named 'selenium'",
+    "database_integration": "\u274c FAIL - connection to server at \"localhost\" (127.0.0.1), port 5433 failed: Connection refused\n\tIs the server running on that host and accepting TCP/IP connections?\n",
+    "search_functionality": "\u274c FAIL - No module named 'selenium'",
+    "error_handling": "\u274c FAIL - No module named 'selenium'",
+    "widget_PropertyDetailsWidget_import": "\u274c FAIL - Error: No module named 'selenium'",
+    "widget_PerformanceDashboard_import": "\u274c FAIL - Error: No module named 'selenium'",
+    "widget_SearchHistoryWidget_import": "\u274c FAIL - Error: No module named 'selenium'",
+    "widget_NotificationArea_import": "\u274c FAIL - Error: No module named 'selenium'",
+    "widget_StatusIndicator_import": "\u274c FAIL - Error: No module named 'selenium'",
+    "widget_AdvancedFiltersWidget_import": "\u274c FAIL - Error: No module named 'selenium'"
+  },
+  "errors": [
+    "Import failure: No module named 'selenium'",
+    "Component initialization error: No module named 'selenium'",
+    "Database integration error: connection to server at \"localhost\" (127.0.0.1), port 5433 failed: Connection refused\n\tIs the server running on that host and accepting TCP/IP connections?\n",
+    "Search functionality error: No module named 'selenium'",
+    "Error handling test error: No module named 'selenium'"
+  ],
+  "summary": {
+    "total_tests": 13,
+    "passed": 2,
+    "warnings": 0,
+    "failed": 11,
+    "total_errors": 5,
+    "success_rate": 15.384615384615385
+  }
+}

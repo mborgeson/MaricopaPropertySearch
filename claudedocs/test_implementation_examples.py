@@ -234,8 +234,8 @@ class TestAPIClient:
     @pytest.fixture
     def api_client(self, mock_config_manager):
         """Create API client instance for testing"""
-        from api_client import MaricopaAPIClient
-        return MaricopaAPIClient(mock_config_manager)
+        # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+        return UnifiedMaricopaAPIClient(mock_config_manager)
     
     def test_api_authentication(self, api_client):
         """Test API authentication headers are properly set"""
@@ -560,6 +560,7 @@ class TestPerformanceBenchmarks:
     def test_concurrent_user_simulation(self):
         """Simulate 10 concurrent users performing searches"""
         import concurrent.futures
+from src.api_client_unified import UnifiedMaricopaAPIClient
         
         def simulate_user_search(user_id):
             # Mock user search behavior

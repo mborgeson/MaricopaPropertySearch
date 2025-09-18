@@ -18,19 +18,34 @@ import queue
 import json
 from pathlib import Path
 
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException, WebDriverException
+# Optional selenium imports
+try:
+    from selenium import webdriver
+    from selenium.webdriver.chrome.service import Service
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support.ui import WebDriverWait
+    from selenium.webdriver.support import expected_conditions as EC
+    from selenium.common.exceptions import TimeoutException, NoSuchElementException, WebDriverException
+    SELENIUM_AVAILABLE = True
+except ImportError:
+    # Mock selenium objects when not available
+    webdriver = None
+    Service = None
+    Options = None
+    By = None
+    WebDriverWait = None
+    EC = None
+    TimeoutException = Exception
+    NoSuchElementException = Exception
+    WebDriverException = Exception
+    SELENIUM_AVAILABLE = False
 
 from PyQt5.QtCore import QThread, pyqtSignal
 
-from src.logging_config import get_logger, get_performance_logger
-from src.tax_scraper import MaricopaTaxScraper
-from src.recorder_scraper import MaricopaRecorderScraper
+from logging_config import get_logger, get_performance_logger
+from tax_scraper import MaricopaTaxScraper
+from recorder_scraper import MaricopaRecorderScraper
 
 logger = get_logger(__name__)
 perf_logger = get_performance_logger(__name__)
@@ -71,13 +86,16 @@ class ScrapingRequest:
 
 class BrowserPool:
     """Pool of browser instances for parallel scraping"""
-    
-    def __init__(self, 
+
+    def __init__(self,
                  chrome_driver_path: str,
                  pool_size: int = 4,
                  headless: bool = True,
                  user_agent_rotation: bool = True):
-        
+
+        if not SELENIUM_AVAILABLE:
+            raise ImportError("Selenium is required for BrowserPool but is not installed. Install with: pip install selenium")
+
         self.chrome_driver_path = chrome_driver_path
         self.pool_size = pool_size
         self.headless = headless

@@ -18,12 +18,12 @@ def test_background_collection():
     print("=" * 50)
     
     try:
-        from src.config_manager import ConfigManager
-        from src.api_client import MaricopaAPIClient
+        # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+        # MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
         from src.threadsafe_database_manager import ThreadSafeDatabaseManager
         
-        config = ConfigManager()
-        api_client = MaricopaAPIClient(config)
+        config = EnhancedConfigManager()
+        api_client = UnifiedMaricopaAPIClient(config)
         db_manager = ThreadSafeDatabaseManager(config)
         
         # Test 1: Try to create the improved data collector
@@ -94,6 +94,8 @@ def test_background_collection():
     except Exception as e:
         print(f"Background collection test failed: {e}")
         import traceback
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.enhanced_config_manager import EnhancedConfigManager
         traceback.print_exc()
         return False
 

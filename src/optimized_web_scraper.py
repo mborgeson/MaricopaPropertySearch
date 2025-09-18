@@ -23,7 +23,7 @@ import threading
 from dataclasses import dataclass
 from functools import lru_cache
 
-from src.logging_config import get_logger, get_performance_logger
+from logging_config import get_logger, get_performance_logger
 
 logger = get_logger(__name__)
 perf_logger = get_performance_logger(__name__)

@@ -10,7 +10,7 @@ import json
 import asyncio
 from typing import Dict, List, Optional, Any
 from urllib.parse import urljoin
-from src.logging_config import get_api_logger
+from logging_config import get_api_logger
 
 logger = logging.getLogger(__name__)
 api_logger = get_api_logger(__name__)
@@ -52,7 +52,17 @@ class MaricopaAPIClient:
             time.sleep(sleep_time)
         
         self.last_request_time = time.time()
-    
+
+    def test_connection(self) -> bool:
+        """Test if API connection is working"""
+        try:
+            # Simple test request to base URL
+            response = self.session.get(self.base_url, timeout=5)
+            return response.status_code == 200
+        except Exception as e:
+            logger.debug(f"API connection test failed: {e}")
+            return False
+
     def _make_request(self, endpoint: str, params: Dict = None, retry_count: int = 0) -> Optional[Dict]:
         """Make HTTP request with retry logic"""
         self._rate_limit()
@@ -314,7 +324,7 @@ class MaricopaAPIClient:
     def _scrape_tax_data_sync(self, apn: str) -> Optional[Dict]:
         """Synchronous wrapper for tax data scraping"""
         try:
-            from src.tax_scraper import MaricopaTaxScraper
+            from tax_scraper import MaricopaTaxScraper
             from playwright.sync_api import sync_playwright
             
             with sync_playwright() as p:
@@ -344,7 +354,7 @@ class MaricopaAPIClient:
     def _scrape_sales_data_sync(self, apn: str, years: int = 10) -> Optional[Dict]:
         """Synchronous wrapper for sales data scraping"""
         try:
-            from src.recorder_scraper import MaricopaRecorderScraper
+            from recorder_scraper import MaricopaRecorderScraper
             from playwright.sync_api import sync_playwright
             
             with sync_playwright() as p:
@@ -962,7 +972,12 @@ class MockMaricopaAPIClient(MaricopaAPIClient):
         logger.info("Initializing Mock API Client")
         logger.warning("Using Mock API Client - no actual API calls will be made")
         logger.debug(f"Mock API Configuration - Base URL: {self.base_url}")
-    
+
+    def test_connection(self) -> bool:
+        """Mock test connection - always returns True"""
+        logger.debug("Mock: Testing API connection (always returns True)")
+        return True
+
     def _generate_mock_property(self, apn: str) -> Dict:
         """Generate mock property data"""
         import random

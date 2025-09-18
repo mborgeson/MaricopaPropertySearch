@@ -18,9 +18,10 @@ from conftest import app_instance, db_manager, mock_api_client, test_config
 
 # Import application modules
 from src.gui.enhanced_main_window import EnhancedPropertySearchApp
-from src.database_manager import DatabaseManager
+# MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.background_data_collector import BackgroundDataCollectionManager, JobPriority
 from src.automatic_data_collector import MaricopaDataCollector
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
 logger = logging.getLogger(__name__)
 

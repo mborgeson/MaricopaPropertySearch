@@ -47,8 +47,8 @@ def test_configuration():
     print("="*60)
 
     try:
-        from src.config_manager import ConfigManager
-        config = ConfigManager()
+        # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+        config = EnhancedConfigManager()
         print("[OK] Configuration loaded successfully")
 
         # Check critical settings
@@ -69,10 +69,10 @@ def test_database_connection():
     print("="*60)
 
     try:
-        from src.config_manager import ConfigManager
+        # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
-        config = ConfigManager()
+        config = EnhancedConfigManager()
         if not config.get_database_enabled():
             print("[WARNING] Database disabled in configuration")
             return True, "Database disabled"
@@ -98,7 +98,7 @@ def test_gui_initialization():
 
     try:
         from PyQt5.QtWidgets import QApplication
-        from src.config_manager import ConfigManager
+        # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
         # Create QApplication (required for GUI)
@@ -106,7 +106,7 @@ def test_gui_initialization():
         if app is None:
             app = QApplication(sys.argv)
 
-        config = ConfigManager()
+        config = EnhancedConfigManager()
 
         # Try to create main window
         print("Creating main window...")
@@ -178,6 +178,7 @@ def test_batch_search_dialog():
     try:
         from PyQt5.QtWidgets import QApplication
         from src.enhanced_batch_search_dialog import EnhancedBatchSearchDialog
+from src.enhanced_config_manager import EnhancedConfigManager
 
         app = QApplication.instance()
         if app is None:

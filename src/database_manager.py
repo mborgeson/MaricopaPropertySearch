@@ -11,7 +11,7 @@ from typing import Dict, List, Optional, Any
 import json
 
 # Import centralized logging
-from src.logging_config import get_logger, get_performance_logger, log_exception
+from logging_config import get_logger, get_performance_logger, log_exception
 
 logger = get_logger(__name__)
 perf_logger = get_performance_logger(__name__)
@@ -102,13 +102,49 @@ class DatabaseManager:
     @perf_logger.log_database_operation('upsert', 'properties', 1)
     def insert_property(self, property_data: Dict[str, Any]) -> bool:
         """Insert or update property data"""
-        apn = property_data.get('apn', 'unknown')
+        apn = property_data.get('apn')
+
+        # Validate required field
+        if not apn:
+            logger.error("Cannot insert property: missing required 'apn' field")
+            return False
+
         logger.info(f"Inserting/updating property data for APN: {apn}")
-        
+
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
-                
+
+                # Define required fields with default values
+                required_fields = {
+                    'apn': apn,
+                    'owner_name': None,
+                    'property_address': None,
+                    'mailing_address': None,
+                    'legal_description': None,
+                    'land_use_code': None,
+                    'year_built': None,
+                    'living_area_sqft': None,
+                    'lot_size_sqft': None,
+                    'bedrooms': None,
+                    'bathrooms': None,
+                    'pool': None,
+                    'garage_spaces': None,
+                    'raw_data': None
+                }
+
+                # Merge provided data with defaults, ensuring all required keys exist
+                safe_property_data = {**required_fields, **property_data}
+
+                # Convert raw_data to JSON if it's a dict
+                if safe_property_data.get('raw_data') and isinstance(safe_property_data['raw_data'], dict):
+                    safe_property_data['raw_data'] = Json(safe_property_data['raw_data'])
+
+                # Log missing fields for debugging
+                missing_fields = [field for field in required_fields.keys() if field not in property_data]
+                if missing_fields:
+                    logger.debug(f"Using default values for missing fields: {missing_fields} for APN: {apn}")
+
                 sql = """
                 INSERT INTO properties (
                     apn, owner_name, property_address, mailing_address,
@@ -137,12 +173,16 @@ class DatabaseManager:
                     raw_data = EXCLUDED.raw_data,
                     last_updated = CURRENT_TIMESTAMP
                 """
-                
-                cursor.execute(sql, property_data)
+
+                cursor.execute(sql, safe_property_data)
                 conn.commit()
                 logger.debug(f"Property data committed successfully for APN: {apn}")
                 return True
-                
+
+        except KeyError as e:
+            logger.error(f"KeyError in insert_property for APN {apn}: Missing key {e}")
+            logger.error(f"Available keys in property_data: {list(property_data.keys())}")
+            return False
         except Exception as e:
             log_exception(logger, e, f"inserting property data for APN: {apn}")
             return False
@@ -207,25 +247,36 @@ class DatabaseManager:
     def get_property_by_apn(self, apn: str) -> Optional[Dict]:
         """Get property by APN"""
         logger.debug(f"Retrieving property data for APN: {apn}")
-        
+
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
-                
+
                 sql = "SELECT * FROM property_current_view WHERE apn = %s"
                 cursor.execute(sql, (apn,))
-                
+
                 result = cursor.fetchone()
-                
+
                 if result:
                     logger.debug(f"Property data found for APN: {apn}")
                     return dict(result)
                 else:
                     logger.debug(f"No property data found for APN: {apn}")
                     return None
-                
+
         except Exception as e:
             log_exception(logger, e, f"retrieving property data for APN: {apn}")
+            return None
+
+    def get_property_details(self, apn: str) -> Optional[Dict]:
+        """Get property details by APN - alias for get_property_by_apn for GUI compatibility"""
+        logger.debug(f"Retrieving property details for APN: {apn}")
+
+        try:
+            return self.get_property_by_apn(apn)
+
+        except Exception as e:
+            log_exception(logger, e, f"retrieving property details for APN: {apn}")
             return None
     
     # Tax history operations
@@ -363,20 +414,27 @@ class DatabaseManager:
                 stats = {}
                 
                 # Property count
-                cursor.execute("SELECT COUNT(*) FROM properties")
-                stats['properties'] = cursor.fetchone()[0]
-                
+                cursor.execute("SELECT COUNT(*) as count FROM properties")
+                result = cursor.fetchone()
+                stats['properties'] = result['count'] if result else 0
+
                 # Tax records count
-                cursor.execute("SELECT COUNT(*) FROM tax_history")
-                stats['tax_records'] = cursor.fetchone()[0]
-                
+                cursor.execute("SELECT COUNT(*) as count FROM tax_history")
+                result = cursor.fetchone()
+                stats['tax_records'] = result['count'] if result else 0
+
                 # Sales records count
-                cursor.execute("SELECT COUNT(*) FROM sales_history")
-                stats['sales_records'] = cursor.fetchone()[0]
-                
-                # Recent searches
-                cursor.execute("SELECT COUNT(*) FROM search_history WHERE searched_at > NOW() - INTERVAL '7 days'")
-                stats['recent_searches'] = cursor.fetchone()[0]
+                cursor.execute("SELECT COUNT(*) as count FROM sales_history")
+                result = cursor.fetchone()
+                stats['sales_records'] = result['count'] if result else 0
+
+                # Recent searches (handle case where table may not exist)
+                try:
+                    cursor.execute("SELECT COUNT(*) as count FROM search_history WHERE searched_at > NOW() - INTERVAL '7 days'")
+                    result = cursor.fetchone()
+                    stats['recent_searches'] = result['count'] if result else 0
+                except:
+                    stats['recent_searches'] = 0
                 
                 logger.info(f"Database statistics retrieved - Properties: {stats.get('properties', 0):,}, "
                           f"Tax Records: {stats.get('tax_records', 0):,}, "
@@ -445,6 +503,37 @@ class DatabaseManager:
             return int(value)
         except (ValueError, TypeError):
             return None
+
+    def validate_property_data(self, property_data: Dict[str, Any]) -> tuple[bool, List[str]]:
+        """Validate property data before insertion"""
+        errors = []
+
+        # Check for required fields
+        if not property_data.get('apn'):
+            errors.append("Missing required field: 'apn'")
+
+        # Check data types for numeric fields
+        numeric_fields = ['year_built', 'living_area_sqft', 'lot_size_sqft', 'bedrooms', 'bathrooms', 'garage_spaces']
+        for field in numeric_fields:
+            value = property_data.get(field)
+            if value is not None and not isinstance(value, (int, float, type(None))):
+                try:
+                    # Try to convert to numeric
+                    if isinstance(value, str) and value.strip():
+                        float(value.strip())
+                except (ValueError, TypeError):
+                    errors.append(f"Invalid numeric value for field '{field}': {value}")
+
+        # Validate boolean fields
+        boolean_fields = ['pool']
+        for field in boolean_fields:
+            value = property_data.get(field)
+            if value is not None and not isinstance(value, (bool, type(None))):
+                if value not in [0, 1, '0', '1', 'true', 'false', 'True', 'False']:
+                    errors.append(f"Invalid boolean value for field '{field}': {value}")
+
+        is_valid = len(errors) == 0
+        return is_valid, errors
     
     def close(self):
         """Close database connection pool"""

@@ -25,24 +25,24 @@ from datetime import datetime
 import traceback
 
 # Import application modules
-from src.database_manager import DatabaseManager
-from src.api_client import MaricopaAPIClient, MockMaricopaAPIClient
-from src.web_scraper import WebScraperManager, MockWebScraperManager
-from src.background_data_collector import BackgroundDataCollectionManager, JobPriority
-from src.user_action_logger import UserActionLogger, get_user_action_logger
+# MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient, MockMaricopaAPIClient
+from web_scraper import WebScraperManager, MockWebScraperManager
+from background_data_collector import BackgroundDataCollectionManager, JobPriority
+from user_action_logger import UserActionLogger, get_user_action_logger
 
 # Import centralized logging
-from src.logging_config import get_logger, get_search_logger, get_performance_logger, log_exception
+from logging_config import get_logger, get_search_logger, get_performance_logger, log_exception
 
 # Import GUI enhancement dialogs
-from src.gui.gui_enhancements_dialogs import (
+from gui.gui_enhancements_dialogs import (
     ApplicationSettingsDialog, DataCollectionSettingsDialog, CacheManagementDialog,
     BatchSearchDialog, ParallelProcessingDialog, DataSourceConfigurationDialog
 )
 
 # Import enhanced batch search integration
-from src.batch_search_integration import BatchSearchIntegrationManager
-from src.enhanced_batch_search_dialog import EnhancedBatchSearchDialog
+from batch_search_integration import BatchSearchIntegrationManager
+from enhanced_batch_search_dialog import EnhancedBatchSearchDialog
 
 logger = get_logger(__name__)
 search_logger = get_search_logger(__name__)
@@ -649,7 +649,7 @@ class BackgroundCollectionStatusWidget(QWidget):
 class PropertyDetailsDialog(QDialog):
     """Enhanced property details dialog with background data collection"""
     
-    def __init__(self, property_data: Dict, db_manager: DatabaseManager, 
+    def __init__(self, property_data: Dict, db_managerThreadSafeDatabaseManager, 
                  background_manager: BackgroundDataCollectionManager, parent=None):
         super().__init__(parent)
         self.property_data = property_data
@@ -891,7 +891,7 @@ class PropertyDetailsDialog(QDialog):
         
         try:
             # Import the automatic data collector
-            from src.automatic_data_collector import MaricopaDataCollector
+            from automatic_data_collector import MaricopaDataCollector
             
             progress.setValue(30)
             progress.setLabelText("Initializing collector...")
@@ -1226,12 +1226,12 @@ class EnhancedPropertySearchApp(QMainWindow):
         try:
             # Initialize components
             logger.debug("Initializing database manager")
-            self.db_manager = DatabaseManager(config_manager)
+            self.db_manager = ThreadSafeDatabaseManager(config_manager)
             
             # Initialize API client
             try:
                 logger.debug("Attempting to initialize real API client")
-                self.api_client = MaricopaAPIClient(config_manager)
+                self.api_client = UnifiedMaricopaAPIClient(config_manager)
                 logger.info("Using real Maricopa API client")
             except Exception as e:
                 logger.warning(f"Failed to initialize real API client: {e}. Using mock client.")
@@ -2448,6 +2448,8 @@ class EnhancedPropertySearchApp(QMainWindow):
                                "The application will continue running.")
             logger.error(f"Critical error in force_data_collection: {e}")
             import traceback
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             traceback.print_exc()
 
     def _continue_force_collection(self, apns):

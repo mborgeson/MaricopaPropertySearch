@@ -13,11 +13,11 @@ from pathlib import Path
 # Add src to path
 sys.path.append(str(Path(__file__).parent))
 
-from config_manager import EnhancedConfigManager
-from database_manager import DatabaseManager
-from api_client import MaricopaAPIClient
+# MIGRATED: from config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+# MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 from api_client_performance_patch import apply_performance_patch
-from parallel_api_client import HighPerformanceMaricopaAPIClient
+# MIGRATED: from parallel_api_client import HighPerformanceMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 from performance_optimized_data_collector import PerformanceOptimizedDataCollector
 from optimized_web_scraper import OptimizedWebScraperManager
 from logging_config import get_logger, get_performance_logger
@@ -30,7 +30,7 @@ class PerformanceTestSuite:
     
     def __init__(self):
         self.config_manager = EnhancedConfigManager()
-        self.db_manager = DatabaseManager(self.config_manager)
+        self.db_manager = ThreadSafeDatabaseManager(self.config_manager)
         
         # Test APN - "10000 W Missouri Ave" from the issue
         self.test_apn = "12345-67-890"  # Replace with actual APN for Missouri Ave
@@ -81,7 +81,7 @@ class PerformanceTestSuite:
     def test_original_api_client(self) -> Dict[str, Any]:
         """Test original API client performance (baseline)"""
         try:
-            api_client = MaricopaAPIClient(self.config_manager)
+            api_client = UnifiedMaricopaAPIClient(self.config_manager)
             
             # Test basic search
             start_time = time.time()
@@ -118,7 +118,7 @@ class PerformanceTestSuite:
     def test_patched_api_client(self) -> Dict[str, Any]:
         """Test performance-patched API client"""
         try:
-            api_client = MaricopaAPIClient(self.config_manager)
+            api_client = UnifiedMaricopaAPIClient(self.config_manager)
             patch = apply_performance_patch(api_client)
             
             # Test parallel detailed data collection
@@ -154,7 +154,7 @@ class PerformanceTestSuite:
     def test_parallel_api_client(self) -> Dict[str, Any]:
         """Test high-performance parallel API client"""
         try:
-            api_client = HighPerformanceMaricopaAPIClient(self.config_manager)
+            api_client = UnifiedMaricopaAPIClient(self.config_manager)
             
             # Test parallel detailed data collection
             start_time = time.time()
@@ -385,6 +385,9 @@ def main():
         # Save results to file
         import json
         from datetime import datetime
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.enhanced_config_manager import EnhancedConfigManager
         
         results_file = Path(__file__).parent / f"performance_test_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         with open(results_file, 'w') as f:

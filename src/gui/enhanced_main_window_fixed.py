@@ -29,12 +29,14 @@ from PyQt5.QtGui import QFont, QPixmap, QIcon, QPalette, QColor
 # Import all the necessary classes
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 
-from src.database_manager import DatabaseManager
-from src.api_client import APIClient
-from src.web_scraper import WebScraper
-from src.background_data_collector import BackgroundDataCollectionManager
-from src.batch_search_integration import BatchSearchIntegration
-from src.gui.gui_enhancements_dialogs import (
+# MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+# MIGRATED: from api_client import APIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+from web_scraper import WebScraper
+from background_data_collector import BackgroundDataCollectionManager
+from batch_search_integration import BatchSearchIntegration
+from gui.gui_enhancements_dialogs import (
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
     ApplicationSettingsDialog, DataCollectionSettingsDialog, CacheManagementDialog,
     PropertyDetailsDialog, SearchResultsExportDialog, DataVisualizationDialog
 )

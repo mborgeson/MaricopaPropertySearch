@@ -9,7 +9,7 @@ import logging
 import json
 from typing import Dict, List, Optional, Any
 from urllib.parse import urljoin
-from src.logging_config import get_api_logger
+from logging_config import get_api_logger
 
 logger = logging.getLogger(__name__)
 api_logger = get_api_logger(__name__)

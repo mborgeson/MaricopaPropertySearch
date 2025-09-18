@@ -7,9 +7,11 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
-from config_manager import ConfigManager
-from api_client import MaricopaAPIClient
+# MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 from logging_config import setup_logging
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.enhanced_config_manager import EnhancedConfigManager
 
 def test_api_integration():
     """Test the real API integration"""
@@ -22,8 +24,8 @@ def test_api_integration():
     
     try:
         # Initialize components
-        config_manager = ConfigManager()
-        api_client = MaricopaAPIClient(config_manager)
+        config_manager = EnhancedConfigManager()
+        api_client = UnifiedMaricopaAPIClient(config_manager)
         
         # Test API status (mock data is fine for this)
         print("\n1. Testing API status...")

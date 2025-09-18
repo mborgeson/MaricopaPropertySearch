@@ -1,0 +1,11 @@
+{
+  "auto_collect": true,
+  "cache_enabled": true,
+  "max_concurrent": 3,
+  "source_priority": [
+    "api",
+    "scraping",
+    "cache"
+  ],
+  "ui_theme": "default"
+}

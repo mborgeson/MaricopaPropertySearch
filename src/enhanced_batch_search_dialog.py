@@ -24,13 +24,13 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer
 from PyQt5.QtGui import QFont, QIcon, QColor
 
-from src.batch_search_integration import (
+from batch_search_integration import (
     BatchSearchIntegrationManager, 
     BatchSearchJobType,
     BatchSearchResult,
     BatchSearchSummary
 )
-from src.logging_config import get_logger
+from logging_config import get_logger
 
 logger = get_logger(__name__)
 

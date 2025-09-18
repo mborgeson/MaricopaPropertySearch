@@ -15,12 +15,15 @@ from typing import Dict, List, Optional, Any
 # Add src to path for imports
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
-from api_client import MaricopaAPIClient
-from config_manager import ConfigManager
-from database_manager import DatabaseManager
+# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+# MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+# MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from tax_scraper import MaricopaTaxScraper
 from recorder_scraper import MaricopaRecorderScraper
 from web_scraper import WebScraperManager
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.enhanced_config_manager import EnhancedConfigManager
 
 # Configure logging for test output
 logging.basicConfig(
@@ -56,15 +59,15 @@ class ComprehensiveDataTest:
         
         try:
             # Initialize config manager
-            self.config_manager = ConfigManager()
+            self.config_manager = EnhancedConfigManager()
             logger.info("✓ Config Manager initialized")
             
             # Initialize API client
-            self.api_client = MaricopaAPIClient(self.config_manager)
+            self.api_client = UnifiedMaricopaAPIClient(self.config_manager)
             logger.info("✓ API Client initialized")
             
             # Initialize database manager
-            self.db_manager = DatabaseManager()
+            self.db_manager = ThreadSafeDatabaseManager()
             logger.info("✓ Database Manager initialized")
             
             # Test database connection

@@ -18458,3 +18458,705 @@ TypeError: DatabaseManager.__init__() missing 1 required positional argument: 'c
 
 2025-09-16 00:47:10 - src.parallel_web_scraper - ERROR - Failed to create browser: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
 
+2025-09-16 00:50:40 - src.parallel_web_scraper - ERROR - Failed to create browser: Message: Unable to locate or obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-09-16 00:51:03 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 17135060: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 00:51:03 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 17135060: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 00:51:03 - src.gui.enhanced_main_window - ERROR - Error checking data status for 17135060: 'int' object is not iterable
+2025-09-16 00:51:03 - src.gui.enhanced_main_window - ERROR - Error checking data status for 17135060: 'int' object is not iterable
+2025-09-16 00:51:23 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 17135060: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 00:51:23 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 17135060: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 00:51:23 - src.gui.enhanced_main_window - ERROR - Error checking data status for 17135060: 'int' object is not iterable
+2025-09-16 00:52:24 - src.gui.enhanced_main_window - ERROR - Error checking data freshness for APN 17135060: 'DatabaseManager' object has no attribute 'get_property_details'
+2025-09-16 00:53:19 - src.gui.enhanced_main_window - ERROR - Error checking data freshness for APN 17135060: 'DatabaseManager' object has no attribute 'get_property_details'
+2025-09-16 00:58:01 - src.parallel_web_scraper - ERROR - Failed to create browser: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-09-16 00:59:00 - src.parallel_web_scraper - ERROR - Failed to create browser: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-09-16 01:07:10 - src.parallel_web_scraper - ERROR - Failed to create browser: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-09-16 01:07:44 - src.parallel_web_scraper - ERROR - Failed to create browser: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-09-16 01:07:46 - src.parallel_web_scraper - ERROR - Failed to create browser: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-09-16 01:11:46 - src.parallel_web_scraper - ERROR - Failed to create browser: Message: Unable to locate or obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-09-16 01:12:18 - src.database_manager - ERROR - Exception occurred in database operation: 'apn'
+2025-09-16 01:12:18 - src.database_manager - ERROR - Exception type: KeyError
+2025-09-16 01:12:18 - src.database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 64, in get_connection
+    yield connection
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 141, in insert_property
+    cursor.execute(sql, property_data)
+  File "C:\Users\MattBorgeson\anaconda3\envs\maricopa_property\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+KeyError: 'apn'
+
+2025-09-16 01:12:18 - src.database_manager - ERROR - Exception occurred in inserting property data for APN: unknown: 'apn'
+2025-09-16 01:12:18 - src.database_manager - ERROR - Exception type: KeyError
+2025-09-16 01:12:18 - src.database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 141, in insert_property
+    cursor.execute(sql, property_data)
+  File "C:\Users\MattBorgeson\anaconda3\envs\maricopa_property\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+KeyError: 'apn'
+
+2025-09-16 01:12:18 - src.database_manager - ERROR - Exception occurred in database operation: 'apn'
+2025-09-16 01:12:18 - src.database_manager - ERROR - Exception type: KeyError
+2025-09-16 01:12:18 - src.database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 64, in get_connection
+    yield connection
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 141, in insert_property
+    cursor.execute(sql, property_data)
+  File "C:\Users\MattBorgeson\anaconda3\envs\maricopa_property\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+KeyError: 'apn'
+
+2025-09-16 01:12:18 - src.database_manager - ERROR - Exception occurred in inserting property data for APN: unknown: 'apn'
+2025-09-16 01:12:18 - src.database_manager - ERROR - Exception type: KeyError
+2025-09-16 01:12:18 - src.database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 141, in insert_property
+    cursor.execute(sql, property_data)
+  File "C:\Users\MattBorgeson\anaconda3\envs\maricopa_property\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+KeyError: 'apn'
+
+2025-09-16 01:12:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304014A: 'int' object is not iterable
+2025-09-16 01:12:19 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 13304017: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:12:19 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 13304017: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:12:19 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 13304018: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:12:19 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 13304018: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:12:19 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 13304019: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:12:19 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 13304019: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:12:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304017: 'int' object is not iterable
+2025-09-16 01:12:19 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 13304020: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:12:19 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 13304020: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:12:20 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 13304021: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:12:20 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 13304021: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:12:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304018: 'int' object is not iterable
+2025-09-16 01:12:20 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 30149764: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:12:20 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 30483398: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:12:20 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 30149764: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:12:20 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 30483398: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:12:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304019: 'int' object is not iterable
+2025-09-16 01:12:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304020: 'int' object is not iterable
+2025-09-16 01:12:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304014A: 'int' object is not iterable
+2025-09-16 01:12:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304017: 'int' object is not iterable
+2025-09-16 01:12:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304018: 'int' object is not iterable
+2025-09-16 01:12:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304019: 'int' object is not iterable
+2025-09-16 01:12:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304020: 'int' object is not iterable
+2025-09-16 01:12:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304021: 'int' object is not iterable
+2025-09-16 01:12:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 30149764: 'int' object is not iterable
+2025-09-16 01:12:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 30483398: 'int' object is not iterable
+2025-09-16 01:12:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for : 'int' object is not iterable
+2025-09-16 01:12:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for : 'int' object is not iterable
+2025-09-16 01:12:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304014A: 'int' object is not iterable
+2025-09-16 01:12:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304021: 'int' object is not iterable
+2025-09-16 01:12:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 30483398: 'int' object is not iterable
+2025-09-16 01:12:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 30149764: 'int' object is not iterable
+2025-09-16 01:13:20 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 30483398: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:13:20 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 13304021: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:13:20 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 30483398: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:13:20 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 13304014A: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:13:20 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 13304021: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:13:20 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 13304014A: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:13:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 30483398: 'int' object is not iterable
+2025-09-16 01:13:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304021: 'int' object is not iterable
+2025-09-16 01:13:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304014A: 'int' object is not iterable
+2025-09-16 01:13:20 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 13304019: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:13:20 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 13304020: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:13:20 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 13304019: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:13:20 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 13304018: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:13:20 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 13304020: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:13:20 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 13304018: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:13:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304019: 'int' object is not iterable
+2025-09-16 01:13:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304020: 'int' object is not iterable
+2025-09-16 01:13:20 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304018: 'int' object is not iterable
+2025-09-16 01:13:21 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 13304017: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:13:21 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 13304017: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:13:21 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 30149764: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:13:21 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 30149764: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:13:21 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304017: 'int' object is not iterable
+2025-09-16 01:13:21 - src.gui.enhanced_main_window - ERROR - Error checking data status for 30149764: 'int' object is not iterable
+2025-09-16 01:13:50 - src.gui.enhanced_main_window - ERROR - Error checking data freshness for APN 13304020: 'DatabaseManager' object has no attribute 'get_property_details'
+2025-09-16 01:14:22 - src.automatic_data_collector - ERROR - Error collecting tax data: Page.wait_for_selector: Timeout 10000ms exceeded.
+Call log:
+  - waiting for locator("input[name*=\"apn\"], input[id*=\"apn\"], input[placeholder*=\"APN\"]") to be visible
+
+2025-09-16 01:14:55 - src.automatic_data_collector - ERROR - Error collecting sales data: ElementHandle.fill: Timeout 30000ms exceeded.
+Call log:
+    - fill("13304020")
+  - attempting fill action
+    2 × waiting for element to be visible, enabled and editable
+      - element is not visible
+    - retrying fill action
+    - waiting 20ms
+    2 × waiting for element to be visible, enabled and editable
+      - element is not visible
+    - retrying fill action
+      - waiting 100ms
+    58 × waiting for element to be visible, enabled and editable
+       - element is not visible
+     - retrying fill action
+       - waiting 500ms
+
+2025-09-16 01:23:28 - src.parallel_web_scraper - ERROR - Failed to create browser: Message: Unable to locate or obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-09-16 01:32:05 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 10343138: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:05 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 10343138: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:05 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 10343139: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:05 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 10343139: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:05 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 12825108: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:05 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 12825108: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:06 - src.gui.enhanced_main_window - ERROR - Error checking data status for 10343138: 'int' object is not iterable
+2025-09-16 01:32:06 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023002: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:06 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023003: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:06 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023005: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:06 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023002: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:06 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023003: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:06 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023005: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:06 - src.gui.enhanced_main_window - ERROR - Error checking data status for 10343139: 'int' object is not iterable
+2025-09-16 01:32:06 - src.gui.enhanced_main_window - ERROR - Error checking data status for 12825108: 'int' object is not iterable
+2025-09-16 01:32:06 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023020: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:06 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023020: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:07 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023004: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:07 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023008: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:07 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023004: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:07 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023008: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:07 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023002: 'int' object is not iterable
+2025-09-16 01:32:08 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11816025: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:08 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023003: 'int' object is not iterable
+2025-09-16 01:32:08 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023001: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:08 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023022: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:08 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11816025: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:08 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023001: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:08 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023022: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:08 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023005: 'int' object is not iterable
+2025-09-16 01:32:08 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023023: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:08 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11816029: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:08 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023023: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:08 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11816029: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:08 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11816026: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:08 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11816026: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:08 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023020: 'int' object is not iterable
+2025-09-16 01:32:08 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023004: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023008: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816025: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023001: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023022: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023023: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816029: 'int' object is not iterable
+2025-09-16 01:32:09 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11816027: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:09 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 12825065: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:09 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11816028: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:09 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11816027: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:09 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 12825065: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:09 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11816028: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 10343138: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 10343139: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 12825108: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023001: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023002: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023003: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023004: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023005: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023008: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023018: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023020: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023021: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023022: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023023: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023024: 'int' object is not iterable
+2025-09-16 01:32:09 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816025: 'int' object is not iterable
+2025-09-16 01:32:09 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11816030: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:09 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11816030: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:10 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023019: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:10 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023019: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:10 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816026: 'int' object is not iterable
+2025-09-16 01:32:10 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023017: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:10 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023017: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:10 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816027: 'int' object is not iterable
+2025-09-16 01:32:10 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816028: 'int' object is not iterable
+2025-09-16 01:32:10 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816029: 'int' object is not iterable
+2025-09-16 01:32:10 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023006: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:10 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023006: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:10 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023024: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:10 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023024: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:10 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816030: 'int' object is not iterable
+2025-09-16 01:32:10 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023021: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:10 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023018: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 01:32:10 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023021: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:10 - src.gui.enhanced_main_window - ERROR - Error checking data status for 12825065: 'int' object is not iterable
+2025-09-16 01:32:10 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023018: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 01:32:10 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023017: 'int' object is not iterable
+2025-09-16 01:32:10 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023019: 'int' object is not iterable
+2025-09-16 01:32:10 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023006: 'int' object is not iterable
+2025-09-16 01:32:10 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11822001B: 'int' object is not iterable
+2025-09-16 01:32:10 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11822001A: 'int' object is not iterable
+2025-09-16 01:32:10 - src.gui.enhanced_main_window - ERROR - Error checking data status for 12825065: 'int' object is not iterable
+2025-09-16 01:32:10 - src.gui.enhanced_main_window - ERROR - Error checking data status for 12825107: 'int' object is not iterable
+2025-09-16 01:32:10 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816026: 'int' object is not iterable
+2025-09-16 01:32:10 - src.gui.enhanced_main_window - ERROR - Error checking data status for 12825065: 'int' object is not iterable
+2025-09-16 01:32:11 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816028: 'int' object is not iterable
+2025-09-16 01:32:11 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816027: 'int' object is not iterable
+2025-09-16 01:32:11 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816030: 'int' object is not iterable
+2025-09-16 01:32:11 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023019: 'int' object is not iterable
+2025-09-16 01:32:11 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023017: 'int' object is not iterable
+2025-09-16 01:32:11 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023006: 'int' object is not iterable
+2025-09-16 01:32:11 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023024: 'int' object is not iterable
+2025-09-16 01:32:11 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023018: 'int' object is not iterable
+2025-09-16 01:32:11 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023021: 'int' object is not iterable
+2025-09-16 01:32:45 - src.gui.enhanced_main_window - ERROR - Error checking data freshness for APN 11822001B: 'DatabaseManager' object has no attribute 'get_property_details'
+2025-09-16 02:01:31 - src.parallel_web_scraper - ERROR - Failed to create browser: Message: Unable to obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-09-16 02:02:13 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 10343138: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:13 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 10343138: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:14 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 10343139: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:14 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 10343139: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:14 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 12825108: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:14 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 12825108: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:14 - src.gui.enhanced_main_window - ERROR - Error checking data status for 10343138: 'int' object is not iterable
+2025-09-16 02:02:14 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023001: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:14 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023001: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:14 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023002: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:14 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023002: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:15 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023003: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:15 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023003: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:15 - src.gui.enhanced_main_window - ERROR - Error checking data status for 10343139: 'int' object is not iterable
+2025-09-16 02:02:15 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023004: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:15 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023004: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:15 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023005: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:15 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023005: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:15 - src.gui.enhanced_main_window - ERROR - Error checking data status for 12825108: 'int' object is not iterable
+2025-09-16 02:02:15 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023008: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:15 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023008: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:15 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023018: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:15 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023018: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:15 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023020: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:15 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023020: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:15 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023001: 'int' object is not iterable
+2025-09-16 02:02:16 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023021: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:16 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023021: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:16 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023022: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:16 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023022: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:16 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023023: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:16 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023023: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:16 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023002: 'int' object is not iterable
+2025-09-16 02:02:16 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023024: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:16 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023024: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:17 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11816025: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:17 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11816025: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:17 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023003: 'int' object is not iterable
+2025-09-16 02:02:17 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11816026: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:17 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11816026: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:17 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11816027: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:17 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11816027: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:17 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023004: 'int' object is not iterable
+2025-09-16 02:02:17 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11816028: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:17 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11816028: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:18 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11816029: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:18 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11816029: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:18 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11816030: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:18 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023005: 'int' object is not iterable
+2025-09-16 02:02:18 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11816030: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:18 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 12825065: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:18 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 12825065: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:18 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023017: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:18 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023017: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:18 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023008: 'int' object is not iterable
+2025-09-16 02:02:18 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023019: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:18 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023019: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:18 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 11023006: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 02:02:18 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 11023006: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023018: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023020: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023021: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023022: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023023: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023024: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816025: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816026: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816027: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816028: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816029: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816030: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 12825065: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 10343138: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 10343139: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 12825108: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023001: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023002: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023003: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023004: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023005: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023008: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023018: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023020: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023021: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023022: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023023: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023024: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816025: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816026: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816027: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816028: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816029: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816030: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 12825065: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023017: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023019: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023006: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11822001B: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11822001A: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 12825065: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 12825107: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023017: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023019: 'int' object is not iterable
+2025-09-16 02:02:19 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023006: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 10343138: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 10343139: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 12825108: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023001: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023002: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023003: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023004: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023005: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023008: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023018: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023020: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023021: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023022: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023023: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023024: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816025: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816026: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816027: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816028: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816029: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11816030: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 12825065: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023017: 'int' object is not iterable
+2025-09-16 02:03:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023019: 'int' object is not iterable
+2025-09-16 02:03:01 - src.gui.enhanced_main_window - ERROR - Error checking data status for 11023006: 'int' object is not iterable
+2025-09-16 03:13:06 - src.parallel_web_scraper - ERROR - Failed to create browser: Message: Unable to locate or obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-09-16 03:13:31 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 17135060: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 03:13:31 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 17135060: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 03:13:31 - src.gui.enhanced_main_window - ERROR - Error checking data status for 17135060: 'int' object is not iterable
+2025-09-16 03:13:31 - src.gui.enhanced_main_window - ERROR - Error checking data status for 17135060: 'int' object is not iterable
+2025-09-16 03:14:14 - src.gui.enhanced_main_window - ERROR - Error checking data freshness for APN 17135060: 'DatabaseManager' object has no attribute 'get_property_details'
+2025-09-16 03:15:00 - src.improved_automatic_data_collector - ERROR - Error in API script for APN 17135060: 'NoneType' object has no attribute 'get_comprehensive_property_info'
+2025-09-16 03:15:00 - src.improved_automatic_data_collector - ERROR - Error in tax info script for APN 17135060: 'NoneType' object has no attribute 'get_tax_history'
+2025-09-16 03:15:00 - src.gui.enhanced_main_window - ERROR - Error checking data status for 17135060: 'int' object is not iterable
+2025-09-16 03:16:35 - src.database_manager - ERROR - Exception occurred in database operation: invalid input syntax for type boolean: "246"
+LINE 10:                     8934, NULL, 11, '246', 1,
+                                             ^
+
+2025-09-16 03:16:35 - src.database_manager - ERROR - Exception type: InvalidTextRepresentation
+2025-09-16 03:16:35 - src.database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 64, in get_connection
+    yield connection
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 141, in insert_property
+    cursor.execute(sql, property_data)
+  File "C:\Users\MattBorgeson\anaconda3\envs\maricopa_property\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.InvalidTextRepresentation: invalid input syntax for type boolean: "246"
+LINE 10:                     8934, NULL, 11, '246', 1,
+                                             ^
+
+
+2025-09-16 03:16:35 - src.database_manager - ERROR - Exception occurred in inserting property data for APN: 17135060: invalid input syntax for type boolean: "246"
+LINE 10:                     8934, NULL, 11, '246', 1,
+                                             ^
+
+2025-09-16 03:16:35 - src.database_manager - ERROR - Exception type: InvalidTextRepresentation
+2025-09-16 03:16:35 - src.database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 141, in insert_property
+    cursor.execute(sql, property_data)
+  File "C:\Users\MattBorgeson\anaconda3\envs\maricopa_property\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+psycopg2.errors.InvalidTextRepresentation: invalid input syntax for type boolean: "246"
+LINE 10:                     8934, NULL, 11, '246', 1,
+                                             ^
+
+
+2025-09-16 03:16:35 - src.gui.enhanced_main_window - ERROR - Error checking data status for 17135060: 'int' object is not iterable
+2025-09-16 03:17:21 - src.gui.enhanced_main_window - ERROR - Error checking data freshness for APN 17135060: 'DatabaseManager' object has no attribute 'get_property_details'
+2025-09-16 03:59:25 - src.database_manager - ERROR - Exception occurred in database operation: insert or update on table "tax_history" violates foreign key constraint "tax_history_apn_fkey"
+DETAIL:  Key (apn)=(11727002) is not present in table "properties".
+
+2025-09-16 03:59:25 - src.database_manager - ERROR - Exception type: ForeignKeyViolation
+2025-09-16 03:59:25 - src.database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 64, in get_connection
+    yield connection
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 271, in insert_tax_history
+    cursor.execute(sql, tax_data)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^
+  File "C:\Users\MattBorgeson\anaconda3\Lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.ForeignKeyViolation: insert or update on table "tax_history" violates foreign key constraint "tax_history_apn_fkey"
+DETAIL:  Key (apn)=(11727002) is not present in table "properties".
+
+
+2025-09-16 03:59:25 - src.database_manager - ERROR - Failed to insert tax history for 11727002: insert or update on table "tax_history" violates foreign key constraint "tax_history_apn_fkey"
+DETAIL:  Key (apn)=(11727002) is not present in table "properties".
+
+2025-09-16 03:59:25 - src.database_manager - ERROR - Exception occurred in database operation: insert or update on table "sales_history" violates foreign key constraint "sales_history_apn_fkey"
+DETAIL:  Key (apn)=(11727002) is not present in table "properties".
+
+2025-09-16 03:59:25 - src.database_manager - ERROR - Exception type: ForeignKeyViolation
+2025-09-16 03:59:25 - src.database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 64, in get_connection
+    yield connection
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 315, in insert_sales_history
+    cursor.execute(sql, sales_data)
+    ~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "C:\Users\MattBorgeson\anaconda3\Lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+           ~~~~~~~~~~~~~~~^^^^^^^^^^^^^
+psycopg2.errors.ForeignKeyViolation: insert or update on table "sales_history" violates foreign key constraint "sales_history_apn_fkey"
+DETAIL:  Key (apn)=(11727002) is not present in table "properties".
+
+
+2025-09-16 03:59:25 - src.database_manager - ERROR - Failed to insert sales history for 11727002: insert or update on table "sales_history" violates foreign key constraint "sales_history_apn_fkey"
+DETAIL:  Key (apn)=(11727002) is not present in table "properties".
+
+2025-09-16 04:43:59 - __main__ - ERROR - Test failed: DatabaseManager.__init__() missing 1 required positional argument: 'config_manager'
+2025-09-16 04:54:55 - src.parallel_web_scraper - ERROR - Failed to create browser: Message: Unable to locate or obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-09-16 04:55:38 - src.gui.enhanced_main_window - ERROR - Search worker error: 'BackgroundDataCollectionManager' object has no attribute 'enhance_search_results'
+2025-09-16 04:56:04 - src.gui.enhanced_main_window - ERROR - Search worker error: 'BackgroundDataCollectionManager' object has no attribute 'enhance_search_results'
+2025-09-16 04:56:18 - src.database_manager - ERROR - Exception occurred in database operation: connection pool is closed
+2025-09-16 04:56:18 - src.database_manager - ERROR - Exception type: PoolError
+2025-09-16 04:56:18 - src.database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 61, in get_connection
+    connection = self.pool.getconn()
+  File "C:\Users\MattBorgeson\anaconda3\envs\maricopa_property\lib\site-packages\psycopg2\pool.py", line 169, in getconn
+    return self._getconn(key)
+  File "C:\Users\MattBorgeson\anaconda3\envs\maricopa_property\lib\site-packages\psycopg2\pool.py", line 79, in _getconn
+    raise PoolError("connection pool is closed")
+psycopg2.pool.PoolError: connection pool is closed
+
+2025-09-16 04:56:18 - src.database_manager - ERROR - Exception occurred in database connection test: connection pool is closed
+2025-09-16 04:56:18 - src.database_manager - ERROR - Exception type: PoolError
+2025-09-16 04:56:18 - src.database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 85, in test_connection
+    with self.get_connection() as conn:
+  File "C:\Users\MattBorgeson\anaconda3\envs\maricopa_property\lib\contextlib.py", line 135, in __enter__
+    return next(self.gen)
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 61, in get_connection
+    connection = self.pool.getconn()
+  File "C:\Users\MattBorgeson\anaconda3\envs\maricopa_property\lib\site-packages\psycopg2\pool.py", line 169, in getconn
+    return self._getconn(key)
+  File "C:\Users\MattBorgeson\anaconda3\envs\maricopa_property\lib\site-packages\psycopg2\pool.py", line 79, in _getconn
+    raise PoolError("connection pool is closed")
+psycopg2.pool.PoolError: connection pool is closed
+
+2025-09-16 05:04:47 - src.parallel_web_scraper - ERROR - Failed to create browser: Message: Unable to locate or obtain driver for chrome; For documentation on this error, please visit: https://www.selenium.dev/documentation/webdriver/troubleshooting/errors/driver_location
+
+2025-09-16 05:05:11 - src.database_manager - ERROR - Exception occurred in database operation: 'apn'
+2025-09-16 05:05:11 - src.database_manager - ERROR - Exception type: KeyError
+2025-09-16 05:05:11 - src.database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 64, in get_connection
+    yield connection
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 141, in insert_property
+    cursor.execute(sql, property_data)
+  File "C:\Users\MattBorgeson\anaconda3\envs\maricopa_property\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+KeyError: 'apn'
+
+2025-09-16 05:05:11 - src.database_manager - ERROR - Exception occurred in inserting property data for APN: unknown: 'apn'
+2025-09-16 05:05:11 - src.database_manager - ERROR - Exception type: KeyError
+2025-09-16 05:05:11 - src.database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 141, in insert_property
+    cursor.execute(sql, property_data)
+  File "C:\Users\MattBorgeson\anaconda3\envs\maricopa_property\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+KeyError: 'apn'
+
+2025-09-16 05:05:11 - src.database_manager - ERROR - Exception occurred in database operation: 'apn'
+2025-09-16 05:05:11 - src.database_manager - ERROR - Exception type: KeyError
+2025-09-16 05:05:11 - src.database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 64, in get_connection
+    yield connection
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 141, in insert_property
+    cursor.execute(sql, property_data)
+  File "C:\Users\MattBorgeson\anaconda3\envs\maricopa_property\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+KeyError: 'apn'
+
+2025-09-16 05:05:11 - src.database_manager - ERROR - Exception occurred in inserting property data for APN: unknown: 'apn'
+2025-09-16 05:05:11 - src.database_manager - ERROR - Exception type: KeyError
+2025-09-16 05:05:11 - src.database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 141, in insert_property
+    cursor.execute(sql, property_data)
+  File "C:\Users\MattBorgeson\anaconda3\envs\maricopa_property\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+KeyError: 'apn'
+
+2025-09-16 05:05:11 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304014A: 'int' object is not iterable
+2025-09-16 05:05:11 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304017: 'int' object is not iterable
+2025-09-16 05:05:11 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304018: 'int' object is not iterable
+2025-09-16 05:05:11 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304019: 'int' object is not iterable
+2025-09-16 05:05:11 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304020: 'int' object is not iterable
+2025-09-16 05:05:12 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304021: 'int' object is not iterable
+2025-09-16 05:05:12 - src.gui.enhanced_main_window - ERROR - Error checking data status for 30149764: 'int' object is not iterable
+2025-09-16 05:05:12 - src.gui.enhanced_main_window - ERROR - Error checking data status for 30483398: 'int' object is not iterable
+2025-09-16 05:05:12 - src.gui.enhanced_main_window - ERROR - Error checking data status for : 'int' object is not iterable
+2025-09-16 05:05:12 - src.gui.enhanced_main_window - ERROR - Error checking data status for : 'int' object is not iterable
+2025-09-16 05:05:12 - src.gui.enhanced_main_window - ERROR - Error checking data status for 13304014A: 'int' object is not iterable
+2025-09-16 05:18:55 - src.database_manager - ERROR - Cannot insert property: missing required 'apn' field
+2025-09-16 05:21:46 - src.database_manager - ERROR - Cannot insert property: missing required 'apn' field
+2025-09-16 05:23:01 - src.database_manager - ERROR - Cannot insert property: missing required 'apn' field
+2025-09-16 05:47:02 - src.database_manager - ERROR - Cannot insert property: missing required 'apn' field
+2025-09-16 07:12:44 - src.gui.enhanced_main_window - ERROR - Database initialization failed: DatabaseManager.__init__() missing 1 required positional argument: 'config_manager'
+2025-09-16 07:39:45 - __main__ - ERROR - Exception occurred in main application startup: EnhancedMainWindow.__init__() takes 1 positional argument but 2 were given
+2025-09-16 07:39:45 - __main__ - ERROR - Exception type: TypeError
+2025-09-16 07:39:45 - __main__ - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\maricopa_property_search.py", line 57, in main
+    window = EnhancedPropertySearchApp(config)
+TypeError: EnhancedMainWindow.__init__() takes 1 positional argument but 2 were given
+
+2025-09-16 07:42:53 - gui.enhanced_main_window - ERROR - Component initialization failed: name 'PropertySearchEngine' is not defined
+2025-09-16 07:43:01 - __main__ - ERROR - Exception occurred in main application startup: EnhancedMainWindow.__init__() takes 1 positional argument but 2 were given
+2025-09-16 07:43:01 - __main__ - ERROR - Exception type: TypeError
+2025-09-16 07:43:01 - __main__ - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\maricopa_property_search.py", line 57, in main
+    window = EnhancedPropertySearchApp(config)
+TypeError: EnhancedMainWindow.__init__() takes 1 positional argument but 2 were given
+
+2025-09-16 07:43:42 - gui.enhanced_main_window - ERROR - Component initialization failed: name 'PropertySearchEngine' is not defined
+2025-09-16 07:43:54 - __main__ - ERROR - Exception occurred in main application startup: EnhancedMainWindow.__init__() takes 1 positional argument but 2 were given
+2025-09-16 07:43:54 - __main__ - ERROR - Exception type: TypeError
+2025-09-16 07:43:54 - __main__ - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\maricopa_property_search.py", line 57, in main
+    window = EnhancedPropertySearchApp(config)
+TypeError: EnhancedMainWindow.__init__() takes 1 positional argument but 2 were given
+
+2025-09-16 07:54:59 - __main__ - ERROR - Exception occurred in main application startup: EnhancedMainWindow.__init__() takes 1 positional argument but 2 were given
+2025-09-16 07:54:59 - __main__ - ERROR - Exception type: TypeError
+2025-09-16 07:54:59 - __main__ - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\maricopa_property_search.py", line 57, in main
+    window = EnhancedPropertySearchApp(config)
+TypeError: EnhancedMainWindow.__init__() takes 1 positional argument but 2 were given
+
+2025-09-16 07:59:02 - __main__ - ERROR - Exception occurred in main application startup: EnhancedMainWindow.__init__() takes 1 positional argument but 2 were given
+2025-09-16 07:59:02 - __main__ - ERROR - Exception type: TypeError
+2025-09-16 07:59:02 - __main__ - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\maricopa_property_search.py", line 57, in main
+    window = EnhancedPropertySearchApp(config)
+TypeError: EnhancedMainWindow.__init__() takes 1 positional argument but 2 were given
+
+2025-09-16 08:02:11 - gui.enhanced_main_window - ERROR - Component initialization failed: name 'PropertySearchEngine' is not defined
+2025-09-16 08:02:21 - gui.enhanced_main_window - ERROR - Component initialization failed: name 'PropertySearchEngine' is not defined
+2025-09-16 08:02:24 - __main__ - ERROR - Exception occurred in main application startup: name 'AdvancedFiltersWidget' is not defined
+2025-09-16 08:02:24 - __main__ - ERROR - Exception type: NameError
+2025-09-16 08:02:24 - __main__ - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\maricopa_property_search.py", line 57, in main
+    window = EnhancedMainWindow()
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\gui\enhanced_main_window.py", line 409, in __init__
+    self.setup_ui()
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\gui\enhanced_main_window.py", line 493, in setup_ui
+    left_panel = self.create_left_panel()
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\gui\enhanced_main_window.py", line 538, in create_left_panel
+    self.advanced_filters = AdvancedFiltersWidget()
+NameError: name 'AdvancedFiltersWidget' is not defined
+
+2025-09-16 08:03:14 - gui.enhanced_main_window - ERROR - Component initialization failed: name 'PropertySearchEngine' is not defined
+2025-09-16 08:05:13 - gui.enhanced_main_window - ERROR - Component initialization failed: name 'PropertySearchEngine' is not defined
+2025-09-16 08:05:18 - gui.enhanced_main_window - ERROR - Component initialization failed: name 'PropertySearchEngine' is not defined
+2025-09-16 08:06:41 - gui.enhanced_main_window - ERROR - Component initialization failed: name 'PropertySearchEngine' is not defined
+2025-09-16 08:08:34 - src.gui.enhanced_main_window - ERROR - Database initialization failed: No section: 'database'
+2025-09-16 08:08:36 - src.gui.enhanced_main_window - ERROR - Component initialization failed: name 'PropertySearchEngine' is not defined
+2025-09-16 08:08:49 - src.gui.enhanced_main_window - ERROR - Database initialization failed: No section: 'database'
+2025-09-16 08:08:54 - src.gui.enhanced_main_window - ERROR - Component initialization failed: name 'PropertySearchEngine' is not defined
+2025-09-16 08:15:11 - gui.enhanced_main_window - ERROR - Database initialization failed: No section: 'database'
+2025-09-16 08:15:12 - gui.enhanced_main_window - ERROR - Component initialization failed: name 'PropertySearchEngine' is not defined
+2025-09-16 08:15:38 - database_manager - ERROR - Exception occurred in database operation: 'last_payment_date'
+2025-09-16 08:15:38 - database_manager - ERROR - Exception type: KeyError
+2025-09-16 08:15:38 - database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 64, in get_connection
+    yield connection
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 311, in insert_tax_history
+    cursor.execute(sql, tax_data)
+  File "C:\Users\MattBorgeson\anaconda3\envs\maricopa_property\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+KeyError: 'last_payment_date'
+
+2025-09-16 08:15:38 - database_manager - ERROR - Failed to insert tax history for 12345678: 'last_payment_date'
+2025-09-16 08:15:38 - database_manager - ERROR - Exception occurred in database operation: 'recording_number'
+2025-09-16 08:15:38 - database_manager - ERROR - Exception type: KeyError
+2025-09-16 08:15:38 - database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 64, in get_connection
+    yield connection
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 355, in insert_sales_history
+    cursor.execute(sql, sales_data)
+  File "C:\Users\MattBorgeson\anaconda3\envs\maricopa_property\lib\site-packages\psycopg2\extras.py", line 236, in execute
+    return super().execute(query, vars)
+KeyError: 'recording_number'
+
+2025-09-16 08:15:38 - database_manager - ERROR - Failed to insert sales history for 12345678: 'recording_number'
+2025-09-16 08:15:38 - database_manager - ERROR - Exception occurred in database operation: 0
+2025-09-16 08:15:38 - database_manager - ERROR - Exception type: KeyError
+2025-09-16 08:15:38 - database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 64, in get_connection
+    yield connection
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 418, in get_database_stats
+    stats['properties'] = cursor.fetchone()[0]
+KeyError: 0
+
+2025-09-16 08:15:38 - database_manager - ERROR - Exception occurred in retrieving database statistics: 0
+2025-09-16 08:15:38 - database_manager - ERROR - Exception type: KeyError
+2025-09-16 08:15:38 - database_manager - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\database_manager.py", line 418, in get_database_stats
+    stats['properties'] = cursor.fetchone()[0]
+KeyError: 0
+
+2025-09-16 08:18:54 - gui.enhanced_main_window - ERROR - Database initialization failed: No section: 'database'
+2025-09-16 08:25:45 - __main__ - ERROR - Database initialization failed: No section: 'database'
+2025-09-16 08:26:09 - __main__ - ERROR - Component initialization failed: name 'BackgroundDataCollector' is not defined
+2025-09-16 08:26:10 - __main__ - ERROR - Failed to update quick stats: 'NoneType' object has no attribute 'get_quick_stats'
+2025-09-16 08:26:10 - __main__ - ERROR - Database connection check failed: 'NoneType' object has no attribute 'test_connection'
+2025-09-16 08:26:10 - __main__ - ERROR - Application startup failed: 'EnhancedMainWindow' object has no attribute 'data_validator'
+2025-09-16 08:28:43 - gui.enhanced_main_window - ERROR - Failed to update quick stats: 'DatabaseManager' object has no attribute 'get_quick_stats'
+2025-09-16 08:28:44 - gui.enhanced_main_window - ERROR - Database connection check failed: 'DatabaseManager' object has no attribute 'get_database_info'
+2025-09-16 08:28:44 - __main__ - ERROR - Exception occurred in main application startup: 'BackgroundDataCollectionManager' object has no attribute 'collection_finished'
+2025-09-16 08:28:44 - __main__ - ERROR - Exception type: AttributeError
+2025-09-16 08:28:44 - __main__ - ERROR - Traceback:
+Traceback (most recent call last):
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\maricopa_property_search.py", line 57, in main
+    window = EnhancedMainWindow()
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\gui\enhanced_main_window.py", line 1056, in __init__
+    self.connect_signals()
+  File "C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch\src\gui\enhanced_main_window.py", line 1670, in connect_signals
+    self.background_manager.collection_finished.connect(self.on_collection_finished)
+AttributeError: 'BackgroundDataCollectionManager' object has no attribute 'collection_finished'
+
+2025-09-16 08:30:36 - __main__ - ERROR - Database initialization failed: No section: 'database'
+2025-09-16 08:33:09 - src.gui.enhanced_main_window - ERROR - Database initialization failed: No section: 'database'
+2025-09-16 08:40:52 - src.gui.enhanced_main_window - ERROR - Database initialization failed: No section: 'database'

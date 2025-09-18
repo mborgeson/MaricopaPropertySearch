@@ -14,8 +14,9 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 import time
 
-from src.database_manager import DatabaseManager
+# MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.search_validator import SearchType, ValidationResult
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
 logger = logging.getLogger(__name__)
 

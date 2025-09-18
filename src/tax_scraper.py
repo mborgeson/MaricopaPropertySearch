@@ -5,7 +5,7 @@ Maricopa County Treasurer Tax Data Scraper
 
 import re
 from typing import Dict, List, Optional, Any
-from src.logging_config import get_logger
+from logging_config import get_logger
 
 logger = get_logger(__name__)
 

@@ -15,9 +15,9 @@ PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySea
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from config_manager import ConfigManager
-from database_manager import DatabaseManager
-from api_client import MaricopaAPIClient
+# MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+# MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 
 def complete_system_demonstration():
     """
@@ -34,9 +34,9 @@ def complete_system_demonstration():
     print("4. Automatic data collection system for any APN")
     print("=" * 80)
     
-    config = ConfigManager()
-    db_manager = DatabaseManager(config)
-    api_client = MaricopaAPIClient(config)
+    config = EnhancedConfigManager()
+    db_manager = ThreadSafeDatabaseManager(config)
+    api_client = UnifiedMaricopaAPIClient(config)
     
     test_apn = '13304014A'  # Our test property with complete data
     
@@ -171,6 +171,9 @@ def complete_system_demonstration():
     except Exception as e:
         print(f"Error during demonstration: {e}")
         import traceback
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.enhanced_config_manager import EnhancedConfigManager
         traceback.print_exc()
         
     finally:

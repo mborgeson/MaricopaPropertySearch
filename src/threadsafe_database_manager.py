@@ -16,8 +16,8 @@ from datetime import datetime, timedelta
 import time
 import traceback
 
-from src.database_manager import DatabaseManager
-from src.logging_config import get_logger
+from database_manager import DatabaseManager
+from logging_config import get_logger
 
 logger = get_logger(__name__)
 
@@ -661,3 +661,14 @@ class ThreadSafeDatabaseManager(DatabaseManager):
         except Exception as e:
             logger.error(f"Database connection test failed: {e}")
             return False
+
+    def get_property_details(self, apn: str) -> Optional[Dict]:
+        """Get property details by APN - delegates to parent class for GUI compatibility"""
+        logger.debug(f"Retrieving property details for APN: {apn}")
+
+        try:
+            return self.get_property_by_apn(apn)
+
+        except Exception as e:
+            logger.error(f"Error retrieving property details for APN: {apn}: {e}")
+            return None

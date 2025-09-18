@@ -10,16 +10,16 @@ PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySea
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from config_manager import ConfigManager
-from database_manager import DatabaseManager
+# MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+# MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
 def check_enhanced_property_data():
     """Check what enhanced data is now available"""
     print("Enhanced Property Data Check")
     print("=" * 40)
     
-    config = ConfigManager()
-    db_manager = DatabaseManager(config)
+    config = EnhancedConfigManager()
+    db_manager = ThreadSafeDatabaseManager(config)
     
     test_apn = '13304014A'
     
@@ -49,6 +49,8 @@ def check_enhanced_property_data():
     except Exception as e:
         print(f"Error: {e}")
         import traceback
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.enhanced_config_manager import EnhancedConfigManager
         traceback.print_exc()
         
     finally:

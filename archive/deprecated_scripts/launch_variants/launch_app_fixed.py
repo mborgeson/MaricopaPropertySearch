@@ -43,9 +43,9 @@ def main():
         app.setStyle('Fusion')
         
         # Import configuration
-        from config_manager import ConfigManager
+        # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         logger.info("Loading application configuration")
-        config_manager = ConfigManager()
+        config_manager = EnhancedConfigManager()
         
         # Test database connection
         from threadsafe_database_manager import ThreadSafeDatabaseManager
@@ -103,6 +103,7 @@ def main():
         
         try:
             from PyQt5.QtWidgets import QMessageBox
+from src.enhanced_config_manager import EnhancedConfigManager
             QMessageBox.critical(None, "Application Error", 
                                f"A critical error occurred during startup:\n\n{str(e)}\n\n"
                                "Please check the log files for more details.")

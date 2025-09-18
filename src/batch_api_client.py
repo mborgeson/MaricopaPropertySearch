@@ -19,8 +19,9 @@ import queue
 
 from PyQt5.QtCore import QThread, pyqtSignal
 
-from src.api_client import MaricopaAPIClient
-from src.logging_config import get_logger, get_performance_logger
+# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+from logging_config import get_logger, get_performance_logger
+from src.api_client_unified import UnifiedMaricopaAPIClient
 
 logger = get_logger(__name__)
 perf_logger = get_performance_logger(__name__)
@@ -227,7 +228,7 @@ class BatchAPIClient:
     """Enhanced API client with batch operations and parallel processing"""
     
     def __init__(self, 
-                 base_api_client: MaricopaAPIClient,
+                 base_api_clientUnifiedMaricopaAPIClient,
                  max_concurrent_requests: int = 10,
                  enable_connection_pooling: bool = True,
                  enable_adaptive_rate_limiting: bool = True):
@@ -663,7 +664,7 @@ class BatchAPIWorker(QThread):
     batch_progress = pyqtSignal(int, int)  # completed, total
     batch_completed = pyqtSignal(dict)  # completion_stats
     
-    def __init__(self, batch_client: BatchAPIClient):
+    def __init__(self, batch_clientUnifiedMaricopaAPIClient):
         super().__init__()
         self.batch_client = batch_client
         self.current_request_ids = []

@@ -26,12 +26,12 @@ if platform.system() == 'Windows':
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
 # Import configuration and logging
-from src.config_manager import ConfigManager
-from src.logging_config import setup_logging, get_logger, log_exception
-from src.database_manager import DatabaseManager
-from src.api_client import MaricopaAPIClient
-from src.web_scraper import WebScraperManager
-from gui.enhanced_main_window import EnhancedPropertySearchApp
+# MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+from logging_config import setup_logging, get_logger, log_exception
+# MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+from web_scraper import WebScraperManager
+from gui.enhanced_main_window import EnhancedMainWindow
 
 # [Rest of the application code from earlier...]
 
@@ -42,7 +42,7 @@ def main():
         app.setApplicationName("Maricopa Property Search")
         
         # Load configuration
-        config = ConfigManager()
+        config = EnhancedConfigManager()
         
         # Setup logging
         logging_config = setup_logging(config)
@@ -54,7 +54,7 @@ def main():
         logger.info("Initializing application components...")
         
         # Create main window
-        window = EnhancedPropertySearchApp(config)
+        window = EnhancedMainWindow()
         window.show()
         
         logger.info("Application window displayed successfully")
@@ -76,6 +76,9 @@ def main():
         except:
             print(f"CRITICAL ERROR in main(): {e}")
             import traceback
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.enhanced_config_manager import EnhancedConfigManager
             traceback.print_exc()
         sys.exit(1)
 

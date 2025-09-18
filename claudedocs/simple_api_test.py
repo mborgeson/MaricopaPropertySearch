@@ -22,11 +22,11 @@ def main():
     print("=" * 50)
     
     try:
-        from src.config_manager import ConfigManager
-        from src.api_client import MaricopaAPIClient
+        # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+        # MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
         
-        config = ConfigManager()
-        api_client = MaricopaAPIClient(config)
+        config = EnhancedConfigManager()
+        api_client = UnifiedMaricopaAPIClient(config)
         
         # Test 1: Search
         print("1. SEARCHING FOR PROPERTY...")
@@ -114,6 +114,8 @@ def main():
     except Exception as e:
         print(f"TEST FAILED: {e}")
         import traceback
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.enhanced_config_manager import EnhancedConfigManager
         traceback.print_exc()
         return False
 

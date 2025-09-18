@@ -9,8 +9,10 @@ import os
 # Add src to path for imports
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
-from api_client import MaricopaAPIClient
-from config_manager import ConfigManager
+# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+# MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.enhanced_config_manager import EnhancedConfigManager
 
 def test_with_known_good_apn():
     """Test with a known good APN"""
@@ -20,8 +22,8 @@ def test_with_known_good_apn():
     
     # Initialize
     try:
-        config_manager = ConfigManager()
-        api_client = MaricopaAPIClient(config_manager)
+        config_manager = EnhancedConfigManager()
+        api_client = UnifiedMaricopaAPIClient(config_manager)
         print("PASS: API Client initialized")
     except Exception as e:
         print(f"FAIL: {e}")

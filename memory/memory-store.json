@@ -1,0 +1,34 @@
+{
+  "default": [
+    {
+      "key": "MCA GUI TROUBLESHOOTING",
+      "value": "TAX AND SALES HISTORY TROUBLESHOOTING - COMPLETE RESOLUTION",
+      "namespace": "default",
+      "timestamp": 1758023605651
+    },
+    {
+      "key": "MCA_TAX_SALES_FIX",
+      "value": "ISSUE: Tax and sales history not displaying in PropertyDetailsDialog. ROOT CAUSE: BackgroundDataWorker initialized with api_client=None causing silent failures. FIXES: 1) Added ConfigManager.get() method 2) Added DatabaseManager.get_property_details() 3) Fixed manual_collect_data AttributeError 4) Fixed BackgroundDataWorker API client initialization 5) Enabled data collection triggers. FILES: config_manager.py, database_manager.py, background_data_collector.py, enhanced_main_window.py. STATUS: RESOLVED 2025-01-16",
+      "namespace": "default",
+      "timestamp": 1758024389325
+    },
+    {
+      "key": "MCA_COMPREHENSIVE_FIXES",
+      "value": "Complete MaricopaPropertySearch troubleshooting session - Fixed multiple critical issues:",
+      "namespace": "default",
+      "timestamp": 1758027158804
+    },
+    {
+      "key": "MCA_FILES_MODIFIED",
+      "value": "Key files modified during MaricopaPropertySearch fixes:",
+      "namespace": "default",
+      "timestamp": 1758027221619
+    },
+    {
+      "key": "MCA_SOLUTION_PATTERNS",
+      "value": "Solution patterns from MaricopaPropertySearch debugging:",
+      "namespace": "default",
+      "timestamp": 1758027313718
+    }
+  ]
+}

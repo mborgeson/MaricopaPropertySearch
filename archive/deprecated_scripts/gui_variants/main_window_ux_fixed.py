@@ -22,8 +22,8 @@ from datetime import datetime
 import traceback
 
 # Import application modules
-from src.database_manager import DatabaseManager
-from src.api_client import MaricopaAPIClient, MockMaricopaAPIClient
+# MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+# MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient, MockMaricopaAPIClient
 from src.web_scraper import WebScraperManager, MockWebScraperManager
 
 # Import centralized logging
@@ -187,7 +187,7 @@ class SearchWorker(QThread):
 class PropertyDetailsDialog(QDialog):
     """Property details dialog with improved UX messages"""
     
-    def __init__(self, property_data: Dict, db_manager: DatabaseManager, parent=None):
+    def __init__(self, property_data: Dict, db_managerThreadSafeDatabaseManager, parent=None):
         super().__init__(parent)
         self.property_data = property_data
         self.db_manager = db_manager
@@ -567,12 +567,12 @@ class PropertySearchApp(QMainWindow):
         try:
             # Initialize components
             logger.debug("Initializing database manager")
-            self.db_manager = DatabaseManager(config_manager)
+            self.db_manager = ThreadSafeDatabaseManager(config_manager)
             
             # Initialize API client
             try:
                 logger.debug("Attempting to initialize real API client")
-                self.api_client = MaricopaAPIClient(config_manager)
+                self.api_client = UnifiedMaricopaAPIClient(config_manager)
                 logger.info("Using real Maricopa API client")
             except Exception as e:
                 logger.warning(f"Failed to initialize real API client: {e}. Using mock client.")
@@ -1244,10 +1244,13 @@ class PropertySearchApp(QMainWindow):
 if __name__ == "__main__":
     import sys
     from PyQt5.QtWidgets import QApplication
-    from config_manager import ConfigManager
+    # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.enhanced_config_manager import EnhancedConfigManager
     
     app = QApplication(sys.argv)
-    config = ConfigManager()
+    config = EnhancedConfigManager()
     
     window = PropertySearchApp(config)
     window.show()

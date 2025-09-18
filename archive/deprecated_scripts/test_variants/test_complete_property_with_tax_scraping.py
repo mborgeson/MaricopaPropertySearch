@@ -10,16 +10,16 @@ PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySea
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from config_manager import ConfigManager
-from api_client import MaricopaAPIClient
+# MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 
 def test_complete_property_with_tax_data():
     """Test complete property data retrieval including tax scraping"""
     print("Testing Complete Property Data with Tax Scraping")
     print("=" * 60)
     
-    config = ConfigManager()
-    client = MaricopaAPIClient(config)
+    config = EnhancedConfigManager()
+    client = UnifiedMaricopaAPIClient(config)
     
     test_apn = '13304014A'
     
@@ -97,6 +97,8 @@ def test_complete_property_with_tax_data():
     except Exception as e:
         print(f"ERROR: {e}")
         import traceback
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.enhanced_config_manager import EnhancedConfigManager
         traceback.print_exc()
     
     finally:

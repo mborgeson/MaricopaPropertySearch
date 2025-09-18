@@ -1,0 +1,64 @@
+i.	Headers:
+1.	Once you receive your token, the next step is to add a custom header to your request (documentation varies between languages and transports). We use a custom header name of AUTHORIZATION with a value of your token and user-agent with a value of null.
+a.	API Token – ca1a11a6-adc4-4e0c-a584-36cbb6eb35e5
+
+
+ii.	Search Functions:
+1.	Parameters:
+a.	{query} – URL encoded query to search for.
+
+2.	Search Property:
+a.	Description: Searches all data points available. Returns a structured JSON result set with Real Property, BPP, MH, Rentals, Subdivisions, and Content along with totals found.
+b.	Path: /search/property/?q={query}
+c.	Example: https://mcassessor.maricopa.gov/search/property/?q={query}
+d.	Paging within Property Results: Results are returned at 25 results at a time. To access results after 25 simply add the page number. For example, if there are 250 results and you want to access results 201-225, then that would be page 9.
+e.	Path: /search/property/?q={query}&page={number}
+f.	Example: https://mcassessor.maricopa.gov/search/property/?q={query}&page=9
+
+3.	Search Subdivisions:
+a.	Description: Searches only subdivision names. Returns a structured JSON result set with a list of subdivision names and parcel counts.
+b.	Path: /search/sub/?q={query}
+c.	Example: https://mcassessor.maricopa.gov/search/sub/?q={query}
+
+4.	Search Rentals:
+a.	Description: Searches only rental registrations. Returns a structured JSON result set with only rental registrations.
+b.	Path: /search/rental/?q={query}
+c.	Example: https://mcassessor.maricopa.gov/search/rental/?q={query}
+d.	Paging within Property Results: Results are returned at 25 results at a time. To access results after 25 simply add the page number. For example, if there are 250 results and you want to access results 201-225, then that would be page 9.
+e.	Path: /search/ rentals /?q={query}&page={number}
+f.	Example: https://mcassessor.maricopa.gov/search/ rentals /?q={query}&page=9
+
+
+iii.	Parcel Functions:
+1.	Parameters:
+a.	{apn} – APN (Assessor Parcel Number or APN for short) must formatted with (or without) spaces, dashes, or dots.
+
+2.	Parcel Details:
+a.	Description: Returns a JSON object with all available parcel data. Works with parcel type(s): Residential, Commercial, Land, Agriculture
+b.	Path: /parcel/{apn}
+c.	Example: https://mcassessor.maricopa.gov/parcel/{apn}
+
+3.	Property Information:
+a.	Description: Returns a JSON object with information specific to the property. Works with parcel type(s): Residential, Commercial, Land, Agriculture
+b.	Path: /parcel/{apn}/propertyinfo
+c.	Example: https://mcassessor.maricopa.gov/parcel/{apn}/propertyinfo
+
+4.	Property Address:
+a.	Description: Returns a JSON object with address of the property. Works with parcel type(s): Residential, Commercial, Land, Agriculture
+b.	Path: /parcel/{apn}/address
+c.	Example: https://mcassessor.maricopa.gov/parcel/{apn}/address
+
+5.	Valuation Details:
+a.	Description: Returns a JSON object with the past 5 years of valuation data from a parcel. Works with parcel type(s): Residential, Commercial, Land, Agriculture
+b.	Path: /parcel/{apn}/valuations
+c.	Example: https://mcassessor.maricopa.gov/parcel/{apn}/valuations
+
+6.	Residential Details:
+a.	Description: Returns a JSON object with all the available residential parcel data. Does not apply to commerical, land or agriculture parcels. Works with parcel type(s): Residential, Commercial, Land
+b.	Path: /parcel/{apn}
+c.	Example: https://mcassessor.maricopa.gov/parcel/{apn}/residential-details
+
+7.	Owner Details:
+a.	Description: Returns a JSON object with all available parcel data. Works with parcel type(s): Residential, Commercial, Land, Agriculture
+b.	Path: /parcel/{apn}/owner-details
+c.	Example: https://mcassessor.maricopa.gov/parcel/{apn}/owner-details.

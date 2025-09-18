@@ -25,13 +25,13 @@ def test_missouri_ave_search():
     print()
     
     try:
-        from src.config_manager import ConfigManager
-        from src.api_client import MaricopaAPIClient
+        # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+        # MIGRATED: # MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
         from src.threadsafe_database_manager import ThreadSafeDatabaseManager
         
         # Initialize components
-        config = ConfigManager()
-        api_client = MaricopaAPIClient(config)
+        config = EnhancedConfigManager()
+        api_client = UnifiedMaricopaAPIClient(config)
         db_manager = ThreadSafeDatabaseManager(config)
         
         # Test 1: Direct API search for address
@@ -188,11 +188,13 @@ def test_data_collection_bottlenecks():
     print("="*70)
     
     try:
-        from src.config_manager import ConfigManager
-        from src.api_client import MaricopaAPIClient
+        # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+        # MIGRATED: # MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.enhanced_config_manager import EnhancedConfigManager
         
-        config = ConfigManager()
-        api_client = MaricopaAPIClient(config)
+        config = EnhancedConfigManager()
+        api_client = UnifiedMaricopaAPIClient(config)
         
         # Get a sample APN
         results = api_client.search_by_address("10000 W Missouri Ave", limit=1)

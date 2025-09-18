@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Dict, Any, Optional
 import os
 
-from src.config_manager import ConfigManager
+from config_manager import ConfigManager
 
 logger = logging.getLogger(__name__)
 

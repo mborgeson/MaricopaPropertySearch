@@ -12,8 +12,8 @@ PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from src.config_manager import ConfigManager
-from src.api_client import MaricopaAPIClient, MaricopaAssessorAPI
+# MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+# MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient, MaricopaAssessorAPI
 from src.logging_config import setup_logging, get_logger
 
 def test_fixed_methods():
@@ -28,11 +28,11 @@ def test_fixed_methods():
     
     try:
         # Initialize components
-        config_manager = ConfigManager()
-        api_client = MaricopaAPIClient(config_manager)
+        config_manager = EnhancedConfigManager()
+        api_client = UnifiedMaricopaAPIClient(config_manager)
         
         # Test that MaricopaAssessorAPI alias works
-        assessor_api = MaricopaAssessorAPI(config_manager)
+        assessor_api = UnifiedMaricopaAPIClient(config_manager)
         print("[OK] MaricopaAssessorAPI class found and instantiated")
         
         # Test API status
@@ -145,8 +145,8 @@ def test_root_cause_fixes():
     print("=" * 50)
     
     try:
-        config_manager = ConfigManager()
-        api_client = MaricopaAPIClient(config_manager)
+        config_manager = EnhancedConfigManager()
+        api_client = UnifiedMaricopaAPIClient(config_manager)
         
         print("\nROOT CAUSE 1: Empty get_sales_history() method")
         
@@ -164,8 +164,10 @@ def test_root_cause_fixes():
         print("\nROOT CAUSE 2: Missing MaricopaAssessorAPI class")
         
         try:
-            from src.api_client import MaricopaAssessorAPI
-            test_assessor = MaricopaAssessorAPI(config_manager)
+            # MIGRATED: from src.api_client import MaricopaAssessorAPI  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.enhanced_config_manager import EnhancedConfigManager
+            test_assessor = UnifiedMaricopaAPIClient(config_manager)
             print("   [FIXED] MaricopaAssessorAPI class available")
         except ImportError:
             print("   [STILL BROKEN] MaricopaAssessorAPI class not found")

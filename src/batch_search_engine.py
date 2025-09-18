@@ -19,9 +19,11 @@ import json
 
 from PyQt5.QtCore import QThread, pyqtSignal, QObject
 
-from src.logging_config import get_logger, get_performance_logger
-from src.api_client import MaricopaAPIClient
-from src.database_manager import DatabaseManager
+from logging_config import get_logger, get_performance_logger
+# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+# MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
 logger = get_logger(__name__)
 perf_logger = get_performance_logger(__name__)
@@ -148,7 +150,7 @@ class RateLimiter:
 class ConnectionPoolManager:
     """Database connection pooling for batch operations"""
     
-    def __init__(self, db_manager: DatabaseManager, pool_size: int = 10):
+    def __init__(self, db_managerThreadSafeDatabaseManager, pool_size: int = 10):
         self.db_manager = db_manager
         self.pool_size = pool_size
         self.connections = queue.Queue(maxsize=pool_size)
@@ -208,8 +210,8 @@ class BatchSearchEngine:
     """Advanced batch search engine with parallel processing and optimization"""
     
     def __init__(self, 
-                 api_client: MaricopaAPIClient,
-                 db_manager: DatabaseManager,
+                 api_clientUnifiedMaricopaAPIClient,
+                 db_managerThreadSafeDatabaseManager,
                  web_scraper=None,
                  max_concurrent_jobs: int = 3,
                  max_concurrent_per_job: int = 5):

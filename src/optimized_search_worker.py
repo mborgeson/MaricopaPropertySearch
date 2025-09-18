@@ -10,8 +10,8 @@ from PyQt5.QtCore import QThread, pyqtSignal, QMutex, QMutexLocker
 from dataclasses import asdict
 import traceback
 
-from src.search_cache import SearchCache, SearchHistory
-from src.search_validator import SearchValidator, SearchType, ValidationResult, SearchFilters
+from search_cache import SearchCache, SearchHistory
+from search_validator import SearchValidator, SearchType, ValidationResult, SearchFilters
 from optimized_database_manager import OptimizedDatabaseManager
 
 logger = logging.getLogger(__name__)

@@ -10,21 +10,21 @@ PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySea
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from config_manager import ConfigManager
-from api_client import MaricopaAPIClient
-from database_manager import DatabaseManager
+# MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+# MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
 def test_comprehensive_database_integration():
     """Test saving comprehensive property data to database"""
     print("Testing Comprehensive Database Integration")
     print("=" * 50)
     
-    config = ConfigManager()
+    config = EnhancedConfigManager()
     
     # Test database connection first
     print("Checking database connection...")
     try:
-        db_manager = DatabaseManager(config)
+        db_manager = ThreadSafeDatabaseManager(config)
         print("+ Database connection successful")
     except Exception as e:
         print(f"- Database connection failed: {e}")
@@ -33,7 +33,7 @@ def test_comprehensive_database_integration():
     # Get comprehensive property data
     print("Getting comprehensive property data...")
     try:
-        api_client = MaricopaAPIClient(config)
+        api_client = UnifiedMaricopaAPIClient(config)
         test_apn = '13304014A'
         
         comprehensive_info = api_client.get_comprehensive_property_info(test_apn)
@@ -97,6 +97,9 @@ def test_comprehensive_database_integration():
     except Exception as e:
         print(f"- Database save failed: {e}")
         import traceback
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.enhanced_config_manager import EnhancedConfigManager
         traceback.print_exc()
         return False
     

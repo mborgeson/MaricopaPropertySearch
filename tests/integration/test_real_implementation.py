@@ -14,9 +14,11 @@ project_root = Path(__file__).parent
 src_path = project_root / "src"
 sys.path.insert(0, str(src_path))
 
-from config_manager import ConfigManager
-from api_client import MaricopaAPIClient
+# MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 from web_scraper import WebScraperManager
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.enhanced_config_manager import EnhancedConfigManager
 
 # Setup logging
 logging.basicConfig(
@@ -30,8 +32,8 @@ def test_api_client():
     logger.info("Testing Maricopa API Client...")
     
     try:
-        config = ConfigManager()
-        client = MaricopaAPIClient(config)
+        config = EnhancedConfigManager()
+        client = UnifiedMaricopaAPIClient(config)
         
         # Test API status
         logger.info("Testing API status...")
@@ -81,7 +83,7 @@ def test_web_scraper():
     logger.info("Testing Web Scraper...")
     
     try:
-        config = ConfigManager()
+        config = EnhancedConfigManager()
         scraper = WebScraperManager(config)
         
         # Test APN scraping
@@ -120,8 +122,8 @@ def test_data_validation():
     logger.info("Testing data validation...")
     
     try:
-        config = ConfigManager()
-        client = MaricopaAPIClient(config)
+        config = EnhancedConfigManager()
+        client = UnifiedMaricopaAPIClient(config)
         
         # Test APN validation
         valid_apns = ["117-01-001", "11701001", "117.01.001", "117 01 001"]

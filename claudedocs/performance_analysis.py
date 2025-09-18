@@ -20,11 +20,11 @@ def analyze_api_performance():
     print("=" * 60)
     
     try:
-        from src.config_manager import ConfigManager
-        from src.api_client import MaricopaAPIClient
+        # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+        # MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
         
-        config = ConfigManager()
-        api_client = MaricopaAPIClient(config)
+        config = EnhancedConfigManager()
+        api_client = UnifiedMaricopaAPIClient(config)
         
         # Test APN from our Missouri Ave search
         apn = "10215009"
@@ -129,10 +129,12 @@ def analyze_database_performance():
     print("=" * 60)
     
     try:
-        from src.config_manager import ConfigManager
+        # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.enhanced_config_manager import EnhancedConfigManager
         
-        config = ConfigManager()
+        config = EnhancedConfigManager()
         db_manager = ThreadSafeDatabaseManager(config)
         
         # Test database operations

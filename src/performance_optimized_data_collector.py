@@ -10,8 +10,9 @@ import logging
 from typing import Dict, List, Optional, Any, Tuple
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
-from src.parallel_api_client import HighPerformanceMaricopaAPIClient
-from src.logging_config import get_logger, get_performance_logger
+# MIGRATED: from parallel_api_client import HighPerformanceMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+from logging_config import get_logger, get_performance_logger
+from src.api_client_unified import UnifiedMaricopaAPIClient
 
 logger = get_logger(__name__)
 perf_logger = get_performance_logger(__name__)
@@ -47,7 +48,7 @@ class PerformanceOptimizedDataCollector:
         self.config_manager = config_manager
         
         # Initialize high-performance API client
-        self.api_client = HighPerformanceMaricopaAPIClient(config_manager)
+        self.api_client = UnifiedMaricopaAPIClient(config_manager)
         
         # Performance tracking
         self.collection_stats = {

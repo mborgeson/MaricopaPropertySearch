@@ -48,7 +48,7 @@ class TestNetworkErrorHandling:
                 
     def test_partial_data_source_failure(self, app_config):
         """Test handling when some data sources fail but others succeed"""
-        from src.api_client import MockMaricopaAPIClient
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.api_client import MockMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
         from web_scraper import MockWebScraperManager
         
         api_client = MockMaricopaAPIClient(app_config)
@@ -77,7 +77,7 @@ class TestNetworkErrorHandling:
         
     def test_network_recovery_detection(self, app_config, network_simulator):
         """Test that system detects network recovery"""
-        from src.api_client import MockMaricopaAPIClient
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.api_client import MockMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
         
         client = MockMaricopaAPIClient(app_config)
         
@@ -102,13 +102,13 @@ class TestDatabaseErrorHandling:
     
     def test_database_connection_failure_handling(self, app_config):
         """Test handling when database connection fails"""
-        from src.database_manager import DatabaseManager
+        # MIGRATED: # MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
         
         # Create database manager with invalid config
         bad_config = app_config
         bad_config._config['database']['host'] = 'nonexistent-host'
         
-        db = DatabaseManager(bad_config)
+        db = ThreadSafeDatabaseManager(bad_config)
         
         # Should handle connection failure gracefully
         connection_ok = db.test_connection()
@@ -197,7 +197,7 @@ class TestDataInconsistencyHandling:
     
     def test_malformed_api_response_handling(self, app_config):
         """Test handling when API returns malformed data"""
-        from src.api_client import MockMaricopaAPIClient
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.api_client import MockMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
         
         client = MockMaricopaAPIClient(app_config)
         
@@ -245,7 +245,7 @@ class TestDataInconsistencyHandling:
             
     def test_inconsistent_data_between_sources(self, app_config):
         """Test handling when different data sources return inconsistent information"""
-        from src.api_client import MockMaricopaAPIClient
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.api_client import MockMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
         from web_scraper import MockWebScraperManager
         
         api_client = MockMaricopaAPIClient(app_config)
@@ -422,7 +422,7 @@ class TestSystemRecoveryPatterns:
     
     def test_automatic_retry_with_backoff(self, app_config):
         """Test automatic retry with exponential backoff"""
-        from src.api_client import MockMaricopaAPIClient
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.api_client import MockMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
         
         client = MockMaricopaAPIClient(app_config)
         
@@ -483,10 +483,12 @@ class TestSystemRecoveryPatterns:
             
     def test_resource_cleanup_on_failure(self, app_config):
         """Test that resources are properly cleaned up when operations fail"""
-        from src.database_manager import DatabaseManager
-        from src.api_client import MockMaricopaAPIClient
+        # MIGRATED: # MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.api_client import MockMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
         
-        db = DatabaseManager(app_config)
+        db = ThreadSafeDatabaseManager(app_config)
         client = MockMaricopaAPIClient(app_config)
         
         # Simulate operation that fails mid-way

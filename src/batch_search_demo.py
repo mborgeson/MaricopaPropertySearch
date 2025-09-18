@@ -14,16 +14,16 @@ PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from src.config_manager import ConfigManager
-from src.database_manager import DatabaseManager
-from src.api_client import MaricopaAPIClient, MockMaricopaAPIClient
-from src.web_scraper import WebScraperManager, MockWebScraperManager
-from src.background_data_collector import BackgroundDataCollectionManager
-from src.batch_search_integration import (
+# MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+# MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient, MockMaricopaAPIClient
+from web_scraper import WebScraperManager, MockWebScraperManager
+from background_data_collector import BackgroundDataCollectionManager
+from batch_search_integration import (
     BatchSearchIntegrationManager, 
     BatchSearchJobType
 )
-from src.logging_config import setup_logging, get_logger
+from logging_config import setup_logging, get_logger
 
 def demonstrate_batch_search():
     """Demonstrate batch search capabilities"""
@@ -35,19 +35,19 @@ def demonstrate_batch_search():
     
     try:
         # Initialize configuration
-        config = ConfigManager()
+        config = EnhancedConfigManager()
         logging_config = setup_logging(config)
         logger = get_logger(__name__)
         
         print("✓ Configuration and logging initialized")
         
         # Initialize database
-        db_manager = DatabaseManager(config)
+        db_manager = ThreadSafeDatabaseManager(config)
         print("✓ Database manager initialized")
         
         # Initialize API client (use mock for demo)
         try:
-            api_client = MaricopaAPIClient(config)
+            api_client = UnifiedMaricopaAPIClient(config)
             print("✓ Using real Maricopa API client")
         except Exception as e:
             print(f"⚠ Using mock API client ({e})")
@@ -234,6 +234,9 @@ def demonstrate_batch_search():
     except Exception as e:
         print(f"✗ Demo failed with error: {e}")
         import traceback
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.enhanced_config_manager import EnhancedConfigManager
         traceback.print_exc()
     finally:
         # Cleanup

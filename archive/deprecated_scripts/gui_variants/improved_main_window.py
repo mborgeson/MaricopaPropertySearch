@@ -22,12 +22,14 @@ from datetime import datetime
 import traceback
 
 # Import application modules
-from src.database_manager import DatabaseManager
-from src.api_client import MaricopaAPIClient, MockMaricopaAPIClient
+# MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+# MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient, MockMaricopaAPIClient
 from src.web_scraper import WebScraperManager, MockWebScraperManager
 
 # Import centralized logging
 from src.logging_config import get_logger, get_search_logger, get_performance_logger, log_exception
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
 logger = get_logger(__name__)
 search_logger = get_search_logger(__name__)
@@ -250,7 +252,7 @@ class ImprovedSearchWorker(QThread):
 class ImprovedPropertyDetailsDialog(QDialog):
     """Property details dialog with improved UX messages"""
     
-    def __init__(self, property_data: Dict, db_manager: DatabaseManager, parent=None):
+    def __init__(self, property_data: Dict, db_managerThreadSafeDatabaseManager, parent=None):
         super().__init__(parent)
         self.property_data = property_data
         self.db_manager = db_manager
@@ -635,11 +637,11 @@ class ImprovedPropertySearchApp(QMainWindow):
         
         try:
             # Initialize components
-            self.db_manager = DatabaseManager(config_manager)
+            self.db_manager = ThreadSafeDatabaseManager(config_manager)
             
             # Initialize API client
             try:
-                self.api_client = MaricopaAPIClient(config_manager)
+                self.api_client = UnifiedMaricopaAPIClient(config_manager)
                 logger.info("Using real Maricopa API client")
             except Exception as e:
                 logger.warning(f"Using mock API client: {e}")

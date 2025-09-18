@@ -84,3 +84,25 @@ class ConfigManager:
             return self.config.getboolean('logging', 'enabled')
         except:
             return True  # Default to enabled if not specified
+
+    def get_source_priority(self):
+        """Get data source priority order (DB cache last)"""
+        return [
+            'api',       # First: Try API
+            'scraping',  # Second: Try web scraping
+            'cache'      # Last: Database cache
+        ]
+
+    def get(self, key: str, default=None, section: str = 'application'):
+        """Get configuration value with default fallback"""
+        try:
+            if section in self.config and key in self.config[section]:
+                value = self.config.get(section, key)
+                if isinstance(default, bool):
+                    return self.config.getboolean(section, key)
+                elif isinstance(default, int):
+                    return self.config.getint(section, key)
+                return value
+            return default
+        except:
+            return default

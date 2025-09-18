@@ -11,14 +11,16 @@ PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySea
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from config_manager import ConfigManager
-from database_manager import DatabaseManager
+# MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+# MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.enhanced_config_manager import EnhancedConfigManager
 
 def populate_sample_properties():
     """Add real-format sample properties for testing"""
     
-    config = ConfigManager()
-    db = DatabaseManager(config)
+    config = EnhancedConfigManager()
+    db = ThreadSafeDatabaseManager(config)
     
     # Real-format sample properties (based on typical Maricopa County data)
     sample_properties = [

@@ -11,8 +11,8 @@ PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySea
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from config_manager import ConfigManager
-from database_manager import DatabaseManager
+# MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+# MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 import json
 
 def diagnose_all_issues():
@@ -21,8 +21,8 @@ def diagnose_all_issues():
     print("COMPREHENSIVE PROPERTY DATA DIAGNOSIS")
     print("="*80)
     
-    config = ConfigManager()
-    db_manager = DatabaseManager(config)
+    config = EnhancedConfigManager()
+    db_manager = ThreadSafeDatabaseManager(config)
     
     try:
         # 1. Get all properties from recent searches
@@ -155,6 +155,8 @@ def diagnose_all_issues():
     except Exception as e:
         print(f"Error during diagnosis: {e}")
         import traceback
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.enhanced_config_manager import EnhancedConfigManager
         traceback.print_exc()
         
     finally:

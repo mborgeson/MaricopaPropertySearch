@@ -35,8 +35,8 @@ def test_configuration():
     print_header("CONFIGURATION TESTS")
     
     try:
-        from src.config_manager import ConfigManager
-        config = ConfigManager()
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+        config = EnhancedConfigManager()
         
         # Test API config
         api_config = config.get_api_config()
@@ -57,10 +57,10 @@ def test_database_connection():
     print_header("DATABASE CONNECTION TESTS")
     
     try:
-        from src.config_manager import ConfigManager
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         from src.threadsafe_database_manager import ThreadSafeDatabaseManager
         
-        config = ConfigManager()
+        config = EnhancedConfigManager()
         db_manager = ThreadSafeDatabaseManager(config)
         
         # Test connection
@@ -88,11 +88,11 @@ def test_api_client():
     print_header("API CLIENT TESTS")
     
     try:
-        from src.config_manager import ConfigManager
-        from src.api_client import MaricopaAPIClient
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+        # MIGRATED: # MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
         
-        config = ConfigManager()
-        api_client = MaricopaAPIClient(config)
+        config = EnhancedConfigManager()
+        api_client = UnifiedMaricopaAPIClient(config)
         
         # Test API status
         status = api_client.get_api_status()
@@ -164,9 +164,9 @@ def test_web_scraping():
     print_header("WEB SCRAPING TESTS")
     
     try:
-        from src.config_manager import ConfigManager
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         
-        config = ConfigManager()
+        config = EnhancedConfigManager()
         
         # Check if we should use mock or real scraper
         scraping_config = config.get_scraping_config()
@@ -215,10 +215,10 @@ def test_background_data_collection():
     print_header("BACKGROUND DATA COLLECTION TESTS")
     
     try:
-        from src.config_manager import ConfigManager
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         from src.threadsafe_database_manager import ThreadSafeDatabaseManager
         
-        config = ConfigManager()
+        config = EnhancedConfigManager()
         db_manager = ThreadSafeDatabaseManager(config)
         
         # Test if we can create the background collector
@@ -259,13 +259,15 @@ def test_complete_search_workflow():
     search_term = "10000 W Missouri Ave"
     
     try:
-        from src.config_manager import ConfigManager
+        # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         from src.threadsafe_database_manager import ThreadSafeDatabaseManager
-        from src.api_client import MaricopaAPIClient
+        # MIGRATED: # MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.enhanced_config_manager import EnhancedConfigManager
         
-        config = ConfigManager()
+        config = EnhancedConfigManager()
         db_manager = ThreadSafeDatabaseManager(config)
-        api_client = MaricopaAPIClient(config)
+        api_client = UnifiedMaricopaAPIClient(config)
         
         print(f"Testing complete workflow for: {search_term}")
         

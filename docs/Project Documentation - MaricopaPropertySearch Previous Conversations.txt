@@ -1,0 +1,54 @@
+  Conversation Key="MCA_SOLUTION_PATTERNS"
+  Core architectural patterns fixed in the application:
+
+  1. API Client Initialization - BackgroundDataWorker wasn't getting API client
+  2. Thread Safety - SQLite concurrency issues in multi-threaded GUI
+  3. GUI Refresh Crashes - tkinter thread safety violations
+  4. Data Collection Performance - Blocking UI during data fetches
+  5. Batch Processing Memory - Large dataset memory issues
+
+
+  Conversation Key="MCA_COMPREHENSIVE_FIXES"
+  Critical Issues Resolved:
+
+  1. clear_apn_cache AttributeError → Created DataCollectionCache class
+  2. show_message AttributeError → Replaced with update_status calls
+  3. Tax/Sales Data Collection → Fixed API client initialization in BackgroundDataWorker
+  4. Settings Persistence → Added config/app_settings.json
+  5. Source Priority → Configured [api, scraping, cache] order
+  6. Test All Sources → Implemented proper connectivity testing
+
+
+  Conversation Key="Data Flow Fix:"
+  PropertyDetailsDialog → BackgroundDataCollectionManager → BackgroundDataWorker (NOW WITH API CLIENT)
+  → ImprovedMaricopaDataCollector → API calls succeed → Database → UI refresh
+
+
+  Conversation Key="MCA_FILES_MODIFIED"
+  Primary files changed:
+  - src/background_data_collector.py - Fixed API client initialization (lines 170-180, 288-291)
+  - src/config_manager.py - Added get() method for configuration access
+  - src/database_manager.py - Enhanced insert_property with validation (lines 103-184)
+  - src/gui/enhanced_main_window.py - Fixed method calls, added progress dialogs
+  - src/data_collection_cache.py - Created missing cache class
+  - config/app_settings.json - Created settings persistence
+
+
+  Conversation Key="MCA_TAX_SALES_FIX"
+  Root Cause: BackgroundDataWorker initialized with api_client=None
+
+  Solution Applied:
+  # Fixed initialization in BackgroundDataWorker.__init__()
+  config_manager = ConfigManager()
+  api_client = MaricopaAPIClient(config_manager)
+  self.data_collector = ImprovedMaricopaDataCollector(db_manager, api_client)
+
+  Verification: Tax and sales data now displays correctly in PropertyDetailsDialog with automatic collection working.
+
+
+  Key Testing Points:
+  1. Manual Collect shows progress dialog
+  2. Refresh Property Data doesn't crash
+  3. Test All Sources shows API/Scraping/DB status
+  4. Settings persist across restarts
+  5. Tax/Sales history loads automatically

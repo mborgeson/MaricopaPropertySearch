@@ -7,9 +7,9 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
-from config_manager import ConfigManager
-from api_client import MaricopaAPIClient
-from database_manager import DatabaseManager
+# MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+# MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from improved_automatic_data_collector import ImprovedMaricopaDataCollector
 from logging_config import setup_logging
 
@@ -24,9 +24,9 @@ def test_complete_fix():
     
     try:
         # Initialize components
-        config_manager = ConfigManager()
-        api_client = MaricopaAPIClient(config_manager)
-        db_manager = DatabaseManager(config_manager)
+        config_manager = EnhancedConfigManager()
+        api_client = UnifiedMaricopaAPIClient(config_manager)
+        db_manager = ThreadSafeDatabaseManager(config_manager)
         
         # Use the improved data collector
         collector = ImprovedMaricopaDataCollector(db_manager, api_client)
@@ -119,6 +119,9 @@ def test_complete_fix():
     except Exception as e:
         print(f"\n[ERROR] Complete fix test failed: {e}")
         import traceback
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.enhanced_config_manager import EnhancedConfigManager
         traceback.print_exc()
         return False
 

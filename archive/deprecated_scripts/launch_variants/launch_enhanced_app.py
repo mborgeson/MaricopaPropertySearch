@@ -18,7 +18,7 @@ from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtGui import QPixmap, QFont
 
 # Import application modules
-from config_manager import ConfigManager
+# MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 from gui.enhanced_main_window import EnhancedPropertySearchApp
 from logging_config import setup_logging
 
@@ -133,7 +133,7 @@ def main():
         
         # Load configuration
         logger.info("Loading application configuration")
-        config_manager = ConfigManager()
+        config_manager = EnhancedConfigManager()
         
         # Update splash message
         if splash:
@@ -214,6 +214,7 @@ def main():
 
 if __name__ == "__main__":
     import traceback
+from src.enhanced_config_manager import EnhancedConfigManager
     
     try:
         exit_code = main()
