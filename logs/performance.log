@@ -26170,3 +26170,23 @@
 2025-09-16 08:28:43 - database_manager - INFO - PERF_SUCCESS: test_connection completed in 0.005s [ID: test_connection_1758036523]
 2025-09-16 08:28:44 - database_manager - INFO - PERF_START: test_connection [ID: test_connection_1758036524]
 2025-09-16 08:28:44 - database_manager - INFO - PERF_SUCCESS: test_connection completed in 0.000s [ID: test_connection_1758036524]
+2025-09-18 10:11:18 - src.api_client_unified - INFO - SEARCH_ANALYTICS: address_search, results=1, limit=1, source=api
+2025-09-18 10:11:18 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
+2025-09-18 10:11:18 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
+2025-09-18 10:11:18 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
+2025-09-18 10:11:18 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
+2025-09-18 10:11:18 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
+2025-09-18 10:11:19 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
+2025-09-18 10:11:19 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
+2025-09-18 10:11:19 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
+2025-09-18 10:11:19 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
+2025-09-18 11:36:11 - src.api_client_unified - INFO - SEARCH_ANALYTICS: address_search, results=1, limit=1, source=api
+2025-09-18 11:36:11 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
+2025-09-18 11:36:11 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
+2025-09-18 11:36:11 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
+2025-09-18 11:36:11 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
+2025-09-18 11:36:11 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
+2025-09-18 11:36:12 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
+2025-09-18 11:36:12 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
+2025-09-18 11:36:12 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
+2025-09-18 11:36:12 - src.api_client_unified - INFO - SEARCH_ANALYTICS: apn_search, results=1, apn=10215009, source=api
