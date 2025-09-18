@@ -31,12 +31,12 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(
 
 # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 # MIGRATED: from api_client import APIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
-from web_scraper import WebScraper
-from background_data_collector import BackgroundDataCollectionManager
-from batch_search_integration import BatchSearchIntegration
-from gui.gui_enhancements_dialogs import (
-from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from ..web_scraper import WebScraper
+from ..background_data_collector import BackgroundDataCollectionManager
+from ..batch_search_integration import BatchSearchIntegration
+from ..api_client_unified import UnifiedMaricopaAPIClient
+from ..threadsafe_database_manager import ThreadSafeDatabaseManager
+from .gui_enhancements_dialogs import (
     ApplicationSettingsDialog, DataCollectionSettingsDialog, CacheManagementDialog,
     PropertyDetailsDialog, SearchResultsExportDialog, DataVisualizationDialog
 )

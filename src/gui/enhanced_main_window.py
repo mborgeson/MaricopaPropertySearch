@@ -42,13 +42,17 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 
 # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.enhanced_config_manager import EnhancedConfigManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from background_data_collector import BackgroundDataCollectionManager, JobPriority
 from batch_processing_manager import BatchProcessingManager
 # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 # Optional imports - only if they exist
 try:
     # MIGRATED: from batch_api_client import BatchAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
-except ImportErrorUnifiedMaricopaAPIClient = None
+    from src.api_client_unified import UnifiedMaricopaAPIClient
+except ImportError:
+    UnifiedMaricopaAPIClient = None
 
 try:
     from batch_search_engine import BatchSearchEngine
@@ -2353,9 +2357,6 @@ class EnhancedMainWindow(QMainWindow):
             # ULTIMATE CRASH PREVENTION - catch absolutely everything
             logger.error(f"CRITICAL: Unhandled error in refresh_property_data for APN {getattr(self, 'property_data', {}).get('apn', 'unknown')}: {e}")
             import traceback
-from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
-from src.enhanced_config_manager import EnhancedConfigManager
             traceback.print_exc()
 
             # Show error but keep application running

@@ -19,7 +19,7 @@ class EnhancedConfigManager(ConfigManager):
     """Enhanced configuration manager with background collection settings"""
     
     def __init__(self, config_file: Optional[str] = None):
-        super().__init__(config_file)
+        super().__init__()
         
         # Add default background collection settings
         self._add_background_collection_defaults()

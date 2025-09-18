@@ -250,8 +250,8 @@ class LoggingConfig:
     
     def _use_default_config(self):
         """Use default logging configuration"""
-        # Default log directory
-        project_root = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch")
+        # Default log directory - use Linux path for WSL environment
+        project_root = Path("/home/mattb/MaricopaPropertySearch")
         self.log_dir = project_root / "logs"
         self.log_dir.mkdir(parents=True, exist_ok=True)
         

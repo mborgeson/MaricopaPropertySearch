@@ -19160,3 +19160,9 @@ AttributeError: 'BackgroundDataCollectionManager' object has no attribute 'colle
 2025-09-16 08:30:36 - __main__ - ERROR - Database initialization failed: No section: 'database'
 2025-09-16 08:33:09 - src.gui.enhanced_main_window - ERROR - Database initialization failed: No section: 'database'
 2025-09-16 08:40:52 - src.gui.enhanced_main_window - ERROR - Database initialization failed: No section: 'database'
+2025-09-18 06:01:31 - src.threadsafe_database_manager - ERROR - Failed to initialize connection pool: connection to server at "localhost" (127.0.0.1), port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+2025-09-18 06:10:15 - src.threadsafe_database_manager - ERROR - Failed to initialize connection pool: connection to server at "localhost" (127.0.0.1), port 5433 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+

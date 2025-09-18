@@ -341,6 +341,7 @@ class DatabaseChecker:
         """Test threadsafe database manager"""
         try:
             # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+            from src.enhanced_config_manager import EnhancedConfigManager
             from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
             config = EnhancedConfigManager()
@@ -357,6 +358,7 @@ class DatabaseChecker:
         """Test basic database manager"""
         try:
             # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+            from src.enhanced_config_manager import EnhancedConfigManager
             # MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
             config = EnhancedConfigManager()
@@ -440,6 +442,7 @@ class ApplicationLauncher:
 
         # Import enhanced components
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
+        from src.enhanced_config_manager import EnhancedConfigManager
         from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
         # Create configuration
