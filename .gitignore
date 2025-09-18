@@ -76,3 +76,9 @@ exports/*.json
 Backup/
 *.bak
 *.backup
+
+# Windows Zone.Identifier files
+*:Zone.Identifier
+
+# Log files that change frequently
+logs/maricopa_property.log

@@ -105,7 +105,12 @@ class PlatformDetector:
         if self.is_windows:
             return True  # Windows always has display
 
-        # Check DISPLAY environment variable
+        # Check for Wayland display first (WSLg uses Wayland)
+        wayland_display = os.environ.get('WAYLAND_DISPLAY')
+        if wayland_display:
+            return True
+
+        # Check DISPLAY environment variable for X11
         display = os.environ.get('DISPLAY')
         if not display:
             return False
@@ -164,7 +169,14 @@ except Exception as e:
             return "windows"
 
         if self.can_use_gui:
-            return "xcb"  # X11 platform
+            # Check for Wayland first (WSLg uses Wayland)
+            if os.environ.get('WAYLAND_DISPLAY'):
+                return "wayland"
+            # Fallback to X11
+            elif os.environ.get('DISPLAY'):
+                return "xcb"
+            else:
+                return "offscreen"
         else:
             return "offscreen"  # Headless mode
 
