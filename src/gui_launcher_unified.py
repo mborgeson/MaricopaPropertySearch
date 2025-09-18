@@ -555,7 +555,7 @@ class ApplicationLauncher:
 
             # Import enhanced components
             from enhanced_config_manager import EnhancedConfigManager
-            from gui.enhanced_main_window import EnhancedPropertySearchApp
+            from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
             # Create configuration
             config_manager = EnhancedConfigManager()
@@ -587,7 +587,7 @@ class ApplicationLauncher:
         try:
             # Try to import a basic version or create simple one
             try:
-                from gui.enhanced_main_window import EnhancedPropertySearchApp
+                from src.gui.enhanced_main_window import EnhancedPropertySearchApp
                 main_window = EnhancedPropertySearchApp()
             except:
                 # Create a very basic window

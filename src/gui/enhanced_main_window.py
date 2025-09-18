@@ -44,8 +44,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'
 # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.enhanced_config_manager import EnhancedConfigManager
 from src.threadsafe_database_manager import ThreadSafeDatabaseManager
-from background_data_collector import BackgroundDataCollectionManager, JobPriority
-from batch_processing_manager import BatchProcessingManager
+from src.background_data_collector import BackgroundDataCollectionManager, JobPriority
+from src.batch_processing_manager import BatchProcessingManager
 # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 # Optional imports - only if they exist
 try:
@@ -55,12 +55,12 @@ except ImportError:
     UnifiedMaricopaAPIClient = None
 
 try:
-    from batch_search_engine import BatchSearchEngine
+    from src.batch_search_engine import BatchSearchEngine
 except ImportError:
     BatchSearchEngine = None
 # Import existing GUI components
 try:
-    from gui.gui_enhancements_dialogs import ApplicationSettingsDialog
+    from src.gui.gui_enhancements_dialogs import ApplicationSettingsDialog
 except ImportError:
     ApplicationSettingsDialog = None
 # All other GUI components can be imported on-demand
