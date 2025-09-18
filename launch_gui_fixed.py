@@ -1,11 +1,18 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Fixed launcher for the Maricopa Property Search GUI
-Runs without database connection and handles missing dependencies
+CONSOLIDATED - Now imports from gui_launcher_unified.py
+
+This file maintains backward compatibility while delegating all functionality
+to the unified GUI launcher that consolidates features from:
+- RUN_APPLICATION.py (smart platform detection and environment setup)
+- launch_gui_fixed.py (minimal testing functionality)
+- scripts/LAUNCH_GUI_APPLICATION.py (Windows path handling)
+- launch_enhanced_app.py (splash screen and requirement checking)
+- launch_improved_app.py (UX improvements and Missouri Ave testing)
 """
 
 import sys
-import os
 from pathlib import Path
 
 # Add src directory to path
@@ -13,56 +20,27 @@ src_dir = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_dir))
 sys.path.insert(0, str(Path(__file__).parent))
 
+# Import unified launcher functionality
+from src.gui_launcher_unified import main as unified_main
+
+import logging
+from src.logging_config import get_logger
+
+logger = get_logger(__name__)
+
+# Backward compatibility message
+logger.info("launch_gui_fixed: Using unified GUI launcher with consolidated features")
+
 def main():
-    """Main entry point for the GUI"""
+    """Main entry point - delegates to unified launcher"""
+    logger.info("Starting application via launch_gui_fixed (unified launcher)")
+    return unified_main()
+
+if __name__ == "__main__":
     try:
-        # Set Qt platform to offscreen for WSL/headless environment
-        os.environ['QT_QPA_PLATFORM'] = 'offscreen'
-
-        from PyQt5.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QLabel
-        from PyQt5.QtCore import Qt
-
-        print("Starting GUI test...")
-
-        # Create application
-        app = QApplication(sys.argv)
-        app.setApplicationName("Maricopa Property Search - Test")
-
-        # Create simple test window
-        window = QMainWindow()
-        window.setWindowTitle("Maricopa Property Search - Fixed")
-        window.resize(800, 600)
-
-        # Create central widget
-        central = QWidget()
-        layout = QVBoxLayout(central)
-
-        # Add simple label
-        label = QLabel("Application launched successfully in test mode!")
-        label.setAlignment(Qt.AlignCenter)
-        layout.addWidget(label)
-
-        window.setCentralWidget(central)
-        window.show()
-
-        print("GUI created successfully")
-        print("Running in offscreen mode for WSL")
-
-        # For testing, just exit immediately
-        print("\n✓ GUI test completed successfully!")
-        return 0
-
-    except ImportError as e:
-        print(f"Import error: {e}")
-        print("\nPlease install PyQt5:")
-        print("  pip install PyQt5")
-        return 1
-
+        sys.exit(main())
     except Exception as e:
         print(f"Error: {e}")
         import traceback
         traceback.print_exc()
-        return 1
-
-if __name__ == "__main__":
-    sys.exit(main())
+        sys.exit(1)

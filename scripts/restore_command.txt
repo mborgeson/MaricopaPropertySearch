@@ -1,0 +1,5 @@
+The project uses the checkpoint system documented in CHECKPOINT_SYSTEM_COMPLETE_GUIDE.md, which is within the "/home/mattb/MaricopaPropertySearch/checkpoints" folder.
+
+Please load the latest checkpoint from "/home/mattb/MaricopaPropertySearch/checkpoints" and retrieve the most recent knowledge graph entities from the most recently updated files within the "/home/mattb/MaricopaPropertySearch/checkpoints". If none, exist then install and configure the "knowledge-graph" mcp server and create a "knowledge-graph" output that follows the specific guidelines, attributes, and processes as what is detailed in the "CHECKPOINT_SYSTEM_COMPLETE_GUIDE.md" file referenced above.
+
+Show me the current status of the project, the list of next steps from the most recent checkpoint, and prepare to initiate the SPARC Agent Swarm upon my confirmation to move forward with next steps.

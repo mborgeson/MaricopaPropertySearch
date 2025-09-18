@@ -21,6 +21,7 @@ from PyQt5.QtCore import QThread, pyqtSignal, QObject, QTimer
 
 from batch_search_engine import BatchSearchEngine, SearchMode, BatchPriority
 # MIGRATED: from batch_api_client import BatchAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.api_client_unified import UnifiedMaricopaAPIClient, BatchAPIRequest
 from parallel_web_scraper import ParallelWebScraperManager, ScrapingTask, ScrapingRequest
 from background_data_collector import BackgroundDataCollectionManager
 from logging_config import get_logger
@@ -556,7 +557,6 @@ class BatchProcessingManager:
             if job.search_type == 'apn':
                 # For APNs, use search_by_apn to validate
                 # MIGRATED: from batch_api_client import BatchAPIRequest  # → from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.api_client_unified import UnifiedMaricopaAPIClient
                 request = BatchAPIRequest(
                     request_id=f"validate_{identifier}",
                     request_type='search_by_apn',
