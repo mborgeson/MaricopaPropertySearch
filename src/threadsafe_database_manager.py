@@ -13,7 +13,6 @@ to the unified database manager that consolidates features from:
 from .database_manager_unified import (
     # Main class
     UnifiedDatabaseManager as ThreadSafeDatabaseManager,
-
     # Aliases for backward compatibility
     DatabaseManager,
 )
@@ -24,10 +23,12 @@ from .logging_config import get_logger
 logger = get_logger(__name__)
 
 # Backward compatibility message
-logger.info("Thread-Safe Database Manager: Using unified database manager with consolidated features")
+logger.info(
+    "Thread-Safe Database Manager: Using unified database manager with consolidated features"
+)
 
 # Export all the same interface for backward compatibility
 __all__ = [
-    'ThreadSafeDatabaseManager',
-    'DatabaseManager',
+    "ThreadSafeDatabaseManager",
+    "DatabaseManager",
 ]

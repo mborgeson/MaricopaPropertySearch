@@ -18,7 +18,6 @@ from .unified_data_collector import (
     BackgroundDataCollectionManager,
     BackgroundDataWorker,
     WebScrapingFallback,
-
     # Data structures
     CollectionTask,
     ProgressiveResults,
@@ -26,7 +25,6 @@ from .unified_data_collector import (
     DataCollectionStats,
     DataCollectionCache,
     JobPriority,
-
     # Convenience functions
     create_unified_collector,
     create_background_manager,
@@ -39,21 +37,23 @@ from .logging_config import get_logger, get_performance_logger
 logger = get_logger(__name__)
 
 # Backward compatibility message
-logger.info("Performance-Optimized Data Collector: Using unified data collector with consolidated features")
+logger.info(
+    "Performance-Optimized Data Collector: Using unified data collector with consolidated features"
+)
 
 # Export all the same interface for backward compatibility
 __all__ = [
-    'PerformanceOptimizedDataCollector',
-    'BackgroundDataCollectionManager',
-    'BackgroundDataWorker',
-    'WebScrapingFallback',
-    'CollectionTask',
-    'ProgressiveResults',
-    'DataCollectionJob',
-    'DataCollectionStats',
-    'DataCollectionCache',
-    'JobPriority',
-    'create_unified_collector',
-    'create_background_manager',
-    'start_background_collection',
+    "PerformanceOptimizedDataCollector",
+    "BackgroundDataCollectionManager",
+    "BackgroundDataWorker",
+    "WebScrapingFallback",
+    "CollectionTask",
+    "ProgressiveResults",
+    "DataCollectionJob",
+    "DataCollectionStats",
+    "DataCollectionCache",
+    "JobPriority",
+    "create_unified_collector",
+    "create_background_manager",
+    "start_background_collection",
 ]

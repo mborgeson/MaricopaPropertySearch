@@ -15,7 +15,14 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Dict, Any, Optional
 
-from hook_manager import Hook, HookContext, HookResult, HookStatus, HookPriority, get_hook_manager
+from hook_manager import (
+    Hook,
+    HookContext,
+    HookResult,
+    HookStatus,
+    HookPriority,
+    get_hook_manager,
+)
 from logging_config import get_logger, log_exception
 
 logger = get_logger(__name__)
@@ -42,41 +49,45 @@ class ApplicationStartupHook(Hook):
 
             # System resource check
             memory_info = psutil.virtual_memory()
-            disk_info = psutil.disk_usage('/')
+            disk_info = psutil.disk_usage("/")
 
-            logger.info(f"System Memory: {memory_info.total / (1024**3):.1f} GB total, "
-                       f"{memory_info.available / (1024**3):.1f} GB available")
-            logger.info(f"Disk Space: {disk_info.total / (1024**3):.1f} GB total, "
-                       f"{disk_info.free / (1024**3):.1f} GB free")
+            logger.info(
+                f"System Memory: {memory_info.total / (1024**3):.1f} GB total, "
+                f"{memory_info.available / (1024**3):.1f} GB available"
+            )
+            logger.info(
+                f"Disk Space: {disk_info.total / (1024**3):.1f} GB total, "
+                f"{disk_info.free / (1024**3):.1f} GB free"
+            )
 
             # Register cleanup handlers
             self._register_cleanup_handlers()
 
             # Initialize application directories
-            self._initialize_directories(startup_data.get('project_root'))
+            self._initialize_directories(startup_data.get("project_root"))
 
             # Log configuration details
-            if 'config_manager' in startup_data:
-                self._log_configuration_info(startup_data['config_manager'])
+            if "config_manager" in startup_data:
+                self._log_configuration_info(startup_data["config_manager"])
 
             # Create startup metadata
             metadata = {
-                'startup_time': self.startup_time.isoformat(),
-                'process_id': os.getpid(),
-                'system_info': {
-                    'memory_total_gb': memory_info.total / (1024**3),
-                    'memory_available_gb': memory_info.available / (1024**3),
-                    'disk_free_gb': disk_info.free / (1024**3)
+                "startup_time": self.startup_time.isoformat(),
+                "process_id": os.getpid(),
+                "system_info": {
+                    "memory_total_gb": memory_info.total / (1024**3),
+                    "memory_available_gb": memory_info.available / (1024**3),
+                    "disk_free_gb": disk_info.free / (1024**3),
                 },
-                'initialization_steps': self.initialization_steps
+                "initialization_steps": self.initialization_steps,
             }
 
             logger.info("=== APPLICATION STARTUP COMPLETED ===")
 
             return HookResult(
                 status=HookStatus.SUCCESS,
-                result={'startup_time': self.startup_time},
-                metadata=metadata
+                result={"startup_time": self.startup_time},
+                metadata=metadata,
             )
 
         except Exception as e:
@@ -86,11 +97,13 @@ class ApplicationStartupHook(Hook):
 
     def _register_cleanup_handlers(self):
         """Register signal handlers for graceful shutdown"""
+
         def signal_handler(signum, frame):
             logger.info(f"Received signal {signum}, initiating graceful shutdown...")
             # Emit shutdown hook
             from hook_manager import emit_hook
-            emit_hook('application.shutdown', 'signal_handler', signal=signum)
+
+            emit_hook("application.shutdown", "signal_handler", signal=signum)
             sys.exit(0)
 
         signal.signal(signal.SIGINT, signal_handler)
@@ -101,14 +114,16 @@ class ApplicationStartupHook(Hook):
     def _initialize_directories(self, project_root: Optional[str]):
         """Initialize required application directories"""
         if project_root:
-            dirs_to_create = ['logs', 'cache', 'exports', 'backups', 'temp']
+            dirs_to_create = ["logs", "cache", "exports", "backups", "temp"]
 
             for dir_name in dirs_to_create:
                 dir_path = Path(project_root) / dir_name
                 dir_path.mkdir(exist_ok=True)
                 logger.debug(f"Ensured directory exists: {dir_path}")
 
-            self.initialization_steps.append(f"Directories initialized: {dirs_to_create}")
+            self.initialization_steps.append(
+                f"Directories initialized: {dirs_to_create}"
+            )
 
     def _log_configuration_info(self, config_manager):
         """Log configuration information"""
@@ -116,7 +131,9 @@ class ApplicationStartupHook(Hook):
             db_config = config_manager.get_db_config()
             api_config = config_manager.get_api_config()
 
-            logger.info(f"Database: {db_config['host']}:{db_config['port']}/{db_config['database']}")
+            logger.info(
+                f"Database: {db_config['host']}:{db_config['port']}/{db_config['database']}"
+            )
             logger.info(f"API Base URL: {api_config['base_url']}")
             logger.info(f"API Timeout: {api_config['timeout']}s")
 
@@ -147,12 +164,12 @@ class ApplicationShutdownHook(Hook):
             self._cleanup_temp_files()
 
             # Close database connections
-            if 'database_manager' in shutdown_data:
-                self._cleanup_database(shutdown_data['database_manager'])
+            if "database_manager" in shutdown_data:
+                self._cleanup_database(shutdown_data["database_manager"])
 
             # Close API connections
-            if 'api_client' in shutdown_data:
-                self._cleanup_api_client(shutdown_data['api_client'])
+            if "api_client" in shutdown_data:
+                self._cleanup_api_client(shutdown_data["api_client"])
 
             # Generate shutdown report
             uptime = self._calculate_uptime()
@@ -162,8 +179,11 @@ class ApplicationShutdownHook(Hook):
 
             return HookResult(
                 status=HookStatus.SUCCESS,
-                result={'shutdown_time': self.shutdown_time, 'cleanup_results': self.cleanup_results},
-                metadata={'uptime_seconds': uptime.total_seconds() if uptime else 0}
+                result={
+                    "shutdown_time": self.shutdown_time,
+                    "cleanup_results": self.cleanup_results,
+                },
+                metadata={"uptime_seconds": uptime.total_seconds() if uptime else 0},
             )
 
         except Exception as e:
@@ -175,6 +195,7 @@ class ApplicationShutdownHook(Hook):
         """Clean up temporary files"""
         try:
             import tempfile
+
             temp_dir = Path(tempfile.gettempdir())
             app_temp_files = list(temp_dir.glob("maricopa_*"))
 
@@ -194,7 +215,7 @@ class ApplicationShutdownHook(Hook):
     def _cleanup_database(self, database_manager):
         """Clean up database connections"""
         try:
-            if hasattr(database_manager, 'pool') and database_manager.pool:
+            if hasattr(database_manager, "pool") and database_manager.pool:
                 database_manager.pool.closeall()
                 logger.info("Database connection pool closed")
                 self.cleanup_results.append("Database connections closed")
@@ -204,7 +225,7 @@ class ApplicationShutdownHook(Hook):
     def _cleanup_api_client(self, api_client):
         """Clean up API client connections"""
         try:
-            if hasattr(api_client, 'session'):
+            if hasattr(api_client, "session"):
                 api_client.session.close()
                 logger.info("API client session closed")
                 self.cleanup_results.append("API client closed")
@@ -219,7 +240,7 @@ class ApplicationShutdownHook(Hook):
             history = hook_manager.get_event_history(1000)
 
             for event_name, timestamp, source in history:
-                if event_name == 'application.startup':
+                if event_name == "application.startup":
                     return self.shutdown_time - timestamp
 
         except Exception as e:
@@ -246,10 +267,7 @@ class ApplicationShutdownHook(Hook):
                 report_lines.append(f"  - {result}")
 
             if stats:
-                report_lines.extend([
-                    "",
-                    "Hook Execution Summary:"
-                ])
+                report_lines.extend(["", "Hook Execution Summary:"])
                 for hook_name, hook_stats in stats.items():
                     report_lines.append(
                         f"  - {hook_name}: {hook_stats.get('total_executions', 0)} executions, "
@@ -274,7 +292,7 @@ class ResourceMonitorHook(Hook):
         """Monitor system resources"""
         try:
             if not self.monitoring_enabled:
-                return HookResult(status=HookStatus.SUCCESS, result={'skipped': True})
+                return HookResult(status=HookStatus.SUCCESS, result={"skipped": True})
 
             current_time = datetime.now()
             process = psutil.Process()
@@ -288,38 +306,42 @@ class ResourceMonitorHook(Hook):
             system_cpu = psutil.cpu_percent()
 
             resource_data = {
-                'timestamp': current_time.isoformat(),
-                'process': {
-                    'memory_rss_mb': memory_info.rss / (1024 * 1024),
-                    'memory_vms_mb': memory_info.vms / (1024 * 1024),
-                    'cpu_percent': cpu_percent,
-                    'pid': os.getpid()
+                "timestamp": current_time.isoformat(),
+                "process": {
+                    "memory_rss_mb": memory_info.rss / (1024 * 1024),
+                    "memory_vms_mb": memory_info.vms / (1024 * 1024),
+                    "cpu_percent": cpu_percent,
+                    "pid": os.getpid(),
                 },
-                'system': {
-                    'memory_percent': system_memory.percent,
-                    'memory_available_gb': system_memory.available / (1024**3),
-                    'cpu_percent': system_cpu
-                }
+                "system": {
+                    "memory_percent": system_memory.percent,
+                    "memory_available_gb": system_memory.available / (1024**3),
+                    "cpu_percent": system_cpu,
+                },
             }
 
             # Check for resource warnings
             warnings = []
             if system_memory.percent > 85:
-                warnings.append(f"High system memory usage: {system_memory.percent:.1f}%")
+                warnings.append(
+                    f"High system memory usage: {system_memory.percent:.1f}%"
+                )
 
             if memory_info.rss / (1024**3) > 1:  # More than 1GB
-                warnings.append(f"High process memory usage: {memory_info.rss / (1024**3):.1f} GB")
+                warnings.append(
+                    f"High process memory usage: {memory_info.rss / (1024**3):.1f} GB"
+                )
 
             if warnings:
                 logger.warning("Resource usage warnings: " + "; ".join(warnings))
-                resource_data['warnings'] = warnings
+                resource_data["warnings"] = warnings
 
             self.last_check = current_time
 
             return HookResult(
                 status=HookStatus.SUCCESS,
                 result=resource_data,
-                metadata={'warnings_count': len(warnings)}
+                metadata={"warnings_count": len(warnings)},
             )
 
         except Exception as e:
@@ -343,39 +365,41 @@ class HealthCheckHook(Hook):
             health_results = {}
 
             # Check database connectivity
-            if 'database_manager' in health_data:
-                db_health = self._check_database_health(health_data['database_manager'])
-                health_results['database'] = db_health
+            if "database_manager" in health_data:
+                db_health = self._check_database_health(health_data["database_manager"])
+                health_results["database"] = db_health
 
             # Check API connectivity
-            if 'api_client' in health_data:
-                api_health = self._check_api_health(health_data['api_client'])
-                health_results['api'] = api_health
+            if "api_client" in health_data:
+                api_health = self._check_api_health(health_data["api_client"])
+                health_results["api"] = api_health
 
             # Check disk space
             disk_health = self._check_disk_space()
-            health_results['disk'] = disk_health
+            health_results["disk"] = disk_health
 
             # Overall health status
-            overall_healthy = all(result.get('healthy', False) for result in health_results.values())
+            overall_healthy = all(
+                result.get("healthy", False) for result in health_results.values()
+            )
 
             self.health_status = {
-                'timestamp': current_time.isoformat(),
-                'overall_healthy': overall_healthy,
-                'components': health_results
+                "timestamp": current_time.isoformat(),
+                "overall_healthy": overall_healthy,
+                "components": health_results,
             }
             self.last_health_check = current_time
 
             status_level = "INFO" if overall_healthy else "WARNING"
             logger.log(
                 getattr(logging, status_level),
-                f"Health check completed - Overall: {'HEALTHY' if overall_healthy else 'UNHEALTHY'}"
+                f"Health check completed - Overall: {'HEALTHY' if overall_healthy else 'UNHEALTHY'}",
             )
 
             return HookResult(
                 status=HookStatus.SUCCESS,
                 result=self.health_status,
-                metadata={'overall_healthy': overall_healthy}
+                metadata={"overall_healthy": overall_healthy},
             )
 
         except Exception as e:
@@ -390,15 +414,15 @@ class HealthCheckHook(Hook):
             response_time = time.time() - start_time
 
             return {
-                'healthy': is_healthy,
-                'response_time_ms': response_time * 1000,
-                'last_check': datetime.now().isoformat()
+                "healthy": is_healthy,
+                "response_time_ms": response_time * 1000,
+                "last_check": datetime.now().isoformat(),
             }
         except Exception as e:
             return {
-                'healthy': False,
-                'error': str(e),
-                'last_check': datetime.now().isoformat()
+                "healthy": False,
+                "error": str(e),
+                "last_check": datetime.now().isoformat(),
             }
 
     def _check_api_health(self, api_client) -> Dict[str, Any]:
@@ -409,37 +433,37 @@ class HealthCheckHook(Hook):
             response_time = time.time() - start_time
 
             return {
-                'healthy': is_healthy,
-                'response_time_ms': response_time * 1000,
-                'last_check': datetime.now().isoformat()
+                "healthy": is_healthy,
+                "response_time_ms": response_time * 1000,
+                "last_check": datetime.now().isoformat(),
             }
         except Exception as e:
             return {
-                'healthy': False,
-                'error': str(e),
-                'last_check': datetime.now().isoformat()
+                "healthy": False,
+                "error": str(e),
+                "last_check": datetime.now().isoformat(),
             }
 
     def _check_disk_space(self) -> Dict[str, Any]:
         """Check available disk space"""
         try:
-            disk_usage = psutil.disk_usage('/')
+            disk_usage = psutil.disk_usage("/")
             free_percent = (disk_usage.free / disk_usage.total) * 100
 
             is_healthy = free_percent > 10  # At least 10% free space
 
             return {
-                'healthy': is_healthy,
-                'free_percent': free_percent,
-                'free_gb': disk_usage.free / (1024**3),
-                'total_gb': disk_usage.total / (1024**3),
-                'last_check': datetime.now().isoformat()
+                "healthy": is_healthy,
+                "free_percent": free_percent,
+                "free_gb": disk_usage.free / (1024**3),
+                "total_gb": disk_usage.total / (1024**3),
+                "last_check": datetime.now().isoformat(),
             }
         except Exception as e:
             return {
-                'healthy': False,
-                'error': str(e),
-                'last_check': datetime.now().isoformat()
+                "healthy": False,
+                "error": str(e),
+                "last_check": datetime.now().isoformat(),
             }
 
 
@@ -449,10 +473,10 @@ def register_lifecycle_hooks():
     hook_manager = get_hook_manager()
 
     # Register hooks
-    hook_manager.register_hook('application.startup', ApplicationStartupHook())
-    hook_manager.register_hook('application.shutdown', ApplicationShutdownHook())
-    hook_manager.register_hook('system.resource_monitor', ResourceMonitorHook())
-    hook_manager.register_hook('system.health_check', HealthCheckHook())
+    hook_manager.register_hook("application.startup", ApplicationStartupHook())
+    hook_manager.register_hook("application.shutdown", ApplicationShutdownHook())
+    hook_manager.register_hook("system.resource_monitor", ResourceMonitorHook())
+    hook_manager.register_hook("system.health_check", HealthCheckHook())
 
     logger.info("Lifecycle hooks registered successfully")
 
@@ -461,38 +485,42 @@ def register_lifecycle_hooks():
 def trigger_startup(config_manager=None, database_manager=None, project_root=None):
     """Trigger application startup hook"""
     from hook_manager import emit_hook
+
     return emit_hook(
-        'application.startup',
-        'lifecycle_manager',
+        "application.startup",
+        "lifecycle_manager",
         config_manager=config_manager,
         database_manager=database_manager,
-        project_root=project_root
+        project_root=project_root,
     )
 
 
 def trigger_shutdown(database_manager=None, api_client=None):
     """Trigger application shutdown hook"""
     from hook_manager import emit_hook
+
     return emit_hook(
-        'application.shutdown',
-        'lifecycle_manager',
+        "application.shutdown",
+        "lifecycle_manager",
         database_manager=database_manager,
-        api_client=api_client
+        api_client=api_client,
     )
 
 
 def trigger_health_check(database_manager=None, api_client=None):
     """Trigger health check hook"""
     from hook_manager import emit_hook
+
     return emit_hook(
-        'system.health_check',
-        'lifecycle_manager',
+        "system.health_check",
+        "lifecycle_manager",
         database_manager=database_manager,
-        api_client=api_client
+        api_client=api_client,
     )
 
 
 def trigger_resource_monitor():
     """Trigger resource monitoring hook"""
     from hook_manager import emit_hook
-    return emit_hook('system.resource_monitor', 'lifecycle_manager')
+
+    return emit_hook("system.resource_monitor", "lifecycle_manager")

@@ -15,19 +15,48 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any
 
 from PyQt5.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem,
-    QComboBox, QTextEdit, QGroupBox, QCheckBox, QSpinBox,
-    QProgressBar, QStatusBar, QMenuBar, QAction, QMessageBox,
-    QFrame, QTabWidget, QSplitter, QHeaderView, QDialog,
-    QFormLayout, QListWidget, QListWidgetItem, QTreeWidget,
-    QTreeWidgetItem, QSlider, QDoubleSpinBox, QButtonGroup, QRadioButton
+    QMainWindow,
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QGridLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QComboBox,
+    QTextEdit,
+    QGroupBox,
+    QCheckBox,
+    QSpinBox,
+    QProgressBar,
+    QStatusBar,
+    QMenuBar,
+    QAction,
+    QMessageBox,
+    QFrame,
+    QTabWidget,
+    QSplitter,
+    QHeaderView,
+    QDialog,
+    QFormLayout,
+    QListWidget,
+    QListWidgetItem,
+    QTreeWidget,
+    QTreeWidgetItem,
+    QSlider,
+    QDoubleSpinBox,
+    QButtonGroup,
+    QRadioButton,
 )
 from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QObject, QSettings
 from PyQt5.QtGui import QFont, QPixmap, QIcon, QPalette, QColor
 
 # Import all the necessary classes
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 
 # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 # MIGRATED: from api_client import APIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
@@ -37,8 +66,12 @@ from ..batch_search_integration import BatchSearchIntegration
 from ..api_client_unified import UnifiedMaricopaAPIClient
 from ..threadsafe_database_manager import ThreadSafeDatabaseManager
 from .gui_enhancements_dialogs import (
-    ApplicationSettingsDialog, DataCollectionSettingsDialog, CacheManagementDialog,
-    PropertyDetailsDialog, SearchResultsExportDialog, DataVisualizationDialog
+    ApplicationSettingsDialog,
+    DataCollectionSettingsDialog,
+    CacheManagementDialog,
+    PropertyDetailsDialog,
+    SearchResultsExportDialog,
+    DataVisualizationDialog,
 )
 
 logger = logging.getLogger(__name__)

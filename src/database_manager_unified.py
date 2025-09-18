@@ -51,17 +51,21 @@ class UnifiedDatabaseManager:
         logger.info("Initializing Unified Database Manager")
 
         # Get database configuration - support both config methods for compatibility
-        if hasattr(config_manager, 'get_database_config'):
+        if hasattr(config_manager, "get_database_config"):
             self.config = config_manager.get_database_config()
-        elif hasattr(config_manager, 'get_db_config'):
+        elif hasattr(config_manager, "get_db_config"):
             self.config = config_manager.get_db_config()
         else:
-            raise AttributeError("Config manager must have either get_database_config() or get_db_config() method")
+            raise AttributeError(
+                "Config manager must have either get_database_config() or get_db_config() method"
+            )
 
         self.min_connections = min_connections
         self.max_connections = max_connections
 
-        logger.debug(f"Database Configuration - Host: {self.config['host']}, Port: {self.config['port']}, Database: {self.config['database']}")
+        logger.debug(
+            f"Database Configuration - Host: {self.config['host']}, Port: {self.config['port']}, Database: {self.config['database']}"
+        )
 
         # Thread safety
         self._pool_lock = RLock()
@@ -73,9 +77,9 @@ class UnifiedDatabaseManager:
 
         # Performance tracking
         self._operation_stats = {
-            'inserts': {'count': 0, 'total_time': 0.0, 'errors': 0},
-            'selects': {'count': 0, 'total_time': 0.0, 'errors': 0},
-            'updates': {'count': 0, 'total_time': 0.0, 'errors': 0}
+            "inserts": {"count": 0, "total_time": 0.0, "errors": 0},
+            "selects": {"count": 0, "total_time": 0.0, "errors": 0},
+            "updates": {"count": 0, "total_time": 0.0, "errors": 0},
         }
 
         # Initialize connection pool
@@ -84,7 +88,9 @@ class UnifiedDatabaseManager:
         # Initialize database schema if needed
         self._ensure_tables_exist()
 
-        logger.info(f"Unified database manager initialized with pool size {min_connections}-{max_connections}")
+        logger.info(
+            f"Unified database manager initialized with pool size {min_connections}-{max_connections}"
+        )
 
     def _initialize_connection_pool(self):
         """Initialize the database connection pool"""
@@ -103,14 +109,16 @@ class UnifiedDatabaseManager:
                 minconn=self.min_connections,
                 maxconn=self.max_connections,
                 dsn=connection_string,
-                cursor_factory=RealDictCursor
+                cursor_factory=RealDictCursor,
             )
 
             # Alias for backward compatibility
             self.pool = self._connection_pool
 
             logger.info("Database connection pool initialized successfully")
-            logger.debug(f"Connection pool configured with min={self.min_connections}, max={self.max_connections} connections")
+            logger.debug(
+                f"Connection pool configured with min={self.min_connections}, max={self.max_connections} connections"
+            )
 
         except Exception as e:
             log_exception(logger, e, "initializing database connection pool")
@@ -159,17 +167,21 @@ class UnifiedDatabaseManager:
                 except Exception as e:
                     logger.error(f"Error returning connection to pool: {e}")
 
-    def _record_operation_stats(self, operation_type: str, duration: float, error: bool = False):
+    def _record_operation_stats(
+        self, operation_type: str, duration: float, error: bool = False
+    ):
         """Record operation statistics for performance monitoring"""
         with self._stats_lock:
-            stats = self._operation_stats.get(operation_type, {'count': 0, 'total_time': 0.0, 'errors': 0})
-            stats['count'] += 1
-            stats['total_time'] += duration
+            stats = self._operation_stats.get(
+                operation_type, {"count": 0, "total_time": 0.0, "errors": 0}
+            )
+            stats["count"] += 1
+            stats["total_time"] += duration
             if error:
-                stats['errors'] += 1
+                stats["errors"] += 1
             self._operation_stats[operation_type] = stats
 
-    @perf_logger.log_performance('test_connection')
+    @perf_logger.log_performance("test_connection")
     def test_connection(self) -> bool:
         """Test database connectivity"""
         logger.debug("Testing database connection")
@@ -180,7 +192,10 @@ class UnifiedDatabaseManager:
                 cursor.execute("SELECT 1")
                 result = cursor.fetchone()
 
-                if result and (result.get(0) == 1 or (hasattr(result, 'values') and 1 in result.values())):
+                if result and (
+                    result.get(0) == 1
+                    or (hasattr(result, "values") and 1 in result.values())
+                ):
                     logger.info("Database connection test successful")
                     return True
                 else:
@@ -195,10 +210,10 @@ class UnifiedDatabaseManager:
     # PROPERTY OPERATIONS
     # =======================
 
-    @perf_logger.log_database_operation('upsert', 'properties', 1)
+    @perf_logger.log_database_operation("upsert", "properties", 1)
     def insert_property(self, property_data: Dict[str, Any]) -> bool:
         """Insert or update property data with comprehensive validation"""
-        apn = property_data.get('apn')
+        apn = property_data.get("apn")
 
         # Validate required field
         if not apn:
@@ -214,33 +229,43 @@ class UnifiedDatabaseManager:
 
                 # Define required fields with default values
                 required_fields = {
-                    'apn': apn,
-                    'owner_name': None,
-                    'property_address': None,
-                    'mailing_address': None,
-                    'legal_description': None,
-                    'land_use_code': None,
-                    'year_built': None,
-                    'living_area_sqft': None,
-                    'lot_size_sqft': None,
-                    'bedrooms': None,
-                    'bathrooms': None,
-                    'pool': None,
-                    'garage_spaces': None,
-                    'raw_data': None
+                    "apn": apn,
+                    "owner_name": None,
+                    "property_address": None,
+                    "mailing_address": None,
+                    "legal_description": None,
+                    "land_use_code": None,
+                    "year_built": None,
+                    "living_area_sqft": None,
+                    "lot_size_sqft": None,
+                    "bedrooms": None,
+                    "bathrooms": None,
+                    "pool": None,
+                    "garage_spaces": None,
+                    "raw_data": None,
                 }
 
                 # Merge provided data with defaults, ensuring all required keys exist
                 safe_property_data = {**required_fields, **property_data}
 
                 # Convert raw_data to JSON if it's a dict
-                if safe_property_data.get('raw_data') and isinstance(safe_property_data['raw_data'], dict):
-                    safe_property_data['raw_data'] = Json(safe_property_data['raw_data'])
+                if safe_property_data.get("raw_data") and isinstance(
+                    safe_property_data["raw_data"], dict
+                ):
+                    safe_property_data["raw_data"] = Json(
+                        safe_property_data["raw_data"]
+                    )
 
                 # Log missing fields for debugging
-                missing_fields = [field for field in required_fields.keys() if field not in property_data]
+                missing_fields = [
+                    field
+                    for field in required_fields.keys()
+                    if field not in property_data
+                ]
                 if missing_fields:
-                    logger.debug(f"Using default values for missing fields: {missing_fields} for APN: {apn}")
+                    logger.debug(
+                        f"Using default values for missing fields: {missing_fields} for APN: {apn}"
+                    )
 
                 sql = """
                 INSERT INTO properties (
@@ -275,20 +300,22 @@ class UnifiedDatabaseManager:
                 conn.commit()
 
                 duration = time.time() - start_time
-                self._record_operation_stats('inserts', duration)
+                self._record_operation_stats("inserts", duration)
 
                 logger.debug(f"Property data committed successfully for APN: {apn}")
                 return True
 
         except KeyError as e:
             duration = time.time() - start_time
-            self._record_operation_stats('inserts', duration, error=True)
+            self._record_operation_stats("inserts", duration, error=True)
             logger.error(f"KeyError in insert_property for APN {apn}: Missing key {e}")
-            logger.error(f"Available keys in property_data: {list(property_data.keys())}")
+            logger.error(
+                f"Available keys in property_data: {list(property_data.keys())}"
+            )
             return False
         except Exception as e:
             duration = time.time() - start_time
-            self._record_operation_stats('inserts', duration, error=True)
+            self._record_operation_stats("inserts", duration, error=True)
             log_exception(logger, e, f"inserting property data for APN: {apn}")
             return False
 
@@ -296,7 +323,7 @@ class UnifiedDatabaseManager:
         """Thread-safe property insertion - alias for insert_property for backward compatibility"""
         return self.insert_property(property_data)
 
-    @perf_logger.log_database_operation('select', 'properties', 1)
+    @perf_logger.log_database_operation("select", "properties", 1)
     def get_property_by_apn(self, apn: str) -> Optional[Dict]:
         """Get property by APN with performance tracking"""
         logger.debug(f"Retrieving property data for APN: {apn}")
@@ -312,7 +339,7 @@ class UnifiedDatabaseManager:
                 result = cursor.fetchone()
 
                 duration = time.time() - start_time
-                self._record_operation_stats('selects', duration)
+                self._record_operation_stats("selects", duration)
 
                 if result:
                     logger.debug(f"Property data found for APN: {apn}")
@@ -323,7 +350,7 @@ class UnifiedDatabaseManager:
 
         except Exception as e:
             duration = time.time() - start_time
-            self._record_operation_stats('selects', duration, error=True)
+            self._record_operation_stats("selects", duration, error=True)
             log_exception(logger, e, f"retrieving property data for APN: {apn}")
             return None
 
@@ -338,8 +365,10 @@ class UnifiedDatabaseManager:
             log_exception(logger, e, f"retrieving property details for APN: {apn}")
             return None
 
-    @perf_logger.log_database_operation('search', 'properties', None)
-    def search_properties_by_owner(self, owner_name: str, limit: int = 100) -> List[Dict]:
+    @perf_logger.log_database_operation("search", "properties", None)
+    def search_properties_by_owner(
+        self, owner_name: str, limit: int = 100
+    ) -> List[Dict]:
         """Search properties by owner name with performance tracking"""
         logger.info(f"Searching properties by owner: {owner_name} (limit: {limit})")
         start_time = time.time()
@@ -359,21 +388,25 @@ class UnifiedDatabaseManager:
                 results = [dict(row) for row in cursor.fetchall()]
 
                 duration = time.time() - start_time
-                self._record_operation_stats('selects', duration)
+                self._record_operation_stats("selects", duration)
 
                 logger.info(f"Found {len(results)} properties for owner: {owner_name}")
-                logger.debug(f"DB_ANALYTICS: owner_search, query_time={duration:.3f}s, results={len(results)}, limit={limit}")
+                logger.debug(
+                    f"DB_ANALYTICS: owner_search, query_time={duration:.3f}s, results={len(results)}, limit={limit}"
+                )
 
                 return results
 
         except Exception as e:
             duration = time.time() - start_time
-            self._record_operation_stats('selects', duration, error=True)
+            self._record_operation_stats("selects", duration, error=True)
             log_exception(logger, e, f"searching properties by owner: {owner_name}")
             return []
 
-    @perf_logger.log_database_operation('search', 'properties', None)
-    def search_properties_by_address(self, address: str, limit: int = 100) -> List[Dict]:
+    @perf_logger.log_database_operation("search", "properties", None)
+    def search_properties_by_address(
+        self, address: str, limit: int = 100
+    ) -> List[Dict]:
         """Search properties by address with performance tracking"""
         logger.info(f"Searching properties by address: {address} (limit: {limit})")
         start_time = time.time()
@@ -393,16 +426,18 @@ class UnifiedDatabaseManager:
                 results = [dict(row) for row in cursor.fetchall()]
 
                 duration = time.time() - start_time
-                self._record_operation_stats('selects', duration)
+                self._record_operation_stats("selects", duration)
 
                 logger.info(f"Found {len(results)} properties for address: {address}")
-                logger.debug(f"DB_ANALYTICS: address_search, query_time={duration:.3f}s, results={len(results)}, limit={limit}")
+                logger.debug(
+                    f"DB_ANALYTICS: address_search, query_time={duration:.3f}s, results={len(results)}, limit={limit}"
+                )
 
                 return results
 
         except Exception as e:
             duration = time.time() - start_time
-            self._record_operation_stats('selects', duration, error=True)
+            self._record_operation_stats("selects", duration, error=True)
             log_exception(logger, e, f"searching properties by address: {address}")
             return []
 
@@ -437,23 +472,27 @@ class UnifiedDatabaseManager:
 
                 # Prepare data with JSON serialization for raw_data
                 insert_data = tax_data.copy()
-                if 'raw_data' in insert_data and insert_data['raw_data']:
-                    if isinstance(insert_data['raw_data'], dict):
-                        insert_data['raw_data'] = Json(insert_data['raw_data'])
+                if "raw_data" in insert_data and insert_data["raw_data"]:
+                    if isinstance(insert_data["raw_data"], dict):
+                        insert_data["raw_data"] = Json(insert_data["raw_data"])
 
                 cursor.execute(sql, insert_data)
                 conn.commit()
 
                 duration = time.time() - start_time
-                self._record_operation_stats('inserts', duration)
+                self._record_operation_stats("inserts", duration)
 
-                logger.debug(f"Tax history inserted for APN: {tax_data.get('apn')}, year: {tax_data.get('tax_year')}")
+                logger.debug(
+                    f"Tax history inserted for APN: {tax_data.get('apn')}, year: {tax_data.get('tax_year')}"
+                )
                 return True
 
         except Exception as e:
             duration = time.time() - start_time
-            self._record_operation_stats('inserts', duration, error=True)
-            logger.error(f"Error inserting tax history for {tax_data.get('apn', 'unknown')}: {e}")
+            self._record_operation_stats("inserts", duration, error=True)
+            logger.error(
+                f"Error inserting tax history for {tax_data.get('apn', 'unknown')}: {e}"
+            )
             return False
 
     def insert_tax_history_safe(self, tax_data: Dict[str, Any]) -> bool:
@@ -478,13 +517,13 @@ class UnifiedDatabaseManager:
                 results = [dict(row) for row in cursor.fetchall()]
 
                 duration = time.time() - start_time
-                self._record_operation_stats('selects', duration)
+                self._record_operation_stats("selects", duration)
 
                 return results
 
         except Exception as e:
             duration = time.time() - start_time
-            self._record_operation_stats('selects', duration, error=True)
+            self._record_operation_stats("selects", duration, error=True)
             logger.error(f"Failed to get tax history for {apn}: {e}")
             return []
 
@@ -503,16 +542,18 @@ class UnifiedDatabaseManager:
                 # Prepare data tuples for batch insert
                 data_tuples = []
                 for record in tax_records:
-                    data_tuples.append((
-                        record.get('apn'),
-                        record.get('tax_year'),
-                        record.get('assessed_value'),
-                        record.get('limited_value'),
-                        record.get('tax_amount'),
-                        record.get('payment_status'),
-                        record.get('last_payment_date'),
-                        Json(record.get('raw_data', {}))
-                    ))
+                    data_tuples.append(
+                        (
+                            record.get("apn"),
+                            record.get("tax_year"),
+                            record.get("assessed_value"),
+                            record.get("limited_value"),
+                            record.get("tax_amount"),
+                            record.get("payment_status"),
+                            record.get("last_payment_date"),
+                            Json(record.get("raw_data", {})),
+                        )
+                    )
 
                 # Use execute_batch for better performance
                 sql = """
@@ -528,13 +569,15 @@ class UnifiedDatabaseManager:
 
                 inserted_count = len(data_tuples)
                 duration = time.time() - start_time
-                self._record_operation_stats('inserts', duration)
+                self._record_operation_stats("inserts", duration)
 
-                logger.info(f"Bulk inserted {inserted_count} tax records in {duration:.2f}s")
+                logger.info(
+                    f"Bulk inserted {inserted_count} tax records in {duration:.2f}s"
+                )
 
         except Exception as e:
             duration = time.time() - start_time
-            self._record_operation_stats('inserts', duration, error=True)
+            self._record_operation_stats("inserts", duration, error=True)
             logger.error(f"Error in bulk tax history insert: {e}")
             logger.debug(traceback.format_exc())
 
@@ -571,15 +614,19 @@ class UnifiedDatabaseManager:
                 conn.commit()
 
                 duration = time.time() - start_time
-                self._record_operation_stats('inserts', duration)
+                self._record_operation_stats("inserts", duration)
 
-                logger.debug(f"Sales history inserted for APN: {sales_data.get('apn')}, date: {sales_data.get('sale_date')}")
+                logger.debug(
+                    f"Sales history inserted for APN: {sales_data.get('apn')}, date: {sales_data.get('sale_date')}"
+                )
                 return True
 
         except Exception as e:
             duration = time.time() - start_time
-            self._record_operation_stats('inserts', duration, error=True)
-            logger.error(f"Error inserting sales history for {sales_data.get('apn', 'unknown')}: {e}")
+            self._record_operation_stats("inserts", duration, error=True)
+            logger.error(
+                f"Error inserting sales history for {sales_data.get('apn', 'unknown')}: {e}"
+            )
             return False
 
     def insert_sales_history_safe(self, sales_data: Dict[str, Any]) -> bool:
@@ -604,13 +651,13 @@ class UnifiedDatabaseManager:
                 results = [dict(row) for row in cursor.fetchall()]
 
                 duration = time.time() - start_time
-                self._record_operation_stats('selects', duration)
+                self._record_operation_stats("selects", duration)
 
                 return results
 
         except Exception as e:
             duration = time.time() - start_time
-            self._record_operation_stats('selects', duration, error=True)
+            self._record_operation_stats("selects", duration, error=True)
             logger.error(f"Failed to get sales history for {apn}: {e}")
             return []
 
@@ -629,15 +676,20 @@ class UnifiedDatabaseManager:
                 # Prepare data tuples
                 data_tuples = []
                 for record in sales_records:
-                    data_tuples.append((
-                        record.get('apn'),
-                        record.get('sale_date'),
-                        record.get('sale_price'),
-                        record.get('seller_name'),
-                        record.get('buyer_name'),
-                        record.get('deed_type'),
-                        record.get('recording_number', f"AUTO-{datetime.now().strftime('%Y%m%d%H%M%S')}")
-                    ))
+                    data_tuples.append(
+                        (
+                            record.get("apn"),
+                            record.get("sale_date"),
+                            record.get("sale_price"),
+                            record.get("seller_name"),
+                            record.get("buyer_name"),
+                            record.get("deed_type"),
+                            record.get(
+                                "recording_number",
+                                f"AUTO-{datetime.now().strftime('%Y%m%d%H%M%S')}",
+                            ),
+                        )
+                    )
 
                 sql = """
                 INSERT INTO sales_history (
@@ -652,13 +704,15 @@ class UnifiedDatabaseManager:
 
                 inserted_count = len(data_tuples)
                 duration = time.time() - start_time
-                self._record_operation_stats('inserts', duration)
+                self._record_operation_stats("inserts", duration)
 
-                logger.info(f"Bulk inserted {inserted_count} sales records in {duration:.2f}s")
+                logger.info(
+                    f"Bulk inserted {inserted_count} sales records in {duration:.2f}s"
+                )
 
         except Exception as e:
             duration = time.time() - start_time
-            self._record_operation_stats('inserts', duration, error=True)
+            self._record_operation_stats("inserts", duration, error=True)
             logger.error(f"Error in bulk sales history insert: {e}")
             logger.debug(traceback.format_exc())
 
@@ -712,45 +766,46 @@ class UnifiedDatabaseManager:
 
                     # Determine collection completeness
                     has_current_tax = (
-                        status['tax_records_count'] > 0 and
-                        status.get('latest_tax_year', 0) >= datetime.now().year - 1
+                        status["tax_records_count"] > 0
+                        and status.get("latest_tax_year", 0) >= datetime.now().year - 1
                     )
 
                     has_recent_sales = (
-                        status['sales_records_count'] > 0 and
-                        status.get('latest_sale_date') and
-                        status['latest_sale_date'] > (datetime.now().date() - timedelta(days=1825))  # 5 years
+                        status["sales_records_count"] > 0
+                        and status.get("latest_sale_date")
+                        and status["latest_sale_date"]
+                        > (datetime.now().date() - timedelta(days=1825))  # 5 years
                     )
 
-                    status['data_complete'] = has_current_tax and has_recent_sales
-                    status['needs_tax_collection'] = not has_current_tax
-                    status['needs_sales_collection'] = not has_recent_sales
+                    status["data_complete"] = has_current_tax and has_recent_sales
+                    status["needs_tax_collection"] = not has_current_tax
+                    status["needs_sales_collection"] = not has_recent_sales
 
                     duration = time.time() - start_time
-                    self._record_operation_stats('selects', duration)
+                    self._record_operation_stats("selects", duration)
 
                     return status
                 else:
                     return {
-                        'apn': apn,
-                        'exists': False,
-                        'tax_records_count': 0,
-                        'sales_records_count': 0,
-                        'data_complete': False,
-                        'needs_tax_collection': True,
-                        'needs_sales_collection': True
+                        "apn": apn,
+                        "exists": False,
+                        "tax_records_count": 0,
+                        "sales_records_count": 0,
+                        "data_complete": False,
+                        "needs_tax_collection": True,
+                        "needs_sales_collection": True,
                     }
 
         except Exception as e:
             duration = time.time() - start_time
-            self._record_operation_stats('selects', duration, error=True)
+            self._record_operation_stats("selects", duration, error=True)
             logger.error(f"Error getting data collection status for {apn}: {e}")
             return {
-                'apn': apn,
-                'error': str(e),
-                'data_complete': False,
-                'needs_tax_collection': True,
-                'needs_sales_collection': True
+                "apn": apn,
+                "error": str(e),
+                "data_complete": False,
+                "needs_tax_collection": True,
+                "needs_sales_collection": True,
             }
 
     def get_apns_needing_collection(self, limit: int = 100) -> List[Dict[str, Any]]:
@@ -808,18 +863,21 @@ class UnifiedDatabaseManager:
                 current_year = datetime.now().year
                 five_years_ago = datetime.now().date() - timedelta(days=1825)
 
-                cursor.execute(sql, (current_year, five_years_ago, current_year, five_years_ago, limit))
+                cursor.execute(
+                    sql,
+                    (current_year, five_years_ago, current_year, five_years_ago, limit),
+                )
                 results = cursor.fetchall()
 
                 duration = time.time() - start_time
-                self._record_operation_stats('selects', duration)
+                self._record_operation_stats("selects", duration)
 
                 logger.info(f"Found {len(results)} APNs needing data collection")
                 return [dict(row) for row in results]
 
         except Exception as e:
             duration = time.time() - start_time
-            self._record_operation_stats('selects', duration, error=True)
+            self._record_operation_stats("selects", duration, error=True)
             logger.error(f"Error getting APNs needing collection: {e}")
             return []
 
@@ -847,13 +905,15 @@ class UnifiedDatabaseManager:
             logger.error(f"Error marking collection in progress for {apn}: {e}")
             return False
 
-    def mark_collection_completed(self, apn: str, success: bool, error_message: Optional[str] = None) -> bool:
+    def mark_collection_completed(
+        self, apn: str, success: bool, error_message: Optional[str] = None
+    ) -> bool:
         """Mark an APN collection as completed"""
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
-                status = 'completed' if success else 'failed'
+                status = "completed" if success else "failed"
 
                 sql = """
                 INSERT INTO data_collection_status (apn, status, completed_at, error_message)
@@ -877,10 +937,18 @@ class UnifiedDatabaseManager:
     # ANALYTICS OPERATIONS
     # =======================
 
-    @perf_logger.log_database_operation('insert', 'search_history', 1)
-    def log_search(self, search_type: str, search_term: str, results_count: int, user_ip: str = None):
+    @perf_logger.log_database_operation("insert", "search_history", 1)
+    def log_search(
+        self,
+        search_type: str,
+        search_term: str,
+        results_count: int,
+        user_ip: str = None,
+    ):
         """Log search for analytics with performance tracking"""
-        logger.debug(f"Logging search analytics: {search_type} search for '{search_term}' with {results_count} results")
+        logger.debug(
+            f"Logging search analytics: {search_type} search for '{search_term}' with {results_count} results"
+        )
         start_time = time.time()
 
         try:
@@ -896,16 +964,18 @@ class UnifiedDatabaseManager:
                 conn.commit()
 
                 duration = time.time() - start_time
-                self._record_operation_stats('inserts', duration)
+                self._record_operation_stats("inserts", duration)
 
                 logger.debug("Search analytics logged successfully")
 
         except Exception as e:
             duration = time.time() - start_time
-            self._record_operation_stats('inserts', duration, error=True)
-            log_exception(logger, e, f"logging search analytics for {search_type} search")
+            self._record_operation_stats("inserts", duration, error=True)
+            log_exception(
+                logger, e, f"logging search analytics for {search_type} search"
+            )
 
-    @perf_logger.log_performance('get_database_stats')
+    @perf_logger.log_performance("get_database_stats")
     def get_database_stats(self) -> Dict[str, int]:
         """Get database statistics with performance tracking"""
         logger.debug("Retrieving database statistics")
@@ -920,38 +990,42 @@ class UnifiedDatabaseManager:
                 # Property count
                 cursor.execute("SELECT COUNT(*) as count FROM properties")
                 result = cursor.fetchone()
-                stats['properties'] = result['count'] if result else 0
+                stats["properties"] = result["count"] if result else 0
 
                 # Tax records count
                 cursor.execute("SELECT COUNT(*) as count FROM tax_history")
                 result = cursor.fetchone()
-                stats['tax_records'] = result['count'] if result else 0
+                stats["tax_records"] = result["count"] if result else 0
 
                 # Sales records count
                 cursor.execute("SELECT COUNT(*) as count FROM sales_history")
                 result = cursor.fetchone()
-                stats['sales_records'] = result['count'] if result else 0
+                stats["sales_records"] = result["count"] if result else 0
 
                 # Recent searches (handle case where table may not exist)
                 try:
-                    cursor.execute("SELECT COUNT(*) as count FROM search_history WHERE searched_at > NOW() - INTERVAL '7 days'")
+                    cursor.execute(
+                        "SELECT COUNT(*) as count FROM search_history WHERE searched_at > NOW() - INTERVAL '7 days'"
+                    )
                     result = cursor.fetchone()
-                    stats['recent_searches'] = result['count'] if result else 0
+                    stats["recent_searches"] = result["count"] if result else 0
                 except:
-                    stats['recent_searches'] = 0
+                    stats["recent_searches"] = 0
 
                 duration = time.time() - start_time
-                self._record_operation_stats('selects', duration)
+                self._record_operation_stats("selects", duration)
 
-                logger.info(f"Database statistics retrieved - Properties: {stats.get('properties', 0):,}, "
-                          f"Tax Records: {stats.get('tax_records', 0):,}, "
-                          f"Sales Records: {stats.get('sales_records', 0):,}")
+                logger.info(
+                    f"Database statistics retrieved - Properties: {stats.get('properties', 0):,}, "
+                    f"Tax Records: {stats.get('tax_records', 0):,}, "
+                    f"Sales Records: {stats.get('sales_records', 0):,}"
+                )
 
                 return stats
 
         except Exception as e:
             duration = time.time() - start_time
-            self._record_operation_stats('selects', duration, error=True)
+            self._record_operation_stats("selects", duration, error=True)
             log_exception(logger, e, "retrieving database statistics")
             return {}
 
@@ -962,19 +1036,19 @@ class UnifiedDatabaseManager:
 
             # Calculate averages and rates
             for op_type, op_stats in self._operation_stats.items():
-                if op_stats['count'] > 0:
-                    avg_time = op_stats['total_time'] / op_stats['count']
-                    error_rate = (op_stats['errors'] / op_stats['count']) * 100
+                if op_stats["count"] > 0:
+                    avg_time = op_stats["total_time"] / op_stats["count"]
+                    error_rate = (op_stats["errors"] / op_stats["count"]) * 100
                 else:
                     avg_time = 0
                     error_rate = 0
 
                 stats[op_type] = {
-                    'count': op_stats['count'],
-                    'average_time': avg_time,
-                    'total_time': op_stats['total_time'],
-                    'error_count': op_stats['errors'],
-                    'error_rate_percent': error_rate
+                    "count": op_stats["count"],
+                    "average_time": avg_time,
+                    "total_time": op_stats["total_time"],
+                    "error_count": op_stats["errors"],
+                    "error_rate_percent": error_rate,
                 }
 
             # Add connection pool stats
@@ -982,16 +1056,13 @@ class UnifiedDatabaseManager:
                 try:
                     with self._pool_lock:
                         # Get pool status (these methods may not be available in all versions)
-                        stats['connection_pool'] = {
-                            'min_connections': self.min_connections,
-                            'max_connections': self.max_connections,
-                            'status': 'active'
+                        stats["connection_pool"] = {
+                            "min_connections": self.min_connections,
+                            "max_connections": self.max_connections,
+                            "status": "active",
                         }
                 except Exception as e:
-                    stats['connection_pool'] = {
-                        'status': 'error',
-                        'error': str(e)
-                    }
+                    stats["connection_pool"] = {"status": "error", "error": str(e)}
 
             return stats
 
@@ -999,9 +1070,11 @@ class UnifiedDatabaseManager:
     # VALIDATION AND UTILITY METHODS
     # =======================
 
-    def save_comprehensive_property_data(self, comprehensive_info: Dict[str, Any]) -> bool:
+    def save_comprehensive_property_data(
+        self, comprehensive_info: Dict[str, Any]
+    ) -> bool:
         """Save comprehensive property data including detailed information"""
-        apn = comprehensive_info.get('apn', 'unknown')
+        apn = comprehensive_info.get("apn", "unknown")
         logger.info(f"Saving comprehensive property data for APN: {apn}")
 
         try:
@@ -1013,38 +1086,50 @@ class UnifiedDatabaseManager:
 
             # Save valuation history if available
             valuation_records_saved = 0
-            if 'valuation_history' in comprehensive_info:
-                for valuation in comprehensive_info['valuation_history']:
+            if "valuation_history" in comprehensive_info:
+                for valuation in comprehensive_info["valuation_history"]:
                     tax_data = {
-                        'apn': apn,
-                        'tax_year': int(valuation.get('TaxYear', 0)),
-                        'assessed_value': self._safe_int(valuation.get('FullCashValue', 0)),
-                        'limited_value': self._safe_int(valuation.get('LimitedPropertyValue', '').strip()),
-                        'tax_amount': None,  # Not provided in this endpoint
-                        'payment_status': None,  # Not provided in this endpoint
-                        'last_payment_date': None,  # Not provided in this endpoint
-                        'raw_data': Json(valuation)
+                        "apn": apn,
+                        "tax_year": int(valuation.get("TaxYear", 0)),
+                        "assessed_value": self._safe_int(
+                            valuation.get("FullCashValue", 0)
+                        ),
+                        "limited_value": self._safe_int(
+                            valuation.get("LimitedPropertyValue", "").strip()
+                        ),
+                        "tax_amount": None,  # Not provided in this endpoint
+                        "payment_status": None,  # Not provided in this endpoint
+                        "last_payment_date": None,  # Not provided in this endpoint
+                        "raw_data": Json(valuation),
                     }
 
                     if self.insert_tax_history(tax_data):
                         valuation_records_saved += 1
 
-                logger.info(f"Saved {valuation_records_saved} valuation records for APN: {apn}")
+                logger.info(
+                    f"Saved {valuation_records_saved} valuation records for APN: {apn}"
+                )
 
             # Save detailed property data to raw_data field for future use
-            if 'detailed_data' in comprehensive_info:
-                logger.debug(f"Stored detailed data from {len(comprehensive_info['detailed_data'])} endpoints for APN: {apn}")
+            if "detailed_data" in comprehensive_info:
+                logger.debug(
+                    f"Stored detailed data from {len(comprehensive_info['detailed_data'])} endpoints for APN: {apn}"
+                )
 
-            logger.info(f"Successfully saved comprehensive property data for APN: {apn}")
+            logger.info(
+                f"Successfully saved comprehensive property data for APN: {apn}"
+            )
             return True
 
         except Exception as e:
-            log_exception(logger, e, f"saving comprehensive property data for APN: {apn}")
+            log_exception(
+                logger, e, f"saving comprehensive property data for APN: {apn}"
+            )
             return False
 
     def _safe_int(self, value) -> Optional[int]:
         """Safely convert value to integer"""
-        if value is None or value == '':
+        if value is None or value == "":
             return None
         try:
             if isinstance(value, str):
@@ -1057,16 +1142,25 @@ class UnifiedDatabaseManager:
         except (ValueError, TypeError):
             return None
 
-    def validate_property_data(self, property_data: Dict[str, Any]) -> tuple[bool, List[str]]:
+    def validate_property_data(
+        self, property_data: Dict[str, Any]
+    ) -> tuple[bool, List[str]]:
         """Validate property data before insertion"""
         errors = []
 
         # Check for required fields
-        if not property_data.get('apn'):
+        if not property_data.get("apn"):
             errors.append("Missing required field: 'apn'")
 
         # Check data types for numeric fields
-        numeric_fields = ['year_built', 'living_area_sqft', 'lot_size_sqft', 'bedrooms', 'bathrooms', 'garage_spaces']
+        numeric_fields = [
+            "year_built",
+            "living_area_sqft",
+            "lot_size_sqft",
+            "bedrooms",
+            "bathrooms",
+            "garage_spaces",
+        ]
         for field in numeric_fields:
             value = property_data.get(field)
             if value is not None and not isinstance(value, (int, float, type(None))):
@@ -1078,11 +1172,11 @@ class UnifiedDatabaseManager:
                     errors.append(f"Invalid numeric value for field '{field}': {value}")
 
         # Validate boolean fields
-        boolean_fields = ['pool']
+        boolean_fields = ["pool"]
         for field in boolean_fields:
             value = property_data.get(field)
             if value is not None and not isinstance(value, (bool, type(None))):
-                if value not in [0, 1, '0', '1', 'true', 'false', 'True', 'False']:
+                if value not in [0, 1, "0", "1", "true", "false", "True", "False"]:
                     errors.append(f"Invalid boolean value for field '{field}': {value}")
 
         is_valid = len(errors) == 0
@@ -1095,7 +1189,8 @@ class UnifiedDatabaseManager:
                 cursor = conn.cursor()
 
                 # Create data collection status table if it doesn't exist
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE TABLE IF NOT EXISTS data_collection_status (
                         apn VARCHAR(50) PRIMARY KEY,
                         status VARCHAR(20) NOT NULL,
@@ -1104,19 +1199,24 @@ class UnifiedDatabaseManager:
                         error_message TEXT,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                     )
-                """)
+                """
+                )
 
                 # Add indexes for performance
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_collection_status_status
                     ON data_collection_status(status)
-                """)
+                """
+                )
 
-                cursor.execute("""
+                cursor.execute(
+                    """
                     CREATE INDEX IF NOT EXISTS idx_collection_status_completed
                     ON data_collection_status(completed_at)
                     WHERE status = 'completed'
-                """)
+                """
+                )
 
                 conn.commit()
                 logger.debug("Database schema verification completed")
@@ -1152,8 +1252,4 @@ DatabaseManager = UnifiedDatabaseManager
 ThreadSafeDatabaseManager = UnifiedDatabaseManager
 
 # Export both names for maximum compatibility
-__all__ = [
-    'UnifiedDatabaseManager',
-    'DatabaseManager',
-    'ThreadSafeDatabaseManager'
-]
+__all__ = ["UnifiedDatabaseManager", "DatabaseManager", "ThreadSafeDatabaseManager"]

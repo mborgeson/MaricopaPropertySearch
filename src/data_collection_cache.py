@@ -6,6 +6,7 @@ import json
 from pathlib import Path
 from datetime import datetime
 
+
 class DataCollectionCache:
     def __init__(self, cache_dir=None):
         self.cache_dir = cache_dir or Path("cache")
@@ -38,9 +39,11 @@ class DataCollectionCache:
             return False
 
         # Check if APN exists in any of the cache dictionaries
-        return (apn in self.property_cache or
-                apn in self.tax_cache or
-                apn in self.sales_cache)
+        return (
+            apn in self.property_cache
+            or apn in self.tax_cache
+            or apn in self.sales_cache
+        )
 
     def save_cache(self):
         """Save cache to disk"""

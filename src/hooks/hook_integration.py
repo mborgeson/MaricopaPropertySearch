@@ -40,7 +40,9 @@ class HookIntegration:
         self._session_id = session_id
 
     @contextmanager
-    def application_lifecycle(self, config_manager=None, database_manager=None, project_root=None):
+    def application_lifecycle(
+        self, config_manager=None, database_manager=None, project_root=None
+    ):
         """Context manager for application lifecycle hooks"""
         if not self.integration_enabled:
             yield
@@ -49,20 +51,20 @@ class HookIntegration:
         try:
             # Trigger startup
             emit_hook(
-                'application.startup',
-                'hook_integration',
+                "application.startup",
+                "hook_integration",
                 config_manager=config_manager,
                 database_manager=database_manager,
-                project_root=project_root
+                project_root=project_root,
             )
             yield
 
         finally:
             # Trigger shutdown
             emit_hook(
-                'application.shutdown',
-                'hook_integration',
-                database_manager=database_manager
+                "application.shutdown",
+                "hook_integration",
+                database_manager=database_manager,
             )
 
     @contextmanager
@@ -79,17 +81,22 @@ class HookIntegration:
         try:
             # Pre-search hooks
             pre_results = emit_hook(
-                'search.before',
-                'search_operation',
+                "search.before",
+                "search_operation",
                 search_type=search_type,
                 search_term=search_term,
-                **kwargs
+                **kwargs,
             )
 
             # Check for validation failures
             for result in pre_results:
-                if result.status.value == 'failed' and 'validation_errors' in result.metadata:
-                    raise ValueError(f"Search validation failed: {result.metadata['validation_errors']}")
+                if (
+                    result.status.value == "failed"
+                    and "validation_errors" in result.metadata
+                ):
+                    raise ValueError(
+                        f"Search validation failed: {result.metadata['validation_errors']}"
+                    )
 
             yield results
 
@@ -101,19 +108,21 @@ class HookIntegration:
             # Post-search hooks
             execution_time = time.time() - start_time
             emit_hook(
-                'search.after',
-                'search_operation',
+                "search.after",
+                "search_operation",
                 search_type=search_type,
                 search_term=search_term,
                 results=results,
                 success=error is None,
                 error=str(error) if error else None,
                 execution_time=execution_time,
-                **kwargs
+                **kwargs,
             )
 
     @contextmanager
-    def database_connection(self, connection_id: str, database: str, host: str, port: int):
+    def database_connection(
+        self, connection_id: str, database: str, host: str, port: int
+    ):
         """Context manager for database connection hooks"""
         if not self.integration_enabled:
             yield
@@ -122,39 +131,37 @@ class HookIntegration:
         try:
             # Connection start
             emit_hook(
-                'database.connect',
-                'database_connection',
+                "database.connect",
+                "database_connection",
                 connection_id=connection_id,
                 database=database,
                 host=host,
-                port=port
+                port=port,
             )
 
             yield
 
             # Connection success
             emit_hook(
-                'database.connected',
-                'database_connection',
-                connection_id=connection_id
+                "database.connected", "database_connection", connection_id=connection_id
             )
 
         except Exception as e:
             # Connection error
             emit_hook(
-                'database.error',
-                'database_connection',
+                "database.error",
+                "database_connection",
                 connection_id=connection_id,
-                error=e
+                error=e,
             )
             raise
 
         finally:
             # Disconnection
             emit_hook(
-                'database.disconnect',
-                'database_connection',
-                connection_id=connection_id
+                "database.disconnect",
+                "database_connection",
+                connection_id=connection_id,
             )
 
     @contextmanager
@@ -167,32 +174,34 @@ class HookIntegration:
         try:
             # Transaction begin
             emit_hook(
-                'database.transaction.begin',
-                'database_transaction',
-                transaction_id=transaction_id
+                "database.transaction.begin",
+                "database_transaction",
+                transaction_id=transaction_id,
             )
 
             yield
 
             # Transaction commit
             emit_hook(
-                'database.transaction.commit',
-                'database_transaction',
-                transaction_id=transaction_id
+                "database.transaction.commit",
+                "database_transaction",
+                transaction_id=transaction_id,
             )
 
         except Exception as e:
             # Transaction rollback
             emit_hook(
-                'database.transaction.rollback',
-                'database_transaction',
+                "database.transaction.rollback",
+                "database_transaction",
                 transaction_id=transaction_id,
-                reason=str(e)
+                reason=str(e),
             )
             raise
 
     @contextmanager
-    def api_request(self, request_id: str, url: str, method: str = 'GET', params: Dict = None):
+    def api_request(
+        self, request_id: str, url: str, method: str = "GET", params: Dict = None
+    ):
         """Context manager for API request hooks"""
         if not self.integration_enabled:
             yield
@@ -205,41 +214,36 @@ class HookIntegration:
         try:
             # Pre-request hooks
             emit_hook(
-                'api.request',
-                'api_request',
+                "api.request",
+                "api_request",
                 request_id=request_id,
                 url=url,
                 method=method,
-                params=params or {}
+                params=params or {},
             )
 
             yield
 
         except Exception as e:
             # API error
-            emit_hook(
-                'api.error',
-                'api_request',
-                request_id=request_id,
-                error=e
-            )
+            emit_hook("api.error", "api_request", request_id=request_id, error=e)
             raise
 
         finally:
             # Post-request hooks (if we have response data)
-            if hasattr(self, '_api_response_data'):
-                response_data = getattr(self, '_api_response_data', None)
-                status_code = getattr(self, '_api_status_code', 200)
+            if hasattr(self, "_api_response_data"):
+                response_data = getattr(self, "_api_response_data", None)
+                status_code = getattr(self, "_api_status_code", 200)
                 response_time = time.time() - start_time
 
                 emit_hook(
-                    'api.response',
-                    'api_request',
+                    "api.response",
+                    "api_request",
                     request_id=request_id,
                     status_code=status_code,
                     response_data=response_data,
                     response_time=response_time,
-                    response_size=len(str(response_data)) if response_data else 0
+                    response_size=len(str(response_data)) if response_data else 0,
                 )
 
     def set_api_response(self, response_data: Any, status_code: int = 200):
@@ -259,11 +263,11 @@ class HookIntegration:
         try:
             # Start performance monitoring
             emit_hook(
-                'performance.start',
-                'performance_monitoring',
+                "performance.start",
+                "performance_monitoring",
                 operation_id=operation_id,
                 operation_name=operation_name,
-                metadata=metadata or {}
+                metadata=metadata or {},
             )
 
             yield
@@ -278,10 +282,10 @@ class HookIntegration:
         finally:
             # End performance monitoring
             emit_hook(
-                'performance.end',
-                'performance_monitoring',
+                "performance.end",
+                "performance_monitoring",
                 operation_id=operation_id,
-                success=success
+                success=success,
             )
 
     def track_user_action(self, action: str, user_id: str = None, **details):
@@ -290,28 +294,33 @@ class HookIntegration:
             return
 
         emit_hook(
-            'user.session.activity',
-            'user_action_tracking',
-            session_id=self._session_id or 'default',
-            user_id=user_id or 'anonymous',
+            "user.session.activity",
+            "user_action_tracking",
+            session_id=self._session_id or "default",
+            user_id=user_id or "anonymous",
             action=action,
-            details=details
+            details=details,
         )
 
-    def handle_error(self, error: Exception, operation: Callable = None,
-                    fallback: Callable = None, source: str = None):
+    def handle_error(
+        self,
+        error: Exception,
+        operation: Callable = None,
+        fallback: Callable = None,
+        source: str = None,
+    ):
         """Handle error with recovery hooks"""
         if not self.integration_enabled:
             return
 
         emit_hook(
-            'error.occurred',
-            source or 'error_handler',
+            "error.occurred",
+            source or "error_handler",
             error=error,
             error_type=type(error).__name__,
             error_message=str(error),
             failed_operation=operation,
-            fallback_operation=fallback
+            fallback_operation=fallback,
         )
 
     def trigger_health_check(self, database_manager=None, api_client=None):
@@ -320,10 +329,10 @@ class HookIntegration:
             return
 
         return emit_hook(
-            'system.health_check',
-            'health_monitor',
+            "system.health_check",
+            "health_monitor",
             database_manager=database_manager,
-            api_client=api_client
+            api_client=api_client,
         )
 
 
@@ -342,16 +351,17 @@ def get_hook_integration() -> HookIntegration:
 # Decorator functions for easy integration
 def with_hooks(hook_type: str, **hook_kwargs):
     """Decorator to add hooks to functions"""
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
             integration = get_hook_integration()
 
-            if hook_type == 'performance':
+            if hook_type == "performance":
                 with integration.performance_monitoring(func.__name__, hook_kwargs):
                     return func(*args, **kwargs)
 
-            elif hook_type == 'error_handling':
+            elif hook_type == "error_handling":
                 try:
                     return func(*args, **kwargs)
                 except Exception as e:
@@ -362,11 +372,13 @@ def with_hooks(hook_type: str, **hook_kwargs):
                 return func(*args, **kwargs)
 
         return wrapper
+
     return decorator
 
 
 def with_performance_monitoring(operation_name: str = None, **metadata):
     """Decorator for performance monitoring"""
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -377,11 +389,13 @@ def with_performance_monitoring(operation_name: str = None, **metadata):
                 return func(*args, **kwargs)
 
         return wrapper
+
     return decorator
 
 
 def with_error_handling(fallback: Callable = None):
     """Decorator for error handling"""
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -396,11 +410,13 @@ def with_error_handling(fallback: Callable = None):
                 raise
 
         return wrapper
+
     return decorator
 
 
 def track_user_action(action: str, **details):
     """Decorator to track user actions"""
+
     def decorator(func):
         @functools.wraps(func)
         def wrapper(*args, **kwargs):
@@ -415,6 +431,7 @@ def track_user_action(action: str, **details):
             return result
 
         return wrapper
+
     return decorator
 
 
@@ -463,9 +480,9 @@ class HookedDatabaseManager:
 
         with self.integration.database_connection(
             connection_id=connection_id,
-            database=config['database'],
-            host=config['host'],
-            port=config['port']
+            database=config["database"],
+            host=config["host"],
+            port=config["port"],
         ):
             return self.db_manager.get_connection()
 
@@ -490,8 +507,8 @@ class HookedAPIClient:
         with self.integration.api_request(
             request_id=request_id,
             url=url,
-            method=kwargs.get('method', 'GET'),
-            params=params
+            method=kwargs.get("method", "GET"),
+            params=params,
         ):
             result = self.api_client._make_request(endpoint, params, **kwargs)
 
@@ -522,23 +539,24 @@ def enable_hooks_for_api_client(api_client):
 def start_user_session(user_id: str = None, **metadata) -> str:
     """Start a user session with hooks"""
     import uuid
+
     session_id = str(uuid.uuid4())
 
     integration = get_hook_integration()
     integration.set_session_id(session_id)
 
     emit_hook(
-        'user.session.start',
-        'session_manager',
+        "user.session.start",
+        "session_manager",
         session_id=session_id,
-        user_id=user_id or 'anonymous',
-        metadata=metadata
+        user_id=user_id or "anonymous",
+        metadata=metadata,
     )
 
     return session_id
 
 
-def end_user_session(session_id: str = None, reason: str = 'explicit'):
+def end_user_session(session_id: str = None, reason: str = "explicit"):
     """End a user session with hooks"""
     integration = get_hook_integration()
 
@@ -547,10 +565,10 @@ def end_user_session(session_id: str = None, reason: str = 'explicit'):
 
     if session_id:
         emit_hook(
-            'user.session.end',
-            'session_manager',
+            "user.session.end",
+            "session_manager",
             session_id=session_id,
-            end_reason=reason
+            end_reason=reason,
         )
 
         # Clear session from integration
@@ -563,7 +581,7 @@ def get_hook_stats() -> Dict[str, Any]:
     hook_manager = get_hook_manager()
 
     return {
-        'hook_stats': hook_manager.get_hook_stats(),
-        'registered_hooks': hook_manager.get_registered_hooks(),
-        'event_history': hook_manager.get_event_history(50)
+        "hook_stats": hook_manager.get_hook_stats(),
+        "registered_hooks": hook_manager.get_registered_hooks(),
+        "event_history": hook_manager.get_event_history(50),
     }

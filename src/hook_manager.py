@@ -26,6 +26,7 @@ logger = get_logger(__name__)
 
 class HookPriority(Enum):
     """Hook execution priority levels"""
+
     HIGHEST = 1000
     HIGH = 750
     NORMAL = 500
@@ -35,6 +36,7 @@ class HookPriority(Enum):
 
 class HookStatus(Enum):
     """Hook execution status"""
+
     PENDING = "pending"
     RUNNING = "running"
     SUCCESS = "success"
@@ -45,6 +47,7 @@ class HookStatus(Enum):
 @dataclass
 class HookResult:
     """Result of hook execution"""
+
     status: HookStatus
     result: Any = None
     error: Optional[Exception] = None
@@ -55,6 +58,7 @@ class HookResult:
 @dataclass
 class HookContext:
     """Context information passed to hooks"""
+
     event_name: str
     timestamp: datetime
     source: str
@@ -108,7 +112,9 @@ class HookManager:
             # Sort by priority (highest first)
             self._hooks[event_name].sort(key=lambda h: h.priority.value, reverse=True)
 
-            logger.info(f"Registered hook '{hook.name}' for event '{event_name}' with priority {hook.priority.name}")
+            logger.info(
+                f"Registered hook '{hook.name}' for event '{event_name}' with priority {hook.priority.name}"
+            )
 
     def unregister_hook(self, event_name: str, hook_name: str) -> bool:
         """Unregister a hook by name"""
@@ -117,7 +123,9 @@ class HookManager:
             for i, hook in enumerate(hooks):
                 if hook.name == hook_name:
                     del hooks[i]
-                    logger.info(f"Unregistered hook '{hook_name}' from event '{event_name}'")
+                    logger.info(
+                        f"Unregistered hook '{hook_name}' from event '{event_name}'"
+                    )
                     return True
 
             logger.warning(f"Hook '{hook_name}' not found for event '{event_name}'")
@@ -175,7 +183,9 @@ class HookManager:
                     await self._handle_hook_error(hook, result, context)
 
             execution_time = time.time() - start_time
-            logger.debug(f"Event '{event_name}' processed in {execution_time:.3f}s with {len(results)} hooks")
+            logger.debug(
+                f"Event '{event_name}' processed in {execution_time:.3f}s with {len(results)} hooks"
+            )
 
         except Exception as e:
             logger.error(f"Error processing event '{event_name}': {e}")
@@ -203,7 +213,9 @@ class HookManager:
         start_time = time.time()
 
         try:
-            logger.debug(f"Executing hook '{hook.name}' for event '{context.event_name}'")
+            logger.debug(
+                f"Executing hook '{hook.name}' for event '{context.event_name}'"
+            )
 
             result = await hook.execute(context)
             execution_time = time.time() - start_time
@@ -214,7 +226,9 @@ class HookManager:
             hook.total_execution_time += execution_time
 
             if result.status == HookStatus.SUCCESS:
-                logger.debug(f"Hook '{hook.name}' completed successfully in {execution_time:.3f}s")
+                logger.debug(
+                    f"Hook '{hook.name}' completed successfully in {execution_time:.3f}s"
+                )
 
             result.execution_time = execution_time
             return result
@@ -229,17 +243,21 @@ class HookManager:
                 status=HookStatus.FAILED,
                 error=e,
                 execution_time=execution_time,
-                metadata={'traceback': traceback.format_exc()}
+                metadata={"traceback": traceback.format_exc()},
             )
 
-    async def _run_middleware(self, middleware: Callable, context: HookContext) -> HookContext:
+    async def _run_middleware(
+        self, middleware: Callable, context: HookContext
+    ) -> HookContext:
         """Run middleware function"""
         if inspect.iscoroutinefunction(middleware):
             return await middleware(context)
         else:
             return middleware(context)
 
-    async def _handle_hook_error(self, hook: Hook, result: HookResult, context: HookContext):
+    async def _handle_hook_error(
+        self, hook: Hook, result: HookResult, context: HookContext
+    ):
         """Handle hook execution errors"""
         for handler in self._error_handlers:
             try:
@@ -254,16 +272,20 @@ class HookManager:
         """Update hook execution statistics"""
         stats = self._hook_stats[hook.name]
 
-        stats['total_executions'] = hook.execution_count
-        stats['total_time'] = hook.total_execution_time
-        stats['avg_time'] = hook.total_execution_time / hook.execution_count if hook.execution_count > 0 else 0
-        stats['last_execution'] = hook.last_execution
-        stats['last_status'] = result.status.value
+        stats["total_executions"] = hook.execution_count
+        stats["total_time"] = hook.total_execution_time
+        stats["avg_time"] = (
+            hook.total_execution_time / hook.execution_count
+            if hook.execution_count > 0
+            else 0
+        )
+        stats["last_execution"] = hook.last_execution
+        stats["last_status"] = result.status.value
 
         if result.status == HookStatus.FAILED:
-            stats['failure_count'] = stats.get('failure_count', 0) + 1
+            stats["failure_count"] = stats.get("failure_count", 0) + 1
         else:
-            stats['success_count'] = stats.get('success_count', 0) + 1
+            stats["success_count"] = stats.get("success_count", 0) + 1
 
     def _record_event(self, event_name: str, context: HookContext):
         """Record event in history"""
@@ -271,7 +293,7 @@ class HookManager:
 
         # Trim history if too long
         if len(self._event_history) > self._max_history:
-            self._event_history = self._event_history[-self._max_history:]
+            self._event_history = self._event_history[-self._max_history :]
 
     def get_hook_stats(self, hook_name: Optional[str] = None) -> Dict:
         """Get hook execution statistics"""
@@ -281,20 +303,22 @@ class HookManager:
 
     def get_registered_hooks(self) -> Dict[str, List[str]]:
         """Get all registered hooks by event"""
-        return {event: [hook.name for hook in hooks] for event, hooks in self._hooks.items()}
+        return {
+            event: [hook.name for hook in hooks] for event, hooks in self._hooks.items()
+        }
 
     def get_event_history(self, limit: int = 100) -> List[Tuple[str, datetime, str]]:
         """Get recent event history"""
-        return [(event, timestamp, context.source) for event, timestamp, context in self._event_history[-limit:]]
+        return [
+            (event, timestamp, context.source)
+            for event, timestamp, context in self._event_history[-limit:]
+        ]
 
     @contextmanager
     def hook_scope(self, event_name: str, source: str, **data):
         """Context manager for scoped hook execution"""
         context = HookContext(
-            event_name=event_name,
-            timestamp=datetime.now(),
-            source=source,
-            data=data
+            event_name=event_name, timestamp=datetime.now(), source=source, data=data
         )
 
         # Emit pre-hook event
@@ -309,7 +333,7 @@ class HookManager:
                 event_name=f"{event_name}.error",
                 timestamp=datetime.now(),
                 source=source,
-                data={**data, 'error': str(e), 'original_context': context}
+                data={**data, "error": str(e), "original_context": context},
             )
             self.emit_sync(f"{event_name}.error", error_context)
             raise
@@ -335,6 +359,7 @@ def get_hook_manager() -> HookManager:
 
 def hook(event_name: str, priority: HookPriority = HookPriority.NORMAL):
     """Decorator to register a function as a hook"""
+
     def decorator(func: Callable) -> Callable:
         class FunctionHook(Hook):
             def __init__(self):
@@ -363,10 +388,7 @@ def hook(event_name: str, priority: HookPriority = HookPriority.NORMAL):
 def emit_hook(event_name: str, source: str, **data) -> List[HookResult]:
     """Convenience function to emit a hook"""
     context = HookContext(
-        event_name=event_name,
-        timestamp=datetime.now(),
-        source=source,
-        data=data
+        event_name=event_name, timestamp=datetime.now(), source=source, data=data
     )
     return get_hook_manager().emit_sync(event_name, context)
 
@@ -374,9 +396,6 @@ def emit_hook(event_name: str, source: str, **data) -> List[HookResult]:
 async def emit_hook_async(event_name: str, source: str, **data) -> List[HookResult]:
     """Convenience function to emit a hook asynchronously"""
     context = HookContext(
-        event_name=event_name,
-        timestamp=datetime.now(),
-        source=source,
-        data=data
+        event_name=event_name, timestamp=datetime.now(), source=source, data=data
     )
     return await get_hook_manager().emit(event_name, context)

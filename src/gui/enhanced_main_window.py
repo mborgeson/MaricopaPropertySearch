@@ -9,27 +9,90 @@ from pathlib import Path
 from typing import List, Dict, Optional, Any, Tuple
 
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem,
-    QStatusBar, QSplitter, QFrame, QTabWidget, QGroupBox, QGridLayout,
-    QScrollArea, QProgressBar, QTextEdit, QComboBox, QCheckBox,
-    QMessageBox, QDialog, QDialogButtonBox, QFormLayout, QSpinBox,
-    QDateEdit, QCalendarWidget, QButtonGroup, QRadioButton, QListWidget,
-    QListWidgetItem, QHeaderView, QMenu, QSizePolicy, QTreeWidget,
-    QTreeWidgetItem, QToolBar, QSlider, QDoubleSpinBox, QAction,
-    QProgressDialog
+    QApplication,
+    QMainWindow,
+    QWidget,
+    QVBoxLayout,
+    QHBoxLayout,
+    QLabel,
+    QLineEdit,
+    QPushButton,
+    QTableWidget,
+    QTableWidgetItem,
+    QStatusBar,
+    QSplitter,
+    QFrame,
+    QTabWidget,
+    QGroupBox,
+    QGridLayout,
+    QScrollArea,
+    QProgressBar,
+    QTextEdit,
+    QComboBox,
+    QCheckBox,
+    QMessageBox,
+    QDialog,
+    QDialogButtonBox,
+    QFormLayout,
+    QSpinBox,
+    QDateEdit,
+    QCalendarWidget,
+    QButtonGroup,
+    QRadioButton,
+    QListWidget,
+    QListWidgetItem,
+    QHeaderView,
+    QMenu,
+    QSizePolicy,
+    QTreeWidget,
+    QTreeWidgetItem,
+    QToolBar,
+    QSlider,
+    QDoubleSpinBox,
+    QAction,
+    QProgressDialog,
 )
 from PyQt5.QtCore import (
-    Qt, QThread, pyqtSignal as Signal, QTimer, QSize, QRect, QPoint, QDate,
-    QPropertyAnimation, QEasingCurve, QParallelAnimationGroup,
-    QSequentialAnimationGroup, QAbstractAnimation, QObject, QRunnable,
-    QThreadPool, QMutex, QMutexLocker, QSettings, QEventLoop
+    Qt,
+    QThread,
+    pyqtSignal as Signal,
+    QTimer,
+    QSize,
+    QRect,
+    QPoint,
+    QDate,
+    QPropertyAnimation,
+    QEasingCurve,
+    QParallelAnimationGroup,
+    QSequentialAnimationGroup,
+    QAbstractAnimation,
+    QObject,
+    QRunnable,
+    QThreadPool,
+    QMutex,
+    QMutexLocker,
+    QSettings,
+    QEventLoop,
 )
 from PyQt5.QtGui import (
-    QFont, QPalette, QColor, QPixmap, QIcon, QPainter,
-    QBrush, QPen, QLinearGradient, QRadialGradient, QFontMetrics,
-    QMovie, QCursor, QDragEnterEvent, QDropEvent, QDragMoveEvent
+    QFont,
+    QPalette,
+    QColor,
+    QPixmap,
+    QIcon,
+    QPainter,
+    QBrush,
+    QPen,
+    QLinearGradient,
+    QRadialGradient,
+    QFontMetrics,
+    QMovie,
+    QCursor,
+    QDragEnterEvent,
+    QDropEvent,
+    QDragMoveEvent,
 )
+
 # QtCharts import - PyQt5 version
 try:
     from PyQt5.QtChart import QChart, QChartView, QLineSeries, QValueAxis
@@ -38,7 +101,7 @@ except ImportError:
     QChart = QChartView = QLineSeries = QValueAxis = None
 
 # Add the src directory to the path so we can import our modules
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
 # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
@@ -46,6 +109,7 @@ from src.enhanced_config_manager import EnhancedConfigManager
 from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.background_data_collector import BackgroundDataCollectionManager, JobPriority
 from src.batch_processing_manager import BatchProcessingManager
+
 # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 # Optional imports - only if they exist
 try:
@@ -69,6 +133,7 @@ except ImportError:
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 # Placeholder classes for missing components
 class PropertySearchEngine:
     """Placeholder search engine for property queries"""
@@ -76,7 +141,13 @@ class PropertySearchEngine:
     def __init__(self, db_manager):
         self.db_manager = db_manager
 
-    def search_properties(self, search_term, filters=None, include_tax_history=False, include_sales_history=False):
+    def search_properties(
+        self,
+        search_term,
+        filters=None,
+        include_tax_history=False,
+        include_sales_history=False,
+    ):
         """Search for properties based on the search term"""
         try:
             # For now, return mock data to allow GUI to function
@@ -86,25 +157,28 @@ class PropertySearchEngine:
             # Create some mock results for testing
             mock_results = []
             for i in range(3):
-                mock_results.append({
-                    'apn': f'123-45-{i+100:03d}',
-                    'address': f'{1000+i} Example St, Phoenix, AZ 85001',
-                    'owner_name': f'John Doe {i+1}',
-                    'property_type': 'Residential',
-                    'year_built': 2000 + i,
-                    'square_feet': 1500 + (i * 100),
-                    'bedrooms': 3,
-                    'bathrooms': 2,
-                    'market_value': 300000 + (i * 50000),
-                    'assessed_value': 250000 + (i * 40000),
-                    'last_sale_date': '2023-01-01',
-                    'last_sale_amount': 280000 + (i * 30000)
-                })
+                mock_results.append(
+                    {
+                        "apn": f"123-45-{i+100:03d}",
+                        "address": f"{1000+i} Example St, Phoenix, AZ 85001",
+                        "owner_name": f"John Doe {i+1}",
+                        "property_type": "Residential",
+                        "year_built": 2000 + i,
+                        "square_feet": 1500 + (i * 100),
+                        "bedrooms": 3,
+                        "bathrooms": 2,
+                        "market_value": 300000 + (i * 50000),
+                        "assessed_value": 250000 + (i * 40000),
+                        "last_sale_date": "2023-01-01",
+                        "last_sale_amount": 280000 + (i * 30000),
+                    }
+                )
 
             return mock_results
         except Exception as e:
             logger.error(f"Search error in PropertySearchEngine: {e}")
             return []
+
 
 class PerformanceMetrics:
     """Placeholder performance metrics tracker"""
@@ -115,29 +189,28 @@ class PerformanceMetrics:
 
     def record_search(self, search_term, result_count, search_time):
         """Record a search operation"""
-        self.searches.append({
-            'term': search_term,
-            'count': result_count,
-            'time': search_time
-        })
+        self.searches.append(
+            {"term": search_term, "count": result_count, "time": search_time}
+        )
         self.total_time += search_time
 
     def get_summary(self):
         """Get performance summary"""
         if not self.searches:
             return {
-                'total_searches': 0,
-                'avg_time': 0.0,
-                'success_rate': 0.0,
-                'cache_hits': 0
+                "total_searches": 0,
+                "avg_time": 0.0,
+                "success_rate": 0.0,
+                "cache_hits": 0,
             }
 
         return {
-            'total_searches': len(self.searches),
-            'avg_time': self.total_time / len(self.searches),
-            'success_rate': 100.0,  # Mock success rate
-            'cache_hits': 0
+            "total_searches": len(self.searches),
+            "avg_time": self.total_time / len(self.searches),
+            "success_rate": 100.0,  # Mock success rate
+            "cache_hits": 0,
         }
+
 
 class BackupManager:
     """Placeholder backup manager"""
@@ -156,6 +229,7 @@ class BackupManager:
             logger.error(f"Backup creation failed: {e}")
             return None
 
+
 class DataValidator:
     """Placeholder data validator"""
 
@@ -165,11 +239,8 @@ class DataValidator:
     def validate_all_data(self):
         """Validate all database data"""
         # Return mock validation results
-        return {
-            'properties': [],
-            'tax_records': [],
-            'sales_records': []
-        }
+        return {"properties": [], "tax_records": [], "sales_records": []}
+
 
 class PropertyDetailsWidget(QWidget):
     """Widget for displaying detailed property information"""
@@ -190,7 +261,9 @@ class PropertyDetailsWidget(QWidget):
         layout.addWidget(self.info_text)
 
         # Set placeholder text
-        self.info_text.setPlainText("Select a property from the search results to view details here.")
+        self.info_text.setPlainText(
+            "Select a property from the search results to view details here."
+        )
 
     def load_property_data(self, apn):
         """Load detailed data for a property"""
@@ -236,6 +309,7 @@ This is mock data for development purposes.
             logger.error(f"Failed to load property data for {apn}: {e}")
             self.info_text.setPlainText(f"Error loading data for APN {apn}: {str(e)}")
 
+
 class PerformanceDashboard(QWidget):
     """Dashboard for performance monitoring"""
 
@@ -271,11 +345,14 @@ class PerformanceDashboard(QWidget):
         chart_placeholder = QLabel("Performance chart would be displayed here")
         chart_placeholder.setAlignment(Qt.AlignmentFlag.AlignCenter)
         chart_placeholder.setMinimumHeight(200)
-        chart_placeholder.setStyleSheet("border: 1px solid #ccc; background-color: #f9f9f9;")
+        chart_placeholder.setStyleSheet(
+            "border: 1px solid #ccc; background-color: #f9f9f9;"
+        )
         chart_layout.addWidget(chart_placeholder)
 
         layout.addWidget(chart_group)
         layout.addStretch()
+
 
 class SearchHistoryWidget(QWidget):
     """Widget for displaying search history"""
@@ -315,6 +392,7 @@ class SearchHistoryWidget(QWidget):
         """Clear all search history"""
         self.history_list.clear()
 
+
 class SystemHealthWidget(QWidget):
     """Widget for monitoring system health"""
 
@@ -346,6 +424,7 @@ class SystemHealthWidget(QWidget):
         layout.addWidget(status_group)
         layout.addStretch()
 
+
 class BackgroundStatusWidget(QWidget):
     """Widget for displaying background collection status"""
 
@@ -371,13 +450,15 @@ class BackgroundStatusWidget(QWidget):
         """Update the status display"""
         try:
             if isinstance(status_dict, dict):
-                status = status_dict.get('status', 'Unknown')
-                pending = status_dict.get('pending_jobs', 0)
-                active = status_dict.get('active_jobs', 0)
-                completed = status_dict.get('completed_jobs', 0)
+                status = status_dict.get("status", "Unknown")
+                pending = status_dict.get("pending_jobs", 0)
+                active = status_dict.get("active_jobs", 0)
+                completed = status_dict.get("completed_jobs", 0)
 
                 self.status_label.setText(status)
-                self.job_count_label.setText(f"Jobs: {pending} pending, {active} active, {completed} completed")
+                self.job_count_label.setText(
+                    f"Jobs: {pending} pending, {active} active, {completed} completed"
+                )
 
                 # Update progress bar
                 total_jobs = pending + active + completed
@@ -388,6 +469,7 @@ class BackgroundStatusWidget(QWidget):
                     self.progress_bar.setValue(0)
         except Exception as e:
             logger.error(f"Failed to update background status: {e}")
+
 
 class DataValidationWidget(QWidget):
     """Widget for displaying data validation results"""
@@ -440,6 +522,7 @@ class DataValidationWidget(QWidget):
         except Exception as e:
             logger.error(f"Validation failed: {e}")
 
+
 # Placeholder dialog classes
 class CollectionProgressDialog(QDialog):
     """Dialog for monitoring collection progress"""
@@ -474,6 +557,7 @@ class CollectionProgressDialog(QDialog):
             # Update UI based on status
             pass
 
+
 class BatchSearchDialog(QDialog):
     """Dialog for batch search operations"""
 
@@ -501,6 +585,7 @@ class BatchSearchDialog(QDialog):
 
         layout.addLayout(button_layout)
 
+
 class ExportDialog(QDialog):
     """Dialog for exporting search results"""
 
@@ -527,6 +612,7 @@ class ExportDialog(QDialog):
         button_layout.addWidget(cancel_btn)
 
         layout.addLayout(button_layout)
+
 
 class SettingsDialog(QDialog):
     """Dialog for application settings"""
@@ -557,6 +643,7 @@ class SettingsDialog(QDialog):
 
         layout.addLayout(button_layout)
 
+
 class BackupRestoreDialog(QDialog):
     """Dialog for backup and restore operations"""
 
@@ -582,6 +669,7 @@ class BackupRestoreDialog(QDialog):
 
         layout.addLayout(button_layout)
 
+
 class CollectionQueueViewer(QDialog):
     """Dialog for viewing the collection queue"""
 
@@ -606,6 +694,7 @@ class CollectionQueueViewer(QDialog):
         button_layout.addWidget(close_btn)
 
         layout.addLayout(button_layout)
+
 
 class AdvancedFiltersWidget(QWidget):
     """Advanced filters widget for search refinement"""
@@ -692,20 +781,21 @@ class AdvancedFiltersWidget(QWidget):
     def get_filters(self):
         """Get current filter values as dictionary"""
         return {
-            'property_types': {
-                'residential': self.residential_cb.isChecked(),
-                'commercial': self.commercial_cb.isChecked(),
-                'vacant': self.vacant_cb.isChecked()
+            "property_types": {
+                "residential": self.residential_cb.isChecked(),
+                "commercial": self.commercial_cb.isChecked(),
+                "vacant": self.vacant_cb.isChecked(),
             },
-            'value_range': {
-                'min': self.min_value_edit.text(),
-                'max': self.max_value_edit.text()
+            "value_range": {
+                "min": self.min_value_edit.text(),
+                "max": self.max_value_edit.text(),
             },
-            'year_built': {
-                'from': self.year_from_edit.text(),
-                'to': self.year_to_edit.text()
-            }
+            "year_built": {
+                "from": self.year_from_edit.text(),
+                "to": self.year_to_edit.text(),
+            },
         }
+
 
 class NotificationArea(QWidget):
     """A notification area for displaying system messages"""
@@ -713,13 +803,15 @@ class NotificationArea(QWidget):
     def __init__(self):
         super().__init__()
         self.setMaximumHeight(100)
-        self.setStyleSheet("""
+        self.setStyleSheet(
+            """
             QWidget {
                 background-color: #f0f0f0;
                 border: 1px solid #ccc;
                 border-radius: 5px;
             }
-        """)
+        """
+        )
 
         layout = QVBoxLayout(self)
         self.message_label = QLabel("Ready")
@@ -732,18 +824,21 @@ class NotificationArea(QWidget):
             "info": "#d4edda",
             "warning": "#fff3cd",
             "error": "#f8d7da",
-            "success": "#d1ecf1"
+            "success": "#d1ecf1",
         }
 
         self.message_label.setText(message)
         color = colors.get(message_type, colors["info"])
-        self.setStyleSheet(f"""
+        self.setStyleSheet(
+            f"""
             QWidget {{
                 background-color: {color};
                 border: 1px solid #ccc;
                 border-radius: 5px;
             }}
-        """)
+        """
+        )
+
 
 class StatusIndicator(QWidget):
     """Visual status indicator widget"""
@@ -764,10 +859,10 @@ class StatusIndicator(QWidget):
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
         colors = {
-            "idle": QColor(128, 128, 128),      # Gray
-            "working": QColor(255, 165, 0),     # Orange
-            "success": QColor(0, 255, 0),       # Green
-            "error": QColor(255, 0, 0)          # Red
+            "idle": QColor(128, 128, 128),  # Gray
+            "working": QColor(255, 165, 0),  # Orange
+            "success": QColor(0, 255, 0),  # Green
+            "error": QColor(255, 0, 0),  # Red
         }
 
         color = colors.get(self.status, colors["idle"])
@@ -775,12 +870,14 @@ class StatusIndicator(QWidget):
         painter.setPen(QPen(color.darker(), 2))
         painter.drawEllipse(2, 2, 16, 16)
 
+
 class AnimatedProgressBar(QProgressBar):
     """Enhanced progress bar with animations"""
 
     def __init__(self):
         super().__init__()
-        self.setStyleSheet("""
+        self.setStyleSheet(
+            """
             QProgressBar {
                 border: 2px solid grey;
                 border-radius: 5px;
@@ -791,7 +888,8 @@ class AnimatedProgressBar(QProgressBar):
                     stop:0 #05B8CC, stop:1 #0D7377);
                 border-radius: 3px;
             }
-        """)
+        """
+        )
 
         # Add animation
         self.animation = QPropertyAnimation(self, b"value")
@@ -803,6 +901,7 @@ class AnimatedProgressBar(QProgressBar):
         self.animation.setStartValue(self.value())
         self.animation.setEndValue(value)
         self.animation.start()
+
 
 class SearchMetricsWidget(QWidget):
     """Widget for displaying search metrics"""
@@ -834,14 +933,15 @@ class SearchMetricsWidget(QWidget):
 
     def update_metrics(self, metrics: Dict[str, Any]):
         """Update the displayed metrics"""
-        self.total_searches_label.setText(str(metrics.get('total_searches', 0)))
+        self.total_searches_label.setText(str(metrics.get("total_searches", 0)))
         self.avg_time_label.setText(f"{metrics.get('avg_time', 0.0):.2f}s")
         self.success_rate_label.setText(f"{metrics.get('success_rate', 0.0):.1f}%")
-        self.cache_hits_label.setText(str(metrics.get('cache_hits', 0)))
+        self.cache_hits_label.setText(str(metrics.get("cache_hits", 0)))
 
     def reset_metrics(self):
         """Reset all metrics to zero"""
         self.update_metrics({})
+
 
 class DatabaseConnectionWidget(QWidget):
     """Widget for managing database connections"""
@@ -892,9 +992,9 @@ class DatabaseConnectionWidget(QWidget):
 
                 # Update database info
                 db_info = self.db_manager.get_database_info()
-                self.db_path_label.setText(db_info.get('path', 'N/A'))
+                self.db_path_label.setText(db_info.get("path", "N/A"))
                 self.db_size_label.setText(f"{db_info.get('size_mb', 0):.1f} MB")
-                self.tables_count_label.setText(str(db_info.get('table_count', 0)))
+                self.tables_count_label.setText(str(db_info.get("table_count", 0)))
 
             else:
                 self.status_label.setText("✗ Disconnected")
@@ -904,6 +1004,7 @@ class DatabaseConnectionWidget(QWidget):
             self.status_label.setText(f"Error: {str(e)}")
             self.status_label.setStyleSheet("color: red;")
             logger.error(f"Database connection check failed: {e}")
+
 
 class RecentSearchesWidget(QWidget):
     """Widget for displaying recent searches"""
@@ -960,6 +1061,7 @@ class RecentSearchesWidget(QWidget):
         """Clear all search history"""
         self.search_list.clear()
 
+
 class QuickStatsWidget(QWidget):
     """Widget for displaying quick database statistics"""
 
@@ -980,8 +1082,11 @@ class QuickStatsWidget(QWidget):
         self.last_update_label = QLabel("Never")
 
         # Style labels
-        for label in [self.property_count_label, self.tax_records_label,
-                     self.sales_records_label]:
+        for label in [
+            self.property_count_label,
+            self.tax_records_label,
+            self.sales_records_label,
+        ]:
             label.setStyleSheet("font-weight: bold; font-size: 14px;")
 
         # Add to layout
@@ -1002,7 +1107,7 @@ class QuickStatsWidget(QWidget):
             self.tax_records_label.setText(f"{stats.get('tax_records', 0):,}")
             self.sales_records_label.setText(f"{stats.get('sales_records', 0):,}")
 
-            last_update = stats.get('last_update')
+            last_update = stats.get("last_update")
             if last_update:
                 self.last_update_label.setText(last_update)
             else:
@@ -1010,6 +1115,7 @@ class QuickStatsWidget(QWidget):
 
         except Exception as e:
             logger.error(f"Failed to update quick stats: {e}")
+
 
 class EnhancedMainWindow(QMainWindow):
     """Enhanced main window with modern UI and advanced features"""
@@ -1081,8 +1187,9 @@ class EnhancedMainWindow(QMainWindow):
                 raise Exception("Database connection test failed")
         except Exception as e:
             logger.error(f"Database initialization failed: {e}")
-            QMessageBox.critical(self, "Database Error",
-                               f"Failed to initialize database: {str(e)}")
+            QMessageBox.critical(
+                self, "Database Error", f"Failed to initialize database: {str(e)}"
+            )
 
     def init_components(self):
         """Initialize all core components"""
@@ -1099,7 +1206,9 @@ class EnhancedMainWindow(QMainWindow):
             # Background data collector
             if self.db_manager:
                 try:
-                    self.background_manager = BackgroundDataCollectionManager(self.db_manager)
+                    self.background_manager = BackgroundDataCollectionManager(
+                        self.db_manager
+                    )
                 except Exception as e:
                     logger.warning(f"Background manager initialization failed: {e}")
                     self.background_manager = None
@@ -1111,7 +1220,7 @@ class EnhancedMainWindow(QMainWindow):
                 try:
                     self.batch_manager = BatchProcessingManager(
                         db_manager=self.db_manager,
-                        background_collector=self.background_manager
+                        background_collector=self.background_manager,
                     )
                 except Exception as e:
                     logger.warning(f"Batch manager initialization failed: {e}")
@@ -1131,7 +1240,9 @@ class EnhancedMainWindow(QMainWindow):
             else:
                 self.data_validator = None
 
-            logger.info("Component initialization completed (some components may be disabled)")
+            logger.info(
+                "Component initialization completed (some components may be disabled)"
+            )
 
         except Exception as e:
             logger.error(f"Component initialization failed: {e}")
@@ -1260,7 +1371,9 @@ class EnhancedMainWindow(QMainWindow):
         if self.db_manager:
             self.property_details = PropertyDetailsWidget(self.db_manager)
         else:
-            self.property_details = QLabel("Database not available for property details")
+            self.property_details = QLabel(
+                "Database not available for property details"
+            )
         self.main_tabs.addTab(self.property_details, "Property Details")
 
         # Performance dashboard tab
@@ -1375,7 +1488,7 @@ class EnhancedMainWindow(QMainWindow):
         validation_group = QGroupBox("Data Validation")
         validation_layout = QVBoxLayout(validation_group)
 
-        if hasattr(self, 'data_validator') and self.data_validator:
+        if hasattr(self, "data_validator") and self.data_validator:
             self.data_validation = DataValidationWidget(self.data_validator)
         else:
             self.data_validation = QLabel("Data validation not available")
@@ -1394,10 +1507,20 @@ class EnhancedMainWindow(QMainWindow):
         """Set up the enhanced results table"""
         # Define columns
         columns = [
-            "APN", "Address", "Owner", "Property Type", "Year Built",
-            "Square Feet", "Bedrooms", "Bathrooms", "Market Value",
-            "Assessed Value", "Last Sale Date", "Last Sale Amount",
-            "Data Status", "Last Updated"
+            "APN",
+            "Address",
+            "Owner",
+            "Property Type",
+            "Year Built",
+            "Square Feet",
+            "Bedrooms",
+            "Bathrooms",
+            "Market Value",
+            "Assessed Value",
+            "Last Sale Date",
+            "Last Sale Amount",
+            "Data Status",
+            "Last Updated",
         ]
 
         self.results_table.setColumnCount(len(columns))
@@ -1405,19 +1528,25 @@ class EnhancedMainWindow(QMainWindow):
 
         # Configure table properties
         self.results_table.setAlternatingRowColors(True)
-        self.results_table.setSelectionBehavior(QTableWidget.SelectionBehavior.SelectRows)
+        self.results_table.setSelectionBehavior(
+            QTableWidget.SelectionBehavior.SelectRows
+        )
         self.results_table.setSortingEnabled(True)
 
         # Enable context menu
         self.results_table.setContextMenuPolicy(Qt.ContextMenuPolicy.CustomContextMenu)
-        self.results_table.customContextMenuRequested.connect(self.show_results_context_menu)
+        self.results_table.customContextMenuRequested.connect(
+            self.show_results_context_menu
+        )
 
         # Connect selection change
         self.results_table.itemSelectionChanged.connect(self.on_selection_changed)
 
         # Set column widths
         header = self.results_table.horizontalHeader()
-        for i, width in enumerate([100, 200, 150, 120, 80, 80, 80, 80, 100, 100, 100, 120, 100, 100]):
+        for i, width in enumerate(
+            [100, 200, 150, 120, 80, 80, 80, 80, 100, 100, 100, 120, 100, 100]
+        ):
             if i < len(columns):
                 header.resizeSection(i, width)
 
@@ -1670,8 +1799,12 @@ class EnhancedMainWindow(QMainWindow):
         """Connect all signal handlers"""
         # Background manager signals
         if self.background_manager:
-            self.background_manager.progress_updated.connect(self.update_background_status)
-            self.background_manager.collection_finished.connect(self.on_collection_finished)
+            self.background_manager.progress_updated.connect(
+                self.update_background_status
+            )
+            self.background_manager.collection_finished.connect(
+                self.on_collection_finished
+            )
             self.background_manager.error_occurred.connect(self.handle_background_error)
 
         # Search engine signals (if any)
@@ -1683,7 +1816,10 @@ class EnhancedMainWindow(QMainWindow):
             # Start background data collector
             if self.background_manager:
                 try:
-                    if hasattr(self.background_manager, 'is_running') and not self.background_manager.is_running():
+                    if (
+                        hasattr(self.background_manager, "is_running")
+                        and not self.background_manager.is_running()
+                    ):
                         self.background_manager.start()
                         logger.info("Background data collector started")
                 except Exception as e:
@@ -1691,9 +1827,9 @@ class EnhancedMainWindow(QMainWindow):
 
                 # Update status initially and setup periodic updates
                 try:
-                    if hasattr(self.background_manager, 'get_collection_status'):
+                    if hasattr(self.background_manager, "get_collection_status"):
                         status = self.background_manager.get_collection_status()
-                        if hasattr(self, 'bg_status_widget'):
+                        if hasattr(self, "bg_status_widget"):
                             self.bg_status_widget.update_status(status)
                 except Exception as e:
                     logger.warning(f"Failed to get initial background status: {e}")
@@ -1703,7 +1839,9 @@ class EnhancedMainWindow(QMainWindow):
                 self.status_timer.timeout.connect(self.update_background_status)
                 self.status_timer.start(5000)  # Update every 5 seconds
             else:
-                logger.info("Background manager not available, skipping background services")
+                logger.info(
+                    "Background manager not available, skipping background services"
+                )
 
         except Exception as e:
             logger.error(f"Failed to initialize background services: {e}")
@@ -1802,7 +1940,7 @@ class EnhancedMainWindow(QMainWindow):
                 search_term,
                 filters=filters,
                 include_tax_history=True,
-                include_sales_history=True
+                include_sales_history=True,
             )
 
             self.search_progress.set_animated_value(100)
@@ -1821,12 +1959,14 @@ class EnhancedMainWindow(QMainWindow):
             self.search_btn.setEnabled(True)
             self.search_progress.setVisible(False)
             self.status_indicator.set_status("success")
-            self.status_bar.showMessage(f"Search completed: {len(results)} results found")
+            self.status_bar.showMessage(
+                f"Search completed: {len(results)} results found"
+            )
 
             # Show notification
             self.notification_area.show_message(
                 f"Search completed successfully. Found {len(results)} properties.",
-                "success"
+                "success",
             )
 
         except Exception as e:
@@ -1849,39 +1989,73 @@ class EnhancedMainWindow(QMainWindow):
 
             for row, property_data in enumerate(results):
                 # Basic property information
-                self.results_table.setItem(row, 0, QTableWidgetItem(str(property_data.get('apn', ''))))
-                self.results_table.setItem(row, 1, QTableWidgetItem(str(property_data.get('address', ''))))
-                self.results_table.setItem(row, 2, QTableWidgetItem(str(property_data.get('owner_name', ''))))
-                self.results_table.setItem(row, 3, QTableWidgetItem(str(property_data.get('property_type', ''))))
-                self.results_table.setItem(row, 4, QTableWidgetItem(str(property_data.get('year_built', ''))))
+                self.results_table.setItem(
+                    row, 0, QTableWidgetItem(str(property_data.get("apn", "")))
+                )
+                self.results_table.setItem(
+                    row, 1, QTableWidgetItem(str(property_data.get("address", "")))
+                )
+                self.results_table.setItem(
+                    row, 2, QTableWidgetItem(str(property_data.get("owner_name", "")))
+                )
+                self.results_table.setItem(
+                    row,
+                    3,
+                    QTableWidgetItem(str(property_data.get("property_type", ""))),
+                )
+                self.results_table.setItem(
+                    row, 4, QTableWidgetItem(str(property_data.get("year_built", "")))
+                )
 
                 # Property details
-                self.results_table.setItem(row, 5, QTableWidgetItem(str(property_data.get('square_feet', ''))))
-                self.results_table.setItem(row, 6, QTableWidgetItem(str(property_data.get('bedrooms', ''))))
-                self.results_table.setItem(row, 7, QTableWidgetItem(str(property_data.get('bathrooms', ''))))
+                self.results_table.setItem(
+                    row, 5, QTableWidgetItem(str(property_data.get("square_feet", "")))
+                )
+                self.results_table.setItem(
+                    row, 6, QTableWidgetItem(str(property_data.get("bedrooms", "")))
+                )
+                self.results_table.setItem(
+                    row, 7, QTableWidgetItem(str(property_data.get("bathrooms", "")))
+                )
 
                 # Financial information
-                market_value = property_data.get('market_value', 0)
-                assessed_value = property_data.get('assessed_value', 0)
-                last_sale_amount = property_data.get('last_sale_amount', 0)
+                market_value = property_data.get("market_value", 0)
+                assessed_value = property_data.get("assessed_value", 0)
+                last_sale_amount = property_data.get("last_sale_amount", 0)
 
-                self.results_table.setItem(row, 8, QTableWidgetItem(f"${market_value:,}" if market_value else ""))
-                self.results_table.setItem(row, 9, QTableWidgetItem(f"${assessed_value:,}" if assessed_value else ""))
+                self.results_table.setItem(
+                    row,
+                    8,
+                    QTableWidgetItem(f"${market_value:,}" if market_value else ""),
+                )
+                self.results_table.setItem(
+                    row,
+                    9,
+                    QTableWidgetItem(f"${assessed_value:,}" if assessed_value else ""),
+                )
 
                 # Sales information
-                last_sale_date = property_data.get('last_sale_date', '')
-                self.results_table.setItem(row, 10, QTableWidgetItem(str(last_sale_date)))
-                self.results_table.setItem(row, 11, QTableWidgetItem(f"${last_sale_amount:,}" if last_sale_amount else ""))
+                last_sale_date = property_data.get("last_sale_date", "")
+                self.results_table.setItem(
+                    row, 10, QTableWidgetItem(str(last_sale_date))
+                )
+                self.results_table.setItem(
+                    row,
+                    11,
+                    QTableWidgetItem(
+                        f"${last_sale_amount:,}" if last_sale_amount else ""
+                    ),
+                )
 
                 # Data collection status
-                apn = property_data.get('apn', '')
+                apn = property_data.get("apn", "")
                 status_info = self._get_data_collection_status(apn)
-                status_item = QTableWidgetItem(status_info['text'])
+                status_item = QTableWidgetItem(status_info["text"])
 
                 # Color code status
-                if status_info['complete']:
+                if status_info["complete"]:
                     status_item.setBackground(QColor(200, 255, 200))  # Light green
-                elif status_info['collecting']:
+                elif status_info["collecting"]:
                     status_item.setBackground(QColor(255, 255, 200))  # Light yellow
                 else:
                     status_item.setBackground(QColor(255, 200, 200))  # Light red
@@ -1906,7 +2080,7 @@ class EnhancedMainWindow(QMainWindow):
         try:
             # If no database manager, return default status
             if not self.db_manager:
-                return {'text': 'No DB', 'complete': False, 'collecting': False}
+                return {"text": "No DB", "complete": False, "collecting": False}
 
             # Try to get tax and sales records
             try:
@@ -1914,7 +2088,7 @@ class EnhancedMainWindow(QMainWindow):
                 sales_records = self.db_manager.get_sales_history(apn)
             except:
                 # If methods don't exist, return unknown status
-                return {'text': 'Unknown', 'complete': False, 'collecting': False}
+                return {"text": "Unknown", "complete": False, "collecting": False}
 
             # Ensure we have lists to work with
             if not isinstance(tax_records, list):
@@ -1930,12 +2104,16 @@ class EnhancedMainWindow(QMainWindow):
             if self.background_manager:
                 try:
                     bg_status = self.background_manager.get_collection_status()
-                    active_jobs = bg_status.get('active_jobs', [])
+                    active_jobs = bg_status.get("active_jobs", [])
 
                     # Handle case where active_jobs might be an integer (count) or a list (job objects)
                     if isinstance(active_jobs, (list, tuple)):
                         # active_jobs is a list/tuple of job objects
-                        collecting = apn in [job.get('apn', '') for job in active_jobs if isinstance(job, dict)]
+                        collecting = apn in [
+                            job.get("apn", "")
+                            for job in active_jobs
+                            if isinstance(job, dict)
+                        ]
                     elif isinstance(active_jobs, int) and active_jobs > 0:
                         # active_jobs is a count - we can't determine specific APN status
                         # but we know jobs are running, so assume this APN might be collecting
@@ -1946,17 +2124,17 @@ class EnhancedMainWindow(QMainWindow):
                     collecting = False
 
             if has_tax and has_sales:
-                return {'text': 'Complete', 'complete': True, 'collecting': False}
+                return {"text": "Complete", "complete": True, "collecting": False}
             elif collecting:
-                return {'text': 'Collecting...', 'complete': False, 'collecting': True}
+                return {"text": "Collecting...", "complete": False, "collecting": True}
             elif has_tax or has_sales:
-                return {'text': 'Partial', 'complete': False, 'collecting': False}
+                return {"text": "Partial", "complete": False, "collecting": False}
             else:
-                return {'text': 'Queued', 'complete': False, 'collecting': False}
+                return {"text": "Queued", "complete": False, "collecting": False}
 
         except Exception as e:
             logger.error(f"Error checking data status for {apn}: {e}")
-            return {'text': 'Unknown', 'complete': False, 'collecting': False}
+            return {"text": "Unknown", "complete": False, "collecting": False}
 
     def _get_last_update_time(self, apn: str) -> str:
         """Get last update time for an APN"""
@@ -1980,11 +2158,15 @@ class EnhancedMainWindow(QMainWindow):
         QMessageBox.critical(self, "Search Error", error_message)
         self.notification_area.show_message(f"Search failed: {error_message}", "error")
 
-    def update_search_metrics(self, search_term: str, result_count: int, search_time: float):
+    def update_search_metrics(
+        self, search_term: str, result_count: int, search_time: float
+    ):
         """Update search performance metrics"""
         try:
             # Record search metrics
-            self.performance_metrics.record_search(search_term, result_count, search_time)
+            self.performance_metrics.record_search(
+                search_term, result_count, search_time
+            )
 
             # Update metrics display
             metrics = self.performance_metrics.get_summary()
@@ -2001,7 +2183,9 @@ class EnhancedMainWindow(QMainWindow):
         """Start background data collection"""
         try:
             if not self.background_manager:
-                self.notification_area.show_message("Background manager not available", "error")
+                self.notification_area.show_message(
+                    "Background manager not available", "error"
+                )
                 return
 
             # Get selected APNs from results table
@@ -2020,13 +2204,11 @@ class EnhancedMainWindow(QMainWindow):
 
             if success_count > 0:
                 self.notification_area.show_message(
-                    f"Started data collection for {success_count} properties",
-                    "success"
+                    f"Started data collection for {success_count} properties", "success"
                 )
             else:
                 self.notification_area.show_message(
-                    "Failed to start data collection",
-                    "error"
+                    "Failed to start data collection", "error"
                 )
 
         except Exception as e:
@@ -2066,16 +2248,18 @@ class EnhancedMainWindow(QMainWindow):
     def auto_collect_missing_data(self):
         """Automatically collect missing data for current results"""
         try:
-            if not hasattr(self, 'last_search_results') or not self.last_search_results:
-                self.notification_area.show_message("No search results to collect data for", "warning")
+            if not hasattr(self, "last_search_results") or not self.last_search_results:
+                self.notification_area.show_message(
+                    "No search results to collect data for", "warning"
+                )
                 return
 
             missing_data_apns = []
             for property_data in self.last_search_results:
-                apn = property_data.get('apn')
+                apn = property_data.get("apn")
                 if apn:
                     status = self._get_data_collection_status(apn)
-                    if not status['complete']:
+                    if not status["complete"]:
                         missing_data_apns.append(apn)
 
             if missing_data_apns:
@@ -2087,14 +2271,18 @@ class EnhancedMainWindow(QMainWindow):
 
                 self.notification_area.show_message(
                     f"Started collection for {added_jobs} properties with missing data",
-                    "success"
+                    "success",
                 )
             else:
-                self.notification_area.show_message("All properties have complete data", "info")
+                self.notification_area.show_message(
+                    "All properties have complete data", "info"
+                )
 
         except Exception as e:
             logger.error(f"Auto-collect failed: {e}")
-            self.notification_area.show_message(f"Auto-collect failed: {str(e)}", "error")
+            self.notification_area.show_message(
+                f"Auto-collect failed: {str(e)}", "error"
+            )
 
     def get_selected_apns(self) -> List[str]:
         """Get APNs from selected table rows"""
@@ -2121,9 +2309,14 @@ class EnhancedMainWindow(QMainWindow):
             try:
                 status_dict = self.background_manager.get_collection_status()
             except:
-                status_dict = {'status': 'Unknown', 'pending_jobs': 0, 'active_jobs': 0, 'completed_jobs': 0}
+                status_dict = {
+                    "status": "Unknown",
+                    "pending_jobs": 0,
+                    "active_jobs": 0,
+                    "completed_jobs": 0,
+                }
 
-        if status_dict and hasattr(self, 'bg_status_widget'):
+        if status_dict and hasattr(self, "bg_status_widget"):
             self.bg_status_widget.update_status(status_dict)
 
         self.check_system_status()
@@ -2134,7 +2327,10 @@ class EnhancedMainWindow(QMainWindow):
             # Check database connection
             if self.db_manager:
                 try:
-                    if hasattr(self.db_manager, 'test_connection') and not self.db_manager.test_connection():
+                    if (
+                        hasattr(self.db_manager, "test_connection")
+                        and not self.db_manager.test_connection()
+                    ):
                         self.db_status_label.setText("DB: Disconnected")
                         self.db_status_label.setStyleSheet("color: red;")
                     else:
@@ -2148,14 +2344,14 @@ class EnhancedMainWindow(QMainWindow):
                 self.db_status_label.setStyleSheet("color: red;")
 
             # Update quick stats
-            if hasattr(self.quick_stats, 'update_stats'):
+            if hasattr(self.quick_stats, "update_stats"):
                 try:
                     self.quick_stats.update_stats()
                 except:
                     pass  # Ignore quick stats errors
 
             # Update database connection widget
-            if hasattr(self.db_connection, 'update_status'):
+            if hasattr(self.db_connection, "update_status"):
                 try:
                     self.db_connection.update_status()
                 except:
@@ -2167,8 +2363,8 @@ class EnhancedMainWindow(QMainWindow):
     def on_collection_finished(self, results: Dict[str, Any]):
         """Handle collection completion"""
         try:
-            success_count = results.get('successful_collections', 0)
-            failed_count = results.get('failed_collections', 0)
+            success_count = results.get("successful_collections", 0)
+            failed_count = results.get("failed_collections", 0)
 
             message = f"Collection completed: {success_count} successful"
             if failed_count > 0:
@@ -2185,21 +2381,28 @@ class EnhancedMainWindow(QMainWindow):
     def handle_background_error(self, error_message: str):
         """Handle background collection errors"""
         logger.error(f"Background collection error: {error_message}")
-        self.notification_area.show_message(f"Collection error: {error_message}", "error")
+        self.notification_area.show_message(
+            f"Collection error: {error_message}", "error"
+        )
 
     def refresh_displayed_data(self):
         """Refresh currently displayed data"""
         try:
             # If we have current results, refresh their status
-            if hasattr(self, 'last_search_results') and self.last_search_results:
+            if hasattr(self, "last_search_results") and self.last_search_results:
                 self.populate_results_table(self.last_search_results)
 
             # Update quick stats
             self.quick_stats.update_stats()
 
             # Update property details if shown
-            if hasattr(self.property_details, 'current_apn') and self.property_details.current_apn:
-                self.property_details.load_property_data(self.property_details.current_apn)
+            if (
+                hasattr(self.property_details, "current_apn")
+                and self.property_details.current_apn
+            ):
+                self.property_details.load_property_data(
+                    self.property_details.current_apn
+                )
 
         except Exception as e:
             logger.error(f"Failed to refresh displayed data: {e}")
@@ -2208,19 +2411,29 @@ class EnhancedMainWindow(QMainWindow):
         """CRASH-SAFE Force refresh property data by clearing cache and reloading details"""
         try:
             # Comprehensive safety checks first
-            if not hasattr(self, 'property_data') or not self.property_data:
-                QMessageBox.warning(self, "Error", "No property data available for refresh.")
+            if not hasattr(self, "property_data") or not self.property_data:
+                QMessageBox.warning(
+                    self, "Error", "No property data available for refresh."
+                )
                 return
 
-            apn = self.property_data.get('apn') if isinstance(self.property_data, dict) else None
+            apn = (
+                self.property_data.get("apn")
+                if isinstance(self.property_data, dict)
+                else None
+            )
             if not apn:
-                QMessageBox.warning(self, "Error", "No APN available for refresh operation.")
+                QMessageBox.warning(
+                    self, "Error", "No APN available for refresh operation."
+                )
                 return
 
             # Initialize progress dialog with proper error handling
             progress = None
             try:
-                progress = QProgressDialog("Preparing refresh operation...", "Cancel", 0, 100, self)
+                progress = QProgressDialog(
+                    "Preparing refresh operation...", "Cancel", 0, 100, self
+                )
                 progress.setWindowModality(Qt.WindowModal)
                 progress.setMinimumDuration(0)  # Show immediately
                 progress.show()
@@ -2239,21 +2452,32 @@ class EnhancedMainWindow(QMainWindow):
                 cache_cleared = False
                 if self.background_manager:
                     try:
-                        if hasattr(self.background_manager, 'worker') and self.background_manager.worker:
-                            if hasattr(self.background_manager.worker, 'cache'):
+                        if (
+                            hasattr(self.background_manager, "worker")
+                            and self.background_manager.worker
+                        ):
+                            if hasattr(self.background_manager.worker, "cache"):
                                 try:
-                                    self.background_manager.worker.cache.clear_apn_cache(apn)
+                                    self.background_manager.worker.cache.clear_apn_cache(
+                                        apn
+                                    )
                                     cache_cleared = True
                                     logger.info(f"Cleared cache for APN {apn}")
                                 except Exception as cache_error:
-                                    logger.warning(f"Failed to clear cache for APN {apn}: {cache_error}")
+                                    logger.warning(
+                                        f"Failed to clear cache for APN {apn}: {cache_error}"
+                                    )
                                     # Don't fail the entire operation for cache clearing issues
                             else:
                                 logger.debug("Background worker has no cache attribute")
                         else:
-                            logger.debug("Background manager has no worker or worker is None")
+                            logger.debug(
+                                "Background manager has no worker or worker is None"
+                            )
                     except Exception as manager_error:
-                        logger.warning(f"Error accessing background manager for cache clear: {manager_error}")
+                        logger.warning(
+                            f"Error accessing background manager for cache clear: {manager_error}"
+                        )
 
                 if progress:
                     progress.setValue(40)
@@ -2265,43 +2489,65 @@ class EnhancedMainWindow(QMainWindow):
                     try:
                         # Check if background service is running
                         is_running = False
-                        if hasattr(self.background_manager, 'is_running'):
+                        if hasattr(self.background_manager, "is_running"):
                             try:
                                 is_running = self.background_manager.is_running()
                             except Exception as running_check_error:
-                                logger.warning(f"Error checking if background service is running: {running_check_error}")
+                                logger.warning(
+                                    f"Error checking if background service is running: {running_check_error}"
+                                )
 
                         if is_running:
                             if progress:
                                 progress.setValue(60)
-                                progress.setLabelText("Queuing fresh data collection...")
+                                progress.setLabelText(
+                                    "Queuing fresh data collection..."
+                                )
 
                             # SAFE data collection request
                             try:
-                                if hasattr(self.background_manager, 'collect_data_for_apn'):
-                                    success = self.background_manager.collect_data_for_apn(
-                                        apn, JobPriority.CRITICAL, force_fresh=True
+                                if hasattr(
+                                    self.background_manager, "collect_data_for_apn"
+                                ):
+                                    success = (
+                                        self.background_manager.collect_data_for_apn(
+                                            apn, JobPriority.CRITICAL, force_fresh=True
+                                        )
                                     )
 
                                     if success:
                                         collection_success = True
                                         if progress:
                                             progress.setValue(90)
-                                            progress.setLabelText("Collection queued successfully...")
+                                            progress.setLabelText(
+                                                "Collection queued successfully..."
+                                            )
 
-                                        logger.info(f"Successfully queued fresh data collection for APN {apn}")
+                                        logger.info(
+                                            f"Successfully queued fresh data collection for APN {apn}"
+                                        )
                                     else:
-                                        logger.warning(f"Failed to queue data collection for APN {apn}")
+                                        logger.warning(
+                                            f"Failed to queue data collection for APN {apn}"
+                                        )
                                 else:
-                                    logger.error("Background manager missing collect_data_for_apn method")
+                                    logger.error(
+                                        "Background manager missing collect_data_for_apn method"
+                                    )
 
                             except Exception as collection_error:
-                                logger.error(f"Error requesting data collection for APN {apn}: {collection_error}")
+                                logger.error(
+                                    f"Error requesting data collection for APN {apn}: {collection_error}"
+                                )
                         else:
-                            logger.info("Background collection service is not running - using database refresh")
+                            logger.info(
+                                "Background collection service is not running - using database refresh"
+                            )
 
                     except Exception as bg_service_error:
-                        logger.error(f"Error with background collection service: {bg_service_error}")
+                        logger.error(
+                            f"Error with background collection service: {bg_service_error}"
+                        )
                 else:
                     logger.warning("No background manager available for refresh")
 
@@ -2312,37 +2558,55 @@ class EnhancedMainWindow(QMainWindow):
                 # SAFE property details reload
                 reload_success = False
                 try:
-                    if hasattr(self, 'load_property_details'):
+                    if hasattr(self, "load_property_details"):
                         self.load_property_details()
                         reload_success = True
-                        logger.info(f"Successfully reloaded property details for APN {apn}")
+                        logger.info(
+                            f"Successfully reloaded property details for APN {apn}"
+                        )
                     else:
                         logger.error("Dialog missing load_property_details method")
 
                 except Exception as reload_error:
-                    logger.error(f"Error reloading property details for APN {apn}: {reload_error}")
+                    logger.error(
+                        f"Error reloading property details for APN {apn}: {reload_error}"
+                    )
 
                 if progress:
                     progress.setValue(100)
 
                 # Show appropriate success message
                 if collection_success:
-                    QMessageBox.information(self, "Refresh Started",
-                                           f"Fresh data collection started for APN {apn}.\n"
-                                           "The dialog will refresh automatically when complete.")
+                    QMessageBox.information(
+                        self,
+                        "Refresh Started",
+                        f"Fresh data collection started for APN {apn}.\n"
+                        "The dialog will refresh automatically when complete.",
+                    )
                 elif reload_success:
-                    QMessageBox.information(self, "Data Refreshed",
-                                           "Property data has been refreshed with current database contents.")
+                    QMessageBox.information(
+                        self,
+                        "Data Refreshed",
+                        "Property data has been refreshed with current database contents.",
+                    )
                 else:
-                    QMessageBox.warning(self, "Partial Refresh",
-                                       "Refresh completed but some operations may have failed.\n"
-                                       "Check the application logs for more details.")
+                    QMessageBox.warning(
+                        self,
+                        "Partial Refresh",
+                        "Refresh completed but some operations may have failed.\n"
+                        "Check the application logs for more details.",
+                    )
 
             except Exception as main_error:
-                logger.error(f"Error in main refresh operation for APN {apn}: {main_error}")
-                QMessageBox.critical(self, "Refresh Error",
-                                   f"Error during refresh operation: {str(main_error)}\n"
-                                   "Please try again or restart the application if problems persist.")
+                logger.error(
+                    f"Error in main refresh operation for APN {apn}: {main_error}"
+                )
+                QMessageBox.critical(
+                    self,
+                    "Refresh Error",
+                    f"Error during refresh operation: {str(main_error)}\n"
+                    "Please try again or restart the application if problems persist.",
+                )
 
             finally:
                 # SAFE progress dialog cleanup
@@ -2351,23 +2615,33 @@ class EnhancedMainWindow(QMainWindow):
                         progress.close()
                         progress.deleteLater()
                     except Exception as cleanup_error:
-                        logger.warning(f"Error cleaning up progress dialog: {cleanup_error}")
+                        logger.warning(
+                            f"Error cleaning up progress dialog: {cleanup_error}"
+                        )
 
         except Exception as e:
             # ULTIMATE CRASH PREVENTION - catch absolutely everything
-            logger.error(f"CRITICAL: Unhandled error in refresh_property_data for APN {getattr(self, 'property_data', {}).get('apn', 'unknown')}: {e}")
+            logger.error(
+                f"CRITICAL: Unhandled error in refresh_property_data for APN {getattr(self, 'property_data', {}).get('apn', 'unknown')}: {e}"
+            )
             import traceback
+
             traceback.print_exc()
 
             # Show error but keep application running
             try:
-                QMessageBox.critical(self, "Critical Refresh Error",
-                                   f"A critical error occurred during refresh:\n{str(e)}\n\n"
-                                   "The application will continue running.\n"
-                                   "Please restart the application if problems persist.")
+                QMessageBox.critical(
+                    self,
+                    "Critical Refresh Error",
+                    f"A critical error occurred during refresh:\n{str(e)}\n\n"
+                    "The application will continue running.\n"
+                    "Please restart the application if problems persist.",
+                )
             except:
                 # Even the error dialog failed - just log it
-                logger.error("Failed to show critical error dialog - application may be in unstable state")
+                logger.error(
+                    "Failed to show critical error dialog - application may be in unstable state"
+                )
 
     # UI interaction methods
     def toggle_advanced_search(self, checked: bool):
@@ -2420,7 +2694,9 @@ class EnhancedMainWindow(QMainWindow):
 
             # View details action
             view_action = menu.addAction("View Details")
-            view_action.triggered.connect(lambda: self.view_property_details(item.row()))
+            view_action.triggered.connect(
+                lambda: self.view_property_details(item.row())
+            )
 
             # Collection actions
             menu.addSeparator()
@@ -2429,12 +2705,14 @@ class EnhancedMainWindow(QMainWindow):
 
             # Check if this APN is in active jobs
             status = self.background_manager.get_collection_status()
-            active_jobs = status.get('active_jobs', 0)
+            active_jobs = status.get("active_jobs", 0)
 
             if active_jobs > 0 and self.background_manager.worker:
                 # Add option to prioritize this collection
                 prioritize_action = menu.addAction("Prioritize Collection")
-                prioritize_action.triggered.connect(lambda: self.prioritize_collection(item.row()))
+                prioritize_action.triggered.connect(
+                    lambda: self.prioritize_collection(item.row())
+                )
 
             menu.addSeparator()
 
@@ -2481,10 +2759,12 @@ class EnhancedMainWindow(QMainWindow):
             if added_jobs > 0:
                 self.notification_area.show_message(
                     f"Started collection for {added_jobs} selected properties",
-                    "success"
+                    "success",
                 )
             else:
-                self.notification_area.show_message("Failed to start collection", "error")
+                self.notification_area.show_message(
+                    "Failed to start collection", "error"
+                )
 
         except Exception as e:
             logger.error(f"Failed to collect selected data: {e}")
@@ -2495,9 +2775,11 @@ class EnhancedMainWindow(QMainWindow):
             apn_item = self.results_table.item(row, 0)
             if apn_item:
                 apn = apn_item.text()
-                if hasattr(self.background_manager, 'prioritize_job'):
+                if hasattr(self.background_manager, "prioritize_job"):
                     self.background_manager.prioritize_job(apn)
-                    self.notification_area.show_message(f"Prioritized collection for {apn}", "info")
+                    self.notification_area.show_message(
+                        f"Prioritized collection for {apn}", "info"
+                    )
 
         except Exception as e:
             logger.error(f"Failed to prioritize collection: {e}")
@@ -2511,7 +2793,9 @@ class EnhancedMainWindow(QMainWindow):
             dialog.exec()
         except Exception as e:
             logger.error(f"Failed to show batch search dialog: {e}")
-            QMessageBox.critical(self, "Error", f"Failed to open batch search: {str(e)}")
+            QMessageBox.critical(
+                self, "Error", f"Failed to open batch search: {str(e)}"
+            )
 
     def handle_batch_search_results(self, results: List[Dict[str, Any]]):
         """Handle batch search results"""
@@ -2527,8 +2811,7 @@ class EnhancedMainWindow(QMainWindow):
 
             # Show success message
             self.notification_area.show_message(
-                f"Batch search completed: {len(results)} properties found",
-                "success"
+                f"Batch search completed: {len(results)} properties found", "success"
             )
 
         except Exception as e:
@@ -2538,7 +2821,7 @@ class EnhancedMainWindow(QMainWindow):
         """Show export dialog"""
         try:
             # Get current results
-            results = getattr(self, 'last_search_results', [])
+            results = getattr(self, "last_search_results", [])
             if not results:
                 self.notification_area.show_message("No results to export", "warning")
                 return
@@ -2547,7 +2830,9 @@ class EnhancedMainWindow(QMainWindow):
             dialog.exec()
         except Exception as e:
             logger.error(f"Failed to show export dialog: {e}")
-            QMessageBox.critical(self, "Error", f"Failed to open export dialog: {str(e)}")
+            QMessageBox.critical(
+                self, "Error", f"Failed to open export dialog: {str(e)}"
+            )
 
     def export_selected_results(self):
         """Export selected results only"""
@@ -2558,16 +2843,19 @@ class EnhancedMainWindow(QMainWindow):
                 return
 
             # Filter results to selected APNs
-            if hasattr(self, 'last_search_results'):
+            if hasattr(self, "last_search_results"):
                 selected_results = [
-                    result for result in self.last_search_results
-                    if result.get('apn') in selected_apns
+                    result
+                    for result in self.last_search_results
+                    if result.get("apn") in selected_apns
                 ]
 
                 dialog = ExportDialog(selected_results, self.db_manager)
                 dialog.exec()
             else:
-                self.notification_area.show_message("No results available for export", "warning")
+                self.notification_area.show_message(
+                    "No results available for export", "warning"
+                )
 
         except Exception as e:
             logger.error(f"Failed to export selected results: {e}")
@@ -2599,13 +2887,15 @@ class EnhancedMainWindow(QMainWindow):
             dialog.exec()
         except Exception as e:
             logger.error(f"Failed to show collection queue: {e}")
-            QMessageBox.critical(self, "Error", f"Failed to open collection queue: {str(e)}")
+            QMessageBox.critical(
+                self, "Error", f"Failed to open collection queue: {str(e)}"
+            )
 
     def show_collection_stats(self):
         """Show collection statistics"""
         status = self.background_manager.get_collection_status()
-        stats = status.get('statistics', {})
-        cache_stats = status.get('cache_stats', {})
+        stats = status.get("statistics", {})
+        cache_stats = status.get("cache_stats", {})
 
         # Create a detailed statistics dialog
         dialog = QDialog(self)
@@ -2655,7 +2945,9 @@ Current Status:
         """Create a database backup"""
         try:
             if not self.backup_manager:
-                self.notification_area.show_message("Backup manager not available", "error")
+                self.notification_area.show_message(
+                    "Backup manager not available", "error"
+                )
                 return
 
             # Show progress
@@ -2669,9 +2961,14 @@ Current Status:
             self.status_progress.setVisible(False)
 
             if backup_path:
-                self.notification_area.show_message(f"Backup created: {backup_path}", "success")
-                QMessageBox.information(self, "Backup Complete",
-                                      f"Database backup created successfully:\n{backup_path}")
+                self.notification_area.show_message(
+                    f"Backup created: {backup_path}", "success"
+                )
+                QMessageBox.information(
+                    self,
+                    "Backup Complete",
+                    f"Database backup created successfully:\n{backup_path}",
+                )
             else:
                 self.notification_area.show_message("Backup failed", "error")
 
@@ -2687,7 +2984,9 @@ Current Status:
             dialog.exec()
         except Exception as e:
             logger.error(f"Failed to show backup/restore dialog: {e}")
-            QMessageBox.critical(self, "Error", f"Failed to open backup dialog: {str(e)}")
+            QMessageBox.critical(
+                self, "Error", f"Failed to open backup dialog: {str(e)}"
+            )
 
     def validate_data(self):
         """Run data validation"""
@@ -2710,9 +3009,13 @@ Current Status:
             # Show summary
             total_issues = sum(len(issues) for issues in validation_results.values())
             if total_issues == 0:
-                self.notification_area.show_message("Data validation passed - no issues found", "success")
+                self.notification_area.show_message(
+                    "Data validation passed - no issues found", "success"
+                )
             else:
-                self.notification_area.show_message(f"Data validation found {total_issues} issues", "warning")
+                self.notification_area.show_message(
+                    f"Data validation found {total_issues} issues", "warning"
+                )
 
         except Exception as e:
             self.status_progress.setVisible(False)
@@ -2724,8 +3027,9 @@ Current Status:
         try:
             # This would implement data import functionality
             # For now, show a placeholder message
-            QMessageBox.information(self, "Import Data",
-                                  "Data import functionality not yet implemented.")
+            QMessageBox.information(
+                self, "Import Data", "Data import functionality not yet implemented."
+            )
         except Exception as e:
             logger.error(f"Data import failed: {e}")
 
@@ -2755,13 +3059,13 @@ Current Status:
     def _update_dialog_status(self):
         """CRASH-SAFE Periodically update dialog status"""
         try:
-            if not hasattr(self, 'background_manager') or not self.background_manager:
+            if not hasattr(self, "background_manager") or not self.background_manager:
                 return
 
             # SAFE status retrieval
             try:
                 status = self.background_manager.get_collection_status()
-                if hasattr(self, 'bg_status_widget') and self.bg_status_widget:
+                if hasattr(self, "bg_status_widget") and self.bg_status_widget:
                     try:
                         self.bg_status_widget.update_status(status)
                     except Exception as widget_error:
@@ -2771,24 +3075,46 @@ Current Status:
 
             # SAFE collection completion check
             try:
-                if hasattr(self, 'collection_in_progress') and self.collection_in_progress:
-                    if hasattr(self, 'property_data') and self.property_data:
-                        apn = self.property_data.get('apn') if isinstance(self.property_data, dict) else None
-                        if apn and hasattr(self.background_manager, 'worker') and self.background_manager.worker:
+                if (
+                    hasattr(self, "collection_in_progress")
+                    and self.collection_in_progress
+                ):
+                    if hasattr(self, "property_data") and self.property_data:
+                        apn = (
+                            self.property_data.get("apn")
+                            if isinstance(self.property_data, dict)
+                            else None
+                        )
+                        if (
+                            apn
+                            and hasattr(self.background_manager, "worker")
+                            and self.background_manager.worker
+                        ):
                             try:
-                                if hasattr(self.background_manager.worker, 'active_jobs'):
-                                    if apn not in self.background_manager.worker.active_jobs:
+                                if hasattr(
+                                    self.background_manager.worker, "active_jobs"
+                                ):
+                                    if (
+                                        apn
+                                        not in self.background_manager.worker.active_jobs
+                                    ):
                                         # Collection completed, refresh safely
                                         self.collection_in_progress = False
-                                        if hasattr(self, 'load_property_details'):
+                                        if hasattr(self, "load_property_details"):
                                             try:
                                                 self.load_property_details()
                                             except Exception as load_error:
-                                                logger.error(f"Error loading property details after completion: {load_error}")
+                                                logger.error(
+                                                    f"Error loading property details after completion: {load_error}"
+                                                )
                             except Exception as job_check_error:
-                                logger.warning(f"Error checking active jobs: {job_check_error}")
+                                logger.warning(
+                                    f"Error checking active jobs: {job_check_error}"
+                                )
             except Exception as completion_error:
-                logger.warning(f"Error checking collection completion: {completion_error}")
+                logger.warning(
+                    f"Error checking collection completion: {completion_error}"
+                )
 
         except Exception as e:
             logger.warning(f"Error in _update_dialog_status: {e}")
@@ -2814,7 +3140,9 @@ def main():
 
     except Exception as e:
         logger.error(f"Application startup failed: {e}")
-        QMessageBox.critical(None, "Startup Error", f"Failed to start application: {str(e)}")
+        QMessageBox.critical(
+            None, "Startup Error", f"Failed to start application: {str(e)}"
+        )
         sys.exit(1)
 
 

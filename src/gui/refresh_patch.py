@@ -217,5 +217,9 @@ UPDATE_DIALOG_STATUS_REPLACEMENT = '''    def _update_dialog_status(self):
             # Don't re-raise - just log and continue'''
 
 print("Refresh patch functions defined successfully.")
-print("REFRESH_PROPERTY_DATA_REPLACEMENT contains the crash-safe refresh_property_data function")
-print("UPDATE_DIALOG_STATUS_REPLACEMENT contains the crash-safe _update_dialog_status function")
+print(
+    "REFRESH_PROPERTY_DATA_REPLACEMENT contains the crash-safe refresh_property_data function"
+)
+print(
+    "UPDATE_DIALOG_STATUS_REPLACEMENT contains the crash-safe _update_dialog_status function"
+)

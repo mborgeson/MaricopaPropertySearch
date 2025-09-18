@@ -34,9 +34,11 @@ api_logger = get_api_logger(__name__)
 # API Configuration
 API_TOKEN = "ca1a11a6-adc4-4e0c-a584-36cbb6eb35e5"
 
+
 @dataclass
 class PropertyDataCache:
     """Cache entry for property data with TTL"""
+
     data: Dict[str, Any]
     timestamp: float
     ttl: float = 300.0  # 5 minutes default TTL
@@ -44,9 +46,11 @@ class PropertyDataCache:
     def is_expired(self) -> bool:
         return time.time() - self.timestamp > self.ttl
 
+
 @dataclass
 class BatchAPIRequest:
     """Individual API request within a batch operation"""
+
     request_id: str
     request_type: str  # 'search_by_apn', 'search_by_owner', 'search_by_address'
     identifier: str  # APN, owner name, address
@@ -66,17 +70,22 @@ class BatchAPIRequest:
     def __eq__(self, other):
         if not isinstance(other, BatchAPIRequest):
             return False
-        return (self.request_type == other.request_type and
-                self.identifier == other.identifier)
+        return (
+            self.request_type == other.request_type
+            and self.identifier == other.identifier
+        )
+
 
 class AdaptiveRateLimiter:
     """Intelligent rate limiter that adapts based on server responses"""
 
-    def __init__(self,
-                 initial_rate: float = 2.0,
-                 min_rate: float = 0.5,
-                 max_rate: float = 5.0,
-                 burst_capacity: int = 10):
+    def __init__(
+        self,
+        initial_rate: float = 2.0,
+        min_rate: float = 0.5,
+        max_rate: float = 5.0,
+        burst_capacity: int = 10,
+    ):
 
         self.current_rate = initial_rate
         self.min_rate = min_rate
@@ -93,9 +102,11 @@ class AdaptiveRateLimiter:
         self.rate_limit_count = 0
         self.last_rate_adjustment = time.time()
 
-        logger.info(f"Adaptive rate limiter initialized - "
-                   f"Initial rate: {initial_rate} req/s, "
-                   f"Burst capacity: {burst_capacity}")
+        logger.info(
+            f"Adaptive rate limiter initialized - "
+            f"Initial rate: {initial_rate} req/s, "
+            f"Burst capacity: {burst_capacity}"
+        )
 
     def acquire(self, timeout: float = 10.0) -> bool:
         """Acquire token with adaptive rate limiting"""
@@ -174,23 +185,26 @@ class AdaptiveRateLimiter:
         """Get current rate limiter statistics"""
         with self.lock:
             return {
-                'current_rate': self.current_rate,
-                'min_rate': self.min_rate,
-                'max_rate': self.max_rate,
-                'current_tokens': self.tokens,
-                'burst_capacity': self.burst_capacity,
-                'success_count': self.success_count,
-                'error_count': self.error_count,
-                'rate_limit_count': self.rate_limit_count
+                "current_rate": self.current_rate,
+                "min_rate": self.min_rate,
+                "max_rate": self.max_rate,
+                "current_tokens": self.tokens,
+                "burst_capacity": self.burst_capacity,
+                "success_count": self.success_count,
+                "error_count": self.error_count,
+                "rate_limit_count": self.rate_limit_count,
             }
+
 
 class ConnectionPoolManager:
     """Manages HTTP connection pools for optimized API requests"""
 
-    def __init__(self,
-                 max_connections: int = 20,
-                 max_connections_per_host: int = 10,
-                 timeout: int = 30):
+    def __init__(
+        self,
+        max_connections: int = 20,
+        max_connections_per_host: int = 10,
+        timeout: int = 30,
+    ):
 
         self.max_connections = max_connections
         self.max_connections_per_host = max_connections_per_host
@@ -201,9 +215,11 @@ class ConnectionPoolManager:
         self.session = None
         self.lock = Lock()
 
-        logger.info(f"Connection pool manager initialized - "
-                   f"Max connections: {max_connections}, "
-                   f"Max per host: {max_connections_per_host}")
+        logger.info(
+            f"Connection pool manager initialized - "
+            f"Max connections: {max_connections}, "
+            f"Max per host: {max_connections_per_host}"
+        )
 
     def _ensure_connector(self):
         """Ensure connector is initialized (called in async context)"""
@@ -214,7 +230,7 @@ class ConnectionPoolManager:
                 ttl_dns_cache=300,
                 use_dns_cache=True,
                 keepalive_timeout=30,
-                enable_cleanup_closed=True
+                enable_cleanup_closed=True,
             )
 
     async def get_session(self, token: str = None) -> aiohttp.ClientSession:
@@ -224,16 +240,14 @@ class ConnectionPoolManager:
             timeout = aiohttp.ClientTimeout(total=self.timeout)
 
             headers = {
-                'Accept': 'application/json',
-                'User-Agent': None  # API requires null user-agent
+                "Accept": "application/json",
+                "User-Agent": None,  # API requires null user-agent
             }
             if token:
-                headers['AUTHORIZATION'] = token
+                headers["AUTHORIZATION"] = token
 
             self.session = aiohttp.ClientSession(
-                connector=self.connector,
-                timeout=timeout,
-                headers=headers
+                connector=self.connector, timeout=timeout, headers=headers
             )
         return self.session
 
@@ -243,6 +257,7 @@ class ConnectionPoolManager:
             await self.session.close()
         if self.connector:
             await self.connector.close()
+
 
 class UnifiedMaricopaAPIClient:
     """
@@ -265,45 +280,44 @@ class UnifiedMaricopaAPIClient:
         # Configuration
         if config_manager:
             self.config = config_manager.get_api_config()
-            self.base_url = self.config['base_url']
-            self.token = self.config.get('token', API_TOKEN)
-            self.timeout = self.config['timeout']
-            self.max_retries = self.config['max_retries']
+            self.base_url = self.config["base_url"]
+            self.token = self.config.get("token", API_TOKEN)
+            self.timeout = self.config["timeout"]
+            self.max_retries = self.config["max_retries"]
         else:
             # Default configuration
-            self.base_url = 'https://mcassessor.maricopa.gov/api'
+            self.base_url = "https://mcassessor.maricopa.gov/api"
             self.token = API_TOKEN
             self.timeout = 30
             self.max_retries = 3
 
-        logger.debug(f"API Configuration - Base URL: {self.base_url}, Timeout: {self.timeout}s, Max Retries: {self.max_retries}")
+        logger.debug(
+            f"API Configuration - Base URL: {self.base_url}, Timeout: {self.timeout}s, Max Retries: {self.max_retries}"
+        )
 
         # Synchronous session for backward compatibility
         self.session = requests.Session()
-        self.session.headers.update({
-            'User-Agent': None,  # API docs specify null user-agent
-            'Accept': 'application/json',
-            'AUTHORIZATION': self.token if self.token else None
-        })
+        self.session.headers.update(
+            {
+                "User-Agent": None,  # API docs specify null user-agent
+                "Accept": "application/json",
+                "AUTHORIZATION": self.token if self.token else None,
+            }
+        )
 
         # Async components for high-performance operations
         self.connection_pool = ConnectionPoolManager(
-            max_connections=20,
-            max_connections_per_host=10,
-            timeout=self.timeout
+            max_connections=20, max_connections_per_host=10, timeout=self.timeout
         )
 
         # Rate limiting
         self.rate_limiter = AdaptiveRateLimiter(
-            initial_rate=2.0,
-            max_rate=5.0,
-            burst_capacity=10
+            initial_rate=2.0, max_rate=5.0, burst_capacity=10
         )
 
         # Thread pool for parallel operations
         self.executor = ThreadPoolExecutor(
-            max_workers=10,
-            thread_name_prefix="MaricopaAPI"
+            max_workers=10, thread_name_prefix="MaricopaAPI"
         )
 
         # Caching system
@@ -368,9 +382,7 @@ class UnifiedMaricopaAPIClient:
         """Cache response data"""
         with self._cache_lock:
             self._cache[cache_key] = PropertyDataCache(
-                data=data,
-                timestamp=time.time(),
-                ttl=ttl
+                data=data, timestamp=time.time(), ttl=ttl
             )
 
     def test_connection(self) -> bool:
@@ -382,7 +394,9 @@ class UnifiedMaricopaAPIClient:
             logger.debug(f"API connection test failed: {e}")
             return False
 
-    def _make_request(self, endpoint: str, params: Dict = None, retry_count: int = 0) -> Optional[Dict]:
+    def _make_request(
+        self, endpoint: str, params: Dict = None, retry_count: int = 0
+    ) -> Optional[Dict]:
         """Make HTTP request with retry logic and caching"""
         cache_key = self._get_cache_key(endpoint, params)
 
@@ -399,16 +413,14 @@ class UnifiedMaricopaAPIClient:
         start_time = time.time()
 
         try:
-            response = self.session.get(
-                url,
-                params=params,
-                timeout=self.timeout
-            )
+            response = self.session.get(url, params=params, timeout=self.timeout)
 
             response_time = time.time() - start_time
             self.request_times.append(response_time)
 
-            logger.debug(f"API response status: {response.status_code} in {response_time:.3f}s")
+            logger.debug(
+                f"API response status: {response.status_code} in {response_time:.3f}s"
+            )
 
             if response.status_code == 200:
                 data = response.json()
@@ -428,8 +440,10 @@ class UnifiedMaricopaAPIClient:
                     self.rate_limiter.record_rate_limit()
 
                 if retry_count < self.max_retries:
-                    wait_time = 2 ** retry_count  # Exponential backoff
-                    logger.warning(f"Rate limited, waiting {wait_time}s before retry (attempt {retry_count + 1})")
+                    wait_time = 2**retry_count  # Exponential backoff
+                    logger.warning(
+                        f"Rate limited, waiting {wait_time}s before retry (attempt {retry_count + 1})"
+                    )
                     time.sleep(wait_time)
                     return self._make_request(endpoint, params, retry_count + 1)
                 else:
@@ -440,7 +454,9 @@ class UnifiedMaricopaAPIClient:
                 self._cache_data(cache_key, {}, ttl=60.0)
                 return None
             else:
-                logger.error(f"API request failed: {response.status_code} - {response.text}")
+                logger.error(
+                    f"API request failed: {response.status_code} - {response.text}"
+                )
                 if self.rate_limiter:
                     self.rate_limiter.record_error()
                 return None
@@ -476,30 +492,40 @@ class UnifiedMaricopaAPIClient:
         logger.info(f"Searching properties by owner: {owner_name} (limit: {limit})")
 
         # Try API first
-        params = {'q': owner_name}
+        params = {"q": owner_name}
 
         try:
-            response = self._make_request('/search/property/', params)
+            response = self._make_request("/search/property/", params)
 
-            if response and 'Results' in response:
-                results = response['Results'][:limit]  # Limit results
-                normalized_results = [self._normalize_api_data(result) for result in results]
+            if response and "Results" in response:
+                results = response["Results"][:limit]  # Limit results
+                normalized_results = [
+                    self._normalize_api_data(result) for result in results
+                ]
                 result_count = len(normalized_results)
-                logger.info(f"Found {result_count} properties for owner: {owner_name} (via API)")
+                logger.info(
+                    f"Found {result_count} properties for owner: {owner_name} (via API)"
+                )
 
                 # Log search analytics
-                logger.info(f"SEARCH_ANALYTICS: owner_search, results={result_count}, limit={limit}, source=api")
+                logger.info(
+                    f"SEARCH_ANALYTICS: owner_search, results={result_count}, limit={limit}, source=api"
+                )
 
                 return normalized_results
             else:
                 logger.warning(f"No properties found via API for owner: {owner_name}")
 
         except Exception as e:
-            logger.warning(f"API search failed for owner {owner_name}: {e}, returning empty results")
+            logger.warning(
+                f"API search failed for owner {owner_name}: {e}, returning empty results"
+            )
 
         # Web scraping fallback is not practical for owner searches
         # as it would require searching through many possible APNs
-        logger.info(f"SEARCH_ANALYTICS: owner_search, results=0, limit={limit}, source=api_only")
+        logger.info(
+            f"SEARCH_ANALYTICS: owner_search, results=0, limit={limit}, source=api_only"
+        )
         return []
 
     def search_by_address(self, address: str, limit: int = 50) -> List[Dict]:
@@ -507,30 +533,40 @@ class UnifiedMaricopaAPIClient:
         logger.info(f"Searching properties by address: {address} (limit: {limit})")
 
         # Try API first
-        params = {'q': address}
+        params = {"q": address}
 
         try:
-            response = self._make_request('/search/property/', params)
+            response = self._make_request("/search/property/", params)
 
-            if response and 'Results' in response:
-                results = response['Results'][:limit]  # Limit results
-                normalized_results = [self._normalize_api_data(result) for result in results]
+            if response and "Results" in response:
+                results = response["Results"][:limit]  # Limit results
+                normalized_results = [
+                    self._normalize_api_data(result) for result in results
+                ]
                 result_count = len(normalized_results)
-                logger.info(f"Found {result_count} properties for address: {address} (via API)")
+                logger.info(
+                    f"Found {result_count} properties for address: {address} (via API)"
+                )
 
                 # Log search analytics
-                logger.info(f"SEARCH_ANALYTICS: address_search, results={result_count}, limit={limit}, source=api")
+                logger.info(
+                    f"SEARCH_ANALYTICS: address_search, results={result_count}, limit={limit}, source=api"
+                )
 
                 return normalized_results
             else:
                 logger.warning(f"No properties found via API for address: {address}")
 
         except Exception as e:
-            logger.warning(f"API search failed for address {address}: {e}, returning empty results")
+            logger.warning(
+                f"API search failed for address {address}: {e}, returning empty results"
+            )
 
         # Web scraping fallback is not practical for address searches
         # as it would require searching through many possible APNs
-        logger.info(f"SEARCH_ANALYTICS: address_search, results=0, limit={limit}, source=api_only")
+        logger.info(
+            f"SEARCH_ANALYTICS: address_search, results=0, limit={limit}, source=api_only"
+        )
         return []
 
     def search_by_apn(self, apn: str) -> Optional[Dict]:
@@ -539,49 +575,63 @@ class UnifiedMaricopaAPIClient:
 
         # Try API first
         try:
-            params = {'q': apn}
-            response = self._make_request('/search/property/', params)
+            params = {"q": apn}
+            response = self._make_request("/search/property/", params)
 
-            if response and 'Results' in response and len(response['Results']) > 0:
+            if response and "Results" in response and len(response["Results"]) > 0:
                 # Find exact APN match in results
-                for result in response['Results']:
-                    if result.get('APN', '').replace('-', '').replace('.', '') == apn.replace('-', '').replace('.', ''):
+                for result in response["Results"]:
+                    if result.get("APN", "").replace("-", "").replace(
+                        ".", ""
+                    ) == apn.replace("-", "").replace(".", ""):
                         normalized_result = self._normalize_api_data(result)
                         logger.info(f"Found property for APN: {apn} (via API)")
-                        logger.info(f"SEARCH_ANALYTICS: apn_search, results=1, apn={apn}, source=api")
+                        logger.info(
+                            f"SEARCH_ANALYTICS: apn_search, results=1, apn={apn}, source=api"
+                        )
                         return normalized_result
 
                 # If no exact match, return first result
-                if response['Results']:
-                    normalized_result = self._normalize_api_data(response['Results'][0])
+                if response["Results"]:
+                    normalized_result = self._normalize_api_data(response["Results"][0])
                     logger.info(f"Found similar property for APN: {apn} (via API)")
-                    logger.info(f"SEARCH_ANALYTICS: apn_search, results=1, apn={apn}, source=api")
+                    logger.info(
+                        f"SEARCH_ANALYTICS: apn_search, results=1, apn={apn}, source=api"
+                    )
                     return normalized_result
 
-            logger.warning(f"No property found via API for APN: {apn}, trying web scraping fallback")
+            logger.warning(
+                f"No property found via API for APN: {apn}, trying web scraping fallback"
+            )
 
         except Exception as e:
-            logger.warning(f"API search failed for APN {apn}: {e}, trying web scraping fallback")
+            logger.warning(
+                f"API search failed for APN {apn}: {e}, trying web scraping fallback"
+            )
 
         # Web scraping fallback - attempt to get basic property data
         try:
             # Try to get tax data which often contains property info
             tax_data = self._scrape_tax_data_sync(apn)
-            if tax_data and tax_data.get('owner_info'):
-                owner_info = tax_data['owner_info']
+            if tax_data and tax_data.get("owner_info"):
+                owner_info = tax_data["owner_info"]
 
                 # Create basic property record from tax data
                 property_data = {
-                    'apn': apn,
-                    'owner_name': owner_info.get('owner_name', ''),
-                    'property_address': owner_info.get('property_address', ''),
-                    'mailing_address': owner_info.get('mailing_address', ''),
-                    'search_source': 'web_scraping_tax',
-                    'data_quality': 'basic'
+                    "apn": apn,
+                    "owner_name": owner_info.get("owner_name", ""),
+                    "property_address": owner_info.get("property_address", ""),
+                    "mailing_address": owner_info.get("mailing_address", ""),
+                    "search_source": "web_scraping_tax",
+                    "data_quality": "basic",
                 }
 
-                logger.info(f"Found basic property data for APN: {apn} (via web scraping)")
-                logger.info(f"SEARCH_ANALYTICS: apn_search, results=1, apn={apn}, source=webscrape")
+                logger.info(
+                    f"Found basic property data for APN: {apn} (via web scraping)"
+                )
+                logger.info(
+                    f"SEARCH_ANALYTICS: apn_search, results=1, apn={apn}, source=webscrape"
+                )
                 return property_data
 
         except Exception as e:
@@ -630,7 +680,7 @@ class UnifiedMaricopaAPIClient:
 
         try:
             # Primary method: API valuation endpoint
-            response = self._make_request(f'/parcel/{apn}/valuations/')
+            response = self._make_request(f"/parcel/{apn}/valuations/")
 
             if response and isinstance(response, list):
                 # Filter by years if requested
@@ -638,25 +688,35 @@ class UnifiedMaricopaAPIClient:
                 min_year = current_year - years + 1
 
                 filtered_records = [
-                    record for record in response
-                    if record.get('TaxYear') and int(record.get('TaxYear', 0)) >= min_year
+                    record
+                    for record in response
+                    if record.get("TaxYear")
+                    and int(record.get("TaxYear", 0)) >= min_year
                 ]
 
                 result_count = len(filtered_records)
-                logger.info(f"Retrieved {result_count} tax records from API for APN: {apn}")
+                logger.info(
+                    f"Retrieved {result_count} tax records from API for APN: {apn}"
+                )
 
                 if result_count > 0:
                     return filtered_records
 
             # Fallback method: Web scraping from Treasurer's office
-            logger.info(f"API returned limited tax data, attempting web scraping fallback for APN: {apn}")
+            logger.info(
+                f"API returned limited tax data, attempting web scraping fallback for APN: {apn}"
+            )
             try:
                 tax_scrape_data = self.get_tax_information_web(apn)
-                if tax_scrape_data and tax_scrape_data.get('tax_history'):
-                    logger.info(f"Retrieved tax history via web scraping fallback for APN: {apn}")
-                    return tax_scrape_data['tax_history']
+                if tax_scrape_data and tax_scrape_data.get("tax_history"):
+                    logger.info(
+                        f"Retrieved tax history via web scraping fallback for APN: {apn}"
+                    )
+                    return tax_scrape_data["tax_history"]
             except Exception as scrape_error:
-                logger.warning(f"Web scraping fallback failed for tax history - APN {apn}: {scrape_error}")
+                logger.warning(
+                    f"Web scraping fallback failed for tax history - APN {apn}: {scrape_error}"
+                )
 
             logger.warning(f"No tax history found from any source for APN: {apn}")
             return []
@@ -666,13 +726,19 @@ class UnifiedMaricopaAPIClient:
 
             # Try web scraping as last resort
             try:
-                logger.info(f"API failed, attempting web scraping as last resort for APN: {apn}")
+                logger.info(
+                    f"API failed, attempting web scraping as last resort for APN: {apn}"
+                )
                 tax_scrape_data = self.get_tax_information_web(apn)
-                if tax_scrape_data and tax_scrape_data.get('tax_history'):
-                    logger.info(f"Retrieved tax history via web scraping last resort for APN: {apn}")
-                    return tax_scrape_data['tax_history']
+                if tax_scrape_data and tax_scrape_data.get("tax_history"):
+                    logger.info(
+                        f"Retrieved tax history via web scraping last resort for APN: {apn}"
+                    )
+                    return tax_scrape_data["tax_history"]
             except Exception as scrape_error:
-                logger.warning(f"Web scraping last resort failed for tax history - APN {apn}: {scrape_error}")
+                logger.warning(
+                    f"Web scraping last resort failed for tax history - APN {apn}: {scrape_error}"
+                )
 
             # Return empty list rather than raising exception to maintain compatibility
             return []
@@ -708,13 +774,17 @@ class UnifiedMaricopaAPIClient:
             logger.info(f"Falling back to web scraping for sales history - APN: {apn}")
             sales_data = self._scrape_sales_data_sync(apn, years)
 
-            if sales_data and 'sales_history' in sales_data:
-                sales_records = sales_data['sales_history']
+            if sales_data and "sales_history" in sales_data:
+                sales_records = sales_data["sales_history"]
                 result_count = len(sales_records)
-                logger.info(f"Retrieved {result_count} sales records via web scraping for APN: {apn}")
+                logger.info(
+                    f"Retrieved {result_count} sales records via web scraping for APN: {apn}"
+                )
                 return sales_records
             else:
-                logger.warning(f"No sales history found via web scraping for APN: {apn}")
+                logger.warning(
+                    f"No sales history found via web scraping for APN: {apn}"
+                )
                 return []
 
         except Exception as e:
@@ -748,8 +818,12 @@ class UnifiedMaricopaAPIClient:
                     time.sleep(0.02)  # Optimized delay
 
             success_rate = (len(results) / len(apns)) * 100 if apns else 0
-            logger.info(f"Bulk search completed: {len(results)}/{len(apns)} properties retrieved ({success_rate:.1f}% success rate)")
-            logger.info(f"SEARCH_ANALYTICS: bulk_search, requested={len(apns)}, returned={len(results)}, success_rate={success_rate:.1f}%")
+            logger.info(
+                f"Bulk search completed: {len(results)}/{len(apns)} properties retrieved ({success_rate:.1f}% success rate)"
+            )
+            logger.info(
+                f"SEARCH_ANALYTICS: bulk_search, requested={len(apns)}, returned={len(results)}, success_rate={success_rate:.1f}%"
+            )
 
             return results
 
@@ -779,22 +853,21 @@ class UnifiedMaricopaAPIClient:
         stats = self.get_performance_stats()
 
         return {
-            'status': 'Unified Real API',
-            'version': '3.0',
-            'rate_limit': {
-                'requests_per_minute': 60,
-                'remaining': 60
-            },
-            'endpoints': ['property', 'tax', 'sales'],
-            'message': 'Using unified Maricopa County Assessor API with performance optimizations',
-            'performance_stats': stats
+            "status": "Unified Real API",
+            "version": "3.0",
+            "rate_limit": {"requests_per_minute": 60, "remaining": 60},
+            "endpoints": ["property", "tax", "sales"],
+            "message": "Using unified Maricopa County Assessor API with performance optimizations",
+            "performance_stats": stats,
         }
 
     # ========================================================================
     # HIGH-PERFORMANCE ASYNC METHODS
     # ========================================================================
 
-    async def _make_async_request(self, endpoint: str, params: Dict = None) -> Optional[Dict]:
+    async def _make_async_request(
+        self, endpoint: str, params: Dict = None
+    ) -> Optional[Dict]:
         """Make async HTTP request with caching and error handling"""
         cache_key = self._get_cache_key(endpoint, params)
 
@@ -804,7 +877,7 @@ class UnifiedMaricopaAPIClient:
             return cached_data
 
         start_time = time.time()
-        url = urljoin(self.base_url, endpoint.lstrip('/'))
+        url = urljoin(self.base_url, endpoint.lstrip("/"))
 
         try:
             session = await self.connection_pool.get_session(self.token)
@@ -812,7 +885,9 @@ class UnifiedMaricopaAPIClient:
                 response_time = time.time() - start_time
                 self.request_times.append(response_time)
 
-                api_logger.debug(f"API Request: {endpoint} - {response.status} - {response_time:.3f}s")
+                api_logger.debug(
+                    f"API Request: {endpoint} - {response.status} - {response_time:.3f}s"
+                )
 
                 if response.status == 200:
                     data = await response.json()
@@ -828,7 +903,9 @@ class UnifiedMaricopaAPIClient:
                     self._cache_data(cache_key, {}, ttl=60.0)
                     return None
                 else:
-                    logger.warning(f"API request failed: {endpoint} - Status: {response.status}")
+                    logger.warning(
+                        f"API request failed: {endpoint} - Status: {response.status}"
+                    )
                     if self.rate_limiter:
                         self.rate_limiter.record_error()
                     return None
@@ -850,21 +927,25 @@ class UnifiedMaricopaAPIClient:
 
         # Define all endpoints to fetch in parallel
         endpoints = {
-            'valuations': f'/parcel/{apn}/valuations/',
-            'residential_details': f'/parcel/{apn}/residential-details/',
-            'improvements': f'/parcel/{apn}/improvements/',
-            'sketches': f'/parcel/{apn}/sketches/',
-            'mapids': f'/parcel/{apn}/mapids/'
+            "valuations": f"/parcel/{apn}/valuations/",
+            "residential_details": f"/parcel/{apn}/residential-details/",
+            "improvements": f"/parcel/{apn}/improvements/",
+            "sketches": f"/parcel/{apn}/sketches/",
+            "mapids": f"/parcel/{apn}/mapids/",
         }
 
         # Try to get owner name for rental details (if needed)
         try:
-            basic_search = await self._make_async_request(f'/search/property/', {'q': apn})
-            if basic_search and 'Results' in basic_search and basic_search['Results']:
-                for result in basic_search['Results']:
-                    if 'Ownership' in result:
-                        owner_name = result['Ownership']
-                        endpoints['rental_details'] = f'/parcel/{apn}/rental-details/{owner_name}/'
+            basic_search = await self._make_async_request(
+                f"/search/property/", {"q": apn}
+            )
+            if basic_search and "Results" in basic_search and basic_search["Results"]:
+                for result in basic_search["Results"]:
+                    if "Ownership" in result:
+                        owner_name = result["Ownership"]
+                        endpoints["rental_details"] = (
+                            f"/parcel/{apn}/rental-details/{owner_name}/"
+                        )
                         break
         except Exception as e:
             logger.debug(f"Could not determine owner name for rental details: {e}")
@@ -875,8 +956,7 @@ class UnifiedMaricopaAPIClient:
 
         for endpoint_name, endpoint_path in endpoints.items():
             task = asyncio.create_task(
-                self._make_async_request(endpoint_path),
-                name=endpoint_name
+                self._make_async_request(endpoint_path), name=endpoint_name
             )
             tasks.append((endpoint_name, task))
 
@@ -894,7 +974,9 @@ class UnifiedMaricopaAPIClient:
                 logger.error(f"Error retrieving {endpoint_name}: {e}")
 
         total_time = time.time() - start_time
-        logger.info(f"Parallel data collection completed in {total_time:.3f}s for APN: {apn}")
+        logger.info(
+            f"Parallel data collection completed in {total_time:.3f}s for APN: {apn}"
+        )
 
         return detailed_data
 
@@ -902,7 +984,9 @@ class UnifiedMaricopaAPIClient:
         """Synchronous wrapper for parallel detailed property data retrieval"""
         return asyncio.run(self._get_detailed_property_data_parallel(apn))
 
-    async def _get_comprehensive_property_info_parallel(self, apn: str) -> Optional[Dict]:
+    async def _get_comprehensive_property_info_parallel(
+        self, apn: str
+    ) -> Optional[Dict]:
         """Get complete property information using parallel requests"""
         logger.info(f"Getting comprehensive property info (parallel) for APN: {apn}")
 
@@ -910,20 +994,17 @@ class UnifiedMaricopaAPIClient:
 
         # Execute basic search and detailed data collection in parallel
         basic_search_task = asyncio.create_task(
-            self._make_async_request('/search/property/', {'q': apn}),
-            name='basic_search'
+            self._make_async_request("/search/property/", {"q": apn}),
+            name="basic_search",
         )
         detailed_data_task = asyncio.create_task(
-            self._get_detailed_property_data_parallel(apn),
-            name='detailed_data'
+            self._get_detailed_property_data_parallel(apn), name="detailed_data"
         )
 
         # Wait for both to complete
         try:
             basic_search, detailed_data = await asyncio.gather(
-                basic_search_task,
-                detailed_data_task,
-                return_exceptions=True
+                basic_search_task, detailed_data_task, return_exceptions=True
             )
 
             # Handle exceptions
@@ -941,45 +1022,62 @@ class UnifiedMaricopaAPIClient:
 
             # Start with basic info if available
             comprehensive_info = {}
-            if basic_search and 'Results' in basic_search and basic_search['Results']:
+            if basic_search and "Results" in basic_search and basic_search["Results"]:
                 # Find exact APN match
-                for result in basic_search['Results']:
-                    if result.get('APN', '').replace('-', '').replace('.', '') == apn.replace('-', '').replace('.', ''):
+                for result in basic_search["Results"]:
+                    if result.get("APN", "").replace("-", "").replace(
+                        ".", ""
+                    ) == apn.replace("-", "").replace(".", ""):
                         comprehensive_info = self._normalize_api_data(result)
                         break
 
                 # If no exact match, use first result
-                if not comprehensive_info and basic_search['Results']:
-                    comprehensive_info = self._normalize_api_data(basic_search['Results'][0])
+                if not comprehensive_info and basic_search["Results"]:
+                    comprehensive_info = self._normalize_api_data(
+                        basic_search["Results"][0]
+                    )
 
             if not comprehensive_info:
                 comprehensive_info = {
-                    'apn': apn,
-                    'search_source': 'detailed_endpoints_only'
+                    "apn": apn,
+                    "search_source": "detailed_endpoints_only",
                 }
 
             # Add valuation data
-            if 'valuations' in detailed_data and detailed_data['valuations']:
-                self._add_valuation_data(comprehensive_info, detailed_data['valuations'])
+            if "valuations" in detailed_data and detailed_data["valuations"]:
+                self._add_valuation_data(
+                    comprehensive_info, detailed_data["valuations"]
+                )
 
             # Add residential details
-            if 'residential_details' in detailed_data and detailed_data['residential_details']:
-                self._add_residential_data(comprehensive_info, detailed_data['residential_details'])
+            if (
+                "residential_details" in detailed_data
+                and detailed_data["residential_details"]
+            ):
+                self._add_residential_data(
+                    comprehensive_info, detailed_data["residential_details"]
+                )
 
             # Add improvements data
-            if 'improvements' in detailed_data and detailed_data['improvements']:
-                self._add_improvements_data(comprehensive_info, detailed_data['improvements'])
+            if "improvements" in detailed_data and detailed_data["improvements"]:
+                self._add_improvements_data(
+                    comprehensive_info, detailed_data["improvements"]
+                )
 
             # Store all detailed data
-            comprehensive_info['detailed_data'] = detailed_data
+            comprehensive_info["detailed_data"] = detailed_data
 
             total_time = time.time() - start_time
-            logger.info(f"Comprehensive property info collected in {total_time:.3f}s for APN: {apn}")
+            logger.info(
+                f"Comprehensive property info collected in {total_time:.3f}s for APN: {apn}"
+            )
 
             return comprehensive_info
 
         except Exception as e:
-            logger.error(f"Error in comprehensive property info collection for APN {apn}: {e}")
+            logger.error(
+                f"Error in comprehensive property info collection for APN {apn}: {e}"
+            )
             return None
 
     def get_comprehensive_property_info_fast(self, apn: str) -> Optional[Dict]:
@@ -1013,10 +1111,9 @@ class UnifiedMaricopaAPIClient:
         logger.info(f"Submitted {len(requests)} batch API requests")
         return request_ids
 
-    def batch_search_by_apns(self,
-                            apns: List[str],
-                            priority: int = 5,
-                            comprehensive: bool = True) -> List[str]:
+    def batch_search_by_apns(
+        self, apns: List[str], priority: int = 5, comprehensive: bool = True
+    ) -> List[str]:
         """Batch search for multiple properties by APN"""
         requests = []
 
@@ -1024,16 +1121,16 @@ class UnifiedMaricopaAPIClient:
             if comprehensive:
                 request = BatchAPIRequest(
                     request_id=f"comprehensive_{apn}_{int(time.time())}",
-                    request_type='get_comprehensive_property_info',
+                    request_type="get_comprehensive_property_info",
                     identifier=apn,
-                    priority=priority
+                    priority=priority,
                 )
             else:
                 request = BatchAPIRequest(
                     request_id=f"search_{apn}_{int(time.time())}",
-                    request_type='search_by_apn',
+                    request_type="search_by_apn",
                     identifier=apn,
-                    priority=priority
+                    priority=priority,
                 )
             requests.append(request)
 
@@ -1080,23 +1177,25 @@ class UnifiedMaricopaAPIClient:
                     raise TimeoutError("Rate limit timeout")
 
                 # Execute based on request type
-                if request.request_type == 'search_by_apn':
+                if request.request_type == "search_by_apn":
                     result = self.search_by_apn(request.identifier)
-                elif request.request_type == 'search_by_owner':
-                    limit = request.params.get('limit', 50)
+                elif request.request_type == "search_by_owner":
+                    limit = request.params.get("limit", 50)
                     result = self.search_by_owner(request.identifier, limit=limit)
-                elif request.request_type == 'search_by_address':
-                    limit = request.params.get('limit', 50)
+                elif request.request_type == "search_by_address":
+                    limit = request.params.get("limit", 50)
                     result = self.search_by_address(request.identifier, limit=limit)
-                elif request.request_type == 'get_property_details':
+                elif request.request_type == "get_property_details":
                     result = self.get_property_details(request.identifier)
-                elif request.request_type == 'get_comprehensive_property_info':
+                elif request.request_type == "get_comprehensive_property_info":
                     result = self.get_comprehensive_property_info(request.identifier)
-                elif request.request_type == 'get_tax_history':
-                    years = request.params.get('years', 5)
+                elif request.request_type == "get_tax_history":
+                    years = request.params.get("years", 5)
                     result = self.get_tax_history(request.identifier, years=years)
                 else:
-                    raise ValueError(f"Unsupported request type: {request.request_type}")
+                    raise ValueError(
+                        f"Unsupported request type: {request.request_type}"
+                    )
 
                 # Success - record result
                 request.result = result
@@ -1108,7 +1207,9 @@ class UnifiedMaricopaAPIClient:
                     self.total_requests += 1
                     self.total_successful += 1
 
-                logger.info(f"API request completed successfully: {request.request_id} in {response_time:.2f}s")
+                logger.info(
+                    f"API request completed successfully: {request.request_id} in {response_time:.2f}s"
+                )
                 break
 
             except Exception as e:
@@ -1118,7 +1219,7 @@ class UnifiedMaricopaAPIClient:
                 if attempt < request.max_retries:
                     logger.warning(f"API request failed, retrying: {error_msg}")
                     # Exponential backoff with jitter
-                    backoff_time = (2 ** attempt) + (time.time() % 1)  # Add jitter
+                    backoff_time = (2**attempt) + (time.time() % 1)  # Add jitter
                     time.sleep(backoff_time)
                 else:
                     request.error = error_msg
@@ -1129,7 +1230,9 @@ class UnifiedMaricopaAPIClient:
                         self.total_requests += 1
                         self.total_failed += 1
 
-                    logger.error(f"API request failed after {request.max_retries + 1} attempts: {error_msg}")
+                    logger.error(
+                        f"API request failed after {request.max_retries + 1} attempts: {error_msg}"
+                    )
 
         # Move from active to completed
         with self.requests_lock:
@@ -1137,9 +1240,9 @@ class UnifiedMaricopaAPIClient:
                 del self.active_requests[request.request_id]
             self.completed_requests[request.request_id] = request
 
-    def wait_for_batch_completion(self,
-                                 request_ids: List[str],
-                                 timeout: float = 300.0) -> Dict[str, Any]:
+    def wait_for_batch_completion(
+        self, request_ids: List[str], timeout: float = 300.0
+    ) -> Dict[str, Any]:
         """Wait for batch of requests to complete"""
         start_time = time.time()
         results = {}
@@ -1152,12 +1255,9 @@ class UnifiedMaricopaAPIClient:
                     continue
 
                 status = self.get_request_status(request_id)
-                if status and status['status'] == 'completed':
+                if status and status["status"] == "completed":
                     result = self.get_request_result(request_id)
-                    results[request_id] = {
-                        'status': status,
-                        'result': result
-                    }
+                    results[request_id] = {"status": status, "result": result}
                 else:
                     all_completed = False
 
@@ -1168,16 +1268,18 @@ class UnifiedMaricopaAPIClient:
 
         # Return results for completed requests
         completion_stats = {
-            'total_requested': len(request_ids),
-            'completed': len(results),
-            'successful': sum(1 for r in results.values() if r['status']['success']),
-            'failed': sum(1 for r in results.values() if not r['status']['success']),
-            'timeout': time.time() - start_time >= timeout,
-            'results': results
+            "total_requested": len(request_ids),
+            "completed": len(results),
+            "successful": sum(1 for r in results.values() if r["status"]["success"]),
+            "failed": sum(1 for r in results.values() if not r["status"]["success"]),
+            "timeout": time.time() - start_time >= timeout,
+            "results": results,
         }
 
-        logger.info(f"Batch completion: {completion_stats['completed']}/{completion_stats['total_requested']} "
-                   f"requests completed, {completion_stats['successful']} successful")
+        logger.info(
+            f"Batch completion: {completion_stats['completed']}/{completion_stats['total_requested']} "
+            f"requests completed, {completion_stats['successful']} successful"
+        )
 
         return completion_stats
 
@@ -1188,28 +1290,36 @@ class UnifiedMaricopaAPIClient:
             if request_id in self.completed_requests:
                 request = self.completed_requests[request_id]
                 return {
-                    'request_id': request_id,
-                    'status': 'completed',
-                    'request_type': request.request_type,
-                    'identifier': request.identifier,
-                    'started_at': request.started_at.isoformat() if request.started_at else None,
-                    'completed_at': request.completed_at.isoformat() if request.completed_at else None,
-                    'success': request.result is not None,
-                    'error': request.error,
-                    'retry_count': request.retry_count
+                    "request_id": request_id,
+                    "status": "completed",
+                    "request_type": request.request_type,
+                    "identifier": request.identifier,
+                    "started_at": (
+                        request.started_at.isoformat() if request.started_at else None
+                    ),
+                    "completed_at": (
+                        request.completed_at.isoformat()
+                        if request.completed_at
+                        else None
+                    ),
+                    "success": request.result is not None,
+                    "error": request.error,
+                    "retry_count": request.retry_count,
                 }
 
             # Check active requests
             if request_id in self.active_requests:
                 request, future = self.active_requests[request_id]
                 return {
-                    'request_id': request_id,
-                    'status': 'running',
-                    'request_type': request.request_type,
-                    'identifier': request.identifier,
-                    'started_at': request.started_at.isoformat() if request.started_at else None,
-                    'success': False,
-                    'error': None
+                    "request_id": request_id,
+                    "status": "running",
+                    "request_type": request.request_type,
+                    "identifier": request.identifier,
+                    "started_at": (
+                        request.started_at.isoformat() if request.started_at else None
+                    ),
+                    "success": False,
+                    "error": None,
                 }
 
             return None
@@ -1248,7 +1358,9 @@ class UnifiedMaricopaAPIClient:
             return self._get_comprehensive_property_info_sync(apn)
 
         except Exception as e:
-            logger.error(f"Error getting comprehensive property info for APN {apn}: {e}")
+            logger.error(
+                f"Error getting comprehensive property info for APN {apn}: {e}"
+            )
             return None
 
     def _get_comprehensive_property_info_sync(self, apn: str) -> Optional[Dict]:
@@ -1259,7 +1371,9 @@ class UnifiedMaricopaAPIClient:
             try:
                 basic_info = self.search_by_apn(apn)
             except Exception as e:
-                logger.warning(f"Basic search failed for APN {apn}, continuing with detailed data only: {e}")
+                logger.warning(
+                    f"Basic search failed for APN {apn}, continuing with detailed data only: {e}"
+                )
 
             # Get detailed data using parallel thread execution
             detailed_data = self._get_detailed_property_data_threaded(apn)
@@ -1269,20 +1383,28 @@ class UnifiedMaricopaAPIClient:
 
             # If API data is insufficient, try web scraping fallback
             if not api_data_sufficient:
-                logger.warning(f"Insufficient API data for APN: {apn}, trying web scraping fallback")
+                logger.warning(
+                    f"Insufficient API data for APN: {apn}, trying web scraping fallback"
+                )
 
                 try:
                     # Use the new comprehensive web scraping method
-                    web_scraped_data = self.get_complete_property_with_automatic_data_collection(apn)
+                    web_scraped_data = (
+                        self.get_complete_property_with_automatic_data_collection(apn)
+                    )
 
                     if web_scraped_data:
-                        logger.info(f"Successfully retrieved data via web scraping fallback for APN: {apn}")
+                        logger.info(
+                            f"Successfully retrieved data via web scraping fallback for APN: {apn}"
+                        )
                         return web_scraped_data
 
                 except Exception as e:
                     logger.error(f"Web scraping fallback failed for APN {apn}: {e}")
 
-                logger.warning(f"No data found for APN: {apn} (tried API and web scraping)")
+                logger.warning(
+                    f"No data found for APN: {apn} (tried API and web scraping)"
+                )
                 return None
 
             # Start with basic info if available, otherwise create minimal structure
@@ -1290,31 +1412,42 @@ class UnifiedMaricopaAPIClient:
                 comprehensive_info = basic_info.copy()
             else:
                 comprehensive_info = {
-                    'apn': apn,
-                    'search_source': 'detailed_endpoints_only'
+                    "apn": apn,
+                    "search_source": "detailed_endpoints_only",
                 }
 
             # Add valuation data
-            if 'valuations' in detailed_data and detailed_data['valuations']:
-                self._add_valuation_data(comprehensive_info, detailed_data['valuations'])
+            if "valuations" in detailed_data and detailed_data["valuations"]:
+                self._add_valuation_data(
+                    comprehensive_info, detailed_data["valuations"]
+                )
 
             # Add residential details
-            if 'residential_details' in detailed_data and detailed_data['residential_details']:
-                self._add_residential_data(comprehensive_info, detailed_data['residential_details'])
+            if (
+                "residential_details" in detailed_data
+                and detailed_data["residential_details"]
+            ):
+                self._add_residential_data(
+                    comprehensive_info, detailed_data["residential_details"]
+                )
 
             # Add improvements data
-            if 'improvements' in detailed_data and detailed_data['improvements']:
-                self._add_improvements_data(comprehensive_info, detailed_data['improvements'])
+            if "improvements" in detailed_data and detailed_data["improvements"]:
+                self._add_improvements_data(
+                    comprehensive_info, detailed_data["improvements"]
+                )
 
             # Store all detailed data
-            comprehensive_info['detailed_data'] = detailed_data
+            comprehensive_info["detailed_data"] = detailed_data
 
             # Add required database fields if not present from basic search
             self._ensure_required_fields(comprehensive_info)
 
             # Try to enhance with web scraping data if API data seems limited
             if self._is_api_data_limited(comprehensive_info):
-                logger.info(f"Enhancing limited API data with web scraping for APN: {apn}")
+                logger.info(
+                    f"Enhancing limited API data with web scraping for APN: {apn}"
+                )
                 try:
                     # Get additional data via web scraping
                     tax_data = self._scrape_tax_data_sync(apn)
@@ -1322,24 +1455,32 @@ class UnifiedMaricopaAPIClient:
 
                     # Enhance with tax data
                     if tax_data:
-                        comprehensive_info['enhanced_tax_data'] = tax_data
-                        if 'owner_info' in tax_data and not comprehensive_info.get('owner_name'):
-                            comprehensive_info['owner_name'] = tax_data['owner_info'].get('owner_name', '')
+                        comprehensive_info["enhanced_tax_data"] = tax_data
+                        if "owner_info" in tax_data and not comprehensive_info.get(
+                            "owner_name"
+                        ):
+                            comprehensive_info["owner_name"] = tax_data[
+                                "owner_info"
+                            ].get("owner_name", "")
 
                     # Enhance with sales data
                     if sales_data:
-                        comprehensive_info['enhanced_sales_data'] = sales_data
+                        comprehensive_info["enhanced_sales_data"] = sales_data
 
-                    comprehensive_info['data_enhancement'] = 'api_plus_webscraping'
+                    comprehensive_info["data_enhancement"] = "api_plus_webscraping"
 
                 except Exception as e:
-                    logger.warning(f"Could not enhance API data with web scraping for APN {apn}: {e}")
+                    logger.warning(
+                        f"Could not enhance API data with web scraping for APN {apn}: {e}"
+                    )
 
             logger.info(f"Successfully compiled comprehensive info for APN: {apn}")
             return comprehensive_info
 
         except Exception as e:
-            logger.error(f"Error getting comprehensive property info for APN {apn}: {e}")
+            logger.error(
+                f"Error getting comprehensive property info for APN {apn}: {e}"
+            )
             return None
 
     def _get_detailed_property_data_threaded(self, apn: str) -> Dict[str, Any]:
@@ -1348,19 +1489,21 @@ class UnifiedMaricopaAPIClient:
 
         # Define endpoints for parallel execution
         endpoints = {
-            'valuations': f'/parcel/{apn}/valuations/',
-            'residential_details': f'/parcel/{apn}/residential-details/',
-            'improvements': f'/parcel/{apn}/improvements/',
-            'sketches': f'/parcel/{apn}/sketches/',
-            'mapids': f'/parcel/{apn}/mapids/'
+            "valuations": f"/parcel/{apn}/valuations/",
+            "residential_details": f"/parcel/{apn}/residential-details/",
+            "improvements": f"/parcel/{apn}/improvements/",
+            "sketches": f"/parcel/{apn}/sketches/",
+            "mapids": f"/parcel/{apn}/mapids/",
         }
 
         # Try to get owner name for rental details
         try:
             basic_search = self.search_by_apn(apn)
-            if basic_search and basic_search.get('owner_name'):
-                owner_name = basic_search['owner_name']
-                endpoints['rental_details'] = f'/parcel/{apn}/rental-details/{owner_name}/'
+            if basic_search and basic_search.get("owner_name"):
+                owner_name = basic_search["owner_name"]
+                endpoints["rental_details"] = (
+                    f"/parcel/{apn}/rental-details/{owner_name}/"
+                )
         except Exception as e:
             logger.debug(f"Could not determine owner name for rental details: {e}")
 
@@ -1388,7 +1531,9 @@ class UnifiedMaricopaAPIClient:
                 logger.error(f"Error retrieving {endpoint_name}: {e}")
 
         total_time = time.time() - start_time
-        logger.info(f"Threaded data collection completed in {total_time:.3f}s for APN: {apn}")
+        logger.info(
+            f"Threaded data collection completed in {total_time:.3f}s for APN: {apn}"
+        )
 
         return detailed_data
 
@@ -1398,16 +1543,20 @@ class UnifiedMaricopaAPIClient:
             return True
 
         # Check for missing critical fields
-        critical_fields = ['owner_name', 'property_address', 'assessed_value']
-        missing_critical = sum(1 for field in critical_fields if not property_data.get(field))
+        critical_fields = ["owner_name", "property_address", "assessed_value"]
+        missing_critical = sum(
+            1 for field in critical_fields if not property_data.get(field)
+        )
 
         # If more than half of critical fields are missing, enhance with web scraping
         if missing_critical >= len(critical_fields) // 2:
-            logger.debug(f"API data missing {missing_critical}/{len(critical_fields)} critical fields")
+            logger.debug(
+                f"API data missing {missing_critical}/{len(critical_fields)} critical fields"
+            )
             return True
 
         # Check if detailed_data is sparse
-        detailed_data = property_data.get('detailed_data', {})
+        detailed_data = property_data.get("detailed_data", {})
         if not detailed_data or len([k for k, v in detailed_data.items() if v]) < 2:
             logger.debug("Detailed API data is sparse, would benefit from web scraping")
             return True
@@ -1418,87 +1567,100 @@ class UnifiedMaricopaAPIClient:
         """Add valuation data to comprehensive info"""
         if valuations and len(valuations) > 0:
             latest_val = valuations[0]  # Most recent year
-            comprehensive_info.update({
-                'latest_tax_year': latest_val.get('TaxYear'),
-                'latest_assessed_value': self._safe_int(latest_val.get('FullCashValue')),
-                'latest_limited_value': self._safe_int(latest_val.get('LimitedPropertyValue', '').strip()),
-                'assessment_ratio': self._safe_float(latest_val.get('AssessmentRatioPercentage')),
-                'tax_area_code': latest_val.get('TaxAreaCode'),
-                'property_use_description': latest_val.get('PEPropUseDesc'),
-                'valuation_history': valuations
-            })
+            comprehensive_info.update(
+                {
+                    "latest_tax_year": latest_val.get("TaxYear"),
+                    "latest_assessed_value": self._safe_int(
+                        latest_val.get("FullCashValue")
+                    ),
+                    "latest_limited_value": self._safe_int(
+                        latest_val.get("LimitedPropertyValue", "").strip()
+                    ),
+                    "assessment_ratio": self._safe_float(
+                        latest_val.get("AssessmentRatioPercentage")
+                    ),
+                    "tax_area_code": latest_val.get("TaxAreaCode"),
+                    "property_use_description": latest_val.get("PEPropUseDesc"),
+                    "valuation_history": valuations,
+                }
+            )
 
     def _add_residential_data(self, comprehensive_info: Dict, res_details: Dict):
         """Add residential details to comprehensive info"""
-        comprehensive_info.update({
-            'year_built': self._safe_int(res_details.get('ConstructionYear')),
-            'lot_size_sqft': self._safe_int(res_details.get('LotSize')),
-            'living_area_sqft': self._safe_int(res_details.get('LivableSpace')),
-            'pool': res_details.get('Pool', False),
-            'quality_grade': res_details.get('ImprovementQualityGrade'),
-            'exterior_walls': res_details.get('ExteriorWalls'),
-            'roof_type': res_details.get('RoofType'),
-            'bathrooms': self._safe_int(res_details.get('BathFixtures')),
-            'garage_spaces': self._safe_int(res_details.get('NumberOfGarages')),
-            'parking_details': res_details.get('ParkingDetails'),
-            'residential_details': res_details
-        })
+        comprehensive_info.update(
+            {
+                "year_built": self._safe_int(res_details.get("ConstructionYear")),
+                "lot_size_sqft": self._safe_int(res_details.get("LotSize")),
+                "living_area_sqft": self._safe_int(res_details.get("LivableSpace")),
+                "pool": res_details.get("Pool", False),
+                "quality_grade": res_details.get("ImprovementQualityGrade"),
+                "exterior_walls": res_details.get("ExteriorWalls"),
+                "roof_type": res_details.get("RoofType"),
+                "bathrooms": self._safe_int(res_details.get("BathFixtures")),
+                "garage_spaces": self._safe_int(res_details.get("NumberOfGarages")),
+                "parking_details": res_details.get("ParkingDetails"),
+                "residential_details": res_details,
+            }
+        )
 
         # Derive land use code from property use description
-        if 'property_use_description' in comprehensive_info:
-            use_desc = comprehensive_info['property_use_description']
-            if 'Multiple Family' in use_desc:
-                comprehensive_info['land_use_code'] = 'MFR'  # Multi-Family Residential
-            elif 'Single Family' in use_desc:
-                comprehensive_info['land_use_code'] = 'SFR'  # Single Family Residential
-            elif 'Commercial' in use_desc:
-                comprehensive_info['land_use_code'] = 'COM'  # Commercial
+        if "property_use_description" in comprehensive_info:
+            use_desc = comprehensive_info["property_use_description"]
+            if "Multiple Family" in use_desc:
+                comprehensive_info["land_use_code"] = "MFR"  # Multi-Family Residential
+            elif "Single Family" in use_desc:
+                comprehensive_info["land_use_code"] = "SFR"  # Single Family Residential
+            elif "Commercial" in use_desc:
+                comprehensive_info["land_use_code"] = "COM"  # Commercial
 
-    def _add_improvements_data(self, comprehensive_info: Dict, improvements: List[Dict]):
+    def _add_improvements_data(
+        self, comprehensive_info: Dict, improvements: List[Dict]
+    ):
         """Add improvements data to comprehensive info"""
         if improvements:
-            comprehensive_info['improvements_count'] = len(improvements)
-            comprehensive_info['total_improvement_sqft'] = sum(
-                self._safe_int(imp.get('ImprovementSquareFootage', 0)) or 0
+            comprehensive_info["improvements_count"] = len(improvements)
+            comprehensive_info["total_improvement_sqft"] = sum(
+                self._safe_int(imp.get("ImprovementSquareFootage", 0)) or 0
                 for imp in improvements
             )
-            comprehensive_info['improvements_details'] = improvements
+            comprehensive_info["improvements_details"] = improvements
 
             # Calculate living area from residential improvements
             residential_sqft = sum(
-                self._safe_int(imp.get('ImprovementSquareFootage', 0)) or 0
+                self._safe_int(imp.get("ImprovementSquareFootage", 0)) or 0
                 for imp in improvements
-                if 'Apartment' in imp.get('ImprovementDescription', '') or
-                   'Town House' in imp.get('ImprovementDescription', '') or
-                   'Single Family' in imp.get('ImprovementDescription', '')
+                if "Apartment" in imp.get("ImprovementDescription", "")
+                or "Town House" in imp.get("ImprovementDescription", "")
+                or "Single Family" in imp.get("ImprovementDescription", "")
             )
-            if residential_sqft > 0 and not comprehensive_info.get('living_area_sqft'):
-                comprehensive_info['living_area_sqft'] = residential_sqft
+            if residential_sqft > 0 and not comprehensive_info.get("living_area_sqft"):
+                comprehensive_info["living_area_sqft"] = residential_sqft
 
             # Count apartment units for bedroom estimation
             apartment_units = sum(
-                1 for imp in improvements
-                if 'Apartment' in imp.get('ImprovementDescription', '') or
-                   'Town House' in imp.get('ImprovementDescription', '') or
-                   'Single Family' in imp.get('ImprovementDescription', '')
+                1
+                for imp in improvements
+                if "Apartment" in imp.get("ImprovementDescription", "")
+                or "Town House" in imp.get("ImprovementDescription", "")
+                or "Single Family" in imp.get("ImprovementDescription", "")
             )
-            if apartment_units > 0 and not comprehensive_info.get('bedrooms'):
+            if apartment_units > 0 and not comprehensive_info.get("bedrooms"):
                 # Estimate 1-2 bedrooms per unit for multi-family properties
                 estimated_bedrooms = apartment_units * 2  # Conservative estimate
-                comprehensive_info['bedrooms'] = estimated_bedrooms
+                comprehensive_info["bedrooms"] = estimated_bedrooms
 
     def _ensure_required_fields(self, comprehensive_info: Dict):
         """Ensure all required database fields are present"""
         required_fields = {
-            'owner_name': None,
-            'property_address': None,
-            'mailing_address': None,
-            'legal_description': None,
-            'land_use_code': None,
-            'bedrooms': None,
-            'city': None,
-            'zip_code': None,
-            'property_type': None
+            "owner_name": None,
+            "property_address": None,
+            "mailing_address": None,
+            "legal_description": None,
+            "land_use_code": None,
+            "bedrooms": None,
+            "city": None,
+            "zip_code": None,
+            "property_type": None,
         }
 
         for field, default_value in required_fields.items():
@@ -1506,34 +1668,34 @@ class UnifiedMaricopaAPIClient:
                 comprehensive_info[field] = default_value
 
         # Store raw detailed data if not already present
-        if 'raw_data' not in comprehensive_info:
-            comprehensive_info['raw_data'] = json.dumps(comprehensive_info.get('detailed_data', {}))
+        if "raw_data" not in comprehensive_info:
+            comprehensive_info["raw_data"] = json.dumps(
+                comprehensive_info.get("detailed_data", {})
+            )
 
     def _normalize_api_data(self, api_data: Dict) -> Dict:
         """Convert API field names to database field names"""
         field_mapping = {
             # API field -> Database field
-            'APN': 'apn',
-            'MCR': 'mcr',
-            'Ownership': 'owner_name',
-            'SitusAddress': 'property_address',
-            'SitusCity': 'city',
-            'SitusZip': 'zip_code',
-            'PropertyType': 'property_type',
-            'RentalID': 'rental_id',
-            'SubdivisonName': 'subdivision_name',
-            'SectionTownshipRange': 'section_township_range',
-
+            "APN": "apn",
+            "MCR": "mcr",
+            "Ownership": "owner_name",
+            "SitusAddress": "property_address",
+            "SitusCity": "city",
+            "SitusZip": "zip_code",
+            "PropertyType": "property_type",
+            "RentalID": "rental_id",
+            "SubdivisonName": "subdivision_name",
+            "SectionTownshipRange": "section_township_range",
             # Business Personal Property fields
-            'AccountNo': 'account_number',
-            'Name1': 'business_name',
-            'Name2': 'business_name_2',
-
+            "AccountNo": "account_number",
+            "Name1": "business_name",
+            "Name2": "business_name_2",
             # Additional common fields
-            'Address': 'property_address',
-            'City': 'city',
-            'Zip': 'zip_code',
-            'Owner': 'owner_name'
+            "Address": "property_address",
+            "City": "city",
+            "Zip": "zip_code",
+            "Owner": "owner_name",
         }
 
         normalized = {}
@@ -1549,22 +1711,22 @@ class UnifiedMaricopaAPIClient:
                 normalized[key.lower()] = value
 
         # Ensure required fields exist with defaults
-        if 'apn' not in normalized and 'APN' in api_data:
-            normalized['apn'] = api_data['APN']
+        if "apn" not in normalized and "APN" in api_data:
+            normalized["apn"] = api_data["APN"]
 
         # Provide defaults for missing database fields
         default_fields = {
-            'mailing_address': None,
-            'legal_description': None,
-            'land_use_code': None,
-            'year_built': None,
-            'living_area_sqft': None,
-            'lot_size_sqft': None,
-            'bedrooms': None,
-            'bathrooms': None,
-            'pool': None,
-            'garage_spaces': None,
-            'raw_data': json.dumps(api_data)  # Store original API response
+            "mailing_address": None,
+            "legal_description": None,
+            "land_use_code": None,
+            "year_built": None,
+            "living_area_sqft": None,
+            "lot_size_sqft": None,
+            "bedrooms": None,
+            "bathrooms": None,
+            "pool": None,
+            "garage_spaces": None,
+            "raw_data": json.dumps(api_data),  # Store original API response
         }
 
         for field, default_value in default_fields.items():
@@ -1577,19 +1739,19 @@ class UnifiedMaricopaAPIClient:
 
     def _safe_int(self, value) -> Optional[int]:
         """Safely convert value to int"""
-        if not value or value == '':
+        if not value or value == "":
             return None
         try:
-            return int(str(value).replace(',', '').strip())
+            return int(str(value).replace(",", "").strip())
         except (ValueError, AttributeError):
             return None
 
     def _safe_float(self, value) -> Optional[float]:
         """Safely convert value to float"""
-        if not value or value == '':
+        if not value or value == "":
             return None
         try:
-            return float(str(value).replace(',', '').strip())
+            return float(str(value).replace(",", "").strip())
         except (ValueError, AttributeError):
             return None
 
@@ -1602,7 +1764,11 @@ class UnifiedMaricopaAPIClient:
             with sync_playwright() as p:
                 browser = p.chromium.launch(
                     headless=True,
-                    args=['--disable-dev-shm-usage', '--disable-web-security', '--no-sandbox']
+                    args=[
+                        "--disable-dev-shm-usage",
+                        "--disable-web-security",
+                        "--no-sandbox",
+                    ],
                 )
                 page = browser.new_page()
 
@@ -1632,7 +1798,11 @@ class UnifiedMaricopaAPIClient:
             with sync_playwright() as p:
                 browser = p.chromium.launch(
                     headless=True,
-                    args=['--disable-dev-shm-usage', '--disable-web-security', '--no-sandbox']
+                    args=[
+                        "--disable-dev-shm-usage",
+                        "--disable-web-security",
+                        "--no-sandbox",
+                    ],
                 )
                 page = browser.new_page()
 
@@ -1674,14 +1844,20 @@ class UnifiedMaricopaAPIClient:
             tax_data = self._scrape_tax_data_sync(apn)
 
             if tax_data:
-                logger.info(f"Successfully retrieved tax information via web scraping for APN: {apn}")
+                logger.info(
+                    f"Successfully retrieved tax information via web scraping for APN: {apn}"
+                )
                 return tax_data
             else:
-                logger.warning(f"No tax information found via web scraping for APN: {apn}")
+                logger.warning(
+                    f"No tax information found via web scraping for APN: {apn}"
+                )
                 return None
 
         except Exception as e:
-            logger.error(f"Error getting tax information via web scraping for APN {apn}: {e}")
+            logger.error(
+                f"Error getting tax information via web scraping for APN {apn}: {e}"
+            )
             return None
 
     def get_sales_history_web(self, apn: str, years: int = 10) -> Optional[Dict]:
@@ -1695,24 +1871,34 @@ class UnifiedMaricopaAPIClient:
         Returns:
             Dictionary containing sales history scraped from recorder.maricopa.gov
         """
-        logger.info(f"Getting sales history via web scraping for APN: {apn} (years: {years})")
+        logger.info(
+            f"Getting sales history via web scraping for APN: {apn} (years: {years})"
+        )
 
         try:
             # Use the existing recorder scraping method
             sales_data = self._scrape_sales_data_sync(apn, years)
 
             if sales_data:
-                logger.info(f"Successfully retrieved sales history via web scraping for APN: {apn}")
+                logger.info(
+                    f"Successfully retrieved sales history via web scraping for APN: {apn}"
+                )
                 return sales_data
             else:
-                logger.warning(f"No sales history found via web scraping for APN: {apn}")
+                logger.warning(
+                    f"No sales history found via web scraping for APN: {apn}"
+                )
                 return None
 
         except Exception as e:
-            logger.error(f"Error getting sales history via web scraping for APN {apn}: {e}")
+            logger.error(
+                f"Error getting sales history via web scraping for APN {apn}: {e}"
+            )
             return None
 
-    def get_complete_property_with_automatic_data_collection(self, apn: str) -> Optional[Dict]:
+    def get_complete_property_with_automatic_data_collection(
+        self, apn: str
+    ) -> Optional[Dict]:
         """
         Get complete property information with automatic fallback to web scraping
 
@@ -1728,7 +1914,9 @@ class UnifiedMaricopaAPIClient:
         Returns:
             Dictionary containing comprehensive property information from all available sources
         """
-        logger.info(f"Getting complete property with automatic data collection for APN: {apn}")
+        logger.info(
+            f"Getting complete property with automatic data collection for APN: {apn}"
+        )
 
         try:
             # Start with comprehensive API data
@@ -1739,82 +1927,119 @@ class UnifiedMaricopaAPIClient:
                 return None
 
             # Check what additional data we can collect via web scraping
-            needs_tax_data = not property_info.get('current_tax_amount')
-            needs_sales_data = not property_info.get('sales_history') or len(property_info.get('sales_history', [])) == 0
+            needs_tax_data = not property_info.get("current_tax_amount")
+            needs_sales_data = (
+                not property_info.get("sales_history")
+                or len(property_info.get("sales_history", [])) == 0
+            )
 
-            logger.info(f"Data collection needs for APN {apn} - Tax: {needs_tax_data}, Sales: {needs_sales_data}")
+            logger.info(
+                f"Data collection needs for APN {apn} - Tax: {needs_tax_data}, Sales: {needs_sales_data}"
+            )
 
             # Collect tax data via web scraping if needed
             if needs_tax_data:
                 try:
-                    logger.info(f"Attempting to collect tax data via web scraping for APN: {apn}")
+                    logger.info(
+                        f"Attempting to collect tax data via web scraping for APN: {apn}"
+                    )
                     tax_data = self.get_tax_information_web(apn)
 
                     if tax_data:
                         # Integrate tax data with property info
-                        owner_info = tax_data.get('owner_info', {})
-                        current_tax = tax_data.get('current_tax', {})
+                        owner_info = tax_data.get("owner_info", {})
+                        current_tax = tax_data.get("current_tax", {})
 
                         # Update fields from tax scraping if not already present
-                        if owner_info.get('owner_name') and not property_info.get('owner_name'):
-                            property_info['owner_name'] = owner_info['owner_name']
-                        if owner_info.get('property_address') and not property_info.get('property_address'):
-                            property_info['property_address'] = owner_info['property_address']
-                        if owner_info.get('mailing_address') and not property_info.get('mailing_address'):
-                            property_info['mailing_address'] = owner_info['mailing_address']
+                        if owner_info.get("owner_name") and not property_info.get(
+                            "owner_name"
+                        ):
+                            property_info["owner_name"] = owner_info["owner_name"]
+                        if owner_info.get("property_address") and not property_info.get(
+                            "property_address"
+                        ):
+                            property_info["property_address"] = owner_info[
+                                "property_address"
+                            ]
+                        if owner_info.get("mailing_address") and not property_info.get(
+                            "mailing_address"
+                        ):
+                            property_info["mailing_address"] = owner_info[
+                                "mailing_address"
+                            ]
 
                         # Add current tax information
-                        property_info.update({
-                            'current_tax_amount': current_tax.get('assessed_tax'),
-                            'current_payment_status': current_tax.get('payment_status'),
-                            'current_amount_due': current_tax.get('total_due'),
-                            'tax_scrape_data': tax_data
-                        })
+                        property_info.update(
+                            {
+                                "current_tax_amount": current_tax.get("assessed_tax"),
+                                "current_payment_status": current_tax.get(
+                                    "payment_status"
+                                ),
+                                "current_amount_due": current_tax.get("total_due"),
+                                "tax_scrape_data": tax_data,
+                            }
+                        )
 
                         logger.info(f"Successfully integrated tax data for APN: {apn}")
                     else:
-                        logger.warning(f"Could not collect tax data via web scraping for APN: {apn}")
+                        logger.warning(
+                            f"Could not collect tax data via web scraping for APN: {apn}"
+                        )
 
                 except Exception as e:
-                    logger.error(f"Error collecting tax data via web scraping for APN {apn}: {e}")
+                    logger.error(
+                        f"Error collecting tax data via web scraping for APN {apn}: {e}"
+                    )
 
             # Collect sales data via web scraping if needed
             if needs_sales_data:
                 try:
-                    logger.info(f"Attempting to collect sales data via web scraping for APN: {apn}")
+                    logger.info(
+                        f"Attempting to collect sales data via web scraping for APN: {apn}"
+                    )
                     sales_data = self.get_sales_history_web(apn)
 
-                    if sales_data and sales_data.get('sales_history'):
-                        property_info['sales_history'] = sales_data['sales_history']
-                        property_info['sales_scrape_data'] = sales_data
-                        logger.info(f"Successfully integrated sales data for APN: {apn} - {len(sales_data['sales_history'])} records")
+                    if sales_data and sales_data.get("sales_history"):
+                        property_info["sales_history"] = sales_data["sales_history"]
+                        property_info["sales_scrape_data"] = sales_data
+                        logger.info(
+                            f"Successfully integrated sales data for APN: {apn} - {len(sales_data['sales_history'])} records"
+                        )
                     else:
-                        logger.warning(f"Could not collect sales data via web scraping for APN: {apn}")
+                        logger.warning(
+                            f"Could not collect sales data via web scraping for APN: {apn}"
+                        )
 
                 except Exception as e:
-                    logger.error(f"Error collecting sales data via web scraping for APN {apn}: {e}")
+                    logger.error(
+                        f"Error collecting sales data via web scraping for APN {apn}: {e}"
+                    )
 
             # Add data completeness information
-            property_info['data_completeness'] = {
-                'has_api_data': True,
-                'has_tax_scraping': bool(property_info.get('tax_scrape_data')),
-                'has_sales_scraping': bool(property_info.get('sales_scrape_data')),
-                'collection_method': 'api_with_web_scraping_fallback',
-                'last_updated': time.time()
+            property_info["data_completeness"] = {
+                "has_api_data": True,
+                "has_tax_scraping": bool(property_info.get("tax_scrape_data")),
+                "has_sales_scraping": bool(property_info.get("sales_scrape_data")),
+                "collection_method": "api_with_web_scraping_fallback",
+                "last_updated": time.time(),
             }
 
             logger.info(f"Complete property data collection finished for APN {apn}")
             return property_info
 
         except Exception as e:
-            logger.error(f"Error in complete property data collection for APN {apn}: {e}")
+            logger.error(
+                f"Error in complete property data collection for APN {apn}: {e}"
+            )
             return None
 
     def get_performance_stats(self) -> Dict[str, Any]:
         """Get comprehensive performance statistics"""
         with self.stats_lock:
             success_rate = (self.total_successful / max(1, self.total_requests)) * 100
-            avg_response_time = sum(self.request_times) / max(len(self.request_times), 1)
+            avg_response_time = sum(self.request_times) / max(
+                len(self.request_times), 1
+            )
 
         with self.requests_lock:
             active_count = len(self.active_requests)
@@ -1822,23 +2047,26 @@ class UnifiedMaricopaAPIClient:
             pending_count = self.request_queue.qsize()
 
         stats = {
-            'total_requests': self.total_requests,
-            'total_successful': self.total_successful,
-            'total_failed': self.total_failed,
-            'success_rate_percent': success_rate,
-            'average_response_time': avg_response_time,
-            'cache_hits': self.cache_hits,
-            'cache_misses': self.cache_misses,
-            'cache_hit_rate': (self.cache_hits / max(self.cache_hits + self.cache_misses, 1)) * 100,
-            'cached_entries': len(self._cache),
-            'active_requests': active_count,
-            'completed_requests': completed_count,
-            'pending_requests': pending_count
+            "total_requests": self.total_requests,
+            "total_successful": self.total_successful,
+            "total_failed": self.total_failed,
+            "success_rate_percent": success_rate,
+            "average_response_time": avg_response_time,
+            "cache_hits": self.cache_hits,
+            "cache_misses": self.cache_misses,
+            "cache_hit_rate": (
+                self.cache_hits / max(self.cache_hits + self.cache_misses, 1)
+            )
+            * 100,
+            "cached_entries": len(self._cache),
+            "active_requests": active_count,
+            "completed_requests": completed_count,
+            "pending_requests": pending_count,
         }
 
         # Add rate limiter stats if enabled
         if self.rate_limiter:
-            stats['rate_limiter'] = self.rate_limiter.get_stats()
+            stats["rate_limiter"] = self.rate_limiter.get_stats()
 
         return stats
 
@@ -1849,7 +2077,8 @@ class UnifiedMaricopaAPIClient:
 
         with self.requests_lock:
             requests_to_remove = [
-                request_id for request_id, request in self.completed_requests.items()
+                request_id
+                for request_id, request in self.completed_requests.items()
                 if request.completed_at and request.completed_at < cutoff_time
             ]
 
@@ -1907,10 +2136,10 @@ class MockMaricopaAPIClient(UnifiedMaricopaAPIClient):
         # Initialize parent but don't actually make HTTP requests
         if config_manager:
             self.config = config_manager.get_api_config()
-            self.base_url = self.config['base_url']
-            self.token = self.config.get('token', API_TOKEN)
+            self.base_url = self.config["base_url"]
+            self.token = self.config.get("token", API_TOKEN)
         else:
-            self.base_url = 'https://mcassessor.maricopa.gov/api'
+            self.base_url = "https://mcassessor.maricopa.gov/api"
             self.token = API_TOKEN
 
         logger.info("Initializing Mock API Client")
@@ -1929,19 +2158,19 @@ class MockMaricopaAPIClient(UnifiedMaricopaAPIClient):
         logger.debug(f"Generating mock property data for APN: {apn}")
 
         return {
-            'apn': apn,
-            'owner_name': f'Mock Owner {apn[-4:]}',
-            'property_address': f'{random.randint(100, 9999)} Mock Street, Phoenix, AZ 8510{random.randint(1, 9)}',
-            'mailing_address': f'PO Box {random.randint(1000, 9999)}, Phoenix, AZ 8510{random.randint(1, 9)}',
-            'legal_description': f'Mock Legal Description for {apn}',
-            'land_use_code': random.choice(['R1', 'R2', 'C1', 'I1']),
-            'year_built': random.randint(1950, 2023),
-            'living_area_sqft': random.randint(800, 5000),
-            'lot_size_sqft': random.randint(5000, 20000),
-            'bedrooms': random.randint(2, 6),
-            'bathrooms': random.randint(1, 4),
-            'pool': random.choice([True, False]),
-            'garage_spaces': random.randint(0, 3)
+            "apn": apn,
+            "owner_name": f"Mock Owner {apn[-4:]}",
+            "property_address": f"{random.randint(100, 9999)} Mock Street, Phoenix, AZ 8510{random.randint(1, 9)}",
+            "mailing_address": f"PO Box {random.randint(1000, 9999)}, Phoenix, AZ 8510{random.randint(1, 9)}",
+            "legal_description": f"Mock Legal Description for {apn}",
+            "land_use_code": random.choice(["R1", "R2", "C1", "I1"]),
+            "year_built": random.randint(1950, 2023),
+            "living_area_sqft": random.randint(800, 5000),
+            "lot_size_sqft": random.randint(5000, 20000),
+            "bedrooms": random.randint(2, 6),
+            "bathrooms": random.randint(1, 4),
+            "pool": random.choice([True, False]),
+            "garage_spaces": random.randint(0, 3),
         }
 
     def search_by_apn(self, apn: str) -> Optional[Dict]:
@@ -1955,25 +2184,39 @@ class MockMaricopaAPIClient(UnifiedMaricopaAPIClient):
 
     def search_by_owner(self, owner_name: str, limit: int = 50) -> List[Dict]:
         """Mock search by owner"""
-        logger.info(f"Mock: Searching properties by owner: {owner_name} (limit: {limit})")
+        logger.info(
+            f"Mock: Searching properties by owner: {owner_name} (limit: {limit})"
+        )
 
         result_count = min(3, limit)
-        results = [self._generate_mock_property(f"12345{i:03d}") for i in range(result_count)]
+        results = [
+            self._generate_mock_property(f"12345{i:03d}") for i in range(result_count)
+        ]
 
-        logger.info(f"Mock: Generated {result_count} properties for owner: {owner_name}")
-        logger.info(f"SEARCH_ANALYTICS: mock_owner_search, results={result_count}, limit={limit}")
+        logger.info(
+            f"Mock: Generated {result_count} properties for owner: {owner_name}"
+        )
+        logger.info(
+            f"SEARCH_ANALYTICS: mock_owner_search, results={result_count}, limit={limit}"
+        )
 
         return results
 
     def search_by_address(self, address: str, limit: int = 50) -> List[Dict]:
         """Mock search by address"""
-        logger.info(f"Mock: Searching properties by address: {address} (limit: {limit})")
+        logger.info(
+            f"Mock: Searching properties by address: {address} (limit: {limit})"
+        )
 
         result_count = min(2, limit)
-        results = [self._generate_mock_property(f"67890{i:03d}") for i in range(result_count)]
+        results = [
+            self._generate_mock_property(f"67890{i:03d}") for i in range(result_count)
+        ]
 
         logger.info(f"Mock: Generated {result_count} properties for address: {address}")
-        logger.info(f"SEARCH_ANALYTICS: mock_address_search, results={result_count}, limit={limit}")
+        logger.info(
+            f"SEARCH_ANALYTICS: mock_address_search, results={result_count}, limit={limit}"
+        )
 
         return results
 
@@ -1982,9 +2225,9 @@ class MockMaricopaAPIClient(UnifiedMaricopaAPIClient):
         logger.debug("Mock: Getting API status")
 
         return {
-            'status': 'mock',
-            'version': '3.0.0-mock',
-            'rate_limit': {'requests_per_minute': 60},
-            'endpoints': ['mock_endpoints'],
-            'message': 'Using Mock Unified API Client'
+            "status": "mock",
+            "version": "3.0.0-mock",
+            "rate_limit": {"requests_per_minute": 60},
+            "endpoints": ["mock_endpoints"],
+            "message": "Using Mock Unified API Client",
         }

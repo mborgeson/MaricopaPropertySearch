@@ -14,7 +14,14 @@ from email.mime.multipart import MIMEMultipart
 from enum import Enum
 from typing import Dict, Any, List, Optional, Callable, Set
 
-from hook_manager import Hook, HookContext, HookResult, HookStatus, HookPriority, get_hook_manager
+from hook_manager import (
+    Hook,
+    HookContext,
+    HookResult,
+    HookStatus,
+    HookPriority,
+    get_hook_manager,
+)
 from logging_config import get_logger, log_exception
 
 logger = get_logger(__name__)
@@ -22,6 +29,7 @@ logger = get_logger(__name__)
 
 class ErrorSeverity(Enum):
     """Error severity levels"""
+
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
@@ -30,6 +38,7 @@ class ErrorSeverity(Enum):
 
 class RecoveryAction(Enum):
     """Recovery action types"""
+
     RETRY = "retry"
     FALLBACK = "fallback"
     RESTART = "restart"
@@ -40,8 +49,14 @@ class RecoveryAction(Enum):
 class ErrorPattern:
     """Error pattern for classification and handling"""
 
-    def __init__(self, name: str, pattern: str, severity: ErrorSeverity,
-                 recovery_action: RecoveryAction, max_occurrences: int = 5):
+    def __init__(
+        self,
+        name: str,
+        pattern: str,
+        severity: ErrorSeverity,
+        recovery_action: RecoveryAction,
+        max_occurrences: int = 5,
+    ):
         self.name = name
         self.pattern = pattern
         self.severity = severity
@@ -53,6 +68,7 @@ class ErrorPattern:
     def matches(self, error_message: str) -> bool:
         """Check if error matches this pattern"""
         import re
+
         return bool(re.search(self.pattern, error_message, re.IGNORECASE))
 
     def should_suppress(self) -> bool:
@@ -82,91 +98,87 @@ class ErrorClassificationHook(Hook):
                 "database_connection_failed",
                 r"(connection.*failed|could not connect|timeout|connection refused)",
                 ErrorSeverity.HIGH,
-                RecoveryAction.RETRY
+                RecoveryAction.RETRY,
             ),
             ErrorPattern(
                 "database_query_timeout",
                 r"(query.*timeout|statement timeout|lock wait timeout)",
                 ErrorSeverity.MEDIUM,
-                RecoveryAction.RETRY
+                RecoveryAction.RETRY,
             ),
             ErrorPattern(
                 "database_permission_denied",
                 r"(permission denied|access denied|insufficient privileges)",
                 ErrorSeverity.HIGH,
-                RecoveryAction.ALERT
+                RecoveryAction.ALERT,
             ),
-
             # API errors
             ErrorPattern(
                 "api_rate_limit",
                 r"(rate limit|too many requests|429|quota exceeded)",
                 ErrorSeverity.MEDIUM,
-                RecoveryAction.RETRY
+                RecoveryAction.RETRY,
             ),
             ErrorPattern(
                 "api_unauthorized",
                 r"(unauthorized|401|forbidden|403|invalid.*token)",
                 ErrorSeverity.HIGH,
-                RecoveryAction.ALERT
+                RecoveryAction.ALERT,
             ),
             ErrorPattern(
                 "api_service_unavailable",
                 r"(service unavailable|502|503|504|bad gateway)",
                 ErrorSeverity.MEDIUM,
-                RecoveryAction.FALLBACK
+                RecoveryAction.FALLBACK,
             ),
-
             # Network errors
             ErrorPattern(
                 "network_timeout",
                 r"(connection.*timeout|read timeout|socket timeout)",
                 ErrorSeverity.MEDIUM,
-                RecoveryAction.RETRY
+                RecoveryAction.RETRY,
             ),
             ErrorPattern(
                 "network_unreachable",
                 r"(network.*unreachable|host.*unreachable|no route)",
                 ErrorSeverity.HIGH,
-                RecoveryAction.FALLBACK
+                RecoveryAction.FALLBACK,
             ),
-
             # Application errors
             ErrorPattern(
                 "memory_error",
                 r"(out of memory|memory error|cannot allocate)",
                 ErrorSeverity.CRITICAL,
-                RecoveryAction.RESTART
+                RecoveryAction.RESTART,
             ),
             ErrorPattern(
                 "file_not_found",
                 r"(file not found|no such file|path.*not.*exist)",
                 ErrorSeverity.LOW,
-                RecoveryAction.FALLBACK
+                RecoveryAction.FALLBACK,
             ),
             ErrorPattern(
                 "configuration_error",
                 r"(configuration.*error|config.*invalid|missing.*config)",
                 ErrorSeverity.HIGH,
-                RecoveryAction.ALERT
+                RecoveryAction.ALERT,
             ),
-
             # Generic patterns
             ErrorPattern(
                 "unknown_error",
                 r".*",  # Catch-all pattern
                 ErrorSeverity.LOW,
                 RecoveryAction.IGNORE,
-                max_occurrences=10
-            )
+                max_occurrences=10,
+            ),
         ]
 
     async def execute(self, context: HookContext) -> HookResult:
         """Classify and categorize errors"""
         try:
             error_data = context.data
-            error_message = str(error_data.get('error', ''))
-            error_type = error_data.get('error_type', 'Unknown')
+            error_message = str(error_data.get("error", ""))
+            error_type = error_data.get("error_type", "Unknown")
 
             # Find matching pattern
             matched_pattern = None
@@ -187,16 +199,16 @@ class ErrorClassificationHook(Hook):
 
             # Create error record
             error_record = {
-                'timestamp': datetime.now().isoformat(),
-                'error_message': error_message,
-                'error_type': error_type,
-                'pattern_name': matched_pattern.name,
-                'severity': matched_pattern.severity.value,
-                'recovery_action': matched_pattern.recovery_action.value,
-                'occurrence_count': matched_pattern.occurrence_count,
-                'should_suppress': matched_pattern.should_suppress(),
-                'source': context.source,
-                'traceback': error_data.get('traceback', '')
+                "timestamp": datetime.now().isoformat(),
+                "error_message": error_message,
+                "error_type": error_type,
+                "pattern_name": matched_pattern.name,
+                "severity": matched_pattern.severity.value,
+                "recovery_action": matched_pattern.recovery_action.value,
+                "occurrence_count": matched_pattern.occurrence_count,
+                "should_suppress": matched_pattern.should_suppress(),
+                "source": context.source,
+                "traceback": error_data.get("traceback", ""),
             }
 
             # Add to history
@@ -206,21 +218,21 @@ class ErrorClassificationHook(Hook):
             log_level = self._get_log_level(matched_pattern.severity)
             logger.log(
                 log_level,
-                f"Error classified: {matched_pattern.name} ({matched_pattern.severity.value}) - {error_message}"
+                f"Error classified: {matched_pattern.name} ({matched_pattern.severity.value}) - {error_message}",
             )
 
             return HookResult(
                 status=HookStatus.SUCCESS,
                 result={
-                    'classification': error_record,
-                    'pattern': {
-                        'name': matched_pattern.name,
-                        'severity': matched_pattern.severity.value,
-                        'recovery_action': matched_pattern.recovery_action.value,
-                        'should_suppress': matched_pattern.should_suppress()
-                    }
+                    "classification": error_record,
+                    "pattern": {
+                        "name": matched_pattern.name,
+                        "severity": matched_pattern.severity.value,
+                        "recovery_action": matched_pattern.recovery_action.value,
+                        "should_suppress": matched_pattern.should_suppress(),
+                    },
                 },
-                metadata={'severity': matched_pattern.severity.value}
+                metadata={"severity": matched_pattern.severity.value},
             )
 
         except Exception as e:
@@ -233,7 +245,7 @@ class ErrorClassificationHook(Hook):
             ErrorSeverity.LOW: logging.INFO,
             ErrorSeverity.MEDIUM: logging.WARNING,
             ErrorSeverity.HIGH: logging.ERROR,
-            ErrorSeverity.CRITICAL: logging.CRITICAL
+            ErrorSeverity.CRITICAL: logging.CRITICAL,
         }
         return severity_map.get(severity, logging.ERROR)
 
@@ -242,22 +254,20 @@ class ErrorClassificationHook(Hook):
         total_errors = sum(self.error_stats.values())
 
         return {
-            'total_errors': total_errors,
-            'error_patterns': dict(self.error_stats),
-            'recent_errors': len(self.error_history),
-            'top_errors': self._get_top_errors()
+            "total_errors": total_errors,
+            "error_patterns": dict(self.error_stats),
+            "recent_errors": len(self.error_history),
+            "top_errors": self._get_top_errors(),
         }
 
     def _get_top_errors(self, limit: int = 5) -> List[Dict[str, Any]]:
         """Get top error patterns by frequency"""
         sorted_errors = sorted(
-            self.error_stats.items(),
-            key=lambda x: x[1],
-            reverse=True
+            self.error_stats.items(), key=lambda x: x[1], reverse=True
         )
 
         return [
-            {'pattern': pattern, 'count': count}
+            {"pattern": pattern, "count": count}
             for pattern, count in sorted_errors[:limit]
         ]
 
@@ -276,11 +286,13 @@ class ErrorRecoveryHook(Hook):
         """Execute error recovery procedures"""
         try:
             error_data = context.data
-            classification = error_data.get('classification', {})
-            recovery_action = classification.get('recovery_action', 'ignore')
-            pattern_name = classification.get('pattern_name', 'unknown')
+            classification = error_data.get("classification", {})
+            recovery_action = classification.get("recovery_action", "ignore")
+            pattern_name = classification.get("pattern_name", "unknown")
 
-            logger.info(f"Attempting error recovery: {recovery_action} for {pattern_name}")
+            logger.info(
+                f"Attempting error recovery: {recovery_action} for {pattern_name}"
+            )
 
             if recovery_action == RecoveryAction.RETRY.value:
                 result = await self._handle_retry_recovery(context, error_data)
@@ -304,22 +316,26 @@ class ErrorRecoveryHook(Hook):
             logger.error(f"Error recovery hook failed: {e}")
             return HookResult(status=HookStatus.FAILED, error=e)
 
-    async def _handle_retry_recovery(self, context: HookContext, error_data: Dict) -> HookResult:
+    async def _handle_retry_recovery(
+        self, context: HookContext, error_data: Dict
+    ) -> HookResult:
         """Handle retry recovery strategy"""
-        operation = error_data.get('failed_operation')
-        retry_count = error_data.get('retry_count', 0)
+        operation = error_data.get("failed_operation")
+        retry_count = error_data.get("retry_count", 0)
 
         if retry_count >= self.max_retry_attempts:
             logger.warning(f"Max retry attempts ({self.max_retry_attempts}) exceeded")
             return HookResult(
                 status=HookStatus.FAILED,
-                result={'recovery_action': 'retry', 'max_retries_exceeded': True}
+                result={"recovery_action": "retry", "max_retries_exceeded": True},
             )
 
         # Calculate delay
         delay = self.retry_delays[min(retry_count, len(self.retry_delays) - 1)]
 
-        logger.info(f"Retrying operation in {delay}s (attempt {retry_count + 1}/{self.max_retry_attempts})")
+        logger.info(
+            f"Retrying operation in {delay}s (attempt {retry_count + 1}/{self.max_retry_attempts})"
+        )
 
         # Wait before retry
         await asyncio.sleep(delay)
@@ -331,25 +347,35 @@ class ErrorRecoveryHook(Hook):
                 logger.info("Retry recovery successful")
                 return HookResult(
                     status=HookStatus.SUCCESS,
-                    result={'recovery_action': 'retry', 'retry_successful': True, 'attempt': retry_count + 1}
+                    result={
+                        "recovery_action": "retry",
+                        "retry_successful": True,
+                        "attempt": retry_count + 1,
+                    },
                 )
         except Exception as e:
             logger.warning(f"Retry attempt {retry_count + 1} failed: {e}")
 
         return HookResult(
             status=HookStatus.FAILED,
-            result={'recovery_action': 'retry', 'retry_failed': True, 'attempt': retry_count + 1}
+            result={
+                "recovery_action": "retry",
+                "retry_failed": True,
+                "attempt": retry_count + 1,
+            },
         )
 
-    async def _handle_fallback_recovery(self, context: HookContext, error_data: Dict) -> HookResult:
+    async def _handle_fallback_recovery(
+        self, context: HookContext, error_data: Dict
+    ) -> HookResult:
         """Handle fallback recovery strategy"""
-        fallback_operation = error_data.get('fallback_operation')
+        fallback_operation = error_data.get("fallback_operation")
 
         if not fallback_operation:
             logger.warning("No fallback operation available")
             return HookResult(
                 status=HookStatus.FAILED,
-                result={'recovery_action': 'fallback', 'no_fallback_available': True}
+                result={"recovery_action": "fallback", "no_fallback_available": True},
             )
 
         try:
@@ -358,17 +384,23 @@ class ErrorRecoveryHook(Hook):
                 logger.info("Fallback recovery successful")
                 return HookResult(
                     status=HookStatus.SUCCESS,
-                    result={'recovery_action': 'fallback', 'fallback_successful': True, 'fallback_result': result}
+                    result={
+                        "recovery_action": "fallback",
+                        "fallback_successful": True,
+                        "fallback_result": result,
+                    },
                 )
         except Exception as e:
             logger.error(f"Fallback operation failed: {e}")
 
         return HookResult(
             status=HookStatus.FAILED,
-            result={'recovery_action': 'fallback', 'fallback_failed': True}
+            result={"recovery_action": "fallback", "fallback_failed": True},
         )
 
-    async def _handle_restart_recovery(self, context: HookContext, error_data: Dict) -> HookResult:
+    async def _handle_restart_recovery(
+        self, context: HookContext, error_data: Dict
+    ) -> HookResult:
         """Handle restart recovery strategy"""
         logger.critical("Critical error detected - restart recovery initiated")
 
@@ -377,15 +409,15 @@ class ErrorRecoveryHook(Hook):
         # 2. Reinitialize components
         # 3. Potentially restart the application
 
-        restart_component = error_data.get('restart_component')
+        restart_component = error_data.get("restart_component")
 
-        if restart_component and hasattr(restart_component, 'restart'):
+        if restart_component and hasattr(restart_component, "restart"):
             try:
                 await restart_component.restart()
                 logger.info("Component restart successful")
                 return HookResult(
                     status=HookStatus.SUCCESS,
-                    result={'recovery_action': 'restart', 'component_restarted': True}
+                    result={"recovery_action": "restart", "component_restarted": True},
                 )
             except Exception as e:
                 logger.error(f"Component restart failed: {e}")
@@ -394,10 +426,15 @@ class ErrorRecoveryHook(Hook):
         logger.critical("Application restart recommended")
         return HookResult(
             status=HookStatus.SUCCESS,
-            result={'recovery_action': 'restart', 'application_restart_recommended': True}
+            result={
+                "recovery_action": "restart",
+                "application_restart_recommended": True,
+            },
         )
 
-    async def _handle_alert_recovery(self, context: HookContext, error_data: Dict) -> HookResult:
+    async def _handle_alert_recovery(
+        self, context: HookContext, error_data: Dict
+    ) -> HookResult:
         """Handle alert recovery strategy"""
         logger.warning("Alert recovery - notifying administrators")
 
@@ -406,16 +443,18 @@ class ErrorRecoveryHook(Hook):
 
         return HookResult(
             status=HookStatus.SUCCESS,
-            result={'recovery_action': 'alert', 'alert_sent': alert_sent}
+            result={"recovery_action": "alert", "alert_sent": alert_sent},
         )
 
-    async def _handle_ignore_recovery(self, context: HookContext, error_data: Dict) -> HookResult:
+    async def _handle_ignore_recovery(
+        self, context: HookContext, error_data: Dict
+    ) -> HookResult:
         """Handle ignore recovery strategy"""
         logger.debug("Error recovery: ignoring error as per configuration")
 
         return HookResult(
             status=HookStatus.SUCCESS,
-            result={'recovery_action': 'ignore', 'error_ignored': True}
+            result={"recovery_action": "ignore", "error_ignored": True},
         )
 
     async def _send_alerts(self, error_data: Dict) -> bool:
@@ -423,7 +462,9 @@ class ErrorRecoveryHook(Hook):
         try:
             # This would typically integrate with notification services
             # For now, we'll just log the alert
-            logger.error(f"ALERT: Critical error detected - {error_data.get('error_message', 'Unknown error')}")
+            logger.error(
+                f"ALERT: Critical error detected - {error_data.get('error_message', 'Unknown error')}"
+            )
 
             # In a real implementation, you might:
             # - Send email notifications
@@ -452,9 +493,9 @@ class ErrorNotificationHook(Hook):
     def __init__(self):
         super().__init__("error_notification", HookPriority.LOW)
         self.notification_config = {
-            'email_enabled': False,
-            'slack_enabled': False,
-            'severity_threshold': ErrorSeverity.HIGH
+            "email_enabled": False,
+            "slack_enabled": False,
+            "severity_threshold": ErrorSeverity.HIGH,
         }
         self.notification_history = deque(maxlen=100)
 
@@ -462,40 +503,46 @@ class ErrorNotificationHook(Hook):
         """Send error notifications"""
         try:
             error_data = context.data
-            classification = error_data.get('classification', {})
-            severity = ErrorSeverity(classification.get('severity', 'low'))
+            classification = error_data.get("classification", {})
+            severity = ErrorSeverity(classification.get("severity", "low"))
 
             # Check if notification should be sent
-            if severity.value < self.notification_config['severity_threshold'].value:
+            if severity.value < self.notification_config["severity_threshold"].value:
                 return HookResult(
                     status=HookStatus.SUCCESS,
-                    result={'notification_sent': False, 'reason': 'Below severity threshold'}
+                    result={
+                        "notification_sent": False,
+                        "reason": "Below severity threshold",
+                    },
                 )
 
             # Check if error should be suppressed
-            if classification.get('should_suppress', False):
+            if classification.get("should_suppress", False):
                 return HookResult(
                     status=HookStatus.SUCCESS,
-                    result={'notification_sent': False, 'reason': 'Error suppressed due to frequency'}
+                    result={
+                        "notification_sent": False,
+                        "reason": "Error suppressed due to frequency",
+                    },
                 )
 
             # Send notifications
             notifications_sent = []
 
-            if self.notification_config['email_enabled']:
+            if self.notification_config["email_enabled"]:
                 email_result = await self._send_email_notification(error_data)
-                notifications_sent.append({'type': 'email', 'success': email_result})
+                notifications_sent.append({"type": "email", "success": email_result})
 
-            if self.notification_config['slack_enabled']:
+            if self.notification_config["slack_enabled"]:
                 slack_result = await self._send_slack_notification(error_data)
-                notifications_sent.append({'type': 'slack', 'success': slack_result})
+                notifications_sent.append({"type": "slack", "success": slack_result})
 
             # Record notification
             notification_record = {
-                'timestamp': datetime.now().isoformat(),
-                'error_pattern': classification.get('pattern_name'),
-                'severity': severity.value,
-                'notifications_sent': notifications_sent
+                "timestamp": datetime.now().isoformat(),
+                "error_pattern": classification.get("pattern_name"),
+                "severity": severity.value,
+                "notifications_sent": notifications_sent,
             }
             self.notification_history.append(notification_record)
 
@@ -504,10 +551,10 @@ class ErrorNotificationHook(Hook):
             return HookResult(
                 status=HookStatus.SUCCESS,
                 result={
-                    'notification_sent': True,
-                    'notifications': notifications_sent,
-                    'notification_record': notification_record
-                }
+                    "notification_sent": True,
+                    "notifications": notifications_sent,
+                    "notification_record": notification_record,
+                },
             )
 
         except Exception as e:
@@ -550,44 +597,50 @@ def register_error_hooks():
     hook_manager = get_hook_manager()
 
     # Register hooks
-    hook_manager.register_hook('error.occurred', ErrorClassificationHook())
-    hook_manager.register_hook('error.occurred', ErrorRecoveryHook())
-    hook_manager.register_hook('error.occurred', ErrorNotificationHook())
+    hook_manager.register_hook("error.occurred", ErrorClassificationHook())
+    hook_manager.register_hook("error.occurred", ErrorRecoveryHook())
+    hook_manager.register_hook("error.occurred", ErrorNotificationHook())
 
     logger.info("Error handling hooks registered successfully")
 
 
 # Convenience functions for triggering error events
-def trigger_error_occurred(error: Exception, error_type: str = None, source: str = None,
-                          failed_operation: Callable = None, fallback_operation: Callable = None,
-                          retry_count: int = 0, **kwargs):
+def trigger_error_occurred(
+    error: Exception,
+    error_type: str = None,
+    source: str = None,
+    failed_operation: Callable = None,
+    fallback_operation: Callable = None,
+    retry_count: int = 0,
+    **kwargs,
+):
     """Trigger error occurred hook"""
     from hook_manager import emit_hook
 
     error_data = {
-        'error': error,
-        'error_type': error_type or type(error).__name__,
-        'error_message': str(error),
-        'traceback': traceback.format_exc(),
-        'failed_operation': failed_operation,
-        'fallback_operation': fallback_operation,
-        'retry_count': retry_count,
-        **kwargs
+        "error": error,
+        "error_type": error_type or type(error).__name__,
+        "error_message": str(error),
+        "traceback": traceback.format_exc(),
+        "failed_operation": failed_operation,
+        "fallback_operation": fallback_operation,
+        "retry_count": retry_count,
+        **kwargs,
     }
 
-    return emit_hook(
-        'error.occurred',
-        source or 'error_handler',
-        **error_data
-    )
+    return emit_hook("error.occurred", source or "error_handler", **error_data)
 
 
-def handle_error_with_recovery(error: Exception, operation: Callable = None,
-                             fallback: Callable = None, source: str = None):
+def handle_error_with_recovery(
+    error: Exception,
+    operation: Callable = None,
+    fallback: Callable = None,
+    source: str = None,
+):
     """Handle error with automatic recovery"""
     return trigger_error_occurred(
         error=error,
         failed_operation=operation,
         fallback_operation=fallback,
-        source=source or 'auto_recovery'
+        source=source or "auto_recovery",
     )

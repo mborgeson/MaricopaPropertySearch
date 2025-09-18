@@ -46,6 +46,7 @@ HEADER = """
 ========================================================================
 """
 
+
 class PlatformDetector:
     """Intelligent platform detection and environment setup"""
 
@@ -65,17 +66,18 @@ class PlatformDetector:
         # Multiple detection methods for reliability
         wsl_indicators = [
             # Environment variable check
-            'WSL' in os.environ.get('WSL_DISTRO_NAME', ''),
-            'WSL' in os.environ.get('WSL_INTEROP', ''),
-
+            "WSL" in os.environ.get("WSL_DISTRO_NAME", ""),
+            "WSL" in os.environ.get("WSL_INTEROP", ""),
             # Release string check
-            'microsoft' in platform.release().lower() if hasattr(platform, 'release') else False,
-
+            (
+                "microsoft" in platform.release().lower()
+                if hasattr(platform, "release")
+                else False
+            ),
             # Proc version check
             self._check_proc_version(),
-
             # uname check
-            self._check_uname()
+            self._check_uname(),
         ]
 
         return any(wsl_indicators)
@@ -83,10 +85,10 @@ class PlatformDetector:
     def _check_proc_version(self) -> bool:
         """Check /proc/version for WSL"""
         try:
-            proc_version = Path('/proc/version')
+            proc_version = Path("/proc/version")
             if proc_version.exists():
                 content = proc_version.read_text().lower()
-                return 'microsoft' in content or 'wsl' in content
+                return "microsoft" in content or "wsl" in content
         except:
             pass
         return False
@@ -94,8 +96,8 @@ class PlatformDetector:
     def _check_uname(self) -> bool:
         """Check uname for WSL"""
         try:
-            if hasattr(os, 'uname'):
-                return 'microsoft' in os.uname().release.lower()
+            if hasattr(os, "uname"):
+                return "microsoft" in os.uname().release.lower()
         except:
             pass
         return False
@@ -106,12 +108,12 @@ class PlatformDetector:
             return True  # Windows always has display
 
         # Check for Wayland display first (WSLg uses Wayland)
-        wayland_display = os.environ.get('WAYLAND_DISPLAY')
+        wayland_display = os.environ.get("WAYLAND_DISPLAY")
         if wayland_display:
             return True
 
         # Check DISPLAY environment variable for X11
-        display = os.environ.get('DISPLAY')
+        display = os.environ.get("DISPLAY")
         if not display:
             return False
 
@@ -122,7 +124,7 @@ class PlatformDetector:
         """Test if we can actually connect to the display"""
         try:
             # Try to create a simple Qt application to test display
-            test_script = '''
+            test_script = """
 import sys
 import os
 os.environ["QT_QPA_PLATFORM"] = os.environ.get("QT_QPA_PLATFORM", "xcb")
@@ -133,14 +135,18 @@ try:
     print("DISPLAY_OK")
 except Exception as e:
     print(f"DISPLAY_ERROR: {e}")
-'''
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.py', delete=False) as f:
+"""
+            with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
                 f.write(test_script)
                 temp_file = f.name
 
             try:
-                result = subprocess.run([sys.executable, temp_file],
-                                      capture_output=True, text=True, timeout=10)
+                result = subprocess.run(
+                    [sys.executable, temp_file],
+                    capture_output=True,
+                    text=True,
+                    timeout=10,
+                )
                 return "DISPLAY_OK" in result.stdout
             finally:
                 try:
@@ -170,10 +176,10 @@ except Exception as e:
 
         if self.can_use_gui:
             # Check for Wayland first (WSLg uses Wayland)
-            if os.environ.get('WAYLAND_DISPLAY'):
+            if os.environ.get("WAYLAND_DISPLAY"):
                 return "wayland"
             # Fallback to X11
-            elif os.environ.get('DISPLAY'):
+            elif os.environ.get("DISPLAY"):
                 return "xcb"
             else:
                 return "offscreen"
@@ -183,17 +189,17 @@ except Exception as e:
     def setup_environment(self):
         """Setup environment variables for Qt"""
         # Set Qt platform
-        if not os.environ.get('QT_QPA_PLATFORM'):
-            os.environ['QT_QPA_PLATFORM'] = self.qt_platform
+        if not os.environ.get("QT_QPA_PLATFORM"):
+            os.environ["QT_QPA_PLATFORM"] = self.qt_platform
 
         # Additional Qt settings for better compatibility
         if self.qt_platform == "offscreen":
-            os.environ['QT_LOGGING_RULES'] = '*.debug=false'
-            os.environ['QT_QPA_PLATFORM_PLUGIN_PATH'] = ''
+            os.environ["QT_LOGGING_RULES"] = "*.debug=false"
+            os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = ""
 
         elif self.qt_platform == "xcb":
             # Ensure we try xcb first, fallback to offscreen
-            os.environ['QT_QPA_PLATFORM'] = 'xcb'
+            os.environ["QT_QPA_PLATFORM"] = "xcb"
 
         print(f"[ENV] Platform: {platform.system()}")
         print(f"[ENV] WSL detected: {self.is_wsl}")
@@ -202,6 +208,7 @@ except Exception as e:
         print(f"[ENV] Qt platform: {self.qt_platform}")
 
         return True
+
 
 class DependencyManager:
     """Smart dependency checking and handling"""
@@ -215,22 +222,19 @@ class DependencyManager:
 
         # Essential packages needed for basic functionality
         essential_packages = {
-            'PyQt5': 'pyqt5',
-            'requests': 'requests',
+            "PyQt5": "pyqt5",
+            "requests": "requests",
         }
 
         # Important packages for full functionality
         important_packages = {
-            'psycopg2': 'psycopg2-binary',
-            'beautifulsoup4': 'beautifulsoup4',
-            'lxml': 'lxml'
+            "psycopg2": "psycopg2-binary",
+            "beautifulsoup4": "beautifulsoup4",
+            "lxml": "lxml",
         }
 
         # Optional packages for enhanced features
-        optional_packages = {
-            'playwright': 'playwright',
-            'asyncio': 'asyncio'
-        }
+        optional_packages = {"playwright": "playwright", "asyncio": "asyncio"}
 
         missing_essential = []
         missing_important = []
@@ -248,7 +252,7 @@ class DependencyManager:
         # Check important packages
         for package, pip_name in important_packages.items():
             try:
-                module_name = package if package != 'beautifulsoup4' else 'bs4'
+                module_name = package if package != "beautifulsoup4" else "bs4"
                 __import__(module_name)
                 print(f"  [OK] {package} installed")
             except ImportError:
@@ -268,16 +272,21 @@ class DependencyManager:
         can_proceed = len(missing_essential) == 0
 
         if missing_essential:
-            print(f"\n[ERROR] Missing essential dependencies: {', '.join(missing_essential)}")
+            print(
+                f"\n[ERROR] Missing essential dependencies: {', '.join(missing_essential)}"
+            )
             print("Install with:")
             print(f"  pip install {' '.join(missing_essential)}")
 
         if missing_important:
-            print(f"\n[WARNING] Missing important dependencies: {', '.join(missing_important)}")
+            print(
+                f"\n[WARNING] Missing important dependencies: {', '.join(missing_important)}"
+            )
             print("For full functionality, install with:")
             print(f"  pip install {' '.join(missing_important)}")
 
         return can_proceed, missing_essential, missing_important + missing_optional
+
 
 class SmartLogger:
     """Intelligent logging setup"""
@@ -313,6 +322,7 @@ class SmartLogger:
         """Try to setup advanced logging with the app's logging config"""
         try:
             from logging_config import setup_logging
+
             setup_logging()
 
             # Create user action log directory
@@ -328,15 +338,16 @@ class SmartLogger:
         try:
             logging.basicConfig(
                 level=logging.INFO,
-                format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
                 handlers=[
-                    logging.FileHandler(self.log_dir / 'app.log'),
-                    logging.StreamHandler()
-                ]
+                    logging.FileHandler(self.log_dir / "app.log"),
+                    logging.StreamHandler(),
+                ],
             )
             return True
         except:
             return False
+
 
 class DatabaseChecker:
     """Smart database connection checking"""
@@ -394,6 +405,7 @@ class DatabaseChecker:
             pass
         return False
 
+
 class SplashScreenManager:
     """Manage splash screen display with platform awareness"""
 
@@ -441,11 +453,7 @@ class SplashScreenManager:
                     "Starting application..."
                 )
 
-            self.splash.showMessage(
-                message,
-                Qt.AlignCenter | Qt.AlignBottom,
-                Qt.black
-            )
+            self.splash.showMessage(message, Qt.AlignCenter | Qt.AlignBottom, Qt.black)
 
             self.splash.show()
             return self.splash
@@ -459,7 +467,10 @@ class SplashScreenManager:
         if self.splash:
             try:
                 from PyQt5.QtCore import Qt
-                self.splash.showMessage(message, Qt.AlignCenter | Qt.AlignBottom, Qt.black)
+
+                self.splash.showMessage(
+                    message, Qt.AlignCenter | Qt.AlignBottom, Qt.black
+                )
             except:
                 pass
 
@@ -471,6 +482,7 @@ class SplashScreenManager:
                 self.splash = None
             except:
                 pass
+
 
 class ApplicationLauncher:
     """Smart application launcher with multiple fallback strategies"""
@@ -499,7 +511,7 @@ class ApplicationLauncher:
             ("Basic GUI", self._launch_basic_gui),
             ("Fixed GUI", self._launch_fixed_gui),
             ("Minimal GUI", self._launch_minimal_gui),
-            ("Console mode", self._launch_console_mode)
+            ("Console mode", self._launch_console_mode),
         ]
 
         for strategy_name, strategy_func in strategies:
@@ -528,7 +540,7 @@ class ApplicationLauncher:
         app.setOrganizationName("Property Search Solutions")
 
         # Set style
-        app.setStyle('Fusion')
+        app.setStyle("Fusion")
 
         # Set palette for better cross-platform appearance
         palette = QPalette()
@@ -571,7 +583,9 @@ class ApplicationLauncher:
             print("[GUI] Creating enhanced main window...")
             main_window = EnhancedPropertySearchApp()
 
-            return self._run_gui_application(app, main_window, "Enhanced", show_welcome=True)
+            return self._run_gui_application(
+                app, main_window, "Enhanced", show_welcome=True
+            )
 
         except Exception as e:
             self.splash_manager.close_splash()
@@ -588,6 +602,7 @@ class ApplicationLauncher:
             # Try to import a basic version or create simple one
             try:
                 from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+
                 main_window = EnhancedPropertySearchApp()
             except:
                 # Create a very basic window
@@ -616,8 +631,15 @@ class ApplicationLauncher:
 
     def _create_basic_window(self):
         """Create a basic functional window"""
-        from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout,
-                                    QLabel, QPushButton, QLineEdit, QTextEdit)
+        from PyQt5.QtWidgets import (
+            QMainWindow,
+            QWidget,
+            QVBoxLayout,
+            QLabel,
+            QPushButton,
+            QLineEdit,
+            QTextEdit,
+        )
 
         class BasicPropertySearch(QMainWindow):
             def __init__(self):
@@ -649,7 +671,9 @@ class ApplicationLauncher:
                 search_term = self.search_input.text()
                 if search_term:
                     self.results_area.append(f"Searching for: {search_term}")
-                    self.results_area.append("Note: Running in basic mode with mock data")
+                    self.results_area.append(
+                        "Note: Running in basic mode with mock data"
+                    )
                 else:
                     self.results_area.append("Please enter a search term")
 
@@ -681,7 +705,13 @@ class ApplicationLauncher:
 
     def _create_minimal_window(self):
         """Create minimal window for testing"""
-        from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton
+        from PyQt5.QtWidgets import (
+            QMainWindow,
+            QWidget,
+            QVBoxLayout,
+            QLabel,
+            QPushButton,
+        )
 
         class MinimalWindow(QMainWindow):
             def __init__(self):
@@ -693,9 +723,15 @@ class ApplicationLauncher:
                 layout = QVBoxLayout(central)
 
                 layout.addWidget(QLabel("Maricopa Property Search"))
-                layout.addWidget(QLabel("Application launched successfully in test mode"))
+                layout.addWidget(
+                    QLabel("Application launched successfully in test mode")
+                )
                 layout.addWidget(QLabel(f"Platform: {platform.system()}"))
-                layout.addWidget(QLabel(f"Qt Platform: {os.environ.get('QT_QPA_PLATFORM', 'default')}"))
+                layout.addWidget(
+                    QLabel(
+                        f"Qt Platform: {os.environ.get('QT_QPA_PLATFORM', 'default')}"
+                    )
+                )
 
                 close_btn = QPushButton("Close")
                 close_btn.clicked.connect(self.close)
@@ -705,12 +741,14 @@ class ApplicationLauncher:
 
         return MinimalWindow()
 
-    def _run_gui_application(self, app, main_window, mode_name, show_welcome=False) -> int:
+    def _run_gui_application(
+        self, app, main_window, mode_name, show_welcome=False
+    ) -> int:
         """Run the GUI application"""
         print(f"[GUI] {mode_name} window created successfully")
 
         # In offscreen mode, just test creation
-        if os.environ.get('QT_QPA_PLATFORM') == 'offscreen':
+        if os.environ.get("QT_QPA_PLATFORM") == "offscreen":
             print(f"\n[SUCCESS] {mode_name} application initialized in headless mode!")
             print("Note: Running in offscreen mode - GUI won't be visible")
             print("Application would be functional if display were available")
@@ -737,9 +775,9 @@ class ApplicationLauncher:
         except Exception as e:
             print(f"[ERROR] Failed to show {mode_name} window: {e}")
             # Even if show fails, we succeeded in creating it
-            if os.environ.get('QT_QPA_PLATFORM') != 'offscreen':
+            if os.environ.get("QT_QPA_PLATFORM") != "offscreen":
                 print("Switching to offscreen mode...")
-                os.environ['QT_QPA_PLATFORM'] = 'offscreen'
+                os.environ["QT_QPA_PLATFORM"] = "offscreen"
                 print("[SUCCESS] Application running in offscreen mode")
             self.splash_manager.close_splash()
             return 0
@@ -748,6 +786,7 @@ class ApplicationLauncher:
         """Show welcome message for enhanced mode"""
         try:
             from PyQt5.QtWidgets import QMessageBox
+
             QMessageBox.information(
                 parent,
                 "Welcome to Maricopa Property Search",
@@ -763,7 +802,7 @@ class ApplicationLauncher:
                 "• Click 'Search Properties'<br>"
                 "• View details or collect data for any result<br><br>"
                 "💡 <b>Test with:</b> '10000 W Missouri Ave'<br><br>"
-                "<i>All actions are logged for debugging purposes</i>"
+                "<i>All actions are logged for debugging purposes</i>",
             )
         except:
             print("[INFO] Welcome message could not be displayed")
@@ -774,6 +813,7 @@ class ApplicationLauncher:
         print("This would run the application in text mode")
         print("(Console mode not implemented yet)")
         return 0
+
 
 def show_application_info():
     """Show application information and instructions"""
@@ -805,6 +845,7 @@ def show_application_info():
 """
     print(info_text)
 
+
 def main():
     """Main entry point with intelligent environment handling"""
     print(HEADER)
@@ -822,7 +863,9 @@ def main():
     # Phase 2: Dependency Management
     print("\n=== PHASE 2: Dependency Check ===")
     dependency_manager = DependencyManager(platform_detector)
-    can_proceed, missing_essential, missing_other = dependency_manager.check_dependencies()
+    can_proceed, missing_essential, missing_other = (
+        dependency_manager.check_dependencies()
+    )
 
     if not can_proceed:
         print("\n[ERROR] Cannot start: Missing critical dependencies")
@@ -846,6 +889,7 @@ def main():
     print("\n=== PHASE 5: Application Launch ===")
     launcher = ApplicationLauncher(platform_detector, has_database)
     return launcher.launch()
+
 
 if __name__ == "__main__":
     try:
