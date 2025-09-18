@@ -1,8 +1,28 @@
-# Memory System Guide
+# Memory System Guide - MaricopaPropertySearch
 
 ## Overview
 
-The memory system in Claude Flow provides persistent storage capabilities for maintaining context across sessions. This guide covers the available memory commands and their usage.
+This document provides comprehensive guidance on the memory, session, and checkpoint systems configured for the MaricopaPropertySearch project. These systems ensure seamless work continuation across sessions and enable reliable project state management through Claude Flow, memory-keeper, and integrated checkpoint systems.
+
+## Active Session Details
+
+### Memory-Keeper Session
+- **Session ID**: 7af01c57-6963-4a52-9aee-789502d6c316
+- **Channel**: sparc-swarm-migration
+- **Project Directory**: /home/mattb/MaricopaPropertySearch
+- **Git Branch**: main
+- **Git Commit**: 3b985a5 (Phase 1 Complete)
+
+### SPARC Swarm Configuration
+- **Swarm ID**: swarm_1758194153002_mn7w8xv5x
+- **Topology**: Hierarchical
+- **Active Agents**: 7 specialized agents
+- **Status**: ACTIVE
+
+### Checkpoint System
+- **Latest Checkpoint**: MCA_GUI_AUDIT_CHECKPOINT_2025-09-18_0441.md
+- **Checkpoint ID**: a57dfe39 (Phase1_Complete_With_Memory_System)
+- **Location**: /home/mattb/MaricopaPropertySearch/checkpoints/
 
 ## Memory Commands
 
