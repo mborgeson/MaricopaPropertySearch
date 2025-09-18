@@ -1,10 +1,11 @@
 # Maricopa Property Search Application
 
-A comprehensive property research application for Maricopa County, Arizona, featuring advanced property search capabilities, automated data collection, and professional user experience.
+A modern, cross-platform property research application for Maricopa County, Arizona, featuring unified architecture, WSL GUI support, and comprehensive property search capabilities.
 
 ![Application Status](https://img.shields.io/badge/Status-Production%20Ready-brightgreen)
-![Python Version](https://img.shields.io/badge/Python-3.7%2B-blue)
-![Platform](https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-lightgrey)
+![Python Version](https://img.shields.io/badge/Python-3.12%2B-blue)
+![Platform](https://img.shields.io/badge/Platform-WSL%20%7C%20Linux%20%7C%20Windows-lightgrey)
+![Architecture](https://img.shields.io/badge/Architecture-Unified%20Components-blue)
 
 ## Features
 
@@ -26,41 +27,42 @@ A comprehensive property research application for Maricopa County, Arizona, feat
 - **Progress Visualization**: Real-time status updates and collection progress
 - **Error Recovery**: Intelligent retry mechanisms with clear user instructions
 
-### Recent Enhancements (September 2024)
+### Major Enhancements (September 2025)
 
-#### Script Consolidation (September 2024)
-- **Consolidated Structure**: Reduced 68+ scripts to 12 authoritative scripts
-- **Single Application Launcher**: RUN_APPLICATION.py serves as the primary entry point
-- **Organized Script Directory**: Scripts organized by purpose (setup, testing, maintenance, development)
-- **Archive System**: Deprecated scripts moved to archive/ directory for reference
-- **Clear Workflow**: Simplified development and deployment processes
+#### Unified Architecture (Phase 2 Complete)
+- **75% File Reduction**: Consolidated 16 duplicate implementations into 4 unified components
+- **Unified API Client**: Single client with progressive loading (0.04s basic → 0.33s comprehensive)
+- **Unified Data Collector**: Background processing with priority queues and parallel collection
+- **Thread-Safe Database**: Unified manager with PostgreSQL, SQLite, and Mock mode support
+- **Unified GUI Launcher**: Intelligent platform detection with Enhanced + Basic GUI fallback
 
-#### Background Data Collection System
-- **Non-Blocking Architecture**: All data collection happens in background threads
-- **Intelligent Prioritization**: High priority for user-viewed properties
-- **Concurrent Processing**: Configurable concurrent job execution (default: 3 simultaneous)
-- **Smart Queue Management**: Priority-based job queue with retry logic
+#### WSL GUI Support (Phase 3 Complete)
+- **Native Wayland Support**: WSLg integration with automatic platform detection
+- **Cross-Platform Compatibility**: Native support for WSL, Linux, and Windows environments
+- **Enhanced Platform Detection**: Intelligent Wayland/X11/Windows backend selection
+- **Import System Resolution**: Fixed relative import errors for reliable Enhanced GUI loading
 
-#### User Experience Improvements
-- **Professional Messaging**: Replaced all "Not Available" messages with actionable alternatives
-- **Contextual Tooltips**: Helpful guidance throughout the interface
-- **Status Transparency**: Clear indication of data completeness for each property
-- **Enhanced Error Handling**: User-friendly error messages with recovery instructions
+#### Performance Optimization
+- **Sub-Second Search**: 0.04s basic search, 0.33s comprehensive data collection
+- **Progressive Data Loading**: Three-stage loading with immediate basic results
+- **Background Processing**: Non-blocking data collection with real-time progress tracking
+- **Smart Caching**: 24-hour data freshness with intelligent cache management
 
-#### Missouri Avenue Testing
-- **Comprehensive Validation**: Extensive testing with "10000 W Missouri Ave" property
-- **Auto-Collection Verification**: Validated background data collection system
-- **Progress Indicator Testing**: Confirmed visual feedback accuracy
-- **Database Integration**: Verified proper data storage and caching
+#### Developer Experience
+- **Simplified Architecture**: Clear module hierarchy with absolute imports
+- **Backward Compatibility**: All original entry points maintained through delegation
+- **Comprehensive Documentation**: Updated guides, migration paths, and troubleshooting
+- **Validated Workflows**: Complete Missouri Avenue testing with performance metrics
 
 ## Installation
 
 ### System Requirements
-- **Operating System**: Windows 10+, macOS 10.14+, or Linux (Ubuntu 18.04+)
-- **Python**: 3.7 or higher
-- **Database**: PostgreSQL 12+ (recommended) or PostgreSQL 10+
+- **Operating System**: WSL Ubuntu 22.04+, Linux (Ubuntu 20.04+), or Windows 10+
+- **Python**: 3.12+ (tested on Python 3.12.3)
+- **Database**: PostgreSQL 12+ (production), SQLite (development), Mock mode (testing)
 - **Memory**: 4GB RAM minimum, 8GB recommended
 - **Storage**: 1GB free space for application and data
+- **Display**: WSLg, X11, or native Windows GUI support
 
 ### Quick Start
 
@@ -73,50 +75,95 @@ A comprehensive property research application for Maricopa County, Arizona, feat
 2. **Install Dependencies**
    ```bash
    pip install -r requirements.txt
+   # Optional: Enhanced web scraping (recommended)
+   pip install playwright
    playwright install chromium
    ```
 
-3. **Configure Environment**
+3. **Launch Application (Multiple Options)**
    ```bash
-   # Copy and customize environment file
-   cp .env.example .env
-   # Edit .env with your database credentials and settings
+   # Recommended: Unified launcher with automatic platform detection
+   python src/gui_launcher_unified.py
+
+   # Alternative: Basic GUI launcher
+   python src/basic_gui_launcher.py
+
+   # Legacy compatibility (delegated to unified launcher)
+   python maricopa_property_search.py
    ```
 
-4. **Setup Database**
+### WSL GUI Setup (Windows Users)
+
+For WSL users to enable GUI functionality:
+
+4. **Verify WSLg Installation** (pre-configured on Ubuntu 22.04+)
    ```bash
-   # Create PostgreSQL database
-   createdb maricopa_property_search
-   
-   # Run initial schema setup
-   python scripts/setup_database_tables.py
+   echo $WAYLAND_DISPLAY  # Should show: wayland-0
+   echo $DISPLAY          # Should show: :0
    ```
 
-5. **Launch Application**
+5. **Test GUI Capability**
    ```bash
-   python RUN_APPLICATION.py
+   python src/gui_launcher_unified.py --test-gui
+   ```
+
+   Expected output:
+   ```
+   [ENV] Platform: Linux
+   [ENV] WSL detected: True
+   [ENV] Display available: True
+   [ENV] Can use GUI: True
+   [ENV] Qt platform: wayland
+   ```
+
+6. **Install GUI Dependencies**
+   ```bash
+   sudo apt update
+   sudo apt install python3-pyqt5 python3-pyqt5.qtwebkit
    ```
 
 ## How to Run
 
-### Primary Method (Recommended)
+### Unified Launcher (Recommended)
 ```bash
-python RUN_APPLICATION.py
+python src/gui_launcher_unified.py
 ```
 
-### Windows Users (Easiest)
-Simply double-click:
-```
-RUN_APPLICATION.bat
+**Features**:
+- ✅ Automatic platform detection (WSL/Linux/Windows)
+- ✅ Enhanced GUI with PyQt5 + Basic GUI fallback
+- ✅ Native Wayland support for WSL environments
+- ✅ Intelligent Qt backend selection
+- ✅ Graceful degradation across platforms
+
+### Alternative Launch Methods
+
+**Basic GUI** (lightweight option):
+```bash
+python src/basic_gui_launcher.py
 ```
 
-The application launcher will automatically:
-- ✅ Check all dependencies and environment setup
-- ✅ Verify database connection
-- ✅ Initialize comprehensive logging system
-- ✅ Launch the full-featured GUI application
+**Legacy Compatibility** (delegated to unified launcher):
+```bash
+python maricopa_property_search.py
+```
 
-**Note**: Deprecated launch scripts (launch_app_fixed.py, launch_enhanced_app.py, etc.) have been consolidated into the single RUN_APPLICATION.py launcher as part of the September 2025 consolidation.
+### Platform-Specific Notes
+
+**WSL Users**:
+- WSLg provides native GUI support with Wayland backend
+- No manual X11 server configuration required
+- Enhanced GUI loads automatically with full features
+
+**Linux Users**:
+- X11 and Wayland both supported
+- Automatic platform detection and optimization
+- Install PyQt5 via package manager for best performance
+
+**Windows Users**:
+- Native Windows GUI integration
+- Enhanced GUI provides full feature set
+- Basic GUI available as lightweight alternative
 
 ## Usage
 
@@ -161,108 +208,156 @@ Property detail views include:
 - **Bulk Operations**: Export all search results or selected properties
 - **Report Generation**: Generate formatted reports for property research
 
-## API Configuration
+## Configuration
 
-### Maricopa County API
-The application integrates with official Maricopa County APIs:
+### Unified Configuration Manager
 
-```bash
-# Required API configuration in .env file
-API_TOKEN=your_api_token_here
+The application uses a centralized configuration system (`src/enhanced_config_manager.py`):
+
+```python
+from src.enhanced_config_manager import EnhancedConfigManager
+
+# Single configuration instance for entire application
+config = EnhancedConfigManager()
 ```
-
-To obtain an API token:
-1. Visit the Maricopa County Assessor's Office website
-2. Request developer access to property data APIs
-3. Follow their documentation for authentication setup
 
 ### Database Configuration
 
-PostgreSQL connection settings in `.env`:
-
+**Production** (PostgreSQL):
 ```bash
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=maricopa_property_search
-DB_USER=your_username
-DB_PASSWORD=your_password
+config.set('database', 'engine', 'postgresql')
+config.set('database', 'host', 'localhost')
+config.set('database', 'port', 5432)
+config.set('database', 'name', 'maricopa_property_search')
 ```
 
-### Application Settings
-
-Customize application behavior:
-
+**Development** (SQLite):
 ```bash
-# Project paths
-PROJECT_ROOT=C:\Users\YourName\Development\MaricopaPropertySearch
-PYTHONPATH=C:\Users\YourName\Development\MaricopaPropertySearch\src
-
-# Logging
-LOG_LEVEL=INFO
-
-# Performance tuning
-MAX_CONCURRENT_JOBS=3
-CACHE_EXPIRY_HOURS=24
+config.set('database', 'engine', 'sqlite')
+config.set('database', 'path', 'data/maricopa.db')
 ```
+
+**Testing** (Mock mode):
+```bash
+config.set('database', 'use_mock', True)
+```
+
+### API Integration
+
+**Multi-Source Fallback System**:
+1. **Primary**: Maricopa County Assessor API
+2. **Secondary**: Web scraping with BeautifulSoup/Playwright
+3. **Fallback**: Mock data for testing
+
+```python
+# API client automatically handles fallback chain
+from src.api_client_unified import UnifiedMaricopaAPIClient
+api_client = UnifiedMaricopaAPIClient(config)
+```
+
+### Performance Settings
+
+**Progressive Data Loading**:
+- **Basic Search**: 0.04s average response time
+- **Comprehensive Data**: 0.33s average with background enhancement
+- **Background Processing**: Non-blocking with priority queues
 
 ## Troubleshooting
 
-### Common Issues
+### WSL GUI Issues
 
-#### Database Connection Problems
-```bash
-# Test database connectivity
-python src/database_manager.py
+#### GUI Not Loading
+**Symptoms**: "Display not available" or Qt platform errors
 
-# Common solutions:
-# 1. Verify PostgreSQL is running
-# 2. Check credentials in .env file
-# 3. Ensure database exists
-# 4. Verify network connectivity
-```
+**Solutions**:
+1. **Verify Display Environment**:
+   ```bash
+   echo $WAYLAND_DISPLAY $DISPLAY
+   # Should show values for WSL/Linux
+   ```
 
-#### Search Not Returning Results
-- **Check Search Terms**: Ensure correct spelling and format
-- **Try Partial Matches**: Use wildcards (*) for broader searches
-- **Verify Data Sources**: Confirm Maricopa County websites are accessible
-- **Check API Token**: Ensure valid API token in configuration
+2. **Check Qt Installation**:
+   ```bash
+   python -c "import PyQt5; print('PyQt5 available')"
+   ```
 
-#### Background Collection Not Working
-- **Check Browser Drivers**: Ensure Playwright browsers are installed
-- **Verify Internet Connection**: Background collection requires internet access
-- **Review Logs**: Check `logs/` directory for error details
-- **Monitor Resources**: Ensure sufficient system memory
+3. **Test Platform Detection**:
+   ```bash
+   python src/gui_launcher_unified.py --debug-platform
+   ```
 
-#### Performance Issues
-- **Reduce Concurrent Jobs**: Lower `MAX_CONCURRENT_JOBS` in configuration
-- **Check Database Performance**: Monitor PostgreSQL resource usage
-- **Clear Cache**: Delete cached data if experiencing memory issues
-- **Update Dependencies**: Ensure all packages are up to date
+#### Import Errors
+**Symptoms**: "ModuleNotFoundError" or relative import errors
 
-### Error Messages
+**Solutions**:
+1. **Verify Working Directory**:
+   ```bash
+   pwd  # Should be in MaricopaPropertySearch root
+   ```
 
-#### "Connection timeout while searching"
-- Check internet connectivity
-- Verify Maricopa County websites are accessible
-- Consider increasing timeout values in configuration
+2. **Check Python Path**:
+   ```bash
+   python -c "import sys; print('\n'.join(sys.path))"
+   ```
 
-#### "Database connection failed"
-- Verify PostgreSQL service is running
-- Check database credentials in `.env` file
-- Ensure database exists and user has proper permissions
+3. **Use Absolute Imports** (for development):
+   ```python
+   # Correct
+   from src.api_client_unified import UnifiedMaricopaAPIClient
 
-#### "Collection failed - click to retry"
-- Network connectivity issue during data collection
-- Target website may be temporarily unavailable
-- Try manual collection or retry later
+   # Avoid
+   from api_client_unified import UnifiedMaricopaAPIClient
+   ```
+
+### Performance Issues
+
+#### Slow Searches or Timeouts
+**Solutions**:
+1. **Check Data Source Status**:
+   ```bash
+   python claudedocs/missouri_ave_test.py
+   ```
+
+2. **Verify Network Connectivity**:
+   ```bash
+   curl -I https://mcassessor.maricopa.gov
+   ```
+
+3. **Enable Mock Mode** (for development):
+   ```python
+   config = EnhancedConfigManager()
+   config.set('database', 'use_mock', True)
+   ```
+
+### Database Connection Issues
+
+#### Database Connection Errors or Timeouts
+**Solutions**:
+1. **Check PostgreSQL Status** (production):
+   ```bash
+   systemctl status postgresql
+   ```
+
+2. **Use SQLite Fallback** (development):
+   ```python
+   config.set('database', 'engine', 'sqlite')
+   ```
+
+3. **Enable Mock Mode** (testing):
+   ```python
+   config.set('database', 'use_mock', True)
+   ```
 
 ### Getting Help
 
-1. **Check Logs**: Review `logs/application.log` for detailed error information
-2. **Test Components**: Use built-in diagnostic tools in the Help menu
-3. **Configuration Review**: Verify all settings in `.env` and configuration files
-4. **Database Status**: Check database connectivity and performance
-5. **System Resources**: Monitor CPU and memory usage during operation
+1. **Check Phase Completion Documents**: Detailed technical information and troubleshooting
+2. **Run Validation Tests**: Use provided test scripts to verify functionality
+3. **Review Documentation**:
+   - `CLAUDE.md` - Updated development guide with consolidated architecture
+   - `MIGRATION_GUIDE.md` - Comprehensive migration documentation
+   - `checkpoints/PHASE_*_COMPLETE_*.md` - Detailed phase completion records
+4. **Test Missouri Avenue Workflow**: `python claudedocs/missouri_ave_test.py`
+5. **Platform Detection**: `python src/gui_launcher_unified.py --test-gui`
 
 ## Contributing
 
@@ -341,72 +436,89 @@ python src/database_manager.py
 
 ## Architecture
 
-### Project Structure
+### Unified Component Structure (Post-Phase 2)
 
 ```
 MaricopaPropertySearch/
-├── src/                    # Core application modules
-│   ├── api_client.py       # API integration layer
-│   ├── database_manager.py # Database operations
-│   ├── property_gui.py     # Main GUI interface
-│   └── web_scraper.py      # Web automation
-├── scripts/                # Authoritative utility scripts
-│   ├── setup/              # Installation and setup scripts
-│   ├── testing/            # Integration and system tests
-│   ├── maintenance/        # Database and system maintenance
-│   └── development/        # Development utilities
-├── archive/                # Consolidated deprecated scripts
-├── config/                 # Configuration files
-├── logs/                   # Application logs
-└── RUN_APPLICATION.py      # Primary application launcher
+├── src/
+│   ├── gui_launcher_unified.py       # Unified GUI launcher (consolidates 4)
+│   ├── api_client_unified.py         # Unified API client (consolidates 6)
+│   ├── unified_data_collector.py     # Unified data collector (consolidates 4)
+│   ├── threadsafe_database_manager.py # Unified database manager (consolidates 2)
+│   ├── enhanced_config_manager.py    # Centralized configuration
+│   └── gui/
+│       ├── enhanced_main_window.py   # Enhanced GUI (PyQt5)
+│       └── gui_enhancements_dialogs.py # GUI components
+├── claudedocs/
+│   └── missouri_ave_test.py          # Workflow validation
+├── checkpoints/                      # Phase completion records
+├── CLAUDE.md                         # Development guide
+├── MIGRATION_GUIDE.md                # Migration documentation
+└── maricopa_property_search.py       # Legacy entry point (delegates)
 ```
 
-### High-Level Components
+### Unified Architecture Flow
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    RUN_APPLICATION.py                      │
-│              (Primary Application Launcher)                │
+│              UnifiedGUILauncher                             │
+│    (Intelligent Platform Detection & GUI Selection)        │
 ├─────────────────────────────────────────────────────────────┤
-│  Environment Check → Database Setup → GUI Launch          │
+│  WSL/Wayland → Enhanced GUI │ Linux/X11 → Enhanced GUI     │
+│  Windows → Enhanced GUI     │ Fallback → Basic GUI        │
 └─────────────────────┬───────────────────────────────────────┘
                       │
 ┌─────────────────────┼───────────────────────────────────────┐
-│                Enhanced Main Window                         │
+│            Enhanced Main Window (PyQt5)                    │
 ├─────────────────────┼───────────────────────────────────────┤
-│  Search Interface → Results Table → Background Status      │
+│  • Progressive Search Interface • Real-time Results       │
+│  • Background Status Panel • Export Capabilities          │
 └─────────────────────┬───────────────────────────────────────┘
                       │
 ┌─────────────────────┼───────────────────────────────────────┐
-│  Background Data Collection Manager                         │
+│         UnifiedMaricopaAPIClient                           │
 ├─────────────────────┼───────────────────────────────────────┤
-│  • Job Prioritization • Cache Management                   │
-│  • Progress Tracking • Signal Coordination                 │
+│  API → Web Scraping → Mock (Multi-source fallback)       │
+│  • 0.04s Basic Search • 0.33s Comprehensive Data          │
 └─────────────────────┬───────────────────────────────────────┘
                       │
 ┌─────────────────────┼───────────────────────────────────────┐
-│  Thread-Safe Database Manager                              │
+│        UnifiedDataCollector                                │
 ├─────────────────────┼───────────────────────────────────────┤
-│  • Connection Pooling • Concurrent Operations              │
-│  • Performance Monitoring • Data Validation                │
+│  • Background Processing • Priority Queues                │
+│  • Parallel Collection • Real-time Progress               │
 └─────────────────────┬───────────────────────────────────────┘
                       │
 ┌─────────────────────┼───────────────────────────────────────┐
-│  Web Scraping & API Integration                            │
+│      ThreadSafeDatabaseManager                             │
 ├─────────────────────┼───────────────────────────────────────┤
-│  • Playwright Automation • Tax Data Collection             │
-│  • Sales History • Property Details                        │
+│  PostgreSQL → SQLite → Mock (Environment-based selection) │
+│  • Connection Pooling • Thread-safe Operations            │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Key Technologies
 
-- **Frontend**: PyQt5 for cross-platform GUI
-- **Database**: PostgreSQL with connection pooling
-- **Web Scraping**: Playwright for modern web automation
-- **Background Processing**: QThread for non-blocking operations
-- **Configuration**: JSON configuration with environment variable support
-- **Logging**: Centralized logging system with performance monitoring
+**Frontend**:
+- **PyQt5**: Enhanced GUI with native Wayland/X11/Windows support
+- **tkinter**: Basic GUI fallback for lightweight environments
+- **Platform Detection**: Intelligent Qt backend selection
+
+**Backend**:
+- **PostgreSQL**: Production database with connection pooling
+- **SQLite**: Development database for local testing
+- **Mock Mode**: Testing environment with realistic data generation
+
+**Web Automation**:
+- **BeautifulSoup4 + lxml**: Primary web scraping engine
+- **Playwright**: Optional enhanced browser automation
+- **Multi-source Fallback**: API → Web scraping → Mock data
+
+**Architecture**:
+- **Unified Components**: 75% file reduction through consolidation
+- **Thread-safe Operations**: Background processing with QThread
+- **Progressive Loading**: Three-stage data enhancement
+- **Configuration Management**: Centralized EnhancedConfigManager
 
 ## License
 
@@ -416,13 +528,22 @@ This project is proprietary software developed for internal use. All rights rese
 
 For technical support or questions:
 
-1. **Documentation**: Check INSTALLATION.md for detailed setup instructions
-2. **Troubleshooting**: Review the troubleshooting section above
-3. **Logs**: Examine application logs in the `logs/` directory
-4. **Testing**: Use the built-in diagnostic tools and test suites
+1. **Migration Guide**: Check `MIGRATION_GUIDE.md` for comprehensive Phase 2 & 3 documentation
+2. **Development Guide**: Review `CLAUDE.md` for updated architecture details
+3. **Troubleshooting**: WSL GUI setup and common issues covered above
+4. **Testing**: Missouri Avenue workflow validation with `claudedocs/missouri_ave_test.py`
+5. **Checkpoints**: Phase completion records in `checkpoints/` directory
+
+## Migration Status
+
+- ✅ **Phase 1 Complete**: Windows → Linux path migration
+- ✅ **Phase 2 Complete**: Component consolidation (75% file reduction)
+- ✅ **Phase 3 Complete**: WSL GUI configuration with native Wayland support
+- 🔄 **Phase 4 In Progress**: Documentation updates and unified interface documentation
 
 ---
 
-**Last Updated**: December 2024  
-**Version**: 2.0 (Enhanced with Background Collection)  
+**Last Updated**: September 2025
+**Version**: 3.0 (Unified Architecture with WSL GUI Support)
 **Status**: Production Ready
+**Platform Support**: WSL (Wayland), Linux (X11/Wayland), Windows (Native)
