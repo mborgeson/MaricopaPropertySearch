@@ -1,0 +1,193 @@
+# Pre-commit hooks configuration for MaricopaPropertySearch
+# Ensures code quality and consistency before commits
+
+repos:
+  # ============================================================================
+  # General Code Quality
+  # ============================================================================
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: trailing-whitespace
+        description: Remove trailing whitespace
+      - id: end-of-file-fixer
+        description: Ensure files end with newline
+      - id: check-yaml
+        description: Validate YAML syntax
+      - id: check-json
+        description: Validate JSON syntax
+      - id: check-toml
+        description: Validate TOML syntax
+      - id: check-merge-conflict
+        description: Check for merge conflict markers
+      - id: check-added-large-files
+        description: Prevent large files from being committed
+        args: ['--maxkb=1000']
+      - id: check-case-conflict
+        description: Check for case conflicts in file names
+      - id: mixed-line-ending
+        description: Check for mixed line endings
+
+  # ============================================================================
+  # Python Code Formatting
+  # ============================================================================
+  - repo: https://github.com/psf/black
+    rev: 23.9.1
+    hooks:
+      - id: black
+        name: Format code with Black
+        description: Auto-format Python code
+        language_version: python3.12
+        args: [--line-length=88]
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        name: Sort imports with isort
+        description: Sort and organize imports
+        args: [--profile=black, --line-length=88]
+
+  # ============================================================================
+  # Python Code Quality
+  # ============================================================================
+  - repo: https://github.com/pycqa/flake8
+    rev: 6.0.0
+    hooks:
+      - id: flake8
+        name: Lint with Flake8
+        description: Check code style and quality
+        args: [--max-line-length=88, --extend-ignore=E203,W503]
+        additional_dependencies:
+          - flake8-docstrings
+          - flake8-import-order
+          - flake8-bugbear
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.5.1
+    hooks:
+      - id: mypy
+        name: Type checking with MyPy
+        description: Static type checking
+        args: [--ignore-missing-imports, --python-version=3.12]
+        additional_dependencies:
+          - types-requests
+          - types-PyQt5
+
+  - repo: https://github.com/pycqa/pylint
+    rev: v3.0.0a7
+    hooks:
+      - id: pylint
+        name: Lint with Pylint
+        description: Comprehensive code analysis
+        args: [--disable=C0114,C0115,C0116, --fail-under=8.0]
+        additional_dependencies:
+          - PyQt5
+          - requests
+          - psycopg2-binary
+
+  # ============================================================================
+  # Security Scanning
+  # ============================================================================
+  - repo: https://github.com/PyCQA/bandit
+    rev: 1.7.5
+    hooks:
+      - id: bandit
+        name: Security scan with Bandit
+        description: Scan for security vulnerabilities
+        args: [-r, src/, --skip=B101]
+        exclude: ^tests/
+
+  # ============================================================================
+  # Dependency Management
+  # ============================================================================
+  - repo: https://github.com/lucas-c/pre-commit-hooks-safety
+    rev: v1.3.2
+    hooks:
+      - id: python-safety-dependencies-check
+        name: Check dependencies for security vulnerabilities
+        description: Scan dependencies for known vulnerabilities
+
+  # ============================================================================
+  # Documentation
+  # ============================================================================
+  - repo: https://github.com/pycqa/pydocstyle
+    rev: 6.3.0
+    hooks:
+      - id: pydocstyle
+        name: Check docstring style
+        description: Validate docstring formatting
+        args: [--convention=google, --add-ignore=D100,D101,D102,D103,D104,D105]
+        exclude: ^(tests/|setup.py)
+
+  # ============================================================================
+  # Git Commit Message Validation
+  # ============================================================================
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.9.0
+    hooks:
+      - id: commitizen
+        name: Validate commit message format
+        description: Ensure consistent commit message format
+        stages: [commit-msg]
+
+  # ============================================================================
+  # Custom Project-Specific Hooks
+  # ============================================================================
+  - repo: local
+    hooks:
+      - id: test-coverage
+        name: Ensure test coverage
+        description: Run quick test coverage check
+        entry: python -m pytest tests/unit/ --cov=src --cov-fail-under=80 --quiet
+        language: system
+        pass_filenames: false
+        stages: [push]
+
+      - id: validate-requirements
+        name: Validate requirements.txt
+        description: Ensure requirements.txt is properly formatted
+        entry: python -c "import pkg_resources; [pkg_resources.Requirement.parse(line) for line in open('requirements.txt') if line.strip() and not line.startswith('#')]"
+        language: system
+        files: requirements\.txt$
+
+      - id: check-api-token-exposure
+        name: Check for API token exposure
+        description: Prevent accidental API token commits
+        entry: python scripts/check_secrets.py
+        language: system
+        files: \.(py|yml|yaml|json|env)$
+
+      - id: validate-test-structure
+        name: Validate test structure
+        description: Ensure test files follow naming conventions
+        entry: python scripts/validate_test_structure.py
+        language: system
+        files: ^tests/.*\.py$
+
+# ============================================================================
+# Configuration
+# ============================================================================
+default_stages: [commit]
+fail_fast: false
+minimum_pre_commit_version: "3.0.0"
+
+# Configuration for specific tools
+ci:
+  autofix_prs: true
+  autoupdate_schedule: weekly
+  skip: [pylint, mypy]  # Skip slow hooks in CI
+
+# Custom configuration
+exclude: |
+  (?x)^(
+      \.git/|
+      \.tox/|
+      \.pytest_cache/|
+      __pycache__/|
+      \.coverage|
+      htmlcov/|
+      build/|
+      dist/|
+      \.egg-info/
+  )$

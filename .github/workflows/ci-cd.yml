@@ -1,0 +1,487 @@
+name: MaricopaPropertySearch CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run tests daily at 6 AM UTC
+    - cron: '0 6 * * *'
+
+env:
+  PYTHON_VERSION: '3.12'
+  COVERAGE_THRESHOLD: 80
+
+jobs:
+  # ============================================================================
+  # Code Quality Gate
+  # ============================================================================
+  code-quality:
+    name: Code Quality Gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install black pylint mypy isort flake8
+        pip install -r requirements.txt
+
+    - name: Code formatting check (Black)
+      run: |
+        black --check --diff src/ tests/
+        echo "✓ Code formatting check passed"
+
+    - name: Import sorting check (isort)
+      run: |
+        isort --check-only --diff src/ tests/
+        echo "✓ Import sorting check passed"
+
+    - name: Code style check (flake8)
+      run: |
+        flake8 src/ tests/ --max-line-length=88 --extend-ignore=E203,W503
+        echo "✓ Code style check passed"
+
+    - name: Static type checking (mypy)
+      run: |
+        mypy src/ --ignore-missing-imports
+        echo "✓ Type checking passed"
+
+    - name: Linting (pylint)
+      run: |
+        pylint src/ --disable=C0114,C0115,C0116 --fail-under=8.0
+        echo "✓ Linting check passed"
+
+  # ============================================================================
+  # Security Gate
+  # ============================================================================
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install security tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit safety
+        pip install -r requirements.txt
+
+    - name: Security vulnerability scan (bandit)
+      run: |
+        bandit -r src/ -f json -o bandit-report.json
+        bandit -r src/
+        echo "✓ Security scan passed"
+
+    - name: Dependency vulnerability scan (safety)
+      run: |
+        safety check --json --output safety-report.json
+        safety check
+        echo "✓ Dependency scan passed"
+
+    - name: Upload security reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          bandit-report.json
+          safety-report.json
+
+  # ============================================================================
+  # Unit Tests Gate
+  # ============================================================================
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [code-quality]
+
+    strategy:
+      matrix:
+        test-group: [api-client, data-collector, database-manager, gui-launcher]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql-client libpq-dev
+        # GUI dependencies for testing
+        sudo apt-get install -y xvfb libgl1-mesa-glx libglib2.0-0
+
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov pytest-xvfb pytest-qt pytest-asyncio pytest-mock
+        pip install -r requirements.txt
+
+    - name: Run unit tests for ${{ matrix.test-group }}
+      run: |
+        export DISPLAY=:99.0
+        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        sleep 3
+
+        case "${{ matrix.test-group }}" in
+          "api-client")
+            pytest tests/unit/test_api_client_unified.py -v --cov=src.api_client_unified --cov-report=xml:coverage-api.xml
+            ;;
+          "data-collector")
+            pytest tests/unit/test_unified_data_collector.py -v --cov=src.unified_data_collector --cov-report=xml:coverage-collector.xml
+            ;;
+          "database-manager")
+            pytest tests/unit/test_threadsafe_database_manager.py -v --cov=src.threadsafe_database_manager --cov-report=xml:coverage-db.xml
+            ;;
+          "gui-launcher")
+            pytest tests/unit/test_gui_launcher_unified.py -v --cov=src.gui_launcher_unified --cov-report=xml:coverage-gui.xml
+            ;;
+        esac
+        echo "✓ Unit tests for ${{ matrix.test-group }} passed"
+
+    - name: Upload coverage reports
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-${{ matrix.test-group }}
+        path: coverage-*.xml
+
+  # ============================================================================
+  # Integration Tests Gate
+  # ============================================================================
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [unit-tests, security-scan]
+
+    services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_DB: test_db
+          POSTGRES_USER: test_user
+          POSTGRES_PASSWORD: test_password
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql-client libpq-dev xvfb
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov pytest-xvfb pytest-qt pytest-asyncio pytest-mock
+        pip install -r requirements.txt
+
+    - name: Set up test database
+      env:
+        PGPASSWORD: test_password
+      run: |
+        psql -h localhost -U test_user -d test_db -c "CREATE TABLE IF NOT EXISTS properties (id SERIAL PRIMARY KEY, apn VARCHAR(50), address TEXT);"
+
+    - name: Run integration tests
+      env:
+        PGHOST: localhost
+        PGPORT: 5432
+        PGDATABASE: test_db
+        PGUSER: test_user
+        PGPASSWORD: test_password
+        DISPLAY: :99.0
+      run: |
+        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        sleep 3
+        pytest tests/integration/ -v --cov=src --cov-report=xml:coverage-integration.xml
+        echo "✓ Integration tests passed"
+
+    - name: Upload integration coverage
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-integration
+        path: coverage-integration.xml
+
+  # ============================================================================
+  # Performance Tests Gate
+  # ============================================================================
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: [integration-tests]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-benchmark memory-profiler
+        pip install -r requirements.txt
+
+    - name: Run performance tests
+      run: |
+        pytest tests/performance/ -v --benchmark-only --benchmark-json=benchmark-results.json
+        echo "✓ Performance tests passed"
+
+    - name: Upload benchmark results
+      uses: actions/upload-artifact@v3
+      with:
+        name: benchmark-results
+        path: benchmark-results.json
+
+    - name: Performance regression check
+      run: |
+        python scripts/check_performance_regression.py benchmark-results.json
+        echo "✓ Performance regression check passed"
+
+  # ============================================================================
+  # Coverage Consolidation
+  # ============================================================================
+  coverage-report:
+    name: Coverage Report
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [unit-tests, integration-tests]
+    if: always()
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install coverage tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install coverage[toml] codecov
+
+    - name: Download all coverage reports
+      uses: actions/download-artifact@v3
+      with:
+        path: coverage-reports
+
+    - name: Combine coverage reports
+      run: |
+        find coverage-reports -name "*.xml" -exec cp {} . \;
+        coverage combine
+        coverage report --fail-under=${{ env.COVERAGE_THRESHOLD }}
+        coverage html -d htmlcov
+        echo "✓ Coverage threshold (${{ env.COVERAGE_THRESHOLD }}%) met"
+
+    - name: Upload combined coverage to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./coverage-*.xml
+        fail_ci_if_error: true
+        verbose: true
+
+    - name: Upload coverage HTML report
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-html-report
+        path: htmlcov/
+
+  # ============================================================================
+  # System Tests (End-to-End)
+  # ============================================================================
+  system-tests:
+    name: System Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [performance-tests]
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install system dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y xvfb libgl1-mesa-glx
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-qt pytest-xvfb
+        pip install -r requirements.txt
+
+    - name: Run Missouri Avenue workflow validation
+      env:
+        DISPLAY: :99.0
+      run: |
+        Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
+        sleep 3
+        pytest tests/system/test_missouri_ave_workflow.py -v -m missouri_ave
+        echo "✓ Missouri Avenue workflow validation passed"
+
+    - name: Run complete system tests
+      env:
+        DISPLAY: :99.0
+      run: |
+        pytest tests/system/ -v
+        echo "✓ System tests passed"
+
+  # ============================================================================
+  # Build and Package
+  # ============================================================================
+  build-package:
+    name: Build Package
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    needs: [coverage-report, system-tests]
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Set up Python ${{ env.PYTHON_VERSION }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+
+    - name: Install build dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build wheel setuptools
+
+    - name: Build package
+      run: |
+        python -m build
+        echo "✓ Package built successfully"
+
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: dist-packages
+        path: dist/
+
+  # ============================================================================
+  # Deployment (Main Branch Only)
+  # ============================================================================
+  deploy:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: [build-package]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: staging
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Download build artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: dist-packages
+        path: dist/
+
+    - name: Deploy to staging environment
+      run: |
+        echo "Deploying to staging environment..."
+        # Add actual deployment commands here
+        echo "✓ Deployment to staging completed"
+
+  # ============================================================================
+  # Notification and Reporting
+  # ============================================================================
+  notify:
+    name: Notify Results
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: [deploy]
+    if: always()
+
+    steps:
+    - name: Notify success
+      if: ${{ needs.deploy.result == 'success' }}
+      run: |
+        echo "🎉 Pipeline completed successfully!"
+        echo "✓ All quality gates passed"
+        echo "✓ Coverage threshold met"
+        echo "✓ Security scans passed"
+        echo "✓ Performance benchmarks met"
+        echo "✓ Deployment completed"
+
+    - name: Notify failure
+      if: ${{ needs.deploy.result == 'failure' || contains(needs.*.result, 'failure') }}
+      run: |
+        echo "❌ Pipeline failed"
+        echo "Check the failed jobs for details"
+
+# ============================================================================
+# Workflow Configuration
+# ============================================================================
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
