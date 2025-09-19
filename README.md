@@ -7,6 +7,47 @@ A modern, cross-platform property research application for Maricopa County, Ariz
 ![Platform](https://img.shields.io/badge/Platform-WSL%20%7C%20Linux%20%7C%20Windows-lightgrey)
 ![Architecture](https://img.shields.io/badge/Architecture-Unified%20Components-blue)
 
+## 🚨 **IMPORTANT: GitHub CI/CD Requirements**
+
+**Before pushing any code to GitHub, ALL changes must pass automated quality gates.**
+
+This repository uses strict code formatting and quality enforcement through GitHub Actions. **Your push will FAIL if code is not properly formatted.**
+
+### Quick Setup for Contributors
+
+```bash
+# 1. Create virtual environment
+python3 -m venv venv
+source venv/bin/activate
+
+# 2. Install formatting tools
+pip install black isort flake8 pylint mypy bandit
+
+# 3. Format code before commit (REQUIRED)
+python -m black src/
+python -m isort src/
+
+# 4. Install pre-commit hooks (RECOMMENDED)
+pip install pre-commit
+pre-commit install
+```
+
+### Most Common Error: Black Formatting
+**Error**: `"Code Formatting Check: Black" with exit code 123`
+
+**Fix**:
+```bash
+source venv/bin/activate
+python -m black src/
+git add .
+git commit -m "Fix Black formatting"
+git push
+```
+
+📋 **For complete setup instructions, quality standards, and troubleshooting**, see **[CONTRIBUTING.md](CONTRIBUTING.md)**
+
+---
+
 ## Features
 
 ### Core Search Capabilities
@@ -361,78 +402,58 @@ api_client = UnifiedMaricopaAPIClient(config)
 
 ## Contributing
 
-### Development Setup
+⚠️ **CRITICAL**: Before contributing, read **[CONTRIBUTING.md](CONTRIBUTING.md)** for complete GitHub CI/CD requirements and quality standards.
 
-1. **Fork the Repository**
+### Quick Start for Contributors
+
+**⚡ Fast Track Setup**:
+```bash
+# 1. Setup environment
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+pip install black isort flake8 pylint mypy bandit pre-commit
+
+# 2. Install pre-commit hooks (prevents CI failures)
+pre-commit install
+
+# 3. Before EVERY commit (REQUIRED)
+python -m black src/
+python -m isort src/
+```
+
+### Development Workflow
+
+1. **Fork and Setup**
    ```bash
    git fork <repository-url>
    cd MaricopaPropertySearch
    ```
 
-2. **Create Development Environment**
-   ```bash
-   # Create virtual environment
-   python -m venv venv
-   
-   # Activate environment
-   # Windows:
-   venv\Scripts\activate
-   # macOS/Linux:
-   source venv/bin/activate
-   
-   # Install development dependencies
-   pip install -r requirements.txt
-   pip install pytest pytest-qt mypy black
-   ```
+2. **Follow Quality Standards** (See [CONTRIBUTING.md](CONTRIBUTING.md))
+   - ✅ **Black formatting**: 100% compliance (enforced by CI/CD)
+   - ✅ **Type hints**: Required for all public functions
+   - ✅ **Test coverage**: 80%+ minimum
+   - ✅ **Security scanning**: Zero high-severity issues
 
-3. **Run Tests**
-   ```bash
-   # Run all tests
-   pytest
-   
-   # Run specific test suites
-   pytest tests/test_missouri_avenue_address.py
-   
-   # Run with coverage
-   pytest --cov=src
-   ```
+3. **Submit Changes**
+   - Format code with Black (REQUIRED)
+   - Run tests and quality checks
+   - Create pull request
 
-### Code Standards
+### GitHub Actions Pipeline
 
-- **Python Style**: Follow PEP 8 guidelines
-- **Type Hints**: Use type hints for all functions and methods
-- **Documentation**: Document all public APIs with docstrings
-- **Testing**: Write tests for new functionality
-- **Logging**: Use the centralized logging system for all output
+Every push triggers a **9-stage quality pipeline**:
+1. **Code Formatting Check (Black)** ⚠️ **WILL FAIL IF NOT FORMATTED**
+2. Import Organization (isort)
+3. Code Linting (Flake8, Pylint)
+4. Type Checking (mypy)
+5. Security Scanning (Bandit, Safety)
+6. Unit Tests (80%+ coverage required)
+7. Integration Tests
+8. Performance Benchmarks
+9. System Workflow Validation
 
-### Submitting Changes
-
-1. **Create Feature Branch**
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-2. **Make Changes**
-   - Follow existing code patterns
-   - Add comprehensive tests
-   - Update documentation as needed
-
-3. **Test Thoroughly**
-   ```bash
-   # Run test suite
-   pytest
-   
-   # Run type checking
-   mypy src/
-   
-   # Format code
-   black src/
-   ```
-
-4. **Submit Pull Request**
-   - Provide clear description of changes
-   - Include test results and screenshots if applicable
-   - Reference any related issues
+**📋 For complete details, troubleshooting, and quality standards**: **[CONTRIBUTING.md](CONTRIBUTING.md)**
 
 ## Architecture
 
