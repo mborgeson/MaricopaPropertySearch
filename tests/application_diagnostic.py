@@ -15,6 +15,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
 
+
 class ApplicationDiagnostic:
     def __init__(self):
         self.issues = []
@@ -31,12 +32,15 @@ class ApplicationDiagnostic:
             self.successes.append("ConfigManager imports successfully")
 
             from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
             self.successes.append("ThreadSafeDatabaseManager imports successfully")
 
             from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+
             self.successes.append("EnhancedPropertySearchApp imports successfully")
 
             from src.logging_config import setup_logging
+
             self.successes.append("Logging setup imports successfully")
 
         except ImportError as e:
@@ -67,7 +71,9 @@ class ApplicationDiagnostic:
                 # Check for example file
                 example_path = project_root / f"{file_path}.example"
                 if example_path.exists():
-                    self.warnings.append(f"  -> Example found: {file_path}.example (copy this to {file_path})")
+                    self.warnings.append(
+                        f"  -> Example found: {file_path}.example (copy this to {file_path})"
+                    )
 
     def check_directories(self):
         """Check if required directories exist"""
@@ -104,7 +110,7 @@ class ApplicationDiagnostic:
             config = EnhancedConfigManager()
 
             # Check database settings
-            if hasattr(config, 'get_database_enabled'):
+            if hasattr(config, "get_database_enabled"):
                 db_enabled = config.get_database_enabled()
                 self.successes.append(f"Database enabled: {db_enabled}")
 
@@ -128,6 +134,7 @@ class ApplicationDiagnostic:
 
         try:
             from PyQt5.QtWidgets import QApplication
+
             self.successes.append("PyQt5 available")
 
             # Check if we can create QApplication
@@ -154,7 +161,7 @@ class ApplicationDiagnostic:
         # Try a dry run (just imports and checks, no GUI)
         try:
             # Create a test script that imports and checks
-            test_code = '''
+            test_code = """
 import sys
 sys.path.insert(0, r"{root}")
 sys.path.insert(0, r"{src}")
@@ -171,13 +178,15 @@ print("Config loaded")
 
 # Don't actually create GUI or database
 print("Import test successful")
-'''.format(root=project_root, src=project_root / "src")
+""".format(
+                root=project_root, src=project_root / "src"
+            )
 
             result = subprocess.run(
                 [sys.executable, "-c", test_code],
                 capture_output=True,
                 text=True,
-                timeout=5
+                timeout=5,
             )
 
             if result.returncode == 0:
@@ -192,9 +201,9 @@ print("Import test successful")
 
     def generate_report(self):
         """Generate diagnostic report"""
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         print(" DIAGNOSTIC REPORT FOR RUN_APPLICATION.py")
-        print("="*70)
+        print("=" * 70)
 
         if self.issues:
             print(f"\n[CRITICAL] ISSUES ({len(self.issues)}):")
@@ -213,14 +222,14 @@ print("Import test successful")
             if len(self.successes) > 5:
                 print(f"  ... and {len(self.successes)-5} more")
 
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
 
         if not self.issues:
             print(" [OK] NO CRITICAL ISSUES FOUND")
         else:
             print(f" [WARNING] {len(self.issues)} CRITICAL ISSUES NEED ATTENTION")
 
-        print("="*70)
+        print("=" * 70)
 
         # Generate fix suggestions
         if self.issues:
@@ -256,13 +265,14 @@ print("Import test successful")
 
         return len(self.issues) == 0
 
+
 def main():
     diagnostic = ApplicationDiagnostic()
     success = diagnostic.run_diagnostic()
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print(" NEXT STEPS:")
-    print("="*70)
+    print("=" * 70)
 
     if success:
         print("\n1. Run the application:")
@@ -274,6 +284,7 @@ def main():
         print("   npx claude-flow hive-mind wizard")
 
     return 0 if success else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

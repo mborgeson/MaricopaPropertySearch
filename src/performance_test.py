@@ -385,9 +385,6 @@ def main():
         # Save results to file
         import json
         from datetime import datetime
-from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
-from src.enhanced_config_manager import EnhancedConfigManager
         
         results_file = Path(__file__).parent / f"performance_test_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         with open(results_file, 'w') as f:

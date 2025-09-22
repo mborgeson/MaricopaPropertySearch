@@ -12,6 +12,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
 
+
 def fix_1_clear_apn_cache():
     """Fix the clear_apn_cache AttributeError"""
     print("\n[FIX 1] Adding clear_apn_cache method")
@@ -144,14 +145,14 @@ class DataCollectionCache:
             print("Adding clear_apn_cache method to existing file...")
 
             # Find the class and add the method
-            lines = content.split('\n')
+            lines = content.split("\n")
             class_found = False
             insert_index = -1
 
             for i, line in enumerate(lines):
                 if "class DataCollectionCache" in line:
                     class_found = True
-                elif class_found and line.strip() and not line.startswith(' '):
+                elif class_found and line.strip() and not line.startswith(" "):
                     # End of class, insert before this
                     insert_index = i
                     break
@@ -183,13 +184,14 @@ class DataCollectionCache:
 '''
 
             lines.insert(insert_index, method)
-            cache_file.write_text('\n'.join(lines))
+            cache_file.write_text("\n".join(lines))
             print("[OK] Added clear_apn_cache method to DataCollectionCache")
             return True
 
         else:
             print("[INFO] clear_apn_cache method already exists")
             return True
+
 
 def fix_2_show_message():
     """Fix the show_message AttributeError"""
@@ -199,24 +201,23 @@ def fix_2_show_message():
     window_file = project_root / "src" / "gui" / "enhanced_main_window.py"
 
     if window_file.exists():
-        with open(window_file, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(window_file, "r", encoding="utf-8", errors="ignore") as f:
             content = f.read()
 
         # Replace show_message with update_status
         original = content
         content = content.replace(
             'self.status_widget.show_message("Automatically collecting comprehensive property data...", "info")',
-            'self.status_widget.update_status("Automatically collecting comprehensive property data...")'
+            'self.status_widget.update_status("Automatically collecting comprehensive property data...")',
         )
 
         # Fix any other show_message calls
         content = content.replace(
-            'self.status_widget.show_message(',
-            'self.status_widget.update_status('
+            "self.status_widget.show_message(", "self.status_widget.update_status("
         )
 
         if content != original:
-            with open(window_file, 'w', encoding='utf-8') as f:
+            with open(window_file, "w", encoding="utf-8") as f:
                 f.write(content)
             print("[OK] Fixed show_message calls to use update_status")
             return True
@@ -226,6 +227,7 @@ def fix_2_show_message():
 
     return False
 
+
 def fix_3_test_sources():
     """Fix the Test All Sources functionality"""
     print("\n[FIX 3] Fixing Test All Sources")
@@ -234,7 +236,7 @@ def fix_3_test_sources():
     window_file = project_root / "src" / "gui" / "enhanced_main_window.py"
 
     if window_file.exists():
-        with open(window_file, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(window_file, "r", encoding="utf-8", errors="ignore") as f:
             lines = f.readlines()
 
         # Find test_all_sources method
@@ -247,7 +249,7 @@ def fix_3_test_sources():
                 # Find end of method
                 indent = len(line) - len(line.lstrip())
                 for j in range(i + 1, len(lines)):
-                    if lines[j].strip() and not lines[j].startswith(' ' * (indent + 1)):
+                    if lines[j].strip() and not lines[j].startswith(" " * (indent + 1)):
                         method_end = j
                         break
                 break
@@ -311,13 +313,14 @@ def fix_3_test_sources():
                 # Insert after method declaration
                 lines.insert(method_start + 1, new_method)
 
-            with open(window_file, 'w', encoding='utf-8') as f:
+            with open(window_file, "w", encoding="utf-8") as f:
                 f.writelines(lines)
 
             print("[OK] Fixed test_all_sources method")
             return True
 
     return False
+
 
 def fix_4_settings_persistence():
     """Add settings save functionality"""
@@ -337,17 +340,19 @@ def fix_4_settings_persistence():
             "cache_enabled": True,
             "max_concurrent": 3,
             "source_priority": ["api", "scraping", "cache"],
-            "ui_theme": "default"
+            "ui_theme": "default",
         }
 
         import json
-        with open(settings_file, 'w') as f:
+
+        with open(settings_file, "w") as f:
             json.dump(default_settings, f, indent=2)
 
         print(f"[OK] Created default settings file: {settings_file}")
 
     print("[INFO] Settings will be persisted to config/app_settings.json")
     return True
+
 
 def main():
     print("=" * 60)
@@ -391,6 +396,7 @@ def main():
     print("   - Settings should persist")
 
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

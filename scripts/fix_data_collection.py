@@ -12,6 +12,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
 
+
 def add_enhanced_collection_methods():
     """Add enhanced data collection methods to the main window"""
     print("\n[DATA FIX] Adding enhanced collection methods")
@@ -20,7 +21,7 @@ def add_enhanced_collection_methods():
     window_file = project_root / "src" / "gui" / "enhanced_main_window.py"
 
     if window_file.exists():
-        with open(window_file, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(window_file, "r", encoding="utf-8", errors="ignore") as f:
             content = f.read()
 
         # Check if enhanced collection method exists
@@ -180,13 +181,13 @@ def add_enhanced_collection_methods():
 '''
 
             # Find where to insert (before the last class closing)
-            lines = content.split('\n')
+            lines = content.split("\n")
             insert_index = len(lines) - 5  # Insert near the end
 
             lines.insert(insert_index, enhanced_method)
 
-            with open(window_file, 'w', encoding='utf-8') as f:
-                f.write('\n'.join(lines))
+            with open(window_file, "w", encoding="utf-8") as f:
+                f.write("\n".join(lines))
 
             print("[OK] Added enhanced_collect_property_data method")
             return True
@@ -197,6 +198,7 @@ def add_enhanced_collection_methods():
 
     return False
 
+
 def update_manual_collect_button():
     """Update the manual collect button to use enhanced method"""
     print("\n[DATA FIX] Updating manual collect button")
@@ -205,7 +207,7 @@ def update_manual_collect_button():
     window_file = project_root / "src" / "gui" / "enhanced_main_window.py"
 
     if window_file.exists():
-        with open(window_file, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(window_file, "r", encoding="utf-8", errors="ignore") as f:
             content = f.read()
 
         # Find manual collect method and update it
@@ -214,7 +216,7 @@ def update_manual_collect_button():
             original = content
 
             # Look for the method and replace its content
-            lines = content.split('\n')
+            lines = content.split("\n")
             method_start = -1
             method_end = -1
 
@@ -224,7 +226,9 @@ def update_manual_collect_button():
                     indent = len(line) - len(line.lstrip())
                     # Find end of method
                     for j in range(i + 1, len(lines)):
-                        if lines[j].strip() and not lines[j].startswith(' ' * (indent + 1)):
+                        if lines[j].strip() and not lines[j].startswith(
+                            " " * (indent + 1)
+                        ):
                             method_end = j
                             break
                     break
@@ -257,12 +261,12 @@ def update_manual_collect_button():
 '''
 
                 if method_end > method_start:
-                    lines[method_start:method_end] = new_method.split('\n')
+                    lines[method_start:method_end] = new_method.split("\n")
                 else:
-                    lines[method_start:method_start+10] = new_method.split('\n')
+                    lines[method_start : method_start + 10] = new_method.split("\n")
 
-                with open(window_file, 'w', encoding='utf-8') as f:
-                    f.write('\n'.join(lines))
+                with open(window_file, "w", encoding="utf-8") as f:
+                    f.write("\n".join(lines))
 
                 print("[OK] Updated manual_collect_data method")
                 return True
@@ -271,6 +275,7 @@ def update_manual_collect_button():
         return False
 
     return False
+
 
 def improve_error_handling():
     """Improve error handling in data collection"""
@@ -281,7 +286,7 @@ def improve_error_handling():
     api_file = project_root / "src" / "api_client.py"
 
     if api_file.exists():
-        with open(api_file, 'r', encoding='utf-8', errors='ignore') as f:
+        with open(api_file, "r", encoding="utf-8", errors="ignore") as f:
             content = f.read()
 
         # Check if we need to add test_connection method
@@ -303,19 +308,22 @@ def improve_error_handling():
 '''
 
             # Add the method
-            lines = content.split('\n')
+            lines = content.split("\n")
             # Find a good place to insert (after __init__)
             for i, line in enumerate(lines):
-                if "def __init__" in line and "MaricopaAPIClient" in lines[i-2:i+2]:
+                if (
+                    "def __init__" in line
+                    and "MaricopaAPIClient" in lines[i - 2 : i + 2]
+                ):
                     # Find end of __init__
                     for j in range(i + 1, len(lines)):
-                        if lines[j].strip() and not lines[j].startswith(' '):
+                        if lines[j].strip() and not lines[j].startswith(" "):
                             lines.insert(j, method)
                             break
                     break
 
-            with open(api_file, 'w', encoding='utf-8') as f:
-                f.write('\n'.join(lines))
+            with open(api_file, "w", encoding="utf-8") as f:
+                f.write("\n".join(lines))
 
             print("[OK] Added test_connection method to API client")
 
@@ -323,6 +331,7 @@ def improve_error_handling():
         return True
 
     return False
+
 
 def main():
     print("=" * 60)
@@ -366,6 +375,7 @@ def main():
     print("4. Should see progress dialog and detailed results")
 
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

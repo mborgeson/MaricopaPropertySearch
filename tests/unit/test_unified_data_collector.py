@@ -15,6 +15,7 @@ from queue import Queue, Empty, PriorityQueue
 # Import the component under test
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 from unified_data_collector import (
@@ -23,8 +24,9 @@ from unified_data_collector import (
     DataCollectionJob,
     CollectionStrategy,
     ProgressTracker,
-    BackgroundProcessor
+    BackgroundProcessor,
 )
+
 
 class TestUnifiedDataCollector:
     """Test suite for UnifiedDataCollector component."""
@@ -34,20 +36,22 @@ class TestUnifiedDataCollector:
         """Mock API client for data collector testing."""
         api_client = Mock()
         api_client.search_property.return_value = {
-            'success': True,
-            'data': {'apn': '10215009', 'address': '10000 W Missouri Ave'}
+            "success": True,
+            "data": {"apn": "10215009", "address": "10000 W Missouri Ave"},
         }
-        api_client.search_property_async = AsyncMock(return_value={
-            'success': True,
-            'data': {'apn': '10215009', 'address': '10000 W Missouri Ave'}
-        })
+        api_client.search_property_async = AsyncMock(
+            return_value={
+                "success": True,
+                "data": {"apn": "10215009", "address": "10000 W Missouri Ave"},
+            }
+        )
         return api_client
 
     @pytest.fixture
     def data_collector(self, mock_api_client):
         """Create a UnifiedDataCollector instance for testing."""
-        with patch('unified_data_collector.get_logger'):
-            with patch('unified_data_collector.get_performance_logger'):
+        with patch("unified_data_collector.get_logger"):
+            with patch("unified_data_collector.get_performance_logger"):
                 collector = UnifiedDataCollector(api_client=mock_api_client)
                 # Mock background thread to avoid actual threading in tests
                 collector.background_thread = Mock()
@@ -56,8 +60,8 @@ class TestUnifiedDataCollector:
     @pytest.mark.unit
     def test_collector_initialization(self, mock_api_client):
         """Test proper initialization of the data collector."""
-        with patch('unified_data_collector.get_logger'):
-            with patch('unified_data_collector.get_performance_logger'):
+        with patch("unified_data_collector.get_logger"):
+            with patch("unified_data_collector.get_performance_logger"):
                 collector = UnifiedDataCollector(api_client=mock_api_client)
 
                 assert collector.api_client == mock_api_client
@@ -86,7 +90,7 @@ class TestUnifiedDataCollector:
             apn="10215009",
             priority=JobPriority.HIGH,
             collection_type="property_search",
-            params={"include_tax_history": True}
+            params={"include_tax_history": True},
         )
 
         assert job.job_id == "test_job_001"
@@ -126,16 +130,16 @@ class TestUnifiedDataCollector:
         """Test collection of single property data."""
         # Setup mock return data
         data_collector.api_client.search_property.return_value = {
-            'success': True,
-            'data': mock_property_data
+            "success": True,
+            "data": mock_property_data,
         }
 
         # Execute collection
         result = data_collector.collect_property_data("10215009")
 
         # Verify results
-        assert result['success'] is True
-        assert result['data']['apn'] == "10215009"
+        assert result["success"] is True
+        assert result["data"]["apn"] == "10215009"
         data_collector.api_client.search_property.assert_called_once_with("10215009")
 
     @pytest.mark.unit
@@ -143,16 +147,16 @@ class TestUnifiedDataCollector:
         """Test error handling in single property collection."""
         # Setup mock error
         data_collector.api_client.search_property.return_value = {
-            'success': False,
-            'error': 'Property not found'
+            "success": False,
+            "error": "Property not found",
         }
 
         # Execute collection
         result = data_collector.collect_property_data("invalid_apn")
 
         # Verify error handling
-        assert result['success'] is False
-        assert 'error' in result
+        assert result["success"] is False
+        assert "error" in result
 
     @pytest.mark.unit
     def test_batch_property_collection(self, data_collector, mock_property_data):
@@ -161,10 +165,7 @@ class TestUnifiedDataCollector:
 
         # Setup mock return data for batch
         def mock_search_property(apn):
-            return {
-                'success': True,
-                'data': {**mock_property_data, 'apn': apn}
-            }
+            return {"success": True, "data": {**mock_property_data, "apn": apn}}
 
         data_collector.api_client.search_property.side_effect = mock_search_property
 
@@ -173,7 +174,7 @@ class TestUnifiedDataCollector:
 
         # Verify results
         assert len(results) == 3
-        assert all(result['success'] for result in results)
+        assert all(result["success"] for result in results)
         assert data_collector.api_client.search_property.call_count == 3
 
     @pytest.mark.unit
@@ -184,11 +185,8 @@ class TestUnifiedDataCollector:
         # Setup mock with mixed results
         def mock_search_property(apn):
             if apn == "invalid_apn":
-                return {'success': False, 'error': 'Property not found'}
-            return {
-                'success': True,
-                'data': {**mock_property_data, 'apn': apn}
-            }
+                return {"success": False, "error": "Property not found"}
+            return {"success": True, "data": {**mock_property_data, "apn": apn}}
 
         data_collector.api_client.search_property.side_effect = mock_search_property
 
@@ -197,9 +195,9 @@ class TestUnifiedDataCollector:
 
         # Verify mixed results
         assert len(results) == 3
-        assert results[0]['success'] is True
-        assert results[1]['success'] is False
-        assert results[2]['success'] is True
+        assert results[0]["success"] is True
+        assert results[1]["success"] is False
+        assert results[2]["success"] is True
 
     @pytest.mark.unit
     @pytest.mark.asyncio
@@ -207,17 +205,19 @@ class TestUnifiedDataCollector:
         """Test asynchronous property data collection."""
         # Setup mock async return data
         data_collector.api_client.search_property_async.return_value = {
-            'success': True,
-            'data': mock_property_data
+            "success": True,
+            "data": mock_property_data,
         }
 
         # Execute async collection
         result = await data_collector.collect_property_data_async("10215009")
 
         # Verify results
-        assert result['success'] is True
-        assert result['data']['apn'] == "10215009"
-        data_collector.api_client.search_property_async.assert_called_once_with("10215009")
+        assert result["success"] is True
+        assert result["data"]["apn"] == "10215009"
+        data_collector.api_client.search_property_async.assert_called_once_with(
+            "10215009"
+        )
 
     @pytest.mark.unit
     @pytest.mark.asyncio
@@ -227,10 +227,7 @@ class TestUnifiedDataCollector:
 
         # Setup mock async return data
         async def mock_async_search(apn):
-            return {
-                'success': True,
-                'data': {**mock_property_data, 'apn': apn}
-            }
+            return {"success": True, "data": {**mock_property_data, "apn": apn}}
 
         data_collector.api_client.search_property_async.side_effect = mock_async_search
 
@@ -239,7 +236,7 @@ class TestUnifiedDataCollector:
 
         # Verify results
         assert len(results) == 3
-        assert all(result['success'] for result in results)
+        assert all(result["success"] for result in results)
         assert data_collector.api_client.search_property_async.call_count == 3
 
     @pytest.mark.unit
@@ -247,14 +244,10 @@ class TestUnifiedDataCollector:
         """Test job queue functionality."""
         # Test adding jobs with different priorities
         job_high = DataCollectionJob(
-            job_id="high_priority",
-            apn="10215009",
-            priority=JobPriority.HIGH
+            job_id="high_priority", apn="10215009", priority=JobPriority.HIGH
         )
         job_low = DataCollectionJob(
-            job_id="low_priority",
-            apn="10215010",
-            priority=JobPriority.LOW
+            job_id="low_priority", apn="10215010", priority=JobPriority.LOW
         )
 
         data_collector.add_job(job_high)
@@ -294,17 +287,15 @@ class TestUnifiedDataCollector:
 
         # Verify callbacks were called
         assert len(progress_updates) == 2
-        assert progress_updates[0]['progress'] == 50
-        assert progress_updates[1]['progress'] == 100
+        assert progress_updates[0]["progress"] == 50
+        assert progress_updates[1]["progress"] == 100
 
     @pytest.mark.unit
     def test_cancellation_functionality(self, data_collector):
         """Test job cancellation functionality."""
         # Add a job
         job = DataCollectionJob(
-            job_id="cancellable_job",
-            apn="10215009",
-            priority=JobPriority.NORMAL
+            job_id="cancellable_job", apn="10215009", priority=JobPriority.NORMAL
         )
         data_collector.add_job(job)
 
@@ -321,28 +312,26 @@ class TestUnifiedDataCollector:
         """Test collection strategy selection based on job parameters."""
         # Test strategy for single property
         strategy = data_collector.select_collection_strategy(
-            job_count=1,
-            priority=JobPriority.HIGH,
-            include_background_data=False
+            job_count=1, priority=JobPriority.HIGH, include_background_data=False
         )
         assert strategy == CollectionStrategy.SINGLE_THREADED
 
         # Test strategy for batch processing
         strategy = data_collector.select_collection_strategy(
-            job_count=10,
-            priority=JobPriority.NORMAL,
-            include_background_data=True
+            job_count=10, priority=JobPriority.NORMAL, include_background_data=True
         )
         assert strategy == CollectionStrategy.PARALLEL_BATCH
 
     @pytest.mark.unit
     @pytest.mark.performance
-    def test_performance_metrics(self, data_collector, performance_timer, mock_property_data):
+    def test_performance_metrics(
+        self, data_collector, performance_timer, mock_property_data
+    ):
         """Test performance tracking and metrics."""
         # Setup mock for performance testing
         data_collector.api_client.search_property.return_value = {
-            'success': True,
-            'data': mock_property_data
+            "success": True,
+            "data": mock_property_data,
         }
 
         # Measure collection performance
@@ -351,7 +340,7 @@ class TestUnifiedDataCollector:
         elapsed_time = performance_timer.stop()
 
         # Verify performance meets baseline
-        assert result['success'] is True
+        assert result["success"] is True
         assert elapsed_time < 0.1  # Should complete under 100ms
 
     @pytest.mark.unit
@@ -362,7 +351,7 @@ class TestUnifiedDataCollector:
             job = DataCollectionJob(
                 job_id=f"job_{i:03d}",
                 apn=f"1021500{i:02d}",
-                priority=JobPriority.NORMAL
+                priority=JobPriority.NORMAL,
             )
             data_collector.add_job(job)
 
@@ -385,18 +374,19 @@ class TestUnifiedDataCollector:
             call_count += 1
             if call_count <= 2:
                 raise Exception("Temporary failure")
-            return {
-                'success': True,
-                'data': {'apn': apn, 'address': 'Recovery Test'}
-            }
+            return {"success": True, "data": {"apn": apn, "address": "Recovery Test"}}
 
-        data_collector.api_client.search_property.side_effect = mock_search_with_recovery
+        data_collector.api_client.search_property.side_effect = (
+            mock_search_with_recovery
+        )
 
         # Test recovery mechanism
-        result = data_collector.collect_property_data_with_retry("10215009", max_retries=3)
+        result = data_collector.collect_property_data_with_retry(
+            "10215009", max_retries=3
+        )
 
         # Verify recovery succeeded
-        assert result['success'] is True
+        assert result["success"] is True
         assert call_count == 3  # Failed twice, succeeded on third try
 
     @pytest.mark.unit
@@ -404,22 +394,22 @@ class TestUnifiedDataCollector:
         """Test the validated Missouri Avenue workflow."""
         missouri_data = {
             **mock_property_data,
-            'apn': '10215009',
-            'address': '10000 W Missouri Ave'
+            "apn": "10215009",
+            "address": "10000 W Missouri Ave",
         }
 
         data_collector.api_client.search_property.return_value = {
-            'success': True,
-            'data': missouri_data
+            "success": True,
+            "data": missouri_data,
         }
 
         # Execute Missouri Avenue collection
         result = data_collector.collect_property_data("10215009")
 
         # Verify Missouri Avenue specific validation
-        assert result['success'] is True
-        assert result['data']['apn'] == '10215009'
-        assert result['data']['address'] == '10000 W Missouri Ave'
+        assert result["success"] is True
+        assert result["data"]["apn"] == "10215009"
+        assert result["data"]["address"] == "10000 W Missouri Ave"
 
     @pytest.mark.unit
     def test_thread_safety(self, data_collector):
@@ -433,7 +423,7 @@ class TestUnifiedDataCollector:
                     job = DataCollectionJob(
                         job_id=f"thread_{thread_id}_job_{i}",
                         apn=f"102150{thread_id}{i:02d}",
-                        priority=JobPriority.NORMAL
+                        priority=JobPriority.NORMAL,
                     )
                     data_collector.add_job(job)
                     results.append(f"thread_{thread_id}_completed")
@@ -467,7 +457,7 @@ class TestUnifiedDataCollector:
             job = DataCollectionJob(
                 job_id=f"cleanup_job_{i}",
                 apn=f"1021500{i}",
-                priority=JobPriority.NORMAL
+                priority=JobPriority.NORMAL,
             )
             data_collector.add_job(job)
 

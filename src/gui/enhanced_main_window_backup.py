@@ -1626,8 +1626,6 @@ class EnhancedPropertySearchApp(QMainWindow):
             if isinstance(raw_data, str):
                 try:
                     import json
-from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
                     raw_data = json.loads(raw_data)
                 except (json.JSONDecodeError, TypeError):
                     raw_data = {}

@@ -16,6 +16,7 @@ import aiohttp
 # Import the component under test
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 from api_client_unified import (
@@ -24,8 +25,9 @@ from api_client_unified import (
     BatchAPIRequest,
     APIClientConfig,
     RateLimiter,
-    ConnectionPoolManager
+    ConnectionPoolManager,
 )
+
 
 class TestUnifiedMaricopaAPIClient:
     """Test suite for UnifiedMaricopaAPIClient component."""
@@ -41,13 +43,13 @@ class TestUnifiedMaricopaAPIClient:
             rate_limit_requests=10,
             rate_limit_period=60,
             connection_pool_size=5,
-            timeout=5.0
+            timeout=5.0,
         )
 
     @pytest.fixture
     def api_client(self, client_config):
         """Create a UnifiedMaricopaAPIClient instance for testing."""
-        with patch('api_client_unified.get_api_logger'):
+        with patch("api_client_unified.get_api_logger"):
             client = UnifiedMaricopaAPIClient(config=client_config)
             # Mock the session to avoid actual HTTP requests
             client.session = Mock()
@@ -57,7 +59,7 @@ class TestUnifiedMaricopaAPIClient:
     @pytest.mark.unit
     def test_client_initialization(self, client_config):
         """Test proper initialization of the API client."""
-        with patch('api_client_unified.get_api_logger'):
+        with patch("api_client_unified.get_api_logger"):
             client = UnifiedMaricopaAPIClient(config=client_config)
 
             assert client.config.base_url == "https://api.test.com"
@@ -71,16 +73,16 @@ class TestUnifiedMaricopaAPIClient:
     def test_property_data_cache(self):
         """Test PropertyDataCache functionality."""
         test_data = {"apn": "10215009", "address": "10000 W Missouri Ave"}
-        cache_entry = PropertyDataCache(data=test_data, timestamp=time.time(), ttl=300.0)
+        cache_entry = PropertyDataCache(
+            data=test_data, timestamp=time.time(), ttl=300.0
+        )
 
         assert cache_entry.data == test_data
         assert not cache_entry.is_expired()
 
         # Test expired cache
         old_cache = PropertyDataCache(
-            data=test_data,
-            timestamp=time.time() - 400,
-            ttl=300.0
+            data=test_data, timestamp=time.time() - 400, ttl=300.0
         )
         assert old_cache.is_expired()
 
@@ -96,28 +98,27 @@ class TestUnifiedMaricopaAPIClient:
         api_client.rate_limiter.acquire.assert_called_once()
 
     @pytest.mark.unit
-    @patch('requests.Session.get')
-    def test_sync_property_search_success(self, mock_get, api_client, mock_property_data):
+    @patch("requests.Session.get")
+    def test_sync_property_search_success(
+        self, mock_get, api_client, mock_property_data
+    ):
         """Test successful synchronous property search."""
         # Setup mock response
         mock_response = Mock()
         mock_response.status_code = 200
-        mock_response.json.return_value = {
-            'success': True,
-            'data': mock_property_data
-        }
+        mock_response.json.return_value = {"success": True, "data": mock_property_data}
         mock_get.return_value = mock_response
 
         # Execute search
         result = api_client.search_property("10215009")
 
         # Verify results
-        assert result['success'] is True
-        assert result['data']['apn'] == "10215009"
+        assert result["success"] is True
+        assert result["data"]["apn"] == "10215009"
         mock_get.assert_called_once()
 
     @pytest.mark.unit
-    @patch('requests.Session.get')
+    @patch("requests.Session.get")
     def test_sync_property_search_api_error(self, mock_get, api_client):
         """Test handling of API errors in synchronous search."""
         # Setup mock error response
@@ -130,12 +131,12 @@ class TestUnifiedMaricopaAPIClient:
         result = api_client.search_property("10215009")
 
         # Verify error handling
-        assert result['success'] is False
-        assert 'error' in result
+        assert result["success"] is False
+        assert "error" in result
         mock_get.assert_called_once()
 
     @pytest.mark.unit
-    @patch('requests.Session.get')
+    @patch("requests.Session.get")
     def test_sync_property_search_timeout(self, mock_get, api_client):
         """Test handling of timeout errors."""
         # Setup mock timeout
@@ -145,8 +146,8 @@ class TestUnifiedMaricopaAPIClient:
         result = api_client.search_property("10215009")
 
         # Verify timeout handling
-        assert result['success'] is False
-        assert 'timeout' in result.get('error', '').lower()
+        assert result["success"] is False
+        assert "timeout" in result.get("error", "").lower()
 
     @pytest.mark.unit
     @pytest.mark.asyncio
@@ -155,10 +156,9 @@ class TestUnifiedMaricopaAPIClient:
         # Setup mock async response
         mock_response = AsyncMock()
         mock_response.status = 200
-        mock_response.json = AsyncMock(return_value={
-            'success': True,
-            'data': mock_property_data
-        })
+        mock_response.json = AsyncMock(
+            return_value={"success": True, "data": mock_property_data}
+        )
 
         # Mock the async session get method
         api_client.async_session.get = AsyncMock(return_value=mock_response)
@@ -167,8 +167,8 @@ class TestUnifiedMaricopaAPIClient:
         result = await api_client.search_property_async("10215009")
 
         # Verify results
-        assert result['success'] is True
-        assert result['data']['apn'] == "10215009"
+        assert result["success"] is True
+        assert result["data"]["apn"] == "10215009"
 
     @pytest.mark.unit
     @pytest.mark.asyncio
@@ -183,8 +183,8 @@ class TestUnifiedMaricopaAPIClient:
         result = await api_client.search_property_async("10215009")
 
         # Verify error handling
-        assert result['success'] is False
-        assert 'error' in result
+        assert result["success"] is False
+        assert "error" in result
 
     @pytest.mark.unit
     def test_cache_functionality(self, api_client, mock_property_data):
@@ -199,7 +199,7 @@ class TestUnifiedMaricopaAPIClient:
         cached_data = api_client.get_from_cache(cache_key)
 
         assert cached_data is not None
-        assert cached_data['apn'] == mock_property_data['apn']
+        assert cached_data["apn"] == mock_property_data["apn"]
 
     @pytest.mark.unit
     def test_cache_expiration(self, api_client, mock_property_data):
@@ -217,29 +217,29 @@ class TestUnifiedMaricopaAPIClient:
         assert cached_data is None
 
     @pytest.mark.unit
-    @patch('requests.Session.get')
+    @patch("requests.Session.get")
     def test_retry_mechanism(self, mock_get, api_client):
         """Test retry mechanism for failed requests."""
         # Setup mock to fail twice, then succeed
         mock_response_success = Mock()
         mock_response_success.status_code = 200
-        mock_response_success.json.return_value = {'success': True, 'data': {}}
+        mock_response_success.json.return_value = {"success": True, "data": {}}
 
         mock_get.side_effect = [
             RequestException("Connection error"),
             RequestException("Connection error"),
-            mock_response_success
+            mock_response_success,
         ]
 
         # Execute search
         result = api_client.search_property("10215009")
 
         # Verify retry behavior
-        assert result['success'] is True
+        assert result["success"] is True
         assert mock_get.call_count == 3
 
     @pytest.mark.unit
-    @patch('requests.Session.get')
+    @patch("requests.Session.get")
     def test_retry_exhaustion(self, mock_get, api_client):
         """Test behavior when all retries are exhausted."""
         # Setup mock to always fail
@@ -249,18 +249,14 @@ class TestUnifiedMaricopaAPIClient:
         result = api_client.search_property("10215009")
 
         # Verify retry exhaustion handling
-        assert result['success'] is False
-        assert 'error' in result
+        assert result["success"] is False
+        assert "error" in result
         assert mock_get.call_count == api_client.config.max_retries
 
     @pytest.mark.unit
     def test_batch_request_creation(self, api_client):
         """Test creation of batch API requests."""
-        request_params = [
-            {"apn": "10215009"},
-            {"apn": "10215010"},
-            {"apn": "10215011"}
-        ]
+        request_params = [{"apn": "10215009"}, {"apn": "10215010"}, {"apn": "10215011"}]
 
         batch_requests = []
         for i, params in enumerate(request_params):
@@ -268,7 +264,7 @@ class TestUnifiedMaricopaAPIClient:
                 request_id=f"req_{i}",
                 endpoint="/property/search",
                 params=params,
-                priority=1
+                priority=1,
             )
             batch_requests.append(batch_request)
 
@@ -277,7 +273,7 @@ class TestUnifiedMaricopaAPIClient:
         assert batch_requests[0].params["apn"] == "10215009"
 
     @pytest.mark.unit
-    @patch('requests.Session.get')
+    @patch("requests.Session.get")
     def test_batch_property_search(self, mock_get, api_client, mock_property_data):
         """Test batch property search functionality."""
         # Setup mock responses for batch requests
@@ -286,8 +282,8 @@ class TestUnifiedMaricopaAPIClient:
             mock_response = Mock()
             mock_response.status_code = 200
             mock_response.json.return_value = {
-                'success': True,
-                'data': {**mock_property_data, 'apn': f'1021500{9+i}'}
+                "success": True,
+                "data": {**mock_property_data, "apn": f"1021500{9+i}"},
             }
             mock_responses.append(mock_response)
 
@@ -299,7 +295,7 @@ class TestUnifiedMaricopaAPIClient:
 
         # Verify batch results
         assert len(results) == 3
-        assert all(result['success'] for result in results)
+        assert all(result["success"] for result in results)
         assert mock_get.call_count == 3
 
     @pytest.mark.unit
@@ -309,14 +305,19 @@ class TestUnifiedMaricopaAPIClient:
         assert api_client.connection_pool is not None
 
         # Test pool size configuration
-        assert api_client.connection_pool.max_size == api_client.config.connection_pool_size
+        assert (
+            api_client.connection_pool.max_size
+            == api_client.config.connection_pool_size
+        )
 
     @pytest.mark.unit
     @pytest.mark.performance
-    def test_performance_with_caching(self, api_client, mock_property_data, performance_timer):
+    def test_performance_with_caching(
+        self, api_client, mock_property_data, performance_timer
+    ):
         """Test performance improvement with caching."""
-        with patch.object(api_client, '_make_request') as mock_request:
-            mock_request.return_value = {'success': True, 'data': mock_property_data}
+        with patch.object(api_client, "_make_request") as mock_request:
+            mock_request.return_value = {"success": True, "data": mock_property_data}
 
             # First request (cache miss)
             performance_timer.start()
@@ -329,24 +330,24 @@ class TestUnifiedMaricopaAPIClient:
             second_request_time = performance_timer.stop()
 
             # Verify caching performance improvement
-            assert result1['success'] is True
-            assert result2['success'] is True
+            assert result1["success"] is True
+            assert result2["success"] is True
             assert mock_request.call_count == 1  # Only one actual request made
             assert second_request_time < first_request_time  # Cache should be faster
 
     @pytest.mark.unit
     def test_error_handling_and_logging(self, api_client):
         """Test comprehensive error handling and logging."""
-        with patch.object(api_client, 'logger') as mock_logger:
-            with patch.object(api_client, '_make_request') as mock_request:
+        with patch.object(api_client, "logger") as mock_logger:
+            with patch.object(api_client, "_make_request") as mock_request:
                 mock_request.side_effect = Exception("Test error")
 
                 # Execute search with error
                 result = api_client.search_property("10215009")
 
                 # Verify error handling
-                assert result['success'] is False
-                assert 'error' in result
+                assert result["success"] is False
+                assert "error" in result
 
                 # Verify logging
                 mock_logger.error.assert_called()
@@ -356,28 +357,27 @@ class TestUnifiedMaricopaAPIClient:
         """Test the validated Missouri Avenue property case."""
         missouri_data = {
             **mock_property_data,
-            'apn': '10215009',
-            'address': '10000 W Missouri Ave'
+            "apn": "10215009",
+            "address": "10000 W Missouri Ave",
         }
 
-        with patch.object(api_client, '_make_request') as mock_request:
-            mock_request.return_value = {'success': True, 'data': missouri_data}
+        with patch.object(api_client, "_make_request") as mock_request:
+            mock_request.return_value = {"success": True, "data": missouri_data}
 
             # Execute Missouri Avenue search
             result = api_client.search_property("10215009")
 
             # Verify Missouri Avenue specific data
-            assert result['success'] is True
-            assert result['data']['apn'] == '10215009'
-            assert result['data']['address'] == '10000 W Missouri Ave'
+            assert result["success"] is True
+            assert result["data"]["apn"] == "10215009"
+            assert result["data"]["address"] == "10000 W Missouri Ave"
 
     @pytest.mark.unit
     def test_configuration_validation(self):
         """Test API client configuration validation."""
         # Test valid configuration
         valid_config = APIClientConfig(
-            base_url="https://api.test.com",
-            api_token="test_token"
+            base_url="https://api.test.com", api_token="test_token"
         )
         assert valid_config.base_url == "https://api.test.com"
 
@@ -386,7 +386,7 @@ class TestUnifiedMaricopaAPIClient:
             base_url="https://api.test.com",
             api_token="test_token",
             max_retries=5,
-            rate_limit_requests=20
+            rate_limit_requests=20,
         )
         assert custom_config.max_retries == 5
         assert custom_config.rate_limit_requests == 20
@@ -398,5 +398,5 @@ class TestUnifiedMaricopaAPIClient:
         api_client.close()
 
         # Verify cleanup calls
-        if hasattr(api_client.session, 'close'):
+        if hasattr(api_client.session, "close"):
             api_client.session.close.assert_called_once()

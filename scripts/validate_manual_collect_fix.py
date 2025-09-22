@@ -17,9 +17,12 @@ import ast
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 
+
 def validate_fix():
     """Validate that the manual_collect_data fix is correct"""
-    enhanced_main_window_path = os.path.join(project_root, 'src', 'gui', 'enhanced_main_window.py')
+    enhanced_main_window_path = os.path.join(
+        project_root, "src", "gui", "enhanced_main_window.py"
+    )
 
     if not os.path.exists(enhanced_main_window_path):
         print(f"ERROR: File not found: {enhanced_main_window_path}")
@@ -27,7 +30,7 @@ def validate_fix():
 
     print("Validating manual_collect_data fix...")
 
-    with open(enhanced_main_window_path, 'r', encoding='utf-8') as f:
+    with open(enhanced_main_window_path, "r", encoding="utf-8") as f:
         content = f.read()
 
     # Parse the AST to find the manual_collect_data method
@@ -42,12 +45,15 @@ def validate_fix():
     manual_collect_method = None
 
     for node in ast.walk(tree):
-        if isinstance(node, ast.ClassDef) and node.name == 'PropertyDetailsDialog':
+        if isinstance(node, ast.ClassDef) and node.name == "PropertyDetailsDialog":
             property_dialog_class = node
 
             # Look for manual_collect_data method
             for class_node in node.body:
-                if isinstance(class_node, ast.FunctionDef) and class_node.name == 'manual_collect_data':
+                if (
+                    isinstance(class_node, ast.FunctionDef)
+                    and class_node.name == "manual_collect_data"
+                ):
                     manual_collect_method = class_node
                     break
 
@@ -66,41 +72,44 @@ def validate_fix():
     method_source = ast.get_source_segment(content, manual_collect_method)
     if method_source:
         # Check that it uses property_data instead of results_table
-        if 'self.property_data.get(\'apn\',' in method_source:
+        if "self.property_data.get('apn'," in method_source:
             print("OK: Method correctly uses self.property_data.get('apn')")
         else:
             print("ERROR: Method does not use self.property_data.get('apn')")
             return False
 
         # Check that it doesn't use results_table
-        if 'self.results_table' in method_source:
+        if "self.results_table" in method_source:
             print("ERROR: Method still references self.results_table")
             return False
         else:
             print("OK: Method does not reference self.results_table")
 
         # Check that it uses background_manager properly
-        if 'self.background_manager' in method_source:
+        if "self.background_manager" in method_source:
             print("OK: Method uses self.background_manager")
         else:
             print("ERROR: Method does not use self.background_manager")
             return False
 
         # Check for proper error handling
-        if 'try:' in method_source and 'except Exception' in method_source:
+        if "try:" in method_source and "except Exception" in method_source:
             print("OK: Method has proper error handling")
         else:
             print("ERROR: Method lacks proper error handling")
             return False
 
     # Check imports
-    if 'from src.background_data_collector import' in content and 'JobPriority' in content:
+    if (
+        "from src.background_data_collector import" in content
+        and "JobPriority" in content
+    ):
         print("OK: JobPriority is properly imported")
     else:
         print("ERROR: JobPriority import not found")
         return False
 
-    if 'from PyQt5.QtCore import' in content and 'QTimer' in content:
+    if "from PyQt5.QtCore import" in content and "QTimer" in content:
         print("OK: QTimer is properly imported")
     else:
         print("ERROR: QTimer import not found")
@@ -109,6 +118,7 @@ def validate_fix():
     print("\nSUCCESS: All validation checks passed!")
     print("The manual_collect_data AttributeError fix appears to be correct.")
     return True
+
 
 if __name__ == "__main__":
     success = validate_fix()

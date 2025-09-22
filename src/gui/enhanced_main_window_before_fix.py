@@ -1016,7 +1016,7 @@ class PropertyDetailsDialog(QDialog):
         except Exception as e:
             logger.error(f"Failed to apply settings or start background collection: {e}")
 
-        def closeEvent(self, event):
+    def closeEvent(self, event):
         """Handle dialog close event"""
         # Stop the status timer
         if hasattr(self, 'status_timer'):

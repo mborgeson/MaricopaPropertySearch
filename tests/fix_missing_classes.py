@@ -8,7 +8,8 @@ import sys
 from pathlib import Path
 
 # Add src directory to path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "src"))
+
 
 def check_and_fix_missing_classes():
     """Check for and fix missing class definitions"""
@@ -19,22 +20,22 @@ def check_and_fix_missing_classes():
     fixes_applied = []
 
     print("CHECKING FOR MISSING CLASS DEFINITIONS")
-    print("="*60)
+    print("=" * 60)
 
     # 1. Check API Client
-    api_client_path = project_root / 'src' / 'api_client.py'
+    api_client_path = project_root / "src" / "api_client.py"
     try:
-        with open(api_client_path, 'r') as f:
+        with open(api_client_path, "r") as f:
             content = f.read()
 
-        if 'class APIClient' not in content and 'class MaricopaAPIClient' in content:
+        if "class APIClient" not in content and "class MaricopaAPIClient" in content:
             print("✓ Found MaricopaAPIClient, need alias for APIClient")
 
             # Add alias at the end
-            if '# APIClient alias' not in content:
-                content += '\n\n# APIClient alias for backward compatibility\nAPIClient = MaricopaAPIClient\n'
+            if "# APIClient alias" not in content:
+                content += "\n\n# APIClient alias for backward compatibility\nAPIClient = MaricopaAPIClient\n"
 
-                with open(api_client_path, 'w') as f:
+                with open(api_client_path, "w") as f:
                     f.write(content)
 
                 fixes_applied.append("Added APIClient alias in api_client.py")
@@ -46,22 +47,29 @@ def check_and_fix_missing_classes():
         issues_found.append(f"API Client check failed: {e}")
 
     # 2. Check Background Data Collector
-    bg_collector_path = project_root / 'src' / 'background_data_collector.py'
+    bg_collector_path = project_root / "src" / "background_data_collector.py"
     try:
-        with open(bg_collector_path, 'r') as f:
+        with open(bg_collector_path, "r") as f:
             content = f.read()
 
-        if 'class BackgroundDataCollector' not in content and 'class BackgroundDataCollectionManager' in content:
-            print("✓ Found BackgroundDataCollectionManager, need alias for BackgroundDataCollector")
+        if (
+            "class BackgroundDataCollector" not in content
+            and "class BackgroundDataCollectionManager" in content
+        ):
+            print(
+                "✓ Found BackgroundDataCollectionManager, need alias for BackgroundDataCollector"
+            )
 
             # Add alias at the end
-            if '# BackgroundDataCollector alias' not in content:
-                content += '\n\n# BackgroundDataCollector alias for backward compatibility\nBackgroundDataCollector = BackgroundDataCollectionManager\n'
+            if "# BackgroundDataCollector alias" not in content:
+                content += "\n\n# BackgroundDataCollector alias for backward compatibility\nBackgroundDataCollector = BackgroundDataCollectionManager\n"
 
-                with open(bg_collector_path, 'w') as f:
+                with open(bg_collector_path, "w") as f:
                     f.write(content)
 
-                fixes_applied.append("Added BackgroundDataCollector alias in background_data_collector.py")
+                fixes_applied.append(
+                    "Added BackgroundDataCollector alias in background_data_collector.py"
+                )
                 print("  → Fixed: Added BackgroundDataCollector alias")
             else:
                 print("  → Already has alias")
@@ -70,23 +78,30 @@ def check_and_fix_missing_classes():
         issues_found.append(f"Background Data Collector check failed: {e}")
 
     # 3. Check for missing AdvancedFiltersWidget in GUI
-    gui_path = project_root / 'src' / 'gui' / 'enhanced_main_window.py'
+    gui_path = project_root / "src" / "gui" / "enhanced_main_window.py"
     try:
-        with open(gui_path, 'r') as f:
+        with open(gui_path, "r") as f:
             content = f.read()
 
-        if 'class AdvancedFiltersWidget' not in content and 'AdvancedFiltersWidget()' in content:
+        if (
+            "class AdvancedFiltersWidget" not in content
+            and "AdvancedFiltersWidget()" in content
+        ):
             print("✓ Found usage of AdvancedFiltersWidget, but class not defined")
 
             # Find good place to add class (after imports, before main class)
-            lines = content.split('\n')
+            lines = content.split("\n")
             insert_idx = 0
 
             # Find last import line
             for i, line in enumerate(lines):
-                if line.startswith('from ') or line.startswith('import ') or line.strip() == '':
+                if (
+                    line.startswith("from ")
+                    or line.startswith("import ")
+                    or line.strip() == ""
+                ):
                     insert_idx = i + 1
-                elif line.startswith('class ') or line.startswith('def '):
+                elif line.startswith("class ") or line.startswith("def "):
                     break
 
             # Add basic AdvancedFiltersWidget class
@@ -135,19 +150,24 @@ class AdvancedFiltersWidget(QWidget):
 '''
 
             lines.insert(insert_idx, widget_code)
-            content = '\n'.join(lines)
+            content = "\n".join(lines)
 
-            with open(gui_path, 'w') as f:
+            with open(gui_path, "w") as f:
                 f.write(content)
 
-            fixes_applied.append("Added AdvancedFiltersWidget class to enhanced_main_window.py")
+            fixes_applied.append(
+                "Added AdvancedFiltersWidget class to enhanced_main_window.py"
+            )
             print("  → Fixed: Added AdvancedFiltersWidget class")
 
     except Exception as e:
         issues_found.append(f"AdvancedFiltersWidget check failed: {e}")
 
     # 4. Check for missing PropertySearchEngine
-    if 'PropertySearchEngine(' in content and 'class PropertySearchEngine' not in content:
+    if (
+        "PropertySearchEngine(" in content
+        and "class PropertySearchEngine" not in content
+    ):
         print("✓ Found usage of PropertySearchEngine, but class not defined")
 
         # Add basic PropertySearchEngine class
@@ -169,28 +189,34 @@ class PropertySearchEngine:
         return {"address": address, "status": "mock_data"}
 '''
 
-        lines = content.split('\n')
+        lines = content.split("\n")
         insert_idx = 0
 
         # Find good place to add class
         for i, line in enumerate(lines):
-            if line.startswith('from ') or line.startswith('import ') or line.strip() == '':
+            if (
+                line.startswith("from ")
+                or line.startswith("import ")
+                or line.strip() == ""
+            ):
                 insert_idx = i + 1
-            elif line.startswith('class ') or line.startswith('def '):
+            elif line.startswith("class ") or line.startswith("def "):
                 break
 
         lines.insert(insert_idx, search_engine_code)
-        content = '\n'.join(lines)
+        content = "\n".join(lines)
 
-        with open(gui_path, 'w') as f:
+        with open(gui_path, "w") as f:
             f.write(content)
 
-        fixes_applied.append("Added PropertySearchEngine class to enhanced_main_window.py")
+        fixes_applied.append(
+            "Added PropertySearchEngine class to enhanced_main_window.py"
+        )
         print("  → Fixed: Added PropertySearchEngine class")
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("FIXES SUMMARY")
-    print("="*60)
+    print("=" * 60)
 
     if fixes_applied:
         print("✓ FIXES APPLIED:")
@@ -206,10 +232,11 @@ class PropertySearchEngine:
 
     return len(fixes_applied), len(issues_found)
 
+
 def main():
     """Main execution"""
     print("MISSING CLASS DEFINITIONS FIXER")
-    print("="*60)
+    print("=" * 60)
 
     fixes, issues = check_and_fix_missing_classes()
 
@@ -224,6 +251,7 @@ def main():
         return 1
     else:
         return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

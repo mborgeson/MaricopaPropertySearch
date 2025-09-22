@@ -188,7 +188,6 @@ def main():
     except Exception as e:
         print(f"ERROR: {e}")
         import traceback
-from src.enhanced_config_manager import EnhancedConfigManager
         traceback.print_exc()
         return 1
     

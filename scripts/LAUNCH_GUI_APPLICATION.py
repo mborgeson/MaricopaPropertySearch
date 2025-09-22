@@ -17,8 +17,10 @@ import subprocess
 from pathlib import Path
 
 # Handle both Windows and Linux paths
-if sys.platform.startswith('win'):
-    PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch")
+if sys.platform.startswith("win"):
+    PROJECT_ROOT = Path(
+        r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch"
+    )
 else:
     PROJECT_ROOT = Path("/home/mattb/MaricopaPropertySearch")
 
@@ -36,7 +38,10 @@ from src.logging_config import get_logger
 logger = get_logger(__name__)
 
 # Backward compatibility message
-logger.info("LAUNCH_GUI_APPLICATION: Using unified GUI launcher with consolidated features")
+logger.info(
+    "LAUNCH_GUI_APPLICATION: Using unified GUI launcher with consolidated features"
+)
+
 
 def launch_gui():
     """Launch the GUI application - delegates to unified launcher"""
@@ -61,9 +66,11 @@ def launch_gui():
     logger.info("Starting application via LAUNCH_GUI_APPLICATION (unified launcher)")
     return unified_main()
 
+
 def main():
     """Main entry point"""
     return launch_gui()
+
 
 if __name__ == "__main__":
     try:
@@ -71,5 +78,6 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"Error launching GUI: {e}")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)

@@ -15,12 +15,11 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 # Import the component under test
 import sys
 from pathlib import Path
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
-from threadsafe_database_manager import (
-    ThreadSafeDatabaseManager,
-    DatabaseManager
-)
+from threadsafe_database_manager import ThreadSafeDatabaseManager, DatabaseManager
+
 
 class TestThreadSafeDatabaseManager:
     """Test suite for ThreadSafeDatabaseManager component."""
@@ -29,20 +28,20 @@ class TestThreadSafeDatabaseManager:
     def mock_config(self):
         """Provide a test database configuration."""
         return {
-            'host': 'localhost',
-            'port': 5432,
-            'database': 'test_db',
-            'user': 'test_user',
-            'password': 'test_password',
-            'pool_size': 5,
-            'max_overflow': 10,
-            'mock_mode': True
+            "host": "localhost",
+            "port": 5432,
+            "database": "test_db",
+            "user": "test_user",
+            "password": "test_password",
+            "pool_size": 5,
+            "max_overflow": 10,
+            "mock_mode": True,
         }
 
     @pytest.fixture
     def db_manager(self, mock_config):
         """Create a ThreadSafeDatabaseManager instance for testing."""
-        with patch('threadsafe_database_manager.get_logger'):
+        with patch("threadsafe_database_manager.get_logger"):
             manager = ThreadSafeDatabaseManager(config=mock_config)
             return manager
 
@@ -61,24 +60,24 @@ class TestThreadSafeDatabaseManager:
     @pytest.mark.unit
     def test_manager_initialization_mock_mode(self, mock_config):
         """Test initialization in mock mode."""
-        with patch('threadsafe_database_manager.get_logger'):
+        with patch("threadsafe_database_manager.get_logger"):
             manager = ThreadSafeDatabaseManager(config=mock_config)
 
             assert manager.mock_mode is True
-            assert manager.config['database'] == 'test_db'
+            assert manager.config["database"] == "test_db"
             assert manager.connection_pool is not None
 
     @pytest.mark.unit
     def test_manager_initialization_real_mode(self, mock_config):
         """Test initialization with real database mode."""
-        mock_config['mock_mode'] = False
+        mock_config["mock_mode"] = False
 
-        with patch('threadsafe_database_manager.get_logger'):
-            with patch('psycopg2.pool.ThreadedConnectionPool') as mock_pool:
+        with patch("threadsafe_database_manager.get_logger"):
+            with patch("psycopg2.pool.ThreadedConnectionPool") as mock_pool:
                 manager = ThreadSafeDatabaseManager(config=mock_config)
 
                 assert manager.mock_mode is False
-                assert manager.config['database'] == 'test_db'
+                assert manager.config["database"] == "test_db"
                 mock_pool.assert_called_once()
 
     @pytest.mark.unit
@@ -87,9 +86,9 @@ class TestThreadSafeDatabaseManager:
         connection = db_manager.get_connection()
 
         assert connection is not None
-        assert hasattr(connection, 'cursor')
-        assert hasattr(connection, 'commit')
-        assert hasattr(connection, 'rollback')
+        assert hasattr(connection, "cursor")
+        assert hasattr(connection, "commit")
+        assert hasattr(connection, "rollback")
 
     @pytest.mark.unit
     def test_connection_release_mock_mode(self, db_manager):
@@ -101,14 +100,14 @@ class TestThreadSafeDatabaseManager:
         assert result is True
 
     @pytest.mark.unit
-    @patch('psycopg2.pool.ThreadedConnectionPool')
+    @patch("psycopg2.pool.ThreadedConnectionPool")
     def test_connection_acquisition_real_mode(self, mock_pool, mock_config):
         """Test connection acquisition in real database mode."""
-        mock_config['mock_mode'] = False
+        mock_config["mock_mode"] = False
         mock_connection = Mock()
         mock_pool.return_value.getconn.return_value = mock_connection
 
-        with patch('threadsafe_database_manager.get_logger'):
+        with patch("threadsafe_database_manager.get_logger"):
             manager = ThreadSafeDatabaseManager(config=mock_config)
             connection = manager.get_connection()
 
@@ -119,16 +118,20 @@ class TestThreadSafeDatabaseManager:
     def test_execute_query_success(self, db_manager, sample_database_records):
         """Test successful query execution."""
         # Setup mock cursor behavior
-        with patch.object(db_manager, 'get_connection') as mock_get_conn:
+        with patch.object(db_manager, "get_connection") as mock_get_conn:
             mock_connection = Mock()
             mock_cursor = Mock()
-            mock_connection.cursor.return_value.__enter__ = Mock(return_value=mock_cursor)
+            mock_connection.cursor.return_value.__enter__ = Mock(
+                return_value=mock_cursor
+            )
             mock_connection.cursor.return_value.__exit__ = Mock(return_value=None)
             mock_cursor.fetchall.return_value = sample_database_records
             mock_get_conn.return_value = mock_connection
 
             # Execute query
-            result = db_manager.execute_query("SELECT * FROM properties WHERE apn = %s", ("10215009",))
+            result = db_manager.execute_query(
+                "SELECT * FROM properties WHERE apn = %s", ("10215009",)
+            )
 
             # Verify results
             assert result is not None
@@ -138,10 +141,12 @@ class TestThreadSafeDatabaseManager:
     @pytest.mark.unit
     def test_execute_query_error_handling(self, db_manager):
         """Test query execution error handling."""
-        with patch.object(db_manager, 'get_connection') as mock_get_conn:
+        with patch.object(db_manager, "get_connection") as mock_get_conn:
             mock_connection = Mock()
             mock_cursor = Mock()
-            mock_connection.cursor.return_value.__enter__ = Mock(return_value=mock_cursor)
+            mock_connection.cursor.return_value.__enter__ = Mock(
+                return_value=mock_cursor
+            )
             mock_connection.cursor.return_value.__exit__ = Mock(return_value=None)
             mock_cursor.execute.side_effect = Exception("Database error")
             mock_get_conn.return_value = mock_connection
@@ -156,7 +161,7 @@ class TestThreadSafeDatabaseManager:
     @pytest.mark.unit
     def test_insert_property_data(self, db_manager, mock_property_data):
         """Test inserting property data."""
-        with patch.object(db_manager, 'execute_query') as mock_execute:
+        with patch.object(db_manager, "execute_query") as mock_execute:
             mock_execute.return_value = True
 
             # Insert property data
@@ -168,16 +173,16 @@ class TestThreadSafeDatabaseManager:
 
             # Verify query parameters include property data
             call_args = mock_execute.call_args
-            assert 'INSERT' in call_args[0][0].upper()
+            assert "INSERT" in call_args[0][0].upper()
 
     @pytest.mark.unit
     def test_update_property_data(self, db_manager, mock_property_data):
         """Test updating existing property data."""
-        with patch.object(db_manager, 'execute_query') as mock_execute:
+        with patch.object(db_manager, "execute_query") as mock_execute:
             mock_execute.return_value = True
 
             # Update property data
-            updated_data = {**mock_property_data, 'assessed_value': 300000}
+            updated_data = {**mock_property_data, "assessed_value": 300000}
             result = db_manager.update_property(updated_data)
 
             # Verify update
@@ -186,12 +191,12 @@ class TestThreadSafeDatabaseManager:
 
             # Verify query parameters
             call_args = mock_execute.call_args
-            assert 'UPDATE' in call_args[0][0].upper()
+            assert "UPDATE" in call_args[0][0].upper()
 
     @pytest.mark.unit
     def test_search_properties_by_apn(self, db_manager, sample_database_records):
         """Test searching properties by APN."""
-        with patch.object(db_manager, 'execute_query') as mock_execute:
+        with patch.object(db_manager, "execute_query") as mock_execute:
             mock_execute.return_value = sample_database_records
 
             # Search by APN
@@ -205,7 +210,7 @@ class TestThreadSafeDatabaseManager:
     @pytest.mark.unit
     def test_search_properties_by_address(self, db_manager, sample_database_records):
         """Test searching properties by address."""
-        with patch.object(db_manager, 'execute_query') as mock_execute:
+        with patch.object(db_manager, "execute_query") as mock_execute:
             mock_execute.return_value = sample_database_records
 
             # Search by address
@@ -223,12 +228,12 @@ class TestThreadSafeDatabaseManager:
         for i in range(5):
             property_data = {
                 **mock_property_data,
-                'apn': f'1021500{9+i}',
-                'address': f'1000{i} W Missouri Ave'
+                "apn": f"1021500{9+i}",
+                "address": f"1000{i} W Missouri Ave",
             }
             batch_data.append(property_data)
 
-        with patch.object(db_manager, 'execute_query') as mock_execute:
+        with patch.object(db_manager, "execute_query") as mock_execute:
             mock_execute.return_value = True
 
             # Execute batch insert
@@ -241,7 +246,7 @@ class TestThreadSafeDatabaseManager:
     @pytest.mark.unit
     def test_transaction_management(self, db_manager):
         """Test transaction management functionality."""
-        with patch.object(db_manager, 'get_connection') as mock_get_conn:
+        with patch.object(db_manager, "get_connection") as mock_get_conn:
             mock_connection = Mock()
             mock_get_conn.return_value = mock_connection
 
@@ -316,6 +321,7 @@ class TestThreadSafeDatabaseManager:
     @pytest.mark.performance
     def test_performance_concurrent_queries(self, db_manager, performance_timer):
         """Test performance under concurrent load."""
+
         def execute_query_worker():
             return db_manager.execute_query("SELECT * FROM properties LIMIT 1", ())
 
@@ -357,13 +363,13 @@ class TestThreadSafeDatabaseManager:
         health_status = db_manager.health_check()
 
         assert health_status is not None
-        assert 'status' in health_status
-        assert 'connection_pool' in health_status
+        assert "status" in health_status
+        assert "connection_pool" in health_status
 
     @pytest.mark.unit
     def test_query_caching_functionality(self, db_manager, sample_database_records):
         """Test query result caching."""
-        with patch.object(db_manager, 'execute_query') as mock_execute:
+        with patch.object(db_manager, "execute_query") as mock_execute:
             mock_execute.return_value = sample_database_records
 
             # Enable caching
@@ -385,11 +391,11 @@ class TestThreadSafeDatabaseManager:
         """Test database operations with Missouri Avenue data."""
         missouri_data = {
             **mock_property_data,
-            'apn': '10215009',
-            'address': '10000 W Missouri Ave'
+            "apn": "10215009",
+            "address": "10000 W Missouri Ave",
         }
 
-        with patch.object(db_manager, 'execute_query') as mock_execute:
+        with patch.object(db_manager, "execute_query") as mock_execute:
             mock_execute.return_value = True
 
             # Test Missouri Avenue specific operations
@@ -399,14 +405,14 @@ class TestThreadSafeDatabaseManager:
             # Verify Missouri Avenue data in query
             call_args = mock_execute.call_args
             query_params = call_args[0][1] if len(call_args[0]) > 1 else ()
-            assert any('10215009' in str(param) for param in query_params)
+            assert any("10215009" in str(param) for param in query_params)
 
     @pytest.mark.unit
     def test_backup_and_restore_functionality(self, db_manager, temp_dir):
         """Test database backup and restore capabilities."""
         backup_path = temp_dir / "test_backup.sql"
 
-        with patch.object(db_manager, 'execute_query') as mock_execute:
+        with patch.object(db_manager, "execute_query") as mock_execute:
             mock_execute.return_value = True
 
             # Test backup
@@ -420,7 +426,7 @@ class TestThreadSafeDatabaseManager:
     @pytest.mark.unit
     def test_database_schema_management(self, db_manager):
         """Test database schema creation and management."""
-        with patch.object(db_manager, 'execute_query') as mock_execute:
+        with patch.object(db_manager, "execute_query") as mock_execute:
             mock_execute.return_value = True
 
             # Test schema creation
@@ -442,12 +448,12 @@ class TestThreadSafeDatabaseManager:
 
         # Verify cleanup released resources
         # Note: In mock mode, this tests the cleanup interface
-        assert hasattr(db_manager, 'cleanup')
+        assert hasattr(db_manager, "cleanup")
 
     @pytest.mark.unit
     def test_backward_compatibility_alias(self, mock_config):
         """Test backward compatibility with DatabaseManager alias."""
-        with patch('threadsafe_database_manager.get_logger'):
+        with patch("threadsafe_database_manager.get_logger"):
             # Test that DatabaseManager is an alias for ThreadSafeDatabaseManager
             manager = DatabaseManager(config=mock_config)
 
@@ -457,8 +463,8 @@ class TestThreadSafeDatabaseManager:
     @pytest.mark.unit
     def test_error_logging_and_monitoring(self, db_manager):
         """Test error logging and monitoring functionality."""
-        with patch.object(db_manager, 'logger') as mock_logger:
-            with patch.object(db_manager, 'get_connection') as mock_get_conn:
+        with patch.object(db_manager, "logger") as mock_logger:
+            with patch.object(db_manager, "get_connection") as mock_get_conn:
                 mock_get_conn.side_effect = Exception("Connection failed")
 
                 # Execute operation that should fail
@@ -472,18 +478,18 @@ class TestThreadSafeDatabaseManager:
     def test_configuration_validation(self, mock_config):
         """Test database configuration validation."""
         # Test valid configuration
-        with patch('threadsafe_database_manager.get_logger'):
+        with patch("threadsafe_database_manager.get_logger"):
             manager = ThreadSafeDatabaseManager(config=mock_config)
-            assert manager.config['database'] == 'test_db'
+            assert manager.config["database"] == "test_db"
 
         # Test configuration with missing required fields
-        invalid_config = {'host': 'localhost'}
+        invalid_config = {"host": "localhost"}
 
-        with patch('threadsafe_database_manager.get_logger'):
+        with patch("threadsafe_database_manager.get_logger"):
             try:
                 manager = ThreadSafeDatabaseManager(config=invalid_config)
                 # Should handle missing configuration gracefully
                 assert manager is not None
             except Exception as e:
                 # Or raise appropriate error for invalid config
-                assert 'config' in str(e).lower() or 'database' in str(e).lower()
+                assert "config" in str(e).lower() or "database" in str(e).lower()

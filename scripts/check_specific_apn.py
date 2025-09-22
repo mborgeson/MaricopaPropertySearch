@@ -68,8 +68,8 @@ def check_apn_comprehensive(test_apn):
 
         # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         # MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.enhanced_config_manager import EnhancedConfigManager
+        from src.api_client_unified import UnifiedMaricopaAPIClient
+        from src.enhanced_config_manager import EnhancedConfigManager
 
         config_manager = EnhancedConfigManager()
         api_client = UnifiedMaricopaAPIClient(config_manager)

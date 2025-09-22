@@ -12,7 +12,10 @@ from pathlib import Path
 from datetime import datetime
 
 # Add the src directory to the path
-sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
+sys.path.insert(
+    0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "src")
+)
+
 
 class StaticGUIAnalyzer:
     """Analyzes GUI code structure and identifies potential issues"""
@@ -30,9 +33,9 @@ class StaticGUIAnalyzer:
 
         # Find the GUI file
         possible_paths = [
-            'src/gui/enhanced_main_window.py',
-            '../src/gui/enhanced_main_window.py',
-            './src/gui/enhanced_main_window.py'
+            "src/gui/enhanced_main_window.py",
+            "../src/gui/enhanced_main_window.py",
+            "./src/gui/enhanced_main_window.py",
         ]
 
         for path in possible_paths:
@@ -47,7 +50,7 @@ class StaticGUIAnalyzer:
         print(f"📁 Found GUI file: {self.gui_file_path}")
 
         try:
-            with open(self.gui_file_path, 'r', encoding='utf-8') as f:
+            with open(self.gui_file_path, "r", encoding="utf-8") as f:
                 content = f.read()
 
             # Parse the AST
@@ -71,20 +74,20 @@ class StaticGUIAnalyzer:
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
                 for alias in node.names:
-                    self.imports[alias.name] = 'import'
+                    self.imports[alias.name] = "import"
             elif isinstance(node, ast.ImportFrom):
-                module = node.module or ''
+                module = node.module or ""
                 for alias in node.names:
-                    self.imports[f"{module}.{alias.name}"] = 'from_import'
+                    self.imports[f"{module}.{alias.name}"] = "from_import"
 
         # Check critical imports
         critical_imports = [
-            'PyQt5.QtWidgets',
-            'PyQt5.QtCore',
-            'PyQt5.QtGui',
-            'config_manager',
-            'database_manager',
-            'background_data_collector'
+            "PyQt5.QtWidgets",
+            "PyQt5.QtCore",
+            "PyQt5.QtGui",
+            "config_manager",
+            "database_manager",
+            "background_data_collector",
         ]
 
         for imp in critical_imports:
@@ -106,27 +109,31 @@ class StaticGUIAnalyzer:
                 classes_found.append(node.name)
 
                 # Analyze class inheritance
-                bases = [base.id if hasattr(base, 'id') else str(base) for base in node.bases]
-                self.components[f'class_{node.name}'] = f"✅ FOUND - inherits from: {bases}"
+                bases = [
+                    base.id if hasattr(base, "id") else str(base) for base in node.bases
+                ]
+                self.components[f"class_{node.name}"] = (
+                    f"✅ FOUND - inherits from: {bases}"
+                )
 
                 # Check for required GUI classes
-                if node.name == 'EnhancedMainWindow':
+                if node.name == "EnhancedMainWindow":
                     self.analyze_main_window_class(node)
 
         # Check for expected classes
         expected_classes = [
-            'EnhancedMainWindow',
-            'PropertyDetailsWidget',
-            'NotificationArea',
-            'StatusIndicator',
-            'AdvancedFiltersWidget'
+            "EnhancedMainWindow",
+            "PropertyDetailsWidget",
+            "NotificationArea",
+            "StatusIndicator",
+            "AdvancedFiltersWidget",
         ]
 
         for expected in expected_classes:
             if expected in classes_found:
-                self.components[f'class_check_{expected}'] = "✅ FOUND"
+                self.components[f"class_check_{expected}"] = "✅ FOUND"
             else:
-                self.components[f'class_check_{expected}'] = "❌ MISSING"
+                self.components[f"class_check_{expected}"] = "❌ MISSING"
                 self.issues.append(f"Expected class not found: {expected}")
 
     def analyze_main_window_class(self, class_node):
@@ -141,24 +148,24 @@ class StaticGUIAnalyzer:
                 methods_found.append(node.name)
             elif isinstance(node, ast.Assign):
                 for target in node.targets:
-                    if hasattr(target, 'attr'):
+                    if hasattr(target, "attr"):
                         attributes_found.append(target.attr)
 
         # Check critical methods
         critical_methods = [
-            '__init__',
-            'setup_ui',
-            'perform_search',
-            'start_background_collection',
-            'show_export_dialog',
-            'connect_signals'
+            "__init__",
+            "setup_ui",
+            "perform_search",
+            "start_background_collection",
+            "show_export_dialog",
+            "connect_signals",
         ]
 
         for method in critical_methods:
             if method in methods_found:
-                self.components[f'method_{method}'] = "✅ FOUND"
+                self.components[f"method_{method}"] = "✅ FOUND"
             else:
-                self.components[f'method_{method}'] = "❌ MISSING"
+                self.components[f"method_{method}"] = "❌ MISSING"
                 self.issues.append(f"Critical method missing: {method}")
 
     def analyze_methods(self, tree):
@@ -170,16 +177,18 @@ class StaticGUIAnalyzer:
         for node in ast.walk(tree):
             if isinstance(node, ast.FunctionDef):
                 # Count lines of code
-                if hasattr(node, 'lineno') and hasattr(node, 'end_lineno'):
+                if hasattr(node, "lineno") and hasattr(node, "end_lineno"):
                     lines = node.end_lineno - node.lineno + 1
                     method_stats[node.name] = {
-                        'lines': lines,
-                        'args': len(node.args.args) if node.args else 0
+                        "lines": lines,
+                        "args": len(node.args.args) if node.args else 0,
                     }
 
                     # Flag very long methods
                     if lines > 100:
-                        self.issues.append(f"⚠️ Long method detected: {node.name} ({lines} lines)")
+                        self.issues.append(
+                            f"⚠️ Long method detected: {node.name} ({lines} lines)"
+                        )
 
         self.methods = method_stats
 
@@ -188,50 +197,62 @@ class StaticGUIAnalyzer:
         print("🔍 Checking GUI patterns...")
 
         try:
-            with open(self.gui_file_path, 'r', encoding='utf-8') as f:
+            with open(self.gui_file_path, "r", encoding="utf-8") as f:
                 content = f.read()
 
             # Check for signal connections
-            if 'connect(' in content:
-                self.components['signal_connections'] = "✅ FOUND - Signal connections present"
+            if "connect(" in content:
+                self.components["signal_connections"] = (
+                    "✅ FOUND - Signal connections present"
+                )
             else:
-                self.components['signal_connections'] = "❌ MISSING - No signal connections found"
+                self.components["signal_connections"] = (
+                    "❌ MISSING - No signal connections found"
+                )
                 self.issues.append("No PyQt signal connections found")
 
             # Check for error handling
-            if 'try:' in content and 'except' in content:
-                self.components['error_handling'] = "✅ FOUND - Error handling present"
+            if "try:" in content and "except" in content:
+                self.components["error_handling"] = "✅ FOUND - Error handling present"
             else:
-                self.components['error_handling'] = "⚠️ LIMITED - Minimal error handling"
+                self.components["error_handling"] = "⚠️ LIMITED - Minimal error handling"
                 self.issues.append("Limited error handling detected")
 
             # Check for threading
-            if 'QThread' in content or 'QTimer' in content:
-                self.components['threading'] = "✅ FOUND - Threading components present"
+            if "QThread" in content or "QTimer" in content:
+                self.components["threading"] = "✅ FOUND - Threading components present"
             else:
-                self.components['threading'] = "⚠️ LIMITED - No threading detected"
+                self.components["threading"] = "⚠️ LIMITED - No threading detected"
 
             # Check for database integration
-            if 'db_manager' in content or 'DatabaseManager' in content:
-                self.components['database_integration'] = "✅ FOUND - Database integration present"
+            if "db_manager" in content or "DatabaseManager" in content:
+                self.components["database_integration"] = (
+                    "✅ FOUND - Database integration present"
+                )
             else:
-                self.components['database_integration'] = "❌ MISSING - No database integration"
+                self.components["database_integration"] = (
+                    "❌ MISSING - No database integration"
+                )
                 self.issues.append("No database integration found")
 
             # Check for progress indicators
-            if 'QProgressBar' in content or 'progress' in content.lower():
-                self.components['progress_indicators'] = "✅ FOUND - Progress indicators present"
+            if "QProgressBar" in content or "progress" in content.lower():
+                self.components["progress_indicators"] = (
+                    "✅ FOUND - Progress indicators present"
+                )
             else:
-                self.components['progress_indicators'] = "⚠️ LIMITED - Limited progress feedback"
+                self.components["progress_indicators"] = (
+                    "⚠️ LIMITED - Limited progress feedback"
+                )
 
         except Exception as e:
             self.issues.append(f"Pattern analysis failed: {e}")
 
     def generate_report(self):
         """Generate comprehensive analysis report"""
-        print("\n" + "="*80)
+        print("\n" + "=" * 80)
         print("📋 STATIC GUI ANALYSIS REPORT")
-        print("="*80)
+        print("=" * 80)
 
         # Component analysis
         print("\n🏗️ COMPONENT ANALYSIS:")
@@ -244,10 +265,14 @@ class StaticGUIAnalyzer:
             print(f"  Total methods found: {len(self.methods)}")
 
             # Top 5 longest methods
-            sorted_methods = sorted(self.methods.items(), key=lambda x: x[1]['lines'], reverse=True)[:5]
+            sorted_methods = sorted(
+                self.methods.items(), key=lambda x: x[1]["lines"], reverse=True
+            )[:5]
             print("  Longest methods:")
             for name, stats in sorted_methods:
-                print(f"    {name:30} | {stats['lines']:3} lines | {stats['args']:2} args")
+                print(
+                    f"    {name:30} | {stats['lines']:3} lines | {stats['args']:2} args"
+                )
 
         # Issues found
         if self.issues:
@@ -259,9 +284,15 @@ class StaticGUIAnalyzer:
 
         # Summary statistics
         total_components = len(self.components)
-        passed_components = len([c for c in self.components.values() if c.startswith('✅')])
-        warning_components = len([c for c in self.components.values() if c.startswith('⚠️')])
-        failed_components = len([c for c in self.components.values() if c.startswith('❌')])
+        passed_components = len(
+            [c for c in self.components.values() if c.startswith("✅")]
+        )
+        warning_components = len(
+            [c for c in self.components.values() if c.startswith("⚠️")]
+        )
+        failed_components = len(
+            [c for c in self.components.values() if c.startswith("❌")]
+        )
 
         print(f"\n📊 SUMMARY:")
         print(f"  Total components analyzed: {total_components}")
@@ -275,19 +306,20 @@ class StaticGUIAnalyzer:
             print(f"  📈 Success rate: {success_rate:.1f}%")
 
         return {
-            'timestamp': datetime.now().isoformat(),
-            'components': self.components,
-            'methods': self.methods,
-            'issues': self.issues,
-            'summary': {
-                'total_components': total_components,
-                'passed': passed_components,
-                'warnings': warning_components,
-                'failed': failed_components,
-                'total_issues': len(self.issues),
-                'success_rate': success_rate if total_components > 0 else 0
-            }
+            "timestamp": datetime.now().isoformat(),
+            "components": self.components,
+            "methods": self.methods,
+            "issues": self.issues,
+            "summary": {
+                "total_components": total_components,
+                "passed": passed_components,
+                "warnings": warning_components,
+                "failed": failed_components,
+                "total_issues": len(self.issues),
+                "success_rate": success_rate if total_components > 0 else 0,
+            },
         }
+
 
 def main():
     """Main analysis function"""
@@ -301,10 +333,11 @@ def main():
         # Save report
         try:
             import json
+
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"static_gui_analysis_{timestamp}.json"
 
-            with open(filename, 'w') as f:
+            with open(filename, "w") as f:
                 json.dump(report, f, indent=2)
 
             print(f"\n💾 Analysis report saved to: {filename}")
@@ -316,6 +349,7 @@ def main():
     else:
         print("💥 Analysis failed to complete")
         return None
+
 
 if __name__ == "__main__":
     main()

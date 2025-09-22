@@ -12,6 +12,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
 
+
 def fix_config_manager():
     """Add missing methods to ConfigManager"""
     config_file = project_root / "src" / "config_manager.py"
@@ -47,15 +48,20 @@ def fix_config_manager():
 
         # Find the last method in the class (before the final closing)
         # We'll insert our new methods before the end of the class
-        lines = content.split('\n')
+        lines = content.split("\n")
         insert_index = -1
 
         # Find the ConfigManager class
         in_class = False
         for i, line in enumerate(lines):
-            if 'class ConfigManager' in line:
+            if "class ConfigManager" in line:
                 in_class = True
-            elif in_class and line and not line.startswith(' ') and not line.startswith('\t'):
+            elif (
+                in_class
+                and line
+                and not line.startswith(" ")
+                and not line.startswith("\t")
+            ):
                 # End of class found
                 insert_index = i - 1
                 break
@@ -65,17 +71,18 @@ def fix_config_manager():
             insert_index = len(lines) - 1
 
         # Insert the new methods
-        method_lines = new_methods.split('\n')
+        method_lines = new_methods.split("\n")
         for j, method_line in enumerate(reversed(method_lines)):
             lines.insert(insert_index, method_line)
 
         # Write back
-        config_file.write_text('\n'.join(lines))
+        config_file.write_text("\n".join(lines))
         print("  [OK] Added 4 missing methods to ConfigManager")
         return True
     else:
         print("  [ERROR] config_manager.py not found")
         return False
+
 
 def fix_search_button():
     """Fix missing search button in enhanced_main_window.py"""
@@ -93,7 +100,7 @@ def fix_search_button():
 
         # Find where to add the search button
         # It should be near search_input initialization
-        lines = content.split('\n')
+        lines = content.split("\n")
         insert_index = -1
 
         for i, line in enumerate(lines):
@@ -104,7 +111,9 @@ def fix_search_button():
 
         if insert_index != -1:
             # Add search button initialization
-            button_code = "        self.search_button = QPushButton('Search Properties')"
+            button_code = (
+                "        self.search_button = QPushButton('Search Properties')"
+            )
             lines.insert(insert_index, button_code)
 
             # Also need to connect it to search function
@@ -123,7 +132,7 @@ def fix_search_button():
                         break
 
             # Write back
-            window_file.write_text('\n'.join(lines))
+            window_file.write_text("\n".join(lines))
             print("  [OK] Added search_button to enhanced_main_window.py")
             return True
         else:
@@ -133,25 +142,31 @@ def fix_search_button():
         print("  [ERROR] enhanced_main_window.py not found")
         return False
 
+
 def verify_fixes():
     """Run the test again to verify fixes"""
     print("\n[VERIFY] Running test to check fixes...")
 
     import subprocess
+
     test_script = project_root / "tests" / "gui_launcher_test.py"
 
     if test_script.exists():
         result = subprocess.run(
-            [sys.executable, str(test_script)],
-            capture_output=True,
-            text=True
+            [sys.executable, str(test_script)], capture_output=True, text=True
         )
 
         # Check for specific issues
         output = result.stdout + result.stderr
 
-        config_fixed = "get_database_enabled" not in output or "[OK] CONFIGURATION: PASSED" in output
-        button_fixed = "Search Button: MISSING" not in output or "Search Button: INITIALIZED" in output
+        config_fixed = (
+            "get_database_enabled" not in output
+            or "[OK] CONFIGURATION: PASSED" in output
+        )
+        button_fixed = (
+            "Search Button: MISSING" not in output
+            or "Search Button: INITIALIZED" in output
+        )
 
         print("\n[RESULTS]")
         print(f"  ConfigManager Fix: {'✓ PASSED' if config_fixed else '✗ FAILED'}")
@@ -167,10 +182,11 @@ def verify_fixes():
         print("  [ERROR] Test script not found")
         return False
 
+
 def main():
-    print("="*60)
+    print("=" * 60)
     print(" GUI LAUNCHER ISSUE FIX SCRIPT")
-    print("="*60)
+    print("=" * 60)
     print("Based on issues identified in GUI_LAUNCHER_TEST_REPORT.md")
 
     # Apply fixes
@@ -184,9 +200,9 @@ def main():
         verify_ok = verify_fixes()
 
         if verify_ok:
-            print("\n" + "="*60)
+            print("\n" + "=" * 60)
             print(" ✓ ALL ISSUES RESOLVED - GUI LAUNCHER READY!")
-            print("="*60)
+            print("=" * 60)
             return 0
         else:
             print("\nSome issues remain. Please review manually.")
@@ -194,6 +210,7 @@ def main():
     else:
         print("\n[ERROR] Failed to apply all fixes")
         return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

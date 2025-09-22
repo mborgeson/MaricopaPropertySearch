@@ -14,7 +14,7 @@ try:
         capture_output=True,
         text=True,
         timeout=2,
-        cwd=project_root
+        cwd=project_root,
     )
 except subprocess.TimeoutExpired as e:
     # This is expected - app runs until timeout

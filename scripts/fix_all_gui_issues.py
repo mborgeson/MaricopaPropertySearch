@@ -13,6 +13,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
 
+
 class ComprehensiveFixer:
     def __init__(self):
         self.issues_fixed = []
@@ -62,15 +63,17 @@ class ComprehensiveFixer:
 '''
 
                     # Find the last method in the class
-                    lines = content.split('\n')
+                    lines = content.split("\n")
                     insert_index = -1
 
                     for i in range(len(lines) - 1, -1, -1):
-                        if lines[i].strip().startswith('def ') and lines[i-1].startswith('    '):
+                        if lines[i].strip().startswith("def ") and lines[
+                            i - 1
+                        ].startswith("    "):
                             insert_index = i + 1
                             # Find the end of this method
                             for j in range(i + 1, len(lines)):
-                                if lines[j] and not lines[j].startswith(' '):
+                                if lines[j] and not lines[j].startswith(" "):
                                     insert_index = j
                                     break
                             break
@@ -83,7 +86,7 @@ class ComprehensiveFixer:
                     lines.insert(insert_index, method_code)
 
                     # Write back
-                    cache_file.write_text('\n'.join(lines))
+                    cache_file.write_text("\n".join(lines))
                     print("[OK] Added clear_apn_cache method to DataCollectionCache")
                     self.issues_fixed.append("clear_apn_cache method added")
                 else:
@@ -91,7 +94,9 @@ class ComprehensiveFixer:
                     self.issues_fixed.append("clear_apn_cache already exists")
             else:
                 # Create a simple version if file doesn't exist
-                print("[WARNING] DataCollectionCache file not found, creating workaround")
+                print(
+                    "[WARNING] DataCollectionCache file not found, creating workaround"
+                )
                 self.create_cache_workaround()
 
         except Exception as e:
@@ -113,14 +118,14 @@ class ComprehensiveFixer:
                 if "self.status_widget.show_message" in content:
                     content = content.replace(
                         'self.status_widget.show_message("Automatically collecting comprehensive property data...", "info")',
-                        'self.status_widget.update_status("Automatically collecting comprehensive property data...")'
+                        'self.status_widget.update_status("Automatically collecting comprehensive property data...")',
                     )
 
                     # Also fix any other occurrences
                     content = re.sub(
                         r'self\.status_widget\.show_message\((.*?),\s*".*?"\)',
-                        r'self.status_widget.update_status(\1)',
-                        content
+                        r"self.status_widget.update_status(\1)",
+                        content,
                     )
 
                     window_file.write_text(content)
@@ -170,17 +175,17 @@ class ComprehensiveFixer:
         }
 '''
                     # Add this method to the API client
-                    lines = content.split('\n')
+                    lines = content.split("\n")
                     for i, line in enumerate(lines):
-                        if 'def get_property_details' in line:
+                        if "def get_property_details" in line:
                             # Insert after this method
                             for j in range(i + 1, len(lines)):
-                                if lines[j].strip() and not lines[j].startswith(' '):
+                                if lines[j].strip() and not lines[j].startswith(" "):
                                     lines.insert(j, method_code)
                                     break
                             break
 
-                    api_file.write_text('\n'.join(lines))
+                    api_file.write_text("\n".join(lines))
                     print("[OK] Added get_tax_info method")
 
                 print("[OK] Data collection methods checked")
@@ -206,17 +211,23 @@ class ComprehensiveFixer:
                     # Ensure it's called when OK is pressed
                     if "accepted.connect(self.save_settings)" not in content:
                         # Add connection
-                        lines = content.split('\n')
+                        lines = content.split("\n")
                         for i, line in enumerate(lines):
-                            if "ApplicationSettingsDialog" in line and "exec" in lines[i+1:i+5]:
+                            if (
+                                "ApplicationSettingsDialog" in line
+                                and "exec" in lines[i + 1 : i + 5]
+                            ):
                                 # Find where dialog is created and add connection
-                                for j in range(i, min(i+10, len(lines))):
+                                for j in range(i, min(i + 10, len(lines))):
                                     if "dialog.exec" in lines[j]:
-                                        lines.insert(j, "        dialog.accepted.connect(lambda: self.save_settings(dialog.get_settings()))")
+                                        lines.insert(
+                                            j,
+                                            "        dialog.accepted.connect(lambda: self.save_settings(dialog.get_settings()))",
+                                        )
                                         break
                                 break
 
-                        window_file.write_text('\n'.join(lines))
+                        window_file.write_text("\n".join(lines))
                         print("[OK] Added settings save on dialog accept")
                 else:
                     # Add save_settings method
@@ -251,14 +262,14 @@ class ComprehensiveFixer:
             'cache'      # Last: Database cache
         ]
 '''
-                    lines = content.split('\n')
+                    lines = content.split("\n")
                     # Add at the end of the class
                     for i in range(len(lines) - 1, -1, -1):
-                        if lines[i].strip() and not lines[i].startswith('#'):
+                        if lines[i].strip() and not lines[i].startswith("#"):
                             lines.insert(i + 1, method_code)
                             break
 
-                    config_file.write_text('\n'.join(lines))
+                    config_file.write_text("\n".join(lines))
                     print("[OK] Added source priority configuration")
 
                 self.issues_fixed.append("Source priority configured")
@@ -282,7 +293,7 @@ class ComprehensiveFixer:
                 # Find test_all_sources method
                 if "def test_all_sources" in content:
                     # Make sure it returns proper status
-                    lines = content.split('\n')
+                    lines = content.split("\n")
                     in_method = False
                     method_start = -1
 
@@ -290,7 +301,7 @@ class ComprehensiveFixer:
                         if "def test_all_sources" in line:
                             in_method = True
                             method_start = i
-                        elif in_method and line.strip() and not line.startswith(' '):
+                        elif in_method and line.strip() and not line.startswith(" "):
                             # End of method
                             break
 
@@ -328,8 +339,8 @@ class ComprehensiveFixer:
 
         return results
 '''
-                            lines[method_start + 1:i] = implementation.split('\n')
-                            window_file.write_text('\n'.join(lines))
+                            lines[method_start + 1 : i] = implementation.split("\n")
+                            window_file.write_text("\n".join(lines))
                             print("[OK] Fixed test_all_sources implementation")
 
                 self.issues_fixed.append("Test sources fixed")
@@ -403,19 +414,24 @@ class DataCollectionCache:
             return False
 '''
 
-        lines = content.split('\n')
+        lines = content.split("\n")
         # Find a good place to add it (after __init__ method)
         for i, line in enumerate(lines):
-            if "def __init__" in line and "EnhancedPropertySearchApp" in lines[i-5:i]:
+            if (
+                "def __init__" in line
+                and "EnhancedPropertySearchApp" in lines[i - 5 : i]
+            ):
                 # Find end of __init__
                 indent_count = len(line) - len(line.lstrip())
                 for j in range(i + 1, len(lines)):
-                    if lines[j].strip() and not lines[j].startswith(' ' * (indent_count + 4)):
+                    if lines[j].strip() and not lines[j].startswith(
+                        " " * (indent_count + 4)
+                    ):
                         lines.insert(j, method_code)
                         break
                 break
 
-        window_file.write_text('\n'.join(lines))
+        window_file.write_text("\n".join(lines))
         print("[OK] Added save_settings method")
 
     def run_all_fixes(self):
@@ -454,6 +470,7 @@ class DataCollectionCache:
 
         return len(self.issues_failed) == 0
 
+
 def main():
     fixer = ComprehensiveFixer()
     success = fixer.run_all_fixes()
@@ -472,6 +489,7 @@ def main():
         print("3. Restart application after fixes")
 
     return 0 if success else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -20,7 +20,7 @@ class PerformanceRegressionChecker:
         "data_collection": 1.0,  # 1s max for data collection
         "batch_processing": 5.0,  # 5s max for batch operations
         "export_operation": 2.0,  # 2s max for export operations
-        "default": 1.0  # Default threshold for unspecified tests
+        "default": 1.0,  # Default threshold for unspecified tests
     }
 
     # Acceptable regression percentage (e.g., 10% slower is acceptable)
@@ -42,18 +42,18 @@ class PerformanceRegressionChecker:
                 "benchmarks": [
                     {
                         "name": "test_basic_search",
-                        "stats": {"mean": 0.04, "stddev": 0.01}
+                        "stats": {"mean": 0.04, "stddev": 0.01},
                     },
                     {
                         "name": "test_comprehensive_search",
-                        "stats": {"mean": 0.33, "stddev": 0.05}
-                    }
+                        "stats": {"mean": 0.33, "stddev": 0.05},
+                    },
                 ]
             }
             return True
 
         try:
-            with open(self.benchmark_file, 'r') as f:
+            with open(self.benchmark_file, "r") as f:
                 self.results = json.load(f)
             return True
         except json.JSONDecodeError as e:
@@ -111,7 +111,11 @@ class PerformanceRegressionChecker:
                     "test": name,
                     "time": mean_time,
                     "threshold": self._get_threshold(name),
-                    "severity": "critical" if mean_time > self._get_threshold(name) * 2 else "warning"
+                    "severity": (
+                        "critical"
+                        if mean_time > self._get_threshold(name) * 2
+                        else "warning"
+                    ),
                 }
                 self.regressions.append(regression)
                 if regression["severity"] == "critical":
@@ -119,11 +123,13 @@ class PerformanceRegressionChecker:
             else:
                 # Track improvements for reporting
                 if mean_time < self._get_threshold(name) * 0.8:
-                    self.improvements.append({
-                        "test": name,
-                        "time": mean_time,
-                        "threshold": self._get_threshold(name)
-                    })
+                    self.improvements.append(
+                        {
+                            "test": name,
+                            "time": mean_time,
+                            "threshold": self._get_threshold(name),
+                        }
+                    )
 
         return not has_critical_regression
 
@@ -136,9 +142,9 @@ class PerformanceRegressionChecker:
 
     def generate_report(self):
         """Generate performance report"""
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("PERFORMANCE REGRESSION ANALYSIS REPORT")
-        print("="*60)
+        print("=" * 60)
 
         # Summary
         total_tests = len(self.results.get("benchmarks", []))
@@ -153,7 +159,9 @@ class PerformanceRegressionChecker:
             for reg in self.regressions:
                 severity_icon = "🔴" if reg["severity"] == "critical" else "🟡"
                 print(f"{severity_icon} {reg['test']}")
-                print(f"   Time: {reg['time']:.3f}s (threshold: {reg['threshold']:.3f}s)")
+                print(
+                    f"   Time: {reg['time']:.3f}s (threshold: {reg['threshold']:.3f}s)"
+                )
                 print(f"   Severity: {reg['severity'].upper()}")
 
         # Report improvements
@@ -161,13 +169,17 @@ class PerformanceRegressionChecker:
             print("\n✅ PERFORMANCE IMPROVEMENTS:")
             print("-" * 40)
             for imp in self.improvements:
-                improvement_pct = ((imp['threshold'] - imp['time']) / imp['threshold']) * 100
+                improvement_pct = (
+                    (imp["threshold"] - imp["time"]) / imp["threshold"]
+                ) * 100
                 print(f"✓ {imp['test']}")
-                print(f"   Time: {imp['time']:.3f}s (threshold: {imp['threshold']:.3f}s)")
+                print(
+                    f"   Time: {imp['time']:.3f}s (threshold: {imp['threshold']:.3f}s)"
+                )
                 print(f"   Improvement: {improvement_pct:.1f}%")
 
         # Overall status
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         if not self.regressions:
             print("✅ NO PERFORMANCE REGRESSIONS DETECTED")
             print("All benchmarks passed within acceptable thresholds")
@@ -177,7 +189,7 @@ class PerformanceRegressionChecker:
         else:
             print("⚠️  MINOR PERFORMANCE REGRESSIONS DETECTED")
             print("Some tests are slower but within warning thresholds")
-        print("="*60 + "\n")
+        print("=" * 60 + "\n")
 
 
 def main():

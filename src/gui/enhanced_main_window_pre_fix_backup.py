@@ -2255,7 +2255,9 @@ class EnhancedPropertySearchApp(QMainWindow):
     def show_cache_management_dialog(self):
         """Show cache management dialog"""
         dialog = CacheManagementDialog(self.background_manager, self)
-        dialog.exec_()    def refresh_current_data(self):
+        dialog.exec_()
+
+    def refresh_current_data(self):
         """Refresh data for currently displayed results - CRASH-SAFE VERSION"""
         try:
             # Check if we have results to refresh

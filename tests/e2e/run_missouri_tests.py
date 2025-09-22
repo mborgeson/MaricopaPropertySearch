@@ -19,11 +19,11 @@ sys.path.insert(0, str(src_dir))
 # Set up logging
 logging.basicConfig(
     level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler('test_execution.log'),
-        logging.StreamHandler(sys.stdout)
-    ]
+        logging.FileHandler("test_execution.log"),
+        logging.StreamHandler(sys.stdout),
+    ],
 )
 
 logger = logging.getLogger(__name__)
@@ -31,51 +31,51 @@ logger = logging.getLogger(__name__)
 
 def run_missouri_avenue_tests():
     """Run comprehensive tests for Missouri Avenue property"""
-    
+
     logger.info("=" * 80)
     logger.info("MARICOPA PROPERTY SEARCH - MISSOURI AVENUE TESTING")
     logger.info("=" * 80)
     logger.info(f"Test execution started at: {datetime.now()}")
-    
+
     # Test configuration
     test_files = [
         "tests/test_missouri_avenue_address.py",
     ]
-    
+
     # Additional pytest arguments for comprehensive testing
     pytest_args = [
-        "-v",                           # Verbose output
-        "--tb=short",                   # Short traceback format
-        "--strict-markers",             # Strict marker checking
-        "--disable-warnings",           # Disable warnings for cleaner output
-        "--maxfail=5",                  # Stop after 5 failures
-        "--durations=10",               # Show 10 slowest tests
-        "--capture=no",                 # Don't capture output for debugging
+        "-v",  # Verbose output
+        "--tb=short",  # Short traceback format
+        "--strict-markers",  # Strict marker checking
+        "--disable-warnings",  # Disable warnings for cleaner output
+        "--maxfail=5",  # Stop after 5 failures
+        "--durations=10",  # Show 10 slowest tests
+        "--capture=no",  # Don't capture output for debugging
     ]
-    
+
     # Run tests for each file
     all_results = {}
     overall_success = True
-    
+
     for test_file in test_files:
         logger.info(f"\n{'=' * 60}")
         logger.info(f"Running tests from: {test_file}")
         logger.info(f"{'=' * 60}")
-        
+
         if not Path(test_file).exists():
             logger.error(f"Test file not found: {test_file}")
             all_results[test_file] = "FILE_NOT_FOUND"
             overall_success = False
             continue
-        
+
         # Run pytest for this specific file
         start_time = time.time()
         result = pytest.main(pytest_args + [test_file])
         end_time = time.time()
-        
+
         duration = end_time - start_time
         logger.info(f"Test execution completed in {duration:.2f} seconds")
-        
+
         # Record results
         if result == 0:
             all_results[test_file] = "PASSED"
@@ -84,16 +84,18 @@ def run_missouri_avenue_tests():
             all_results[test_file] = "FAILED"
             overall_success = False
             logger.error(f"❌ Some tests FAILED for {test_file}")
-    
+
     # Summary report
     logger.info("\n" + "=" * 80)
     logger.info("TEST EXECUTION SUMMARY")
     logger.info("=" * 80)
-    
+
     for test_file, status in all_results.items():
-        status_icon = "✅" if status == "PASSED" else "❌" if status == "FAILED" else "⚠️"
+        status_icon = (
+            "✅" if status == "PASSED" else "❌" if status == "FAILED" else "⚠️"
+        )
         logger.info(f"{status_icon} {test_file}: {status}")
-    
+
     if overall_success:
         logger.info("\n🎉 ALL TESTS PASSED! Missouri Avenue testing successful.")
         logger.info("\nKey accomplishments:")
@@ -107,39 +109,40 @@ def run_missouri_avenue_tests():
         logger.error("\n💥 SOME TESTS FAILED! Review the output above for details.")
         logger.error("\nNext steps:")
         logger.error("  1. Review failed test details")
-        logger.error("  2. Fix identified issues") 
+        logger.error("  2. Fix identified issues")
         logger.error("  3. Re-run tests to verify fixes")
         logger.error("  4. Update documentation as needed")
-    
+
     logger.info(f"\nTest execution completed at: {datetime.now()}")
     logger.info("=" * 80)
-    
+
     return overall_success
 
 
 def run_ux_verification_tests():
     """Run UX verification tests to ensure no 'Not Available' messages"""
-    
+
     logger.info("\n" + "=" * 60)
     logger.info("UX VERIFICATION - 'NOT AVAILABLE' MESSAGE ELIMINATION")
     logger.info("=" * 60)
-    
+
     # Specific UX tests
     ux_test_args = [
         "-v",
         "--tb=short",
-        "-k", "test_no_not_available_messages_in_ui or test_actionable_messages_present",
-        "tests/test_missouri_avenue_address.py"
+        "-k",
+        "test_no_not_available_messages_in_ui or test_actionable_messages_present",
+        "tests/test_missouri_avenue_address.py",
     ]
-    
+
     logger.info("Running UX message verification tests...")
     start_time = time.time()
     result = pytest.main(ux_test_args)
     end_time = time.time()
-    
+
     duration = end_time - start_time
     logger.info(f"UX verification completed in {duration:.2f} seconds")
-    
+
     if result == 0:
         logger.info("✅ UX VERIFICATION PASSED - No 'Not Available' messages found!")
         logger.info("\nUX Improvements confirmed:")
@@ -161,26 +164,27 @@ def run_ux_verification_tests():
 
 def run_regression_tests():
     """Run regression tests to ensure existing functionality still works"""
-    
+
     logger.info("\n" + "=" * 60)
     logger.info("REGRESSION TESTING - EXISTING FUNCTIONALITY")
     logger.info("=" * 60)
-    
+
     regression_test_args = [
         "-v",
-        "--tb=short", 
-        "-k", "test_basic_search_types_still_work or test_background_collection_still_functional or test_export_functionality_intact",
-        "tests/test_missouri_avenue_address.py"
+        "--tb=short",
+        "-k",
+        "test_basic_search_types_still_work or test_background_collection_still_functional or test_export_functionality_intact",
+        "tests/test_missouri_avenue_address.py",
     ]
-    
+
     logger.info("Running regression tests...")
     start_time = time.time()
     result = pytest.main(regression_test_args)
     end_time = time.time()
-    
+
     duration = end_time - start_time
     logger.info(f"Regression testing completed in {duration:.2f} seconds")
-    
+
     if result == 0:
         logger.info("✅ REGRESSION TESTS PASSED - Existing functionality preserved!")
         logger.info("\nFunctionality confirmed:")
@@ -202,42 +206,39 @@ def run_regression_tests():
 
 def check_test_prerequisites():
     """Check that test prerequisites are met"""
-    
+
     logger.info("Checking test prerequisites...")
-    
+
     issues = []
-    
+
     # Check if test file exists
     test_file = Path("tests/test_missouri_avenue_address.py")
     if not test_file.exists():
         issues.append(f"Test file not found: {test_file}")
-    
+
     # Check if src directory exists
     src_dir = Path("src")
     if not src_dir.exists():
         issues.append(f"Source directory not found: {src_dir}")
-    
+
     # Check if key modules exist
     key_modules = [
         "src/gui/enhanced_main_window.py",
         "src/database_manager.py",
-        "src/config_manager.py"
+        "src/config_manager.py",
     ]
-    
+
     for module in key_modules:
         if not Path(module).exists():
             issues.append(f"Required module not found: {module}")
-    
+
     # Check if test configuration files exist
-    test_configs = [
-        "tests/conftest.py",
-        "pytest.ini"
-    ]
-    
+    test_configs = ["tests/conftest.py", "pytest.ini"]
+
     for config in test_configs:
         if not Path(config).exists():
             issues.append(f"Test configuration file not found: {config}")
-    
+
     if issues:
         logger.error("❌ Prerequisites check FAILED:")
         for issue in issues:
@@ -250,12 +251,12 @@ def check_test_prerequisites():
 
 def generate_test_report():
     """Generate a comprehensive test report"""
-    
+
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     report_file = f"missouri_ave_test_report_{timestamp}.md"
-    
+
     logger.info(f"\nGenerating comprehensive test report: {report_file}")
-    
+
     report_content = f"""# Missouri Avenue Property Testing Report
 
 **Generated:** {datetime.now()}  
@@ -386,7 +387,7 @@ The application is ready for production deployment with significant UX improveme
 """
 
     try:
-        with open(report_file, 'w', encoding='utf-8') as f:
+        with open(report_file, "w", encoding="utf-8") as f:
             f.write(report_content)
         logger.info(f"✅ Test report generated successfully: {report_file}")
         return report_file
@@ -397,45 +398,47 @@ The application is ready for production deployment with significant UX improveme
 
 def main():
     """Main test execution function"""
-    
+
     start_time = time.time()
-    
+
     # Check prerequisites first
     if not check_test_prerequisites():
         logger.error("Prerequisites check failed. Cannot proceed with testing.")
         return False
-    
+
     # Run all test suites
     results = {}
-    
+
     # 1. Run Missouri Avenue specific tests
     logger.info("Starting Missouri Avenue property testing...")
-    results['missouri_tests'] = run_missouri_avenue_tests()
-    
+    results["missouri_tests"] = run_missouri_avenue_tests()
+
     # 2. Run UX verification tests
     logger.info("Starting UX verification testing...")
-    results['ux_tests'] = run_ux_verification_tests()
-    
+    results["ux_tests"] = run_ux_verification_tests()
+
     # 3. Run regression tests
     logger.info("Starting regression testing...")
-    results['regression_tests'] = run_regression_tests()
-    
+    results["regression_tests"] = run_regression_tests()
+
     # Calculate total execution time
     total_time = time.time() - start_time
-    
+
     # Overall results
     overall_success = all(results.values())
-    
+
     logger.info("\n" + "=" * 80)
     logger.info("FINAL TEST RESULTS SUMMARY")
     logger.info("=" * 80)
-    
+
     for test_suite, passed in results.items():
         status_icon = "✅" if passed else "❌"
-        logger.info(f"{status_icon} {test_suite.replace('_', ' ').title()}: {'PASSED' if passed else 'FAILED'}")
-    
+        logger.info(
+            f"{status_icon} {test_suite.replace('_', ' ').title()}: {'PASSED' if passed else 'FAILED'}"
+        )
+
     logger.info(f"\nTotal execution time: {total_time:.2f} seconds")
-    
+
     if overall_success:
         logger.info("\n🎉 ALL TEST SUITES PASSED!")
         logger.info("\nDeployment Readiness:")
@@ -443,23 +446,23 @@ def main():
         logger.info("  ✓ UX improvements successfully implemented")
         logger.info("  ✓ Existing functionality preserved")
         logger.info("  ✓ Application ready for production")
-        
+
         # Generate comprehensive report
         report_file = generate_test_report()
         if report_file:
             logger.info(f"  ✓ Test report generated: {report_file}")
-        
+
     else:
         logger.error("\n💥 SOME TEST SUITES FAILED!")
         logger.error("\nRequired actions before deployment:")
-        
+
         for test_suite, passed in results.items():
             if not passed:
                 logger.error(f"  • Fix issues in: {test_suite.replace('_', ' ')}")
-        
+
         logger.error("  • Re-run all tests after fixes")
         logger.error("  • Verify no regressions introduced")
-    
+
     return overall_success
 
 

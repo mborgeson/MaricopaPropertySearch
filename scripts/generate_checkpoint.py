@@ -11,6 +11,7 @@ import subprocess
 from datetime import datetime
 from pathlib import Path
 
+
 class CheckpointGenerator:
     def __init__(self):
         self.project_root = Path("/home/mattb/MaricopaPropertySearch")
@@ -21,44 +22,58 @@ class CheckpointGenerator:
         """Get current git status and recent commits"""
         try:
             # Get current commit hash
-            current_commit = subprocess.check_output(
-                ["git", "rev-parse", "HEAD"],
-                cwd=self.project_root
-            ).decode().strip()[:7]
+            current_commit = (
+                subprocess.check_output(
+                    ["git", "rev-parse", "HEAD"], cwd=self.project_root
+                )
+                .decode()
+                .strip()[:7]
+            )
 
             # Get recent commits
-            recent_commits = subprocess.check_output(
-                ["git", "log", "--oneline", "-5"],
-                cwd=self.project_root
-            ).decode().strip()
+            recent_commits = (
+                subprocess.check_output(
+                    ["git", "log", "--oneline", "-5"], cwd=self.project_root
+                )
+                .decode()
+                .strip()
+            )
 
             # Get changed files count
-            status = subprocess.check_output(
-                ["git", "status", "--porcelain"],
-                cwd=self.project_root
-            ).decode().strip()
-            changed_files = len(status.split('\n')) if status else 0
+            status = (
+                subprocess.check_output(
+                    ["git", "status", "--porcelain"], cwd=self.project_root
+                )
+                .decode()
+                .strip()
+            )
+            changed_files = len(status.split("\n")) if status else 0
 
             return {
                 "current_commit": current_commit,
                 "recent_commits": recent_commits,
-                "changed_files": changed_files
+                "changed_files": changed_files,
             }
         except:
             return {
                 "current_commit": "unknown",
                 "recent_commits": "Git info unavailable",
-                "changed_files": 0
+                "changed_files": 0,
             }
 
     def analyze_codebase(self):
         """Analyze codebase for large files needing refactoring"""
         large_files = []
         try:
-            result = subprocess.check_output(
-                ["find", ".", "-name", "*.py", "-exec", "wc", "-l", "{}", "+"],
-                cwd=self.project_root
-            ).decode().strip().split('\n')
+            result = (
+                subprocess.check_output(
+                    ["find", ".", "-name", "*.py", "-exec", "wc", "-l", "{}", "+"],
+                    cwd=self.project_root,
+                )
+                .decode()
+                .strip()
+                .split("\n")
+            )
 
             for line in result[:-1]:  # Skip the total line
                 parts = line.strip().split()
@@ -75,11 +90,13 @@ class CheckpointGenerator:
         """Extract TODO items from the previous checkpoint"""
         try:
             # Get latest checkpoint
-            checkpoints = sorted(self.checkpoint_dir.glob("MCA_GUI_AUDIT_CHECKPOINT_*.md"))
+            checkpoints = sorted(
+                self.checkpoint_dir.glob("MCA_GUI_AUDIT_CHECKPOINT_*.md")
+            )
             if not checkpoints:
                 return self.get_default_todos()
 
-            with open(checkpoints[-1], 'r') as f:
+            with open(checkpoints[-1], "r") as f:
                 content = f.read()
 
             # Extract Next Steps section
@@ -221,11 +238,12 @@ Complete all goals in the "Issue Resolution Goals" Checklist with priority on co
 **Checkpoint Path:** checkpoints/{filename}
 """
 
-        with open(filepath, 'w') as f:
+        with open(filepath, "w") as f:
             f.write(checkpoint_content)
 
         print(f"✅ Checkpoint created: {filepath}")
         return filepath
+
 
 if __name__ == "__main__":
     trigger = sys.argv[1] if len(sys.argv) > 1 else "manual"
