@@ -14,7 +14,7 @@ def apply_refresh_fixes():
     # Paths
     main_file = Path("src/gui/enhanced_main_window.py")
     backup_file = Path("src/gui/enhanced_main_window_before_fix.py")
-        print("🔧 Applying crash-safe refresh button fixes...")
+    print("🔧 Applying crash-safe refresh button fixes...")
     
     # Create backup
     if main_file.exists():
@@ -184,7 +184,7 @@ def apply_refresh_fixes():
         except Exception as e:
             # ULTIMATE CRASH PREVENTION - catch absolutely everything
             logger.error(f"CRITICAL: Unhandled error in refresh_property_data for APN {getattr(self, 'property_data', {}).get('apn', 'unknown')}: {e}")
-import traceback
+    import traceback
         traceback.print_exc()
             
             # Show error but keep application running
@@ -267,7 +267,7 @@ def status_replacer(match):
     
     return True
 
-if __name__ == "__main__":
+    if __name__ == "__main__":
     success = apply_refresh_fixes()
     if success:
         print("\\n🎉 All refresh button crash fixes applied successfully!")

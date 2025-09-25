@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 class APIClientPerformancePatch:
     """Performance enhancement patch for MaricopaAPIClient"""
     
-    def __init__(self, api_client):
+def __init__(self, api_client):
         self.api_client = api_client
         self.thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=10)
         self._cache = {}
@@ -27,7 +27,7 @@ class APIClientPerformancePatch:
         
         logger.info("API Client Performance Patch applied")
     
-    def get_detailed_property_data_parallel(self, apn: str) -> Dict[str, Any]:
+def get_detailed_property_data_parallel(self, apn: str) -> Dict[str, Any]:
         """
         PERFORMANCE FIX: Parallel version of get_detailed_property_data
         Reduces collection time from 6+ seconds to <2 seconds
@@ -95,7 +95,7 @@ class APIClientPerformancePatch:
         
         return detailed_data
     
-    def get_comprehensive_property_info_fast(self, apn: str) -> Optional[Dict]:
+def get_comprehensive_property_info_fast(self, apn: str) -> Optional[Dict]:
         """
         PERFORMANCE FIX: Fast version of get_comprehensive_property_info
         Reduces collection time from 25+ seconds to <3 seconds
@@ -169,7 +169,7 @@ class APIClientPerformancePatch:
             logger.error(f"Error in fast comprehensive collection for APN {apn}: {e}")
             return None
     
-    def bulk_property_search_parallel(self, apns: List[str]) -> Dict[str, Dict]:
+def bulk_property_search_parallel(self, apns: List[str]) -> Dict[str, Dict]:
         """
         PERFORMANCE FIX: Parallel bulk search
         Processes multiple APNs concurrently instead of sequentially
@@ -208,7 +208,7 @@ class APIClientPerformancePatch:
         
         return results
     
-    def _make_request_cached(self, endpoint: str, params: Dict = None) -> Optional[Dict]:
+def _make_request_cached(self, endpoint: str, params: Dict = None) -> Optional[Dict]:
         """Cached version of _make_request for better performance"""
         cache_key = f"{endpoint}:{hash(str(params))}"
         
@@ -232,7 +232,7 @@ class APIClientPerformancePatch:
         
         return response
     
-    def _safe_int(self, value) -> Optional[int]:
+def _safe_int(self, value) -> Optional[int]:
         """Safely convert value to int"""
         if not value or value == '':
             return None
@@ -241,7 +241,7 @@ class APIClientPerformancePatch:
         except (ValueError, AttributeError):
             return None
     
-    def _safe_float(self, value) -> Optional[float]:
+def _safe_float(self, value) -> Optional[float]:
         """Safely convert value to float"""
         if not value or value == '':
             return None
@@ -250,13 +250,13 @@ class APIClientPerformancePatch:
         except (ValueError, AttributeError):
             return None
     
-    def clear_cache(self):
+def clear_cache(self):
         """Clear the request cache"""
         with self._cache_lock:
             self._cache.clear()
         logger.info("Request cache cleared")
     
-    def get_cache_stats(self) -> Dict[str, Any]:
+def get_cache_stats(self) -> Dict[str, Any]:
         """Get cache performance statistics"""
         with self._cache_lock:
             return {
@@ -264,7 +264,7 @@ class APIClientPerformancePatch:
                 'cache_memory_mb': len(str(self._cache)) / (1024 * 1024)
             }
     
-    def close(self):
+def close(self):
         """Clean up thread pool"""
         self.thread_pool.shutdown(wait=True)
         logger.info("Performance patch thread pool shut down")

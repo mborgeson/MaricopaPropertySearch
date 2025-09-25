@@ -28,7 +28,7 @@ class DatabaseManager:
         
         self._init_connection_pool()
     
-    def _init_connection_pool(self):
+def _init_connection_pool(self):
         """Initialize database connection pool"""
         logger.debug("Setting up database connection pool")
         
@@ -269,7 +269,7 @@ class DatabaseManager:
             log_exception(logger, e, f"retrieving property data for APN: {apn}")
             return None
 
-    def get_property_details(self, apn: str) -> Optional[Dict]:
+def get_property_details(self, apn: str) -> Optional[Dict]:
         """Get property details by APN - alias for get_property_by_apn for GUI compatibility"""
         logger.debug(f"Retrieving property details for APN: {apn}")
 
@@ -281,7 +281,7 @@ class DatabaseManager:
             return None
     
     # Tax history operations
-    def insert_tax_history(self, tax_data: Dict[str, Any]) -> bool:
+def insert_tax_history(self, tax_data: Dict[str, Any]) -> bool:
         """Insert tax history record"""
         try:
             with self.get_connection() as conn:
@@ -318,7 +318,7 @@ class DatabaseManager:
             logger.error(f"Failed to insert tax history for {tax_data.get('apn', 'unknown')}: {e}")
             return False
     
-    def get_tax_history(self, apn: str) -> List[Dict]:
+def get_tax_history(self, apn: str) -> List[Dict]:
         """Get tax history for property"""
         try:
             with self.get_connection() as conn:
@@ -338,7 +338,7 @@ class DatabaseManager:
             return []
     
     # Sales history operations
-    def insert_sales_history(self, sales_data: Dict[str, Any]) -> bool:
+def insert_sales_history(self, sales_data: Dict[str, Any]) -> bool:
         """Insert sales history record"""
         try:
             with self.get_connection() as conn:
@@ -362,7 +362,7 @@ class DatabaseManager:
             logger.error(f"Failed to insert sales history for {sales_data.get('apn', 'unknown')}: {e}")
             return False
     
-    def get_sales_history(self, apn: str) -> List[Dict]:
+def get_sales_history(self, apn: str) -> List[Dict]:
         """Get sales history for property"""
         try:
             with self.get_connection() as conn:
@@ -448,7 +448,7 @@ class DatabaseManager:
             log_exception(logger, e, "retrieving database statistics")
             return {}
     
-    def save_comprehensive_property_data(self, comprehensive_info: Dict[str, Any]) -> bool:
+def save_comprehensive_property_data(self, comprehensive_info: Dict[str, Any]) -> bool:
         """Save comprehensive property data including detailed information"""
         apn = comprehensive_info.get('apn', 'unknown')
         logger.info(f"Saving comprehensive property data for APN: {apn}")
@@ -491,7 +491,7 @@ class DatabaseManager:
             log_exception(logger, e, f"saving comprehensive property data for APN: {apn}")
             return False
     
-    def _safe_int(self, value) -> Optional[int]:
+def _safe_int(self, value) -> Optional[int]:
         """Safely convert value to integer"""
         if value is None or value == '':
             return None
@@ -506,7 +506,7 @@ class DatabaseManager:
         except (ValueError, TypeError):
             return None
 
-    def validate_property_data(self, property_data: Dict[str, Any]) -> tuple[bool, List[str]]:
+def validate_property_data(self, property_data: Dict[str, Any]) -> tuple[bool, List[str]]:
         """Validate property data before insertion"""
         errors = []
 
@@ -537,7 +537,7 @@ class DatabaseManager:
         is_valid = len(errors) == 0
         return is_valid, errors
     
-    def close(self):
+def close(self):
         """Close database connection pool"""
         logger.info("Closing database connection pool")
         

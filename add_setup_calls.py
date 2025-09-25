@@ -9,7 +9,7 @@ def main():
     main_window_path = "src/gui/enhanced_main_window.py"
     
     # Read the file
-    with open(main_window_path, 'r', encoding='utf-8') as f:
+with open(main_window_path, 'r', encoding='utf-8') as f:
         content = f.read()
     
     # Check if setup calls already exist

@@ -1,0 +1,27 @@
+[tool.black]
+line-length = 88
+target-version = ['py312']
+extend-exclude = '''
+/(
+  # Directories
+  \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | venv
+  | \.history
+  | archive
+  | backups
+  | Backup
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 88
+skip_glob = ["archive/*", "backups/*", ".history/*", "Backup/*"]

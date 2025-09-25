@@ -13,7 +13,7 @@ def backup_file(file_path):
     """Create a backup of the original file"""
     backup_path = f"{file_path}.backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     shutil.copy2(file_path, backup_path)
-        print(f"Backup created: {backup_path}")
+    print(f"Backup created: {backup_path}")
     return backup_path
 def apply_integration(main_window_path):
     """Apply integration enhancements to enhanced_main_window.py"""
@@ -34,7 +34,7 @@ def apply_integration(main_window_path):
     
     # 1. Add additional imports
     additional_imports = """from PyQt5.QtWidgets import QShortcut, QToolBar, QMenu
-from PyQt5.QtGui import QKeySequence"""
+    from PyQt5.QtGui import QKeySequence"""
     
     if "QShortcut" not in content:
         # Find the import section and add new imports
@@ -382,7 +382,7 @@ def keyPressEvent(self, event):
         else:
             super().keyPressEvent(event)
 
-'''
+    '''
     
     # Check if methods already exist before adding
     if "def setup_keyboard_shortcuts" not in content:
@@ -468,5 +468,5 @@ def main():
         print(f"\n❌ Error during integration: {e}")
         print("Please check the file paths and permissions.")
 
-if __name__ == "__main__":
+    if __name__ == "__main__":
     main()

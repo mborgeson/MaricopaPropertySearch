@@ -83,3 +83,6 @@ Backup/
 # Log files that change frequently
 logs/maricopa_property.log
 .venv/
+
+# VS Code history
+.history/

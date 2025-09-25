@@ -44,5 +44,5 @@ if __name__ == "__main__":
         print(f"\n[ERROR] Fatal error: {e}")
 import traceback
 
-        print(traceback.format_exc())
+    print(traceback.format_exc())
         sys.exit(1)
