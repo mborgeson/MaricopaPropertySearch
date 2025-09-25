@@ -33,7 +33,7 @@ class PerformanceRegressionChecker:
     def load_results(self) -> bool:
         """Load benchmark results from JSON file"""
         if not self.benchmark_file.exists():
-        print(f"Warning: Benchmark file {self.benchmark_file} not found")
+            print(f"Warning: Benchmark file {self.benchmark_file} not found")
             # Create dummy results for testing
             self.results = {
                 "benchmarks": [
@@ -49,12 +49,12 @@ class PerformanceRegressionChecker:
             }
             return True
 
-    try:
+        try:
             with open(self.benchmark_file, "r") as f:
                 self.results = json.load(f)
             return True
-    except json.JSONDecodeError as e:
-        print(f"Error parsing benchmark results: {e}")
+        except json.JSONDecodeError as e:
+            print(f"Error parsing benchmark results: {e}")
             return False
     def check_regression(self, test_name: str, current_time: float) -> bool:
         """
