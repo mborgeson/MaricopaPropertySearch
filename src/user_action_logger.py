@@ -3,14 +3,13 @@
 User Action Logger for Maricopa Property Search
 Logs all user actions comprehensively for debugging and issue resolution
 """
-
-import os
 import json
 import logging
+import os
+import threading
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, Optional
-import threading
+from typing import Any, Dict, Optional
 
 # Set up module logger
 logger = logging.getLogger(__name__)
@@ -18,7 +17,6 @@ logger = logging.getLogger(__name__)
 
 class UserActionLogger:
     """Comprehensive user action logger that maintains a persistent action history"""
-
     def __init__(self, log_dir: str = None):
         """Initialize the user action logger"""
         # Determine log directory
@@ -49,8 +47,7 @@ class UserActionLogger:
         self._initialize_logs()
 
         logger.info(f"User action logger initialized - Session: {self.session_id}")
-
-    def _initialize_logs(self):
+def _initialize_logs(self):
         """Initialize log files with session information"""
         self.log_action(
             action_type="SESSION_START",
@@ -60,7 +57,6 @@ class UserActionLogger:
                 "log_file": str(self.log_file),
             },
         )
-
     def log_action(
         self,
         action_type: str,
@@ -103,8 +99,7 @@ class UserActionLogger:
 
             # Also write human-readable summary
             self._write_summary(action_record)
-
-    def _write_summary(self, action_record: Dict[str, Any]):
+def _write_summary(self, action_record: Dict[str, Any]):
         """Write human-readable summary to summary file"""
         try:
             with open(self.summary_file, "a", encoding="utf-8") as f:
@@ -151,8 +146,7 @@ class UserActionLogger:
 
         except Exception as e:
             logger.error(f"Failed to write summary: {e}")
-
-    def log_search(self, search_type: str, search_value: str, result_count: int = 0):
+def log_search(self, search_type: str, search_value: str, result_count: int = 0):
         """Log a search action"""
         self.log_action(
             action_type="SEARCH",
@@ -164,8 +158,7 @@ class UserActionLogger:
             user_input=f"{search_type}: {search_value}",
             result=f"Found {result_count} results",
         )
-
-    def log_view_details(self, apn: str, property_data: Dict[str, Any] = None):
+def log_view_details(self, apn: str, property_data: Dict[str, Any] = None):
         """Log viewing property details"""
         self.log_action(
             action_type="VIEW_DETAILS",
@@ -175,8 +168,7 @@ class UserActionLogger:
                 "data_fields": list(property_data.keys()) if property_data else [],
             },
         )
-
-    def log_collect_data(self, apn: str, data_type: str = "all", success: bool = True):
+def log_collect_data(self, apn: str, data_type: str = "all", success: bool = True):
         """Log data collection action"""
         self.log_action(
             action_type="COLLECT_DATA",
@@ -185,8 +177,7 @@ class UserActionLogger:
                 "Data collected successfully" if success else "Data collection failed"
             ),
         )
-
-    def log_export(self, export_type: str, file_path: str, record_count: int):
+def log_export(self, export_type: str, file_path: str, record_count: int):
         """Log data export action"""
         self.log_action(
             action_type="EXPORT_DATA",
@@ -197,7 +188,6 @@ class UserActionLogger:
             },
             result=f"Exported {record_count} records to {file_path}",
         )
-
     def log_error(
         self, error_type: str, error_message: str, context: Dict[str, Any] = None
     ):
@@ -207,8 +197,7 @@ class UserActionLogger:
             details={"error_type": error_type, "context": context or {}},
             error=error_message,
         )
-
-    def log_batch_operation(self, operation: str, apn_list: list, status: str):
+def log_batch_operation(self, operation: str, apn_list: list, status: str):
         """Log batch operations"""
         self.log_action(
             action_type="BATCH_OPERATION",
@@ -219,7 +208,6 @@ class UserActionLogger:
                 "status": status,
             },
         )
-
     def get_session_summary(self) -> Dict[str, Any]:
         """Get summary of current session"""
         return {
@@ -229,7 +217,6 @@ class UserActionLogger:
             "log_file": str(self.log_file),
             "summary_file": str(self.summary_file),
         }
-
     def export_full_log(self, output_path: Optional[str] = None) -> str:
         """
         Export full log for sharing/debugging
@@ -277,8 +264,7 @@ class UserActionLogger:
         except Exception as e:
             logger.error(f"Failed to export log: {e}")
             return None
-
-    def close(self):
+def close(self):
         """Close the logger and finalize session"""
         self.log_action(
             action_type="SESSION_END",
@@ -293,16 +279,12 @@ class UserActionLogger:
 
 # Global instance for easy access
 _global_logger = None
-
-
-def get_user_action_logger() -> UserActionLogger:
+    def get_user_action_logger() -> UserActionLogger:
     """Get or create global user action logger instance"""
     global _global_logger
     if _global_logger is None:
         _global_logger = UserActionLogger()
     return _global_logger
-
-
 def log_user_action(action_type: str, **kwargs):
     """Convenience function to log user actions"""
     logger = get_user_action_logger()

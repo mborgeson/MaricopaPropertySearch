@@ -7,23 +7,23 @@ Tests the interactions between the 4 unified components:
 - UnifiedGUILauncher ↔ All components
 - End-to-end workflow validation
 """
-
-import pytest
 import asyncio
-import time
-from unittest.mock import Mock, patch, AsyncMock
-from concurrent.futures import ThreadPoolExecutor
 
 # Import components
 import sys
+import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from unittest.mock import AsyncMock, Mock, patch
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 from api_client_unified import UnifiedMaricopaAPIClient
-from unified_data_collector import UnifiedDataCollector
-from threadsafe_database_manager import ThreadSafeDatabaseManager
 from gui_launcher_unified import UnifiedGUILauncher
+from threadsafe_database_manager import ThreadSafeDatabaseManager
+from unified_data_collector import UnifiedDataCollector
 
 
 class TestComponentIntegration:
@@ -174,7 +174,7 @@ class TestComponentIntegration:
         apn_list = ["10215009", "10215010", "10215011"]
 
         # Mock batch responses
-        def mock_search_property(apn):
+    def mock_search_property(apn):
             return {"success": True, "data": {**mock_property_data, "apn": apn}}
 
         api_client.search_property = Mock(side_effect=mock_search_property)
@@ -224,8 +224,7 @@ class TestComponentIntegration:
             return_value={"success": True, "data": mock_property_data}
         )
         db_manager.insert_property = Mock(return_value=True)
-
-        def concurrent_operation(thread_id):
+    def concurrent_operation(thread_id):
             apn = f"102150{thread_id:02d}"
             # Collect data
             result = data_collector.collect_property_data(apn)
@@ -340,8 +339,7 @@ class TestComponentIntegration:
 
         # Setup fallback scenario
         call_count = 0
-
-        def mock_search_with_fallback(apn):
+    def mock_search_with_fallback(apn):
             nonlocal call_count
             call_count += 1
             if call_count == 1:
@@ -442,7 +440,7 @@ class TestComponentIntegration:
         data_collector.start_background_processing()
 
         # Test coordinated cleanup
-        try:
+    try:
             api_client.close()
             data_collector.cleanup()
             db_manager.cleanup()
@@ -451,7 +449,7 @@ class TestComponentIntegration:
             # Verify cleanup succeeded
             assert data_collector.is_running is False
 
-        except Exception as e:
+    except Exception as e:
             pytest.fail(f"Cleanup integration failed: {e}")
 
     @pytest.mark.integration

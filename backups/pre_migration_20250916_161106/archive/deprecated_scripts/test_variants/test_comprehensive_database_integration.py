@@ -10,9 +10,11 @@ PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySea
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from config_manager import ConfigManager
 from api_client import MaricopaAPIClient
 from database_manager import DatabaseManager
+
+from config_manager import ConfigManager
+
 
 def test_comprehensive_database_integration():
     """Test saving comprehensive property data to database"""
@@ -97,14 +99,16 @@ def test_comprehensive_database_integration():
     except Exception as e:
         print(f"- Database save failed: {e}")
         import traceback
+
         traceback.print_exc()
-        return False
+
+    return False
     
     finally:
         try:
             db_manager.close()
         except:
-            pass
+        pass
 
 if __name__ == "__main__":
     success = test_comprehensive_database_integration()

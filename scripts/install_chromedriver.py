@@ -3,20 +3,19 @@
 ChromeDriver Installation Script for Windows
 Automatically downloads and installs the correct ChromeDriver version
 """
-
 import os
+import subprocess
 import sys
 import zipfile
-import requests
-import subprocess
 from pathlib import Path
 
+import requests
 
 def get_chrome_version():
     """Get installed Chrome version on Windows"""
-    import winreg
+import winreg
 
-    try:
+try:
         # Try to get Chrome version from registry
         key = winreg.OpenKey(
             winreg.HKEY_CURRENT_USER, r"Software\Google\Chrome\BLBeacon"
@@ -24,8 +23,8 @@ def get_chrome_version():
         version, _ = winreg.QueryValueEx(key, "version")
         winreg.CloseKey(key)
         return version
-    except:
-        print("Chrome not found in registry. Trying alternative method...")
+except:
+            print("Chrome not found in registry. Trying alternative method...")
 
     # Alternative: Check common installation paths
     chrome_paths = [
@@ -36,19 +35,17 @@ def get_chrome_version():
 
     for path in chrome_paths:
         if os.path.exists(path):
-            try:
+try:
                 result = subprocess.run(
                     [path, "--version"], capture_output=True, text=True
                 )
                 version = result.stdout.strip().split()[-1]
                 return version
-            except:
-                continue
+except:
+                    continue
 
     return None
-
-
-def download_chromedriver(version):
+    def download_chromedriver(version):
     """Download appropriate ChromeDriver"""
     project_root = Path(
         r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch"
@@ -64,11 +61,11 @@ def download_chromedriver(version):
         f"https://chromedriver.storage.googleapis.com/LATEST_RELEASE_{major_version}"
     )
 
-    try:
+try:
         response = requests.get(version_url)
         driver_version = response.text.strip()
-    except:
-        print(f"Could not find ChromeDriver for Chrome {major_version}")
+except:
+            print(f"Could not find ChromeDriver for Chrome {major_version}")
         print("Using latest stable version...")
         response = requests.get(
             "https://chromedriver.storage.googleapis.com/LATEST_RELEASE"
@@ -78,8 +75,7 @@ def download_chromedriver(version):
     # Download ChromeDriver
     download_url = f"https://chromedriver.storage.googleapis.com/{driver_version}/chromedriver_win32.zip"
     zip_path = driver_dir / "chromedriver.zip"
-
-    print(f"Downloading ChromeDriver {driver_version}...")
+        print(f"Downloading ChromeDriver {driver_version}...")
     response = requests.get(download_url, stream=True)
 
     with open(zip_path, "wb") as f:
@@ -87,7 +83,7 @@ def download_chromedriver(version):
             f.write(chunk)
 
     # Extract ChromeDriver
-    print("Extracting ChromeDriver...")
+        print("Extracting ChromeDriver...")
     with zipfile.ZipFile(zip_path, "r") as zip_ref:
         zip_ref.extractall(driver_dir)
 
@@ -98,18 +94,15 @@ def download_chromedriver(version):
     driver_path = str(driver_dir)
     if driver_path not in os.environ["PATH"]:
         os.environ["PATH"] = f"{driver_path};{os.environ['PATH']}"
-
-    print(f"ChromeDriver installed successfully at: {driver_dir}")
-    print(f"Version: {driver_version}")
+        print(f"ChromeDriver installed successfully at: {driver_dir}")
+        print(f"Version: {driver_version}")
 
     return driver_dir / "chromedriver.exe"
-
-
-def main():
-    print("=" * 50)
-    print("ChromeDriver Installation for Windows")
-    print("=" * 50)
-    print()
+    def main():
+        print("=" * 50)
+        print("ChromeDriver Installation for Windows")
+        print("=" * 50)
+        print()
 
     # Get Chrome version
     chrome_version = get_chrome_version()
@@ -118,26 +111,24 @@ def main():
         print("ERROR: Chrome not found!")
         print("Please install Chrome from: https://www.google.com/chrome/")
         sys.exit(1)
-
-    print(f"Found Chrome version: {chrome_version}")
+        print(f"Found Chrome version: {chrome_version}")
 
     # Download and install ChromeDriver
     driver_path = download_chromedriver(chrome_version)
 
     # Test ChromeDriver
-    print("\nTesting ChromeDriver...")
-    try:
+        print("\nTesting ChromeDriver...")
+try:
         result = subprocess.run(
             [str(driver_path), "--version"], capture_output=True, text=True, timeout=5
         )
         print(f"ChromeDriver test: {result.stdout.strip()}")
         print("\nChromeDriver is working correctly!")
-    except Exception as e:
+except Exception as e:
         print(f"ERROR testing ChromeDriver: {e}")
         sys.exit(1)
-
-    print("\nInstallation complete!")
-    print("=" * 50)
+        print("\nInstallation complete!")
+        print("=" * 50)
 
 
 if __name__ == "__main__":

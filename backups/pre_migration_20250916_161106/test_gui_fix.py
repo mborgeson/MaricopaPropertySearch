@@ -4,12 +4,13 @@ Test GUI Fix - PySide6 to PyQt5 Conversion
 Test that the application can start without PySide6 import errors
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent))
+
 
 def test_gui_imports():
     """Test GUI imports work correctly"""
@@ -18,16 +19,20 @@ def test_gui_imports():
     try:
         # Test importing the main window
         from src.gui.enhanced_main_window import EnhancedMainWindow
+
         print("✅ EnhancedMainWindow imported successfully (PyQt5)")
 
         # Test that PyQt5 is being used
         from PyQt5.QtWidgets import QApplication
+
         print("✅ PyQt5.QtWidgets imported successfully")
 
         from PyQt5.QtCore import Qt
+
         print("✅ PyQt5.QtCore imported successfully")
 
         from PyQt5.QtGui import QFont
+
         print("✅ PyQt5.QtGui imported successfully")
 
         print("✅ All GUI imports successful - no more PySide6 dependency!")
@@ -45,12 +50,14 @@ def test_gui_imports():
         print(f"❌ Unexpected error: {e}")
         return False
 
+
 def test_application_can_start():
     """Test that the application can be initialized"""
     print("\n🔍 Testing application initialization...")
 
     try:
         from PyQt5.QtWidgets import QApplication
+
         from src.gui.enhanced_main_window import EnhancedMainWindow
 
         # Create a minimal test app
@@ -62,8 +69,8 @@ def test_application_can_start():
 
         # Test that we can create the main window (don't show it)
         # First we need the required dependencies
-        from src.config_manager import ConfigManager
         from src.api_client import MaricopaAPIClient
+        from src.config_manager import ConfigManager
         from src.database_manager import DatabaseManager
 
         config_manager = ConfigManager()
@@ -78,6 +85,7 @@ def test_application_can_start():
     except Exception as e:
         print(f"❌ Application startup error: {e}")
         return False
+
 
 def run_gui_fix_test():
     """Run all GUI fix tests"""
@@ -116,6 +124,7 @@ def run_gui_fix_test():
     print("=" * 60)
 
     return all_passed
+
 
 if __name__ == "__main__":
     success = run_gui_fix_test()

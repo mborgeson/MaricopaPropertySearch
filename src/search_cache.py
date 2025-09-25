@@ -2,21 +2,19 @@
 Search Cache Manager
 High-performance caching layer for property searches with TTL and LRU eviction
 """
-
-import time
-import threading
-from typing import Dict, List, Optional, Any, Tuple
-from collections import OrderedDict
 import hashlib
 import json
 import logging
+import threading
+import time
+from collections import OrderedDict
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 
 
 class SearchCache:
     """Thread-safe LRU cache with TTL for search results"""
-
     def __init__(self, max_size: int = 1000, default_ttl: int = 3600):
         self.max_size = max_size
         self.default_ttl = default_ttl
@@ -33,7 +31,6 @@ class SearchCache:
         logger.info(
             f"Search cache initialized: max_size={max_size}, ttl={default_ttl}s"
         )
-
     def _generate_key(
         self, search_type: str, search_term: str, filters: Dict = None
     ) -> str:
@@ -46,7 +43,6 @@ class SearchCache:
 
         cache_json = json.dumps(cache_data, sort_keys=True)
         return hashlib.md5(cache_json.encode()).hexdigest()
-
     def get(
         self,
         search_type: str,
@@ -84,7 +80,6 @@ class SearchCache:
 
             logger.debug(f"Cache hit: {key} (size: {len(entry['results'])})")
             return entry["results"].copy()
-
     def put(
         self,
         search_type: str,
@@ -118,7 +113,6 @@ class SearchCache:
             self.access_times[key] = current_time
 
             logger.debug(f"Cached results: {key} (size: {len(results)}, ttl: {ttl}s)")
-
     def invalidate(self, search_type: str = None, search_term: str = None) -> int:
         """Invalidate cache entries matching criteria"""
         if search_type is None and search_term is None:
@@ -140,8 +134,7 @@ class SearchCache:
                 pass
 
         return 0
-
-    def _cleanup_expired(self):
+def _cleanup_expired(self):
         """Background thread to clean up expired entries"""
         while True:
             try:
@@ -166,7 +159,6 @@ class SearchCache:
 
             except Exception as e:
                 logger.error(f"Cache cleanup error: {e}")
-
     def get_stats(self) -> Dict[str, Any]:
         """Get cache statistics"""
         with self.lock:
@@ -188,13 +180,11 @@ class SearchCache:
 
 class SearchHistory:
     """Search history and suggestions manager"""
-
     def __init__(self, max_history: int = 1000):
         self.max_history = max_history
         self.history: List[Dict] = []
         self.term_frequency: Dict[str, int] = {}
         self.lock = threading.RLock()
-
     def add_search(
         self, search_type: str, search_term: str, results_count: int
     ) -> None:
@@ -223,7 +213,6 @@ class SearchHistory:
             # Update term frequency
             term_lower = search_term.lower().strip()
             self.term_frequency[term_lower] = self.term_frequency.get(term_lower, 0) + 1
-
     def get_suggestions(
         self, partial_term: str, search_type: str = None, limit: int = 10
     ) -> List[str]:
@@ -264,12 +253,10 @@ class SearchHistory:
                 suggestions = [term for term, _ in matching_terms[:limit]]
 
         return suggestions
-
     def get_recent_searches(self, limit: int = 20) -> List[Dict]:
         """Get recent searches"""
         with self.lock:
             return self.history[-limit:] if self.history else []
-
     def get_popular_terms(
         self, search_type: str = None, limit: int = 10
     ) -> List[Tuple[str, int]]:

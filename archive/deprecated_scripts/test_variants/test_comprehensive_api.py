@@ -11,6 +11,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 import json
+
 # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 
@@ -117,10 +118,12 @@ def test_comprehensive_property_data():
     except Exception as e:
         print(f"ERROR: {e}")
         import traceback
+
 from src.api_client_unified import UnifiedMaricopaAPIClient
 from src.enhanced_config_manager import EnhancedConfigManager
+
         traceback.print_exc()
-    
+
     finally:
         client.close()
 

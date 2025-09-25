@@ -3,45 +3,43 @@
 GUI Enhancement Dialogs
 Additional dialog classes for enhanced GUI features
 """
+import logging
+from typing import Any, Dict, List, Optional
 
+from PyQt5.QtCore import Qt, QThread, pyqtSignal
 from PyQt5.QtWidgets import (
-    QDialog,
-    QVBoxLayout,
-    QHBoxLayout,
-    QFormLayout,
-    QTabWidget,
-    QWidget,
-    QPushButton,
-    QLabel,
+    QButtonGroup,
     QCheckBox,
     QComboBox,
-    QSpinBox,
+    QDialog,
+    QFileDialog,
+    QFormLayout,
     QGroupBox,
-    QButtonGroup,
-    QRadioButton,
+    QHBoxLayout,
+    QLabel,
     QListWidget,
     QListWidgetItem,
-    QTextEdit,
-    QProgressBar,
-    QFileDialog,
     QMessageBox,
+    QProgressBar,
+    QPushButton,
+    QRadioButton,
+    QSpinBox,
+    QTabWidget,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
 )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
-from typing import Dict, List, Optional, Any
-import logging
 
 logger = logging.getLogger(__name__)
 
 
 class ApplicationSettingsDialog(QDialog):
     """Dialog for general application settings"""
-
     def __init__(self, config_manager, parent=None):
         super().__init__(parent)
         self.config = config_manager
         self.setup_ui()
         self.load_settings()
-
     def setup_ui(self):
         self.setWindowTitle("Application Settings")
         self.setModal(True)
@@ -82,7 +80,6 @@ class ApplicationSettingsDialog(QDialog):
         button_layout.addWidget(cancel_btn)
 
         layout.addLayout(button_layout)
-
     def setup_general_tab(self, tab):
         layout = QFormLayout(tab)
 
@@ -100,7 +97,6 @@ class ApplicationSettingsDialog(QDialog):
         self.result_limit.setRange(10, 1000)
         self.result_limit.setValue(20)
         layout.addRow("Max Results:", self.result_limit)
-
     def setup_performance_tab(self, tab):
         layout = QFormLayout(tab)
 
@@ -122,7 +118,6 @@ class ApplicationSettingsDialog(QDialog):
         self.cache_size.setRange(100, 10000)
         self.cache_size.setValue(1000)
         layout.addRow("Cache Size:", self.cache_size)
-
     def setup_ui_tab(self, tab):
         layout = QFormLayout(tab)
 
@@ -144,9 +139,8 @@ class ApplicationSettingsDialog(QDialog):
         # Always fresh data
         self.always_fresh_data = QCheckBox("Always fetch fresh data (bypass cache)")
         layout.addRow("Data Source:", self.always_fresh_data)
-
     def load_settings(self):
-        try:
+    try:
             # Load current settings from config
             self.auto_start_collection.setChecked(
                 self.config.get("auto_start_collection", True)
@@ -170,9 +164,8 @@ class ApplicationSettingsDialog(QDialog):
             self.always_fresh_data.setChecked(
                 self.config.get("always_fresh_data", True)
             )
-        except Exception as e:
+    except Exception as e:
             logger.warning(f"Error loading settings: {e}")
-
     def get_settings(self):
         return {
             "auto_start_collection": self.auto_start_collection.isChecked(),
@@ -190,13 +183,11 @@ class ApplicationSettingsDialog(QDialog):
 
 class DataCollectionSettingsDialog(QDialog):
     """Dialog for data collection settings"""
-
     def __init__(self, background_manager, parent=None):
         super().__init__(parent)
         self.background_manager = background_manager
         self.setup_ui()
         self.load_settings()
-
     def setup_ui(self):
         self.setWindowTitle("Data Collection Settings")
         self.setModal(True)
@@ -281,15 +272,13 @@ class DataCollectionSettingsDialog(QDialog):
         button_layout.addWidget(cancel_btn)
 
         layout.addLayout(button_layout)
-
     def load_settings(self):
         if self.background_manager:
-            try:
+    try:
                 status = self.background_manager.get_collection_status()
                 self.bg_enabled.setChecked(status.get("status") == "running")
-            except Exception as e:
+    except Exception as e:
                 logger.warning(f"Error loading collection settings: {e}")
-
     def get_settings(self):
         return {
             "background_enabled": self.bg_enabled.isChecked(),
@@ -305,13 +294,11 @@ class DataCollectionSettingsDialog(QDialog):
 
 class CacheManagementDialog(QDialog):
     """Dialog for cache management operations"""
-
     def __init__(self, background_manager, parent=None):
         super().__init__(parent)
         self.background_manager = background_manager
         self.setup_ui()
         self.refresh_cache_stats()
-
     def setup_ui(self):
         self.setWindowTitle("Cache Management")
         self.setModal(True)
@@ -410,12 +397,11 @@ class CacheManagementDialog(QDialog):
         button_layout.addWidget(close_btn)
 
         layout.addLayout(button_layout)
-
     def refresh_cache_stats(self):
         if not self.background_manager or not self.background_manager.worker:
             return
 
-        try:
+    try:
             status = self.background_manager.get_collection_status()
             cache_stats = status.get("cache_stats", {})
 
@@ -439,9 +425,8 @@ class CacheManagementDialog(QDialog):
             else:
                 self.oldest_entry_label.setText(str(oldest_entry))
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error refreshing cache stats: {e}")
-
     def clear_all_cache(self):
         reply = QMessageBox.question(
             self,
@@ -451,7 +436,7 @@ class CacheManagementDialog(QDialog):
         )
 
         if reply == QMessageBox.Yes:
-            try:
+    try:
                 if self.background_manager and self.background_manager.worker:
                     self.background_manager.worker.cache.clear_all_cache()
                     QMessageBox.information(
@@ -459,9 +444,8 @@ class CacheManagementDialog(QDialog):
                     )
                     self.refresh_cache_stats()
 
-            except Exception as e:
+    except Exception as e:
                 QMessageBox.critical(self, "Error", f"Error clearing cache: {str(e)}")
-
     def clear_old_entries(self):
         days = self.days_spinbox.value()
         reply = QMessageBox.question(
@@ -472,7 +456,7 @@ class CacheManagementDialog(QDialog):
         )
 
         if reply == QMessageBox.Yes:
-            try:
+    try:
                 if self.background_manager and self.background_manager.worker:
                     # Clear entries older than specified days
                     max_age_seconds = days * 24 * 3600
@@ -484,7 +468,7 @@ class CacheManagementDialog(QDialog):
                     )
                     self.refresh_cache_stats()
 
-            except Exception as e:
+    except Exception as e:
                 QMessageBox.critical(
                     self, "Error", f"Error clearing old entries: {str(e)}"
                 )
@@ -492,7 +476,6 @@ class CacheManagementDialog(QDialog):
 
 class BatchSearchDialog(QDialog):
     """Dialog for batch search operations"""
-
     def __init__(self, db_manager, api_client, background_manager, parent=None):
         super().__init__(parent)
         self.db_manager = db_manager
@@ -500,7 +483,6 @@ class BatchSearchDialog(QDialog):
         self.background_manager = background_manager
         self.batch_results = []
         self.setup_ui()
-
     def setup_ui(self):
         self.setWindowTitle("Batch Search")
         self.setModal(True)
@@ -609,7 +591,6 @@ class BatchSearchDialog(QDialog):
         button_layout.addWidget(ok_btn)
 
         layout.addLayout(button_layout)
-
     def import_from_file(self):
         filename, _ = QFileDialog.getOpenFileName(
             self,
@@ -619,16 +600,15 @@ class BatchSearchDialog(QDialog):
         )
 
         if filename:
-            try:
+    try:
                 with open(filename, "r", encoding="utf-8") as f:
                     content = f.read()
                     self.input_text.setPlainText(content)
 
-            except Exception as e:
+    except Exception as e:
                 QMessageBox.critical(
                     self, "Import Error", f"Error reading file: {str(e)}"
                 )
-
     def start_batch_search(self):
         search_terms = self.input_text.toPlainText().strip().split("\n")
         search_terms = [term.strip() for term in search_terms if term.strip()]
@@ -656,7 +636,6 @@ class BatchSearchDialog(QDialog):
         self.batch_worker.status_updated.connect(self.status_label.setText)
         self.batch_worker.search_completed.connect(self.on_batch_completed)
         self.batch_worker.start()
-
     def on_batch_completed(self, results):
         self.batch_results = results
         self.status_label.setText(f"Completed: Found {len(results)} properties")
@@ -673,7 +652,6 @@ class BatchSearchDialog(QDialog):
                     f"Found {len(results)} properties and queued "
                     f"{jobs_queued} for background data collection.",
                 )
-
     def get_batch_results(self):
         return self.batch_results
 
@@ -684,7 +662,6 @@ class BatchSearchWorker(QThread):
     progress_updated = pyqtSignal(int)
     status_updated = pyqtSignal(str)
     search_completed = pyqtSignal(list)
-
     def __init__(
         self, search_terms, search_type, db_manager, api_client, max_concurrent
     ):
@@ -698,13 +675,12 @@ class BatchSearchWorker(QThread):
         self.db_manager = db_manager
         self.api_client = api_client
         self.max_concurrent = max_concurrent
-
     def run(self):
         results = []
         completed = 0
 
         for term in self.search_terms:
-            try:
+    try:
                 self.status_updated.emit(f"Searching: {term}")
 
                 if self.search_type == "address":
@@ -719,18 +695,18 @@ class BatchSearchWorker(QThread):
 
                 # If no database results, try API
                 if not term_results and self.api_client:
-                    try:
+    try:
                         api_results = self.api_client.search_all_property_types(term)
                         for category, props in api_results.items():
                             term_results.extend(props)
-                    except:
-                        pass  # Continue with empty results
+    except:
+            pass  # Continue with empty results
 
                 results.extend(term_results)
                 completed += 1
                 self.progress_updated.emit(completed)
 
-            except Exception as e:
+    except Exception as e:
                 logger.error(f"Error in batch search for '{term}': {e}")
                 completed += 1
                 self.progress_updated.emit(completed)
@@ -740,13 +716,11 @@ class BatchSearchWorker(QThread):
 
 class ParallelProcessingDialog(QDialog):
     """Dialog for parallel processing configuration"""
-
     def __init__(self, background_manager, parent=None):
         super().__init__(parent)
         self.background_manager = background_manager
         self.setup_ui()
         self.load_current_settings()
-
     def setup_ui(self):
         self.setWindowTitle("Parallel Processing Settings")
         self.setModal(True)
@@ -820,11 +794,9 @@ class ParallelProcessingDialog(QDialog):
         button_layout.addWidget(close_btn)
 
         layout.addLayout(button_layout)
-
     def load_current_settings(self):
         # Load current parallel processing settings if available
         pass
-
     def apply_settings(self):
         settings = {
             "max_workers": self.max_workers.value(),
@@ -844,7 +816,6 @@ class ParallelProcessingDialog(QDialog):
 
 class DataSourceConfigurationDialog(QDialog):
     """Dialog for configuring data sources"""
-
     def __init__(self, config_manager, api_client, scraper, parent=None):
         super().__init__(parent)
         self.config = config_manager
@@ -852,7 +823,6 @@ class DataSourceConfigurationDialog(QDialog):
         self.scraper = scraper
         self.setup_ui()
         self.load_current_settings()
-
     def setup_ui(self):
         self.setWindowTitle("Data Source Configuration")
         self.setModal(True)
@@ -954,11 +924,9 @@ class DataSourceConfigurationDialog(QDialog):
         button_layout.addWidget(cancel_btn)
 
         layout.addLayout(button_layout)
-
     def load_current_settings(self):
         # Load current data source configuration
         pass
-
     def test_all_sources(self):
         self.test_status_label.setText("Testing sources...")
 
@@ -974,32 +942,28 @@ class DataSourceConfigurationDialog(QDialog):
         self.test_status_label.setText(
             f"API: {api_status} | Scraping: {scraping_status} | DB: {db_status}"
         )
-
     def _test_api(self):
-        try:
+    try:
             if self.api_client:
                 status = self.api_client.get_api_status()
                 return status.get("status") == "active"
-        except:
+    except:
             pass
         return False
-
     def _test_scraping(self):
-        try:
+    try:
             if self.scraper:
                 return True  # Basic availability check
-        except:
+    except:
             pass
         return False
-
     def _test_database(self):
-        try:
+    try:
             # Test database connection through config or other means
             return True
-        except:
+    except:
             pass
         return False
-
     def get_settings(self):
         # Get priority order
         priority_order = []

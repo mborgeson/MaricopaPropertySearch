@@ -3,10 +3,10 @@
 Test Schema Setup Script
 Creates a separate test schema within the existing database for testing isolation
 """
-
-import psycopg2
 import sys
 from pathlib import Path
+
+import psycopg2
 
 # Add project paths
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -21,13 +21,11 @@ DB_CONFIG = {
     "database": "maricopa_properties",  # Use existing database
     "test_schema": "test_data",  # Separate schema for test data
 }
-
-
-def create_test_schema():
+    def create_test_schema():
     """Create test schema for isolated testing"""
-    print("Creating test schema...")
+        print("Creating test schema...")
 
-    try:
+try:
         conn = psycopg2.connect(
             host=DB_CONFIG["host"],
             port=DB_CONFIG["port"],
@@ -49,16 +47,14 @@ def create_test_schema():
         conn.close()
         return True
 
-    except psycopg2.Error as e:
+except psycopg2.Error as e:
         print(f"Error creating test schema: {e}")
         return False
-
-
-def setup_test_tables():
+    def setup_test_tables():
     """Create test tables in test schema"""
-    print("Setting up test tables...")
+        print("Setting up test tables...")
 
-    try:
+try:
         conn = psycopg2.connect(
             host=DB_CONFIG["host"],
             port=DB_CONFIG["port"],
@@ -182,14 +178,12 @@ def setup_test_tables():
         conn.close()
         return True
 
-    except psycopg2.Error as e:
+except psycopg2.Error as e:
         print(f"Error setting up test tables: {e}")
         return False
-
-
-def load_test_data():
+    def load_test_data():
     """Load test data including 10000 W Missouri Ave"""
-    print("Loading test data...")
+        print("Loading test data...")
 
     test_properties = [
         {
@@ -230,7 +224,7 @@ def load_test_data():
         },
     ]
 
-    try:
+try:
         conn = psycopg2.connect(
             host=DB_CONFIG["host"],
             port=DB_CONFIG["port"],
@@ -300,16 +294,14 @@ def load_test_data():
         conn.close()
         return True
 
-    except psycopg2.Error as e:
+except psycopg2.Error as e:
         print(f"Error loading test data: {e}")
         return False
-
-
-def validate_test_setup():
+    def validate_test_setup():
     """Validate the test schema setup"""
-    print("Validating test schema setup...")
+        print("Validating test schema setup...")
 
-    try:
+try:
         conn = psycopg2.connect(
             host=DB_CONFIG["host"],
             port=DB_CONFIG["port"],
@@ -333,9 +325,9 @@ def validate_test_setup():
         )
         missouri_property = cursor.fetchone()
         if missouri_property:
-            print(f"✓ Test property 10000 W Missouri Ave found: {missouri_property}")
+        print(f"✓ Test property 10000 W Missouri Ave found: {missouri_property}")
         else:
-            print("✗ Test property 10000 W Missouri Ave NOT found")
+        print("✗ Test property 10000 W Missouri Ave NOT found")
 
         # Check tax history
         cursor.execute(f"SELECT COUNT(*) FROM {DB_CONFIG['test_schema']}.tax_history")
@@ -349,38 +341,33 @@ def validate_test_setup():
 
         cursor.close()
         conn.close()
-
         print("✓ Test schema validation complete")
         return True
 
-    except psycopg2.Error as e:
+except psycopg2.Error as e:
         print(f"✗ Error validating test setup: {e}")
         return False
-
-
-def get_test_config_info():
+    def get_test_config_info():
     """Print test configuration information for conftest.py"""
-    print("\n" + "=" * 60)
-    print("TEST CONFIGURATION FOR conftest.py")
-    print("=" * 60)
-    print(f"Database: {DB_CONFIG['database']}")
-    print(f"Test Schema: {DB_CONFIG['test_schema']}")
-    print(
+        print("\n" + "=" * 60)
+        print("TEST CONFIGURATION FOR conftest.py")
+        print("=" * 60)
+        print(f"Database: {DB_CONFIG['database']}")
+        print(f"Test Schema: {DB_CONFIG['test_schema']}")
+        print(
         f"Connection String: postgresql://{DB_CONFIG['user']}:***@{DB_CONFIG['host']}:{DB_CONFIG['port']}/{DB_CONFIG['database']}"
     )
-    print("\nUpdate your test configuration to use:")
-    print(f"- Schema: {DB_CONFIG['test_schema']}")
-    print("- Search Path: test_data, public")
-    print("- Table References: test_data.properties, test_data.tax_history, etc.")
-    print("\nExample conftest.py update:")
-    print("config.config.set('database', 'database', 'maricopa_properties')")
-    print("config.config.set('database', 'schema', 'test_data')")
-
-
-def main():
+        print("\nUpdate your test configuration to use:")
+        print(f"- Schema: {DB_CONFIG['test_schema']}")
+        print("- Search Path: test_data, public")
+        print("- Table References: test_data.properties, test_data.tax_history, etc.")
+        print("\nExample conftest.py update:")
+        print("config.config.set('database', 'database', 'maricopa_properties')")
+        print("config.config.set('database', 'schema', 'test_data')")
+    def main():
     """Main setup function"""
-    print("Maricopa Property Search - Test Schema Setup")
-    print("=" * 50)
+        print("Maricopa Property Search - Test Schema Setup")
+        print("=" * 50)
 
     # Step 1: Create test schema
     if not create_test_schema():
@@ -404,14 +391,13 @@ def main():
 
     # Step 5: Provide configuration info
     get_test_config_info()
-
-    print("\n✓ Test schema setup completed successfully!")
-    print(
+        print("\n✓ Test schema setup completed successfully!")
+        print(
         f"✓ Test schema: {DB_CONFIG['test_schema']} in database {DB_CONFIG['database']}"
     )
-    print("✓ Schema created with all required tables")
-    print("✓ Test data loaded including 10000 W Missouri Ave")
-    print("✓ Ready for automated testing")
+        print("✓ Schema created with all required tables")
+        print("✓ Test data loaded including 10000 W Missouri Ave")
+        print("✓ Ready for automated testing")
 
     return True
 

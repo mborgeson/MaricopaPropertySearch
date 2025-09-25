@@ -10,8 +10,10 @@ PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySea
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-import requests
 import json
+
+import requests
+
 
 def test_detailed_endpoints():
     """Test detailed property data endpoints"""
@@ -80,7 +82,7 @@ def test_detailed_endpoints():
                         print(f"HIDDEN JSON found!")
                         print(f"Keys: {list(data.keys()) if isinstance(data, dict) else f'Array({len(data)})'}")
                     except:
-                        print(f"Response text (first 200 chars): {response.text[:200]}")
+        print(f"Response text (first 200 chars): {response.text[:200]}")
             else:
                 print(f"HTTP Error: {response.status_code}")
                 

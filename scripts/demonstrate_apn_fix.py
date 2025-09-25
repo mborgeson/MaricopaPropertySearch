@@ -2,19 +2,17 @@
 """
 Demonstration script showing the APN KeyError fix in action
 """
-
-import sys
 import os
+import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from unittest.mock import Mock, patch
+
 # MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
-
-
-def demonstrate_keyerror_fix():
+    def demonstrate_keyerror_fix():
     """Demonstrate how the KeyError fix handles various scenarios"""
-
-    print("=== APN KeyError Fix Demonstration ===\n")
+        print("=== APN KeyError Fix Demonstration ===\n")
 
     # Mock the config manager
     mock_config_manager = Mock()
@@ -25,9 +23,8 @@ def demonstrate_keyerror_fix():
         'user': 'test_user',
         'password': 'test_pass'
     }
-
-    print("Scenario 1: Property data missing 'apn' key (the original error)")
-    print("-" * 60)
+        print("Scenario 1: Property data missing 'apn' key (the original error)")
+        print("-" * 60)
 
     # Mock the connection pool
     with patch('src.database_manager.ThreadedConnectionPool'):
@@ -40,14 +37,12 @@ def demonstrate_keyerror_fix():
             'year_built': 1995
             # NOTE: No 'apn' field - this would cause KeyError: 'apn'
         }
-
         print(f"Input data: {problem_data}")
         print(f"Missing 'apn' field: {'apn' not in problem_data}")
 
         # This would throw KeyError before the fix
         result = db_manager.insert_property(problem_data)
         print(f"Result: {result} (gracefully handled - returns False instead of crashing)")
-
         print("\nScenario 2: Property data with 'apn' but other missing fields")
         print("-" * 60)
 
@@ -66,17 +61,15 @@ def demonstrate_keyerror_fix():
                 'property_address': '456 Oak Avenue'
                 # Missing many other fields that SQL expects
             }
-
-            print(f"Input data: {partial_data}")
+        print(f"Input data: {partial_data}")
             result = db_manager.insert_property(partial_data)
-            print(f"Result: {result}")
+        print(f"Result: {result}")
 
             if mock_cursor.execute.called:
                 executed_data = mock_cursor.execute.call_args[0][1]
-                print(f"Data passed to SQL (shows all required fields): {list(executed_data.keys())}")
-                print(f"APN value preserved: {executed_data.get('apn')}")
-                print(f"Default values added for missing fields: {executed_data.get('bedrooms')} (bedrooms)")
-
+        print(f"Data passed to SQL (shows all required fields): {list(executed_data.keys())}")
+        print(f"APN value preserved: {executed_data.get('apn')}")
+        print(f"Default values added for missing fields: {executed_data.get('bedrooms')} (bedrooms)")
         print("\nScenario 3: Using validation method")
         print("-" * 60)
 
@@ -97,7 +90,6 @@ def demonstrate_keyerror_fix():
 
         is_valid, errors = db_manager.validate_property_data(valid_data)
         print(f"Validation of data with APN: Valid={is_valid}, Errors={errors}")
-
         print("\n=== Fix Summary ===")
         print("1. Before fix: KeyError: 'apn' would crash the application")
         print("2. After fix: Missing 'apn' is detected and handled gracefully")
@@ -107,11 +99,14 @@ def demonstrate_keyerror_fix():
 
 
 if __name__ == "__main__":
-    try:
+try:
         demonstrate_keyerror_fix()
-    except Exception as e:
+except Exception as e:
         print(f"[ERROR] Demonstration failed: {e}")
-        import traceback
+import traceback
+
 from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
         traceback.print_exc()
-        sys.exit(1)
+
+    sys.exit(1)

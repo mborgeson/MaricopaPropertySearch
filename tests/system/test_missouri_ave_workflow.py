@@ -3,23 +3,22 @@
 Missouri Avenue Workflow System Test
 Tests the complete end-to-end workflow for Missouri Avenue property search
 """
-
-import sys
-import os
-import pytest
 import asyncio
+import os
+import sys
 import time
 from pathlib import Path
+
+import pytest
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
-
 from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.unified_data_collector import UnifiedDataCollector
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.enhanced_config_manager import EnhancedConfigManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.unified_data_collector import UnifiedDataCollector
 
 
 class TestMissouriAveWorkflow:
@@ -258,7 +257,6 @@ class TestMissouriAveWorkflow:
         assert (
             max_search_time < 1.0
         ), f"Max search time {max_search_time:.3f}s should be < 1.0s"
-
         print(
             f"Performance baseline - Avg: {avg_search_time:.3f}s, Max: {max_search_time:.3f}s"
         )

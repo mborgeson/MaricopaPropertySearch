@@ -2,9 +2,9 @@
 """
 Maricopa County Treasurer Tax Data Scraper
 """
-
 import re
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
+
 from logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -13,10 +13,10 @@ logger = get_logger(__name__)
 class MaricopaTaxScraper:
     """Scrape tax data from Maricopa County Treasurer website using browser automation"""
 
-    def __init__(self):
+def __init__(self):
         logger.info("Initializing Maricopa Tax Scraper")
 
-    def scrape_tax_data_for_apn(
+def scrape_tax_data_for_apn(
         self, apn: str, playwright_page
     ) -> Optional[Dict[str, Any]]:
         """
@@ -31,7 +31,7 @@ class MaricopaTaxScraper:
         """
         logger.info(f"Scraping tax data for APN: {apn}")
 
-        try:
+try:
             # Navigate to treasurer website
             playwright_page.goto("https://treasurer.maricopa.gov/")
 
@@ -42,18 +42,18 @@ class MaricopaTaxScraper:
                 return None
 
             # Fill in parcel number segments with error handling
-            try:
+try:
                 # Try the standard approach first
                 playwright_page.get_by_role(
                     "textbox", name="Parcel Number Parcel/Account"
                 ).fill(apn_parts[0])
-            except:
+except:
                 # Fallback to locator approach
-                try:
+try:
                     playwright_page.locator(
                         'input[name*="Parcel"], input[id*="Parcel"]'
                     ).first.fill(apn_parts[0])
-                except:
+except:
                     logger.warning(f"Could not fill first parcel segment for APN {apn}")
 
             # Fill remaining segments
@@ -64,9 +64,9 @@ class MaricopaTaxScraper:
             ]
 
             for selector, value in segments:
-                try:
+try:
                     playwright_page.locator(selector).fill(value)
-                except Exception as e:
+except Exception as e:
                     logger.debug(f"Could not fill segment {selector} with {value}: {e}")
 
             # Click search with fallback options
@@ -80,11 +80,11 @@ class MaricopaTaxScraper:
             ]
 
             for search_method in search_options:
-                try:
+try:
                     search_method()
                     search_clicked = True
                     break
-                except Exception as e:
+except Exception as e:
                     logger.debug(f"Search method failed: {e}")
 
             if not search_clicked:
@@ -105,11 +105,11 @@ class MaricopaTaxScraper:
                 logger.warning(f"No tax data found for APN: {apn}")
                 return None
 
-        except Exception as e:
+except Exception as e:
             logger.error(f"Error scraping tax data for APN {apn}: {e}")
             return None
 
-    def _parse_apn(self, apn: str) -> Optional[List[str]]:
+def _parse_apn(self, apn: str) -> Optional[List[str]]:
         """Parse APN into 4 segments for the treasurer website form"""
         # Remove any existing dashes and clean up
         clean_apn = apn.replace("-", "").replace(".", "").strip()
@@ -129,9 +129,9 @@ class MaricopaTaxScraper:
         logger.error(f"APN format not recognized: {apn}")
         return None
 
-    def _extract_tax_data_from_page(self, page) -> Optional[Dict[str, Any]]:
+def _extract_tax_data_from_page(self, page) -> Optional[Dict[str, Any]]:
         """Extract tax data from the loaded treasurer page"""
-        try:
+try:
             # Get page content
             content = page.content()
 
@@ -151,15 +151,15 @@ class MaricopaTaxScraper:
                 "scrape_source": "treasurer.maricopa.gov",
             }
 
-        except Exception as e:
+except Exception as e:
             logger.error(f"Error extracting tax data from page: {e}")
             return None
 
-    def _extract_owner_info(self, content: str) -> Dict[str, str]:
+def _extract_owner_info(self, content: str) -> Dict[str, str]:
         """Extract owner name and addresses from page content"""
         owner_info = {}
 
-        try:
+try:
             # Extract owner name and mailing address
             mailing_pattern = (
                 r"Current Mailing Name & Address.*?<generic[^>]*>(.*?)</generic>"
@@ -199,16 +199,16 @@ class MaricopaTaxScraper:
                 address_parts = [line.replace("</text>", "").strip() for line in lines]
                 owner_info["property_address"] = ", ".join(address_parts)
 
-        except Exception as e:
+except Exception as e:
             logger.error(f"Error extracting owner info: {e}")
 
         return owner_info
 
-    def _extract_current_tax_info(self, content: str) -> Dict[str, Any]:
+def _extract_current_tax_info(self, content: str) -> Dict[str, Any]:
         """Extract current year tax information"""
         current_tax = {}
 
-        try:
+try:
             # Extract assessed tax amount
             assessed_pattern = r'"Assessed Tax:".*?<generic[^>]*>[\s]*\$?([\d,]+\.?\d*)'
             assessed_match = re.search(assessed_pattern, content, re.IGNORECASE)
@@ -235,16 +235,16 @@ class MaricopaTaxScraper:
             else:
                 current_tax["payment_status"] = "PAID"
 
-        except Exception as e:
+except Exception as e:
             logger.error(f"Error extracting current tax info: {e}")
 
         return current_tax
 
-    def _extract_tax_history_table(self, content: str) -> List[Dict[str, Any]]:
+def _extract_tax_history_table(self, content: str) -> List[Dict[str, Any]]:
         """Extract historical tax data from the tax years table"""
         tax_history = []
 
-        try:
+try:
             # Find tax years table rows
             row_pattern = r"<row[^>]*>.*?(\d{4}).*?(Paid|Unpaid).*?\$([\d,]+\.?\d*).*?\$([\d,]+\.?\d*).*?</row>"
             rows = re.findall(row_pattern, content, re.DOTALL | re.IGNORECASE)
@@ -265,12 +265,12 @@ class MaricopaTaxScraper:
                     }
                 )
 
-        except Exception as e:
+except Exception as e:
             logger.error(f"Error extracting tax history: {e}")
 
         return sorted(tax_history, key=lambda x: x["tax_year"], reverse=True)
 
-    def format_tax_data_for_database(self, tax_data: Dict[str, Any]) -> Dict[str, Any]:
+def format_tax_data_for_database(self, tax_data: Dict[str, Any]) -> Dict[str, Any]:
         """Format scraped tax data for database storage"""
         if not tax_data:
             return {}

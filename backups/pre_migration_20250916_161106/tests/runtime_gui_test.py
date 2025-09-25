@@ -3,10 +3,10 @@
 Runtime GUI Test - Tests actual functionality without full GUI initialization
 """
 
-import sys
 import os
+import sys
 import tempfile
-from unittest.mock import Mock, MagicMock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 # Add the src directory to the path
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
@@ -25,20 +25,25 @@ class RuntimeGUITester:
         try:
             # Test core imports
             from config_manager import ConfigManager
+
             self.test_results['import_config_manager'] = "✅ PASS"
 
             from database_manager import DatabaseManager
+
             self.test_results['import_database_manager'] = "✅ PASS"
 
             # Test if we can import the main GUI class
             from gui.enhanced_main_window import EnhancedMainWindow
+
             self.test_results['import_main_window'] = "✅ PASS"
 
             # Test if we can import specific widget classes
             from gui.enhanced_main_window import PropertyDetailsWidget
+
             self.test_results['import_property_details'] = "✅ PASS"
 
             from gui.enhanced_main_window import NotificationArea
+
             self.test_results['import_notification_area'] = "✅ PASS"
 
             return True
@@ -62,7 +67,10 @@ class RuntimeGUITester:
                  patch('PyQt5.QtWidgets.QMainWindow') as mock_main_window:
 
                 # Import after patching
-                from gui.enhanced_main_window import PropertySearchEngine, PerformanceMetrics
+                from gui.enhanced_main_window import (
+                    PerformanceMetrics,
+                    PropertySearchEngine,
+                )
 
                 # Test PropertySearchEngine
                 mock_db = Mock()
@@ -97,8 +105,9 @@ class RuntimeGUITester:
         print("🔍 Testing Database Integration...")
 
         try:
-            from config_manager import ConfigManager
             from database_manager import DatabaseManager
+
+            from config_manager import ConfigManager
 
             # Test with temporary database
             with tempfile.NamedTemporaryFile(suffix='.db', delete=False) as tmp:
@@ -129,7 +138,7 @@ class RuntimeGUITester:
                 try:
                     os.unlink(temp_db_path)
                 except:
-                    pass
+        pass
 
             return True
 
@@ -243,6 +252,7 @@ class RuntimeGUITester:
 
                         # Try to inspect the class (without instantiating to avoid GUI requirements)
                         import inspect
+
                         sig = inspect.signature(widget_class.__init__)
                         params = list(sig.parameters.keys())
                         self.test_results[f'widget_{widget_name}_signature'] = f"✅ INFO - Parameters: {params}"
@@ -358,6 +368,7 @@ def main():
     try:
         import json
         from datetime import datetime
+
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"runtime_gui_test_{timestamp}.json"
 

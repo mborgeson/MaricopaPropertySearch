@@ -1,38 +1,102 @@
-import sys
-import os
-import time
 import logging
-import tempfile
+import os
 import sqlite3
+import sys
+import tempfile
+import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import List, Dict, Optional, Any, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
-from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-    QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem,
-    QStatusBar, QSplitter, QFrame, QTabWidget, QGroupBox, QGridLayout,
-    QScrollArea, QProgressBar, QTextEdit, QComboBox, QCheckBox,
-    QMessageBox, QDialog, QDialogButtonBox, QFormLayout, QSpinBox,
-    QDateEdit, QCalendarWidget, QButtonGroup, QRadioButton, QListWidget,
-    QListWidgetItem, QHeaderView, QMenu, QSizePolicy, QTreeWidget,
-    QTreeWidgetItem, QToolBar, QSlider, QDoubleSpinBox, QAction,
-    QProgressDialog
-)
 from PyQt5.QtCore import (
-    Qt, QThread, pyqtSignal as Signal, QTimer, QSize, QRect, QPoint, QDate,
-    QPropertyAnimation, QEasingCurve, QParallelAnimationGroup,
-    QSequentialAnimationGroup, QAbstractAnimation, QObject, QRunnable,
-    QThreadPool, QMutex, QMutexLocker, QSettings, QEventLoop
+    QAbstractAnimation,
+    QDate,
+    QEasingCurve,
+    QEventLoop,
+    QMutex,
+    QMutexLocker,
+    QObject,
+    QParallelAnimationGroup,
+    QPoint,
+    QPropertyAnimation,
+    QRect,
+    QRunnable,
+    QSequentialAnimationGroup,
+    QSettings,
+    QSize,
+    Qt,
+    QThread,
+    QThreadPool,
+    QTimer,
 )
+from PyQt5.QtCore import pyqtSignal as Signal
 from PyQt5.QtGui import (
-    QFont, QPalette, QColor, QPixmap, QIcon, QPainter,
-    QBrush, QPen, QLinearGradient, QRadialGradient, QFontMetrics,
-    QMovie, QCursor, QDragEnterEvent, QDropEvent, QDragMoveEvent
+    QBrush,
+    QColor,
+    QCursor,
+    QDragEnterEvent,
+    QDragMoveEvent,
+    QDropEvent,
+    QFont,
+    QFontMetrics,
+    QIcon,
+    QLinearGradient,
+    QMovie,
+    QPainter,
+    QPalette,
+    QPen,
+    QPixmap,
+    QRadialGradient,
 )
+from PyQt5.QtWidgets import (
+    QAction,
+    QApplication,
+    QButtonGroup,
+    QCalendarWidget,
+    QCheckBox,
+    QComboBox,
+    QDateEdit,
+    QDialog,
+    QDialogButtonBox,
+    QDoubleSpinBox,
+    QFormLayout,
+    QFrame,
+    QGridLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QLineEdit,
+    QListWidget,
+    QListWidgetItem,
+    QMainWindow,
+    QMenu,
+    QMessageBox,
+    QProgressBar,
+    QProgressDialog,
+    QPushButton,
+    QRadioButton,
+    QScrollArea,
+    QSizePolicy,
+    QSlider,
+    QSpinBox,
+    QSplitter,
+    QStatusBar,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QTextEdit,
+    QToolBar,
+    QTreeWidget,
+    QTreeWidgetItem,
+    QVBoxLayout,
+    QWidget,
+)
+
 # QtCharts import - PyQt5 version
 try:
     from PyQt5.QtChart import QChart, QChartView, QLineSeries, QValueAxis
+
 except ImportError:
     # Fallback if QtChart not available
     QChart = QChartView = QLineSeries = QValueAxis = None
@@ -40,24 +104,29 @@ except ImportError:
 # Add the src directory to the path so we can import our modules
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
 
-from config_manager import ConfigManager
+from api_client import MaricopaAPIClient
 from database_manager import DatabaseManager
+
 from background_data_collector import BackgroundDataCollectionManager, JobPriority
 from batch_processing_manager import BatchProcessingManager
-from api_client import MaricopaAPIClient
+from config_manager import ConfigManager
+
 # Optional imports - only if they exist
 try:
     from batch_api_client import BatchAPIClient
+
 except ImportError:
     BatchAPIClient = None
 
 try:
     from batch_search_engine import BatchSearchEngine
+
 except ImportError:
     BatchSearchEngine = None
 # Import existing GUI components
 try:
     from gui.gui_enhancements_dialogs import ApplicationSettingsDialog
+
 except ImportError:
     ApplicationSettingsDialog = None
 # All other GUI components can be imported on-demand
@@ -1962,7 +2031,7 @@ class EnhancedMainWindow(QMainWindow):
             # For now, return a placeholder
             return "Recent"
         except:
-            return "Unknown"
+        return "Unknown"
 
     def handle_search_error(self, error_message: str):
         """Handle search errors gracefully"""
@@ -2118,7 +2187,7 @@ class EnhancedMainWindow(QMainWindow):
             try:
                 status_dict = self.background_manager.get_collection_status()
             except:
-                status_dict = {'status': 'Unknown', 'pending_jobs': 0, 'active_jobs': 0, 'completed_jobs': 0}
+        status_dict = {'status': 'Unknown', 'pending_jobs': 0, 'active_jobs': 0, 'completed_jobs': 0}
 
         if status_dict and hasattr(self, 'bg_status_widget'):
             self.bg_status_widget.update_status(status_dict)
@@ -2138,7 +2207,7 @@ class EnhancedMainWindow(QMainWindow):
                         self.db_status_label.setText("DB: Connected")
                         self.db_status_label.setStyleSheet("color: green;")
                 except:
-                    self.db_status_label.setText("DB: Error")
+        self.db_status_label.setText("DB: Error")
                     self.db_status_label.setStyleSheet("color: orange;")
             else:
                 self.db_status_label.setText("DB: Not Available")
@@ -2149,14 +2218,14 @@ class EnhancedMainWindow(QMainWindow):
                 try:
                     self.quick_stats.update_stats()
                 except:
-                    pass  # Ignore quick stats errors
+        pass  # Ignore quick stats errors
 
             # Update database connection widget
             if hasattr(self.db_connection, 'update_status'):
                 try:
                     self.db_connection.update_status()
                 except:
-                    pass  # Ignore connection widget errors
+        pass  # Ignore connection widget errors
 
         except Exception as e:
             logger.error(f"System status check failed: {e}")
@@ -2354,6 +2423,7 @@ class EnhancedMainWindow(QMainWindow):
             # ULTIMATE CRASH PREVENTION - catch absolutely everything
             logger.error(f"CRITICAL: Unhandled error in refresh_property_data for APN {getattr(self, 'property_data', {}).get('apn', 'unknown')}: {e}")
             import traceback
+
             traceback.print_exc()
 
             # Show error but keep application running

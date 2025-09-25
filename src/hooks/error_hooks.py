@@ -2,24 +2,23 @@
 Error Handling and Recovery Hooks
 Comprehensive error detection, logging, recovery, and notification system
 """
-
 import asyncio
 import logging
 import smtplib
 import traceback
 from collections import defaultdict, deque
 from datetime import datetime, timedelta
-from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 from enum import Enum
-from typing import Dict, Any, List, Optional, Callable, Set
+from typing import Any, Callable, Dict, List, Optional, Set
 
 from hook_manager import (
     Hook,
     HookContext,
+    HookPriority,
     HookResult,
     HookStatus,
-    HookPriority,
     get_hook_manager,
 )
 from logging_config import get_logger, log_exception
@@ -48,7 +47,6 @@ class RecoveryAction(Enum):
 
 class ErrorPattern:
     """Error pattern for classification and handling"""
-
     def __init__(
         self,
         name: str,
@@ -64,18 +62,15 @@ class ErrorPattern:
         self.max_occurrences = max_occurrences
         self.occurrence_count = 0
         self.last_occurrence = None
-
     def matches(self, error_message: str) -> bool:
         """Check if error matches this pattern"""
-        import re
+import re
 
         return bool(re.search(self.pattern, error_message, re.IGNORECASE))
-
     def should_suppress(self) -> bool:
         """Check if error should be suppressed due to frequency"""
         return self.occurrence_count >= self.max_occurrences
-
-    def record_occurrence(self):
+def record_occurrence(self):
         """Record an occurrence of this error pattern"""
         self.occurrence_count += 1
         self.last_occurrence = datetime.now()
@@ -83,13 +78,11 @@ class ErrorPattern:
 
 class ErrorClassificationHook(Hook):
     """Hook for classifying and categorizing errors"""
-
     def __init__(self):
         super().__init__("error_classification", HookPriority.HIGHEST)
         self.error_patterns = self._initialize_error_patterns()
         self.error_stats = defaultdict(int)
         self.error_history = deque(maxlen=1000)
-
     def _initialize_error_patterns(self) -> List[ErrorPattern]:
         """Initialize common error patterns"""
         return [
@@ -238,7 +231,6 @@ class ErrorClassificationHook(Hook):
         except Exception as e:
             logger.error(f"Error classification hook failed: {e}")
             return HookResult(status=HookStatus.FAILED, error=e)
-
     def _get_log_level(self, severity: ErrorSeverity) -> int:
         """Get appropriate log level for error severity"""
         severity_map = {
@@ -248,7 +240,6 @@ class ErrorClassificationHook(Hook):
             ErrorSeverity.CRITICAL: logging.CRITICAL,
         }
         return severity_map.get(severity, logging.ERROR)
-
     def get_error_stats(self) -> Dict[str, Any]:
         """Get error statistics"""
         total_errors = sum(self.error_stats.values())
@@ -259,7 +250,6 @@ class ErrorClassificationHook(Hook):
             "recent_errors": len(self.error_history),
             "top_errors": self._get_top_errors(),
         }
-
     def _get_top_errors(self, limit: int = 5) -> List[Dict[str, Any]]:
         """Get top error patterns by frequency"""
         sorted_errors = sorted(
@@ -274,7 +264,6 @@ class ErrorClassificationHook(Hook):
 
 class ErrorRecoveryHook(Hook):
     """Hook for automated error recovery"""
-
     def __init__(self):
         super().__init__("error_recovery", HookPriority.HIGH)
         self.recovery_handlers = {}
@@ -476,12 +465,10 @@ class ErrorRecoveryHook(Hook):
         except Exception as e:
             logger.error(f"Failed to send alert: {e}")
             return False
-
-    def register_recovery_handler(self, error_pattern: str, handler: Callable):
+def register_recovery_handler(self, error_pattern: str, handler: Callable):
         """Register custom recovery handler for specific error pattern"""
         self.recovery_handlers[error_pattern] = handler
         logger.info(f"Registered recovery handler for pattern: {error_pattern}")
-
     def get_recovery_stats(self) -> Dict[str, Any]:
         """Get recovery statistics"""
         return dict(self.recovery_stats)
@@ -489,7 +476,6 @@ class ErrorRecoveryHook(Hook):
 
 class ErrorNotificationHook(Hook):
     """Hook for error notifications and alerting"""
-
     def __init__(self):
         super().__init__("error_notification", HookPriority.LOW)
         self.notification_config = {
@@ -580,12 +566,10 @@ class ErrorNotificationHook(Hook):
         except Exception as e:
             logger.error(f"Failed to send Slack notification: {e}")
             return False
-
-    def configure_notifications(self, config: Dict[str, Any]):
+def configure_notifications(self, config: Dict[str, Any]):
         """Configure notification settings"""
         self.notification_config.update(config)
         logger.info(f"Notification configuration updated: {self.notification_config}")
-
     def get_notification_history(self, limit: int = 50) -> List[Dict[str, Any]]:
         """Get notification history"""
         return list(self.notification_history)[-limit:]
@@ -605,7 +589,7 @@ def register_error_hooks():
 
 
 # Convenience functions for triggering error events
-def trigger_error_occurred(
+    def trigger_error_occurred(
     error: Exception,
     error_type: str = None,
     source: str = None,
@@ -629,9 +613,7 @@ def trigger_error_occurred(
     }
 
     return emit_hook("error.occurred", source or "error_handler", **error_data)
-
-
-def handle_error_with_recovery(
+    def handle_error_with_recovery(
     error: Exception,
     operation: Callable = None,
     fallback: Callable = None,

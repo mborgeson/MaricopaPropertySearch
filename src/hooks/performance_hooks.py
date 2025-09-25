@@ -2,22 +2,22 @@
 Performance Monitoring Hooks
 Comprehensive performance tracking, profiling, and optimization suggestions
 """
-
 import asyncio
-import psutil
 import threading
 import time
 from collections import defaultdict, deque
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional, NamedTuple
+from typing import Any, Dict, List, NamedTuple, Optional
+
+import psutil
 
 from hook_manager import (
     Hook,
     HookContext,
+    HookPriority,
     HookResult,
     HookStatus,
-    HookPriority,
     get_hook_manager,
 )
 from logging_config import get_logger, log_exception
@@ -37,7 +37,6 @@ class PerformanceMetric(NamedTuple):
 
 class PerformanceTrackingHook(Hook):
     """Hook for tracking general performance metrics"""
-
     def __init__(self):
         super().__init__("performance_tracking", HookPriority.NORMAL)
         self.metrics_history = defaultdict(lambda: deque(maxlen=1000))
@@ -197,7 +196,6 @@ class PerformanceTrackingHook(Hook):
             status=HookStatus.SUCCESS,
             result={"metric_recorded": True, "metric": metric._asdict()},
         )
-
     def _capture_system_metrics(self) -> Dict[str, Any]:
         """Capture current system performance metrics"""
         try:
@@ -227,7 +225,6 @@ class PerformanceTrackingHook(Hook):
         except Exception as e:
             logger.warning(f"Failed to capture system metrics: {e}")
             return {"error": str(e)}
-
     def _analyze_performance(
         self, operation_name: str, execution_time: float, system_metrics: Dict
     ) -> Dict[str, Any]:
@@ -287,7 +284,6 @@ class PerformanceTrackingHook(Hook):
                 analysis["suggestions"].append("Compare with historical performance")
 
         return analysis
-
     def _log_performance(
         self, operation_name: str, execution_time: float, analysis: Dict
     ):
@@ -308,7 +304,6 @@ class PerformanceTrackingHook(Hook):
             )
         else:
             logger.debug(f"Performance: {operation_name} ({execution_time:.3f}s)")
-
     def get_performance_summary(self, hours: int = 24) -> Dict[str, Any]:
         """Get performance summary for specified time period"""
         cutoff_time = datetime.now() - timedelta(hours=hours)
@@ -348,7 +343,6 @@ class PerformanceTrackingHook(Hook):
                 ]
 
         return summary
-
     def _get_system_metrics_summary(self) -> Dict[str, Any]:
         """Get system metrics summary"""
         current_metrics = self._capture_system_metrics()
@@ -358,7 +352,6 @@ class PerformanceTrackingHook(Hook):
 
 class MemoryProfilerHook(Hook):
     """Hook for memory profiling and leak detection"""
-
     def __init__(self):
         super().__init__("memory_profiler", HookPriority.LOW)
         self.memory_snapshots = deque(maxlen=100)
@@ -402,7 +395,6 @@ class MemoryProfilerHook(Hook):
         except Exception as e:
             logger.error(f"Memory profiler hook error: {e}")
             return HookResult(status=HookStatus.FAILED, error=e)
-
     def _take_memory_snapshot(self) -> Dict[str, Any]:
         """Take a memory usage snapshot"""
         try:
@@ -419,7 +411,6 @@ class MemoryProfilerHook(Hook):
         except Exception as e:
             logger.warning(f"Failed to take memory snapshot: {e}")
             return {"error": str(e)}
-
     def _analyze_memory_leaks(self) -> Dict[str, Any]:
         """Analyze memory snapshots for potential leaks"""
         if len(self.memory_snapshots) < 5:
@@ -454,7 +445,6 @@ class MemoryProfilerHook(Hook):
             "current_memory_mb": memory_values[-1],
             "snapshots_analyzed": len(memory_values),
         }
-
     def get_memory_report(self) -> Dict[str, Any]:
         """Get comprehensive memory usage report"""
         if not self.memory_snapshots:
@@ -499,8 +489,7 @@ def register_performance_hooks():
 # Convenience functions and decorators
 def performance_monitor(operation_name: str):
     """Decorator to monitor function performance"""
-
-    def decorator(func):
+def decorator(func):
         async def async_wrapper(*args, **kwargs):
             from hook_manager import emit_hook
 
@@ -530,8 +519,7 @@ def performance_monitor(operation_name: str):
                 )
 
             return result
-
-        def sync_wrapper(*args, **kwargs):
+def sync_wrapper(*args, **kwargs):
             from hook_manager import emit_hook
 
             operation_id = f"{operation_name}_{int(time.time())}"
@@ -560,8 +548,7 @@ def performance_monitor(operation_name: str):
                 )
 
             return result
-
-        import asyncio
+import asyncio
 
         if asyncio.iscoroutinefunction(func):
             return async_wrapper
@@ -601,9 +588,7 @@ def performance_scope(operation_name: str, metadata: Dict = None):
             operation_id=operation_id,
             success=success,
         )
-
-
-def track_metric(
+    def track_metric(
     metric_name: str, metric_value: float, unit: str = "", metadata: Dict = None
 ):
     """Track custom performance metric"""

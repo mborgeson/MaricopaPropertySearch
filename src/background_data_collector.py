@@ -6,7 +6,6 @@ CONSOLIDATED into unified_data_collector.py
 This file provides backward compatibility imports.
 All functionality has been integrated into the unified data collector.
 """
-
 import logging
 
 logger = logging.getLogger(__name__)
@@ -18,9 +17,9 @@ logger.warning(
 from .unified_data_collector import (
     BackgroundDataCollectionManager,
     BackgroundDataWorker,
+    DataCollectionCache,
     DataCollectionJob,
     DataCollectionStats,
-    DataCollectionCache,
     JobPriority,
     create_background_manager,
     start_background_collection,

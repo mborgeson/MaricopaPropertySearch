@@ -2,11 +2,11 @@
 """
 Test PostgreSQL database connection
 """
+import sys
+from pathlib import Path
 
 import psycopg2
 from psycopg2 import OperationalError
-import sys
-from pathlib import Path
 
 # Add project root to path
 PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch")
@@ -15,14 +15,14 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 try:
     # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 from src.enhanced_config_manager import EnhancedConfigManager
+
     config = EnhancedConfigManager()
     db_config = config.get_db_config()
-    
-    print("Testing PostgreSQL connection...")
-    print(f"Host: {db_config['host']}")
-    print(f"Port: {db_config['port']}")
-    print(f"Database: {db_config['database']}")
-    print(f"User: {db_config['user']}")
+        print("Testing PostgreSQL connection...")
+        print(f"Host: {db_config['host']}")
+        print(f"Port: {db_config['port']}")
+        print(f"Database: {db_config['database']}")
+        print(f"User: {db_config['user']}")
     
     # Test connection
     connection = psycopg2.connect(
@@ -62,23 +62,23 @@ from src.enhanced_config_manager import EnhancedConfigManager
         tables = cursor.fetchall()
         
         if tables:
-            print("SUCCESS: Database tables found:")
+        print("SUCCESS: Database tables found:")
             for table in tables:
-                print(f"  - {table[0]}")
+        print(f"  - {table[0]}")
         else:
-            print("WARNING: No tables found in database")
+        print("WARNING: No tables found in database")
             
     else:
         print(f"ERROR: Database '{db_config['database']}' does not exist")
     
     connection.close()
-    print("SUCCESS: Connection test successful")
+        print("SUCCESS: Connection test successful")
     
 except OperationalError as e:
-    print(f"ERROR: Connection failed: {e}")
-    print("Attempting to connect as postgres user...")
+        print(f"ERROR: Connection failed: {e}")
+        print("Attempting to connect as postgres user...")
     
-    try:
+try:
         connection = psycopg2.connect(
             host='localhost',
             port=5433,
@@ -89,8 +89,8 @@ except OperationalError as e:
         print("SUCCESS: Connected as postgres user")
         connection.close()
         
-    except OperationalError as e2:
+except OperationalError as e2:
         print(f"ERROR: Even postgres connection failed: {e2}")
         
 except Exception as e:
-    print(f"ERROR: Unexpected error: {e}")
+        print(f"ERROR: Unexpected error: {e}")

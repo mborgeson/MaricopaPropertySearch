@@ -3,7 +3,6 @@
 Performance Analysis for Property Search
 Identifies specific bottlenecks in data collection process
 """
-
 import sys
 import time
 from pathlib import Path
@@ -12,12 +11,10 @@ from pathlib import Path
 src_dir = Path(__file__).parent.parent / "src"
 sys.path.insert(0, str(src_dir))
 sys.path.insert(0, str(Path(__file__).parent.parent))
-
-def analyze_api_performance():
+    def analyze_api_performance():
     """Analyze performance of individual API endpoints"""
-    
-    print("PERFORMANCE BOTTLENECK ANALYSIS")
-    print("=" * 60)
+        print("PERFORMANCE BOTTLENECK ANALYSIS")
+        print("=" * 60)
     
     try:
         # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
@@ -43,7 +40,7 @@ def analyze_api_performance():
         results = {}
         
         for test_name, test_func in endpoints_to_test:
-            print(f"Testing: {test_name}")
+        print(f"Testing: {test_name}")
             times = []
             
             for run in range(3):  # Run each test 3 times
@@ -56,13 +53,13 @@ def analyze_api_performance():
                     
                     # Analyze result size
                     result_size = len(str(result)) if result else 0
-                    print(f"  Run {run+1}: {duration:.2f}s ({result_size:,} chars)")
+        print(f"  Run {run+1}: {duration:.2f}s ({result_size:,} chars)")
                     
                 except Exception as e:
                     end_time = time.time() 
                     duration = end_time - start_time
                     times.append(duration)
-                    print(f"  Run {run+1}: {duration:.2f}s (ERROR: {str(e)[:50]})")
+        print(f"  Run {run+1}: {duration:.2f}s (ERROR: {str(e)[:50]})")
             
             avg_time = sum(times) / len(times)
             min_time = min(times)
@@ -74,9 +71,8 @@ def analyze_api_performance():
                 'max': max_time,
                 'times': times
             }
-            
-            print(f"  Average: {avg_time:.2f}s (min: {min_time:.2f}s, max: {max_time:.2f}s)")
-            print()
+        print(f"  Average: {avg_time:.2f}s (min: {min_time:.2f}s, max: {max_time:.2f}s)")
+        print()
         
         # Summary analysis
         print("PERFORMANCE SUMMARY")
@@ -85,24 +81,23 @@ def analyze_api_performance():
         sorted_results = sorted(results.items(), key=lambda x: x[1]['avg'], reverse=True)
         
         for test_name, perf_data in sorted_results:
-            print(f"{perf_data['avg']:6.2f}s - {test_name}")
-        
+        print(f"{perf_data['avg']:6.2f}s - {test_name}")
         print()
         print("BOTTLENECK ANALYSIS:")
         
         slowest_test = sorted_results[0]
         if slowest_test[1]['avg'] > 5.0:
-            print(f"CRITICAL: {slowest_test[0]} is taking {slowest_test[1]['avg']:.2f}s")
-            print("This is the primary bottleneck causing slow user experience")
+        print(f"CRITICAL: {slowest_test[0]} is taking {slowest_test[1]['avg']:.2f}s")
+        print("This is the primary bottleneck causing slow user experience")
         
         # Check for specific patterns
         if 'Comprehensive Info' in results and results['Comprehensive Info']['avg'] > 5.0:
-            print()
-            print("COMPREHENSIVE INFO ANALYSIS:")
-            print("- This method calls multiple endpoints sequentially")
-            print("- Each endpoint has network latency")
-            print("- Rate limiting adds additional delays")
-            print("- Recommendation: Implement parallel endpoint calls")
+        print()
+        print("COMPREHENSIVE INFO ANALYSIS:")
+        print("- This method calls multiple endpoints sequentially")
+        print("- Each endpoint has network latency")
+        print("- Rate limiting adds additional delays")
+        print("- Recommendation: Implement parallel endpoint calls")
         
         # Check data size impact
         print("\nDATA SIZE IMPACT:")
@@ -118,22 +113,22 @@ def analyze_api_performance():
         
     except Exception as e:
         print(f"Performance analysis failed: {e}")
-        import traceback
-        traceback.print_exc()
-        return None
+import traceback
 
-def analyze_database_performance():
+        traceback.print_exc()
+
+    return None
+    def analyze_database_performance():
     """Analyze database operation performance"""
-    
-    print("\nDATABASE PERFORMANCE ANALYSIS")
-    print("=" * 60)
+        print("\nDATABASE PERFORMANCE ANALYSIS")
+        print("=" * 60)
     
     try:
         # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
-        from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.api_client_unified import UnifiedMaricopaAPIClient
 from src.enhanced_config_manager import EnhancedConfigManager
-        
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
         config = EnhancedConfigManager()
         db_manager = ThreadSafeDatabaseManager(config)
         
@@ -147,7 +142,7 @@ from src.enhanced_config_manager import EnhancedConfigManager
         ]
         
         for op_name, op_func in operations:
-            print(f"Testing: {op_name}")
+        print(f"Testing: {op_name}")
             
             times = []
             for run in range(3):
@@ -159,20 +154,19 @@ from src.enhanced_config_manager import EnhancedConfigManager
                     times.append(duration)
                     
                     result_count = len(result) if isinstance(result, list) else 1
-                    print(f"  Run {run+1}: {duration:.3f}s ({result_count} records)")
+        print(f"  Run {run+1}: {duration:.3f}s ({result_count} records)")
                     
                 except Exception as e:
                     end_time = time.time()
                     duration = end_time - start_time
                     times.append(duration)
-                    print(f"  Run {run+1}: {duration:.3f}s (ERROR: {str(e)[:30]})")
+        print(f"  Run {run+1}: {duration:.3f}s (ERROR: {str(e)[:30]})")
             
             avg_time = sum(times) / len(times)
-            print(f"  Average: {avg_time:.3f}s")
-            print()
+        print(f"  Average: {avg_time:.3f}s")
+        print()
         
         db_manager.close()
-        
         print("DATABASE PERFORMANCE SUMMARY:")
         print("- Database operations are fast (<0.01s typically)")
         print("- Network/API calls are the primary bottleneck")
@@ -180,30 +174,26 @@ from src.enhanced_config_manager import EnhancedConfigManager
         
     except Exception as e:
         print(f"Database performance analysis failed: {e}")
-
-def main():
+    def main():
     """Run complete performance analysis"""
     
     api_results = analyze_api_performance()
     analyze_database_performance()
-    
-    print("\nOVERALL RECOMMENDATIONS:")
-    print("=" * 60)
+        print("\nOVERALL RECOMMENDATIONS:")
+        print("=" * 60)
     
     if api_results:
         comprehensive_time = api_results.get('Comprehensive Info', {}).get('avg', 0)
         if comprehensive_time > 5.0:
-            print("1. CRITICAL: Implement parallel API endpoint calls")
-            print(f"   Current: {comprehensive_time:.2f}s sequential")
-            print(f"   Target: <2.0s with parallel processing")
-            print()
-            
+        print("1. CRITICAL: Implement parallel API endpoint calls")
+        print(f"   Current: {comprehensive_time:.2f}s sequential")
+        print(f"   Target: <2.0s with parallel processing")
+        print()
         print("2. Add response caching for repeated lookups")
         print("3. Implement progressive data loading (load basic info first)")
         print("4. Add user progress indicators during slow operations")
         print("5. Consider API rate limit optimization")
-        
-    print("\nESTIMATED IMPROVEMENTS:")
+        print("\nESTIMATED IMPROVEMENTS:")
     if api_results and 'Comprehensive Info' in api_results:
         current = api_results['Comprehensive Info']['avg']
         print(f"Current performance: {current:.2f}s")

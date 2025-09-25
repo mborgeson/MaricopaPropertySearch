@@ -6,8 +6,8 @@ CONSOLIDATED into unified_data_collector.py
 This file provides backward compatibility imports.
 All functionality has been integrated into the unified data collector.
 """
-
 import logging
+
 from .unified_data_collector import UnifiedDataCollector
 
 logger = logging.getLogger(__name__)
@@ -46,9 +46,10 @@ class MaricopaDataCollector:
             "errors": result.errors,
         }
 
-    def collect_data_for_apn_sync(self, apn: str):
-        """Synchronous wrapper for automatic data collection"""
-        return self.unified_collector.collect_data_for_apn_sync(apn)
+
+def collect_data_for_apn_sync(self, apn: str):
+    """Synchronous wrapper for automatic data collection"""
+    return self.unified_collector.collect_data_for_apn_sync(apn)
 
 
 # Export for backward compatibility

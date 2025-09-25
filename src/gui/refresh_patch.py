@@ -7,7 +7,7 @@ This patch contains the fixed refresh functions to prevent application crashes.
 # CRASH-SAFE refresh_property_data function (line ~1082)
 REFRESH_PROPERTY_DATA_REPLACEMENT = '''    def refresh_property_data(self):
         """CRASH-SAFE Force refresh property data by clearing cache and reloading details"""
-        try:
+try:
             # Comprehensive safety checks first
             if not hasattr(self, 'property_data') or not self.property_data:
                 QMessageBox.warning(self, "Error", "No property data available for refresh.")
@@ -20,7 +20,7 @@ REFRESH_PROPERTY_DATA_REPLACEMENT = '''    def refresh_property_data(self):
             
             # Initialize progress dialog with proper error handling
             progress = None
-            try:
+try:
                 from PyQt5.QtWidgets import QProgressDialog, QMessageBox
                 from PyQt5.QtCore import Qt
                 
@@ -30,11 +30,11 @@ REFRESH_PROPERTY_DATA_REPLACEMENT = '''    def refresh_property_data(self):
                 progress.show()
                 progress.setValue(10)
                 
-            except Exception as progress_error:
+except Exception as progress_error:
                 logger.warning(f"Failed to create progress dialog: {progress_error}")
                 # Continue without progress dialog
             
-            try:
+try:
                 # SAFE cache clearing with comprehensive error handling
                 if progress:
                     progress.setValue(20)
@@ -42,21 +42,21 @@ REFRESH_PROPERTY_DATA_REPLACEMENT = '''    def refresh_property_data(self):
                 
                 cache_cleared = False
                 if self.background_manager:
-                    try:
+try:
                         if hasattr(self.background_manager, 'worker') and self.background_manager.worker:
                             if hasattr(self.background_manager.worker, 'cache'):
-                                try:
+try:
                                     self.background_manager.worker.cache.clear_apn_cache(apn)
                                     cache_cleared = True
                                     logger.info(f"Cleared cache for APN {apn}")
-                                except Exception as cache_error:
+except Exception as cache_error:
                                     logger.warning(f"Failed to clear cache for APN {apn}: {cache_error}")
                                     # Don't fail the entire operation for cache clearing issues
                             else:
                                 logger.debug("Background worker has no cache attribute")
                         else:
                             logger.debug("Background manager has no worker or worker is None")
-                    except Exception as manager_error:
+except Exception as manager_error:
                         logger.warning(f"Error accessing background manager for cache clear: {manager_error}")
                 
                 if progress:
@@ -66,13 +66,13 @@ REFRESH_PROPERTY_DATA_REPLACEMENT = '''    def refresh_property_data(self):
                 # SAFE background collection with comprehensive checks
                 collection_success = False
                 if self.background_manager:
-                    try:
+try:
                         # Check if background service is running
                         is_running = False
                         if hasattr(self.background_manager, 'is_running'):
-                            try:
+try:
                                 is_running = self.background_manager.is_running()
-                            except Exception as running_check_error:
+except Exception as running_check_error:
                                 logger.warning(f"Error checking if background service is running: {running_check_error}")
                         
                         if is_running:
@@ -81,7 +81,7 @@ REFRESH_PROPERTY_DATA_REPLACEMENT = '''    def refresh_property_data(self):
                                 progress.setLabelText("Queuing fresh data collection...")
                             
                             # SAFE data collection request
-                            try:
+try:
                                 if hasattr(self.background_manager, 'collect_data_for_apn'):
                                     success = self.background_manager.collect_data_for_apn(
                                         apn, JobPriority.CRITICAL, force_fresh=True
@@ -99,12 +99,12 @@ REFRESH_PROPERTY_DATA_REPLACEMENT = '''    def refresh_property_data(self):
                                 else:
                                     logger.error("Background manager missing collect_data_for_apn method")
                                     
-                            except Exception as collection_error:
+except Exception as collection_error:
                                 logger.error(f"Error requesting data collection for APN {apn}: {collection_error}")
                         else:
                             logger.info("Background collection service is not running - using database refresh")
                             
-                    except Exception as bg_service_error:
+except Exception as bg_service_error:
                         logger.error(f"Error with background collection service: {bg_service_error}")
                 else:
                     logger.warning("No background manager available for refresh")
@@ -115,7 +115,7 @@ REFRESH_PROPERTY_DATA_REPLACEMENT = '''    def refresh_property_data(self):
                 
                 # SAFE property details reload
                 reload_success = False
-                try:
+try:
                     if hasattr(self, 'load_property_details'):
                         self.load_property_details()
                         reload_success = True
@@ -123,7 +123,7 @@ REFRESH_PROPERTY_DATA_REPLACEMENT = '''    def refresh_property_data(self):
                     else:
                         logger.error("Dialog missing load_property_details method")
                         
-                except Exception as reload_error:
+except Exception as reload_error:
                     logger.error(f"Error reloading property details for APN {apn}: {reload_error}")
                 
                 if progress:
@@ -142,84 +142,83 @@ REFRESH_PROPERTY_DATA_REPLACEMENT = '''    def refresh_property_data(self):
                                        "Refresh completed but some operations may have failed.\\n"
                                        "Check the application logs for more details.")
                     
-            except Exception as main_error:
+except Exception as main_error:
                 logger.error(f"Error in main refresh operation for APN {apn}: {main_error}")
                 QMessageBox.critical(self, "Refresh Error", 
                                    f"Error during refresh operation: {str(main_error)}\\n"
                                    "Please try again or restart the application if problems persist.")
             
-            finally:
+finally:
                 # SAFE progress dialog cleanup
                 if progress:
-                    try:
+try:
                         progress.close()
                         progress.deleteLater()
-                    except Exception as cleanup_error:
+except Exception as cleanup_error:
                         logger.warning(f"Error cleaning up progress dialog: {cleanup_error}")
                         
-        except Exception as e:
+except Exception as e:
             # ULTIMATE CRASH PREVENTION - catch absolutely everything
             logger.error(f"CRITICAL: Unhandled error in refresh_property_data for APN {getattr(self, 'property_data', {}).get('apn', 'unknown')}: {e}")
-            import traceback
-            traceback.print_exc()
+import traceback
+        traceback.print_exc()
             
             # Show error but keep application running
-            try:
+try:
                 QMessageBox.critical(self, "Critical Refresh Error", 
                                    f"A critical error occurred during refresh:\\n{str(e)}\\n\\n"
                                    "The application will continue running.\\n"
                                    "Please restart the application if problems persist.")
-            except:
+except:
                 # Even the error dialog failed - just log it
                 logger.error("Failed to show critical error dialog - application may be in unstable state")'''
 
 # CRASH-SAFE _update_dialog_status function (line ~1135)
 UPDATE_DIALOG_STATUS_REPLACEMENT = '''    def _update_dialog_status(self):
         """CRASH-SAFE Periodically update dialog status"""
-        try:
+try:
             if not hasattr(self, 'background_manager') or not self.background_manager:
                 return
                 
             # SAFE status retrieval
-            try:
+try:
                 status = self.background_manager.get_collection_status()
                 if hasattr(self, 'status_widget') and self.status_widget:
-                    try:
+try:
                         self.status_widget.update_status(status)
-                    except Exception as widget_error:
+except Exception as widget_error:
                         logger.warning(f"Error updating status widget: {widget_error}")
-            except Exception as status_error:
+except Exception as status_error:
                 logger.warning(f"Error getting collection status: {status_error}")
             
             # SAFE collection completion check
-            try:
+try:
                 if hasattr(self, 'collection_in_progress') and self.collection_in_progress:
                     if hasattr(self, 'property_data') and self.property_data:
                         apn = self.property_data.get('apn') if isinstance(self.property_data, dict) else None
                         if apn and hasattr(self.background_manager, 'worker') and self.background_manager.worker:
-                            try:
+try:
                                 if hasattr(self.background_manager.worker, 'active_jobs'):
                                     if apn not in self.background_manager.worker.active_jobs:
                                         # Collection completed, refresh safely
                                         self.collection_in_progress = False
                                         if hasattr(self, 'load_property_details'):
-                                            try:
+try:
                                                 self.load_property_details()
-                                            except Exception as load_error:
+except Exception as load_error:
                                                 logger.error(f"Error loading property details after completion: {load_error}")
-                            except Exception as job_check_error:
+except Exception as job_check_error:
                                 logger.warning(f"Error checking active jobs: {job_check_error}")
-            except Exception as completion_error:
+except Exception as completion_error:
                 logger.warning(f"Error checking collection completion: {completion_error}")
                 
-        except Exception as e:
+except Exception as e:
             logger.warning(f"Error in _update_dialog_status: {e}")
             # Don't re-raise - just log and continue'''
-
-print("Refresh patch functions defined successfully.")
-print(
+        print("Refresh patch functions defined successfully.")
+        print(
     "REFRESH_PROPERTY_DATA_REPLACEMENT contains the crash-safe refresh_property_data function"
 )
-print(
+        print(
     "UPDATE_DIALOG_STATUS_REPLACEMENT contains the crash-safe _update_dialog_status function"
 )

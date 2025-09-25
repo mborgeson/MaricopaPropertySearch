@@ -3,31 +3,59 @@ Improved Main Window with Enhanced UX Messages
 Replaces "Not Available" with actionable user-friendly messages
 """
 
-import sys
-from PyQt5.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QLineEdit, QPushButton, QTabWidget, QTableWidget, 
-    QTableWidgetItem, QTextEdit, QProgressBar, QMessageBox,
-    QComboBox, QSpinBox, QCheckBox, QGroupBox, QSplitter,
-    QHeaderView, QApplication, QStatusBar, QMenuBar, QMenu,
-    QAction, QFileDialog, QDialog
-)
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer
-from PyQt5.QtGui import QFont, QIcon, QPixmap
-from typing import Dict, List, Optional, Any
-import json
 import csv
-from pathlib import Path
-from datetime import datetime
+import json
+import sys
 import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+from PyQt5.QtCore import Qt, QThread, QTimer, pyqtSignal
+from PyQt5.QtGui import QFont, QIcon, QPixmap
+from PyQt5.QtWidgets import (
+    QAction,
+    QApplication,
+    QCheckBox,
+    QComboBox,
+    QDialog,
+    QFileDialog,
+    QGridLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QLineEdit,
+    QMainWindow,
+    QMenu,
+    QMenuBar,
+    QMessageBox,
+    QProgressBar,
+    QPushButton,
+    QSpinBox,
+    QSplitter,
+    QStatusBar,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
+)
+
+from src.api_client import MaricopaAPIClient, MockMaricopaAPIClient
 
 # Import application modules
 from src.database_manager import DatabaseManager
-from src.api_client import MaricopaAPIClient, MockMaricopaAPIClient
-from src.web_scraper import WebScraperManager, MockWebScraperManager
 
 # Import centralized logging
-from src.logging_config import get_logger, get_search_logger, get_performance_logger, log_exception
+from src.logging_config import (
+    get_logger,
+    get_performance_logger,
+    get_search_logger,
+    log_exception,
+)
+from src.web_scraper import MockWebScraperManager, WebScraperManager
 
 logger = get_logger(__name__)
 search_logger = get_search_logger(__name__)
@@ -854,7 +882,7 @@ class ImprovedPropertySearchApp(QMainWindow):
             api_status = self.api_client.get_api_status()
             status_parts.append(f"API: ✅ {api_status.get('status', 'Available')}")
         except:
-            status_parts.append("API: ⚠️ Limited")
+        status_parts.append("API: ⚠️ Limited")
         
         self.status_bar.showMessage(" | ".join(status_parts))
     
@@ -953,7 +981,7 @@ class ImprovedPropertySearchApp(QMainWindow):
                 try:
                     lot_text = f"{int(float(str(lot_size).replace(',', ''))):,}"
                 except:
-                    lot_text = "Size available"
+        lot_text = "Size available"
             else:
                 lot_text = "Size available"
             self.results_table.setItem(i, 4, QTableWidgetItem(lot_text))
@@ -1006,7 +1034,7 @@ class ImprovedPropertySearchApp(QMainWindow):
             property_data = self.current_results[row_index]
             dialog = ImprovedPropertyDetailsDialog(property_data, self.db_manager, self)
             dialog.exec_()
-    
+
     def collect_all_missing_data(self):
         """Collect all missing data for current results"""
         if not self.current_results:

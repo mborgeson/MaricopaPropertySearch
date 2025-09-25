@@ -6,24 +6,21 @@ GUI Framework Migration Test - PySide6 to PyQt5 Conversion Verification
 This test verifies that the PySide6 to PyQt5 conversion is complete and functional.
 Tests all GUI components, dialogs, charts, and event handling.
 """
-
-import sys
 import os
-import traceback
+import sys
 import time
+import traceback
 from datetime import datetime
-from typing import List, Dict, Optional, Any, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 # Add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
 
 class GUIFrameworkMigrationTest:
     """Test suite for verifying PyQt5 GUI framework migration"""
-
     def __init__(self):
         self.test_results = []
         self.app = None
-
     def log_test(self, test_name: str, passed: bool, message: str = ""):
         """Log test results"""
         status = "[PASS]" if passed else "[FAIL]"
@@ -35,50 +32,111 @@ class GUIFrameworkMigrationTest:
         })
         print(f"{status}: {test_name}")
         if message:
-            print(f"    {message}")
-
+        print(f"    {message}")
     def test_1_pyqt5_imports(self):
         """Test 1: Verify all PyQt5 imports work correctly"""
-        try:
+    try:
             # Core PyQt5 imports
-            from PyQt5.QtWidgets import (
-                QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-                QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem,
-                QStatusBar, QSplitter, QFrame, QTabWidget, QGroupBox, QGridLayout,
-                QScrollArea, QProgressBar, QTextEdit, QComboBox, QCheckBox,
-                QMessageBox, QDialog, QDialogButtonBox, QFormLayout, QSpinBox,
-                QDateEdit, QCalendarWidget, QButtonGroup, QRadioButton, QListWidget,
-                QListWidgetItem, QHeaderView, QMenu, QSizePolicy, QTreeWidget,
-                QTreeWidgetItem, QToolBar, QSlider, QDoubleSpinBox, QAction
-            )
             from PyQt5.QtCore import (
-                Qt, QThread, pyqtSignal, QTimer, QSize, QRect, QPoint, QDate,
-                QPropertyAnimation, QEasingCurve, QParallelAnimationGroup,
-                QSequentialAnimationGroup, QAbstractAnimation, QObject, QRunnable,
-                QThreadPool, QMutex, QMutexLocker, QSettings, QEventLoop
+                QAbstractAnimation,
+                QDate,
+                QEasingCurve,
+                QEventLoop,
+                QMutex,
+                QMutexLocker,
+                QObject,
+                QParallelAnimationGroup,
+                QPoint,
+                QPropertyAnimation,
+                QRect,
+                QRunnable,
+                QSequentialAnimationGroup,
+                QSettings,
+                QSize,
+                Qt,
+                QThread,
+                QThreadPool,
+                QTimer,
+                pyqtSignal,
             )
             from PyQt5.QtGui import (
-                QFont, QPalette, QColor, QPixmap, QIcon, QPainter,
-                QBrush, QPen, QLinearGradient, QRadialGradient, QFontMetrics,
-                QMovie, QCursor, QDragEnterEvent, QDropEvent, QDragMoveEvent
+                QBrush,
+                QColor,
+                QCursor,
+                QDragEnterEvent,
+                QDragMoveEvent,
+                QDropEvent,
+                QFont,
+                QFontMetrics,
+                QIcon,
+                QLinearGradient,
+                QMovie,
+                QPainter,
+                QPalette,
+                QPen,
+                QPixmap,
+                QRadialGradient,
+            )
+            from PyQt5.QtWidgets import (
+                QAction,
+                QApplication,
+                QButtonGroup,
+                QCalendarWidget,
+                QCheckBox,
+                QComboBox,
+                QDateEdit,
+                QDialog,
+                QDialogButtonBox,
+                QDoubleSpinBox,
+                QFormLayout,
+                QFrame,
+                QGridLayout,
+                QGroupBox,
+                QHBoxLayout,
+                QHeaderView,
+                QLabel,
+                QLineEdit,
+                QListWidget,
+                QListWidgetItem,
+                QMainWindow,
+                QMenu,
+                QMessageBox,
+                QProgressBar,
+                QPushButton,
+                QRadioButton,
+                QScrollArea,
+                QSizePolicy,
+                QSlider,
+                QSpinBox,
+                QSplitter,
+                QStatusBar,
+                QTableWidget,
+                QTableWidgetItem,
+                QTabWidget,
+                QTextEdit,
+                QToolBar,
+                QTreeWidget,
+                QTreeWidgetItem,
+                QVBoxLayout,
+                QWidget,
             )
 
             self.log_test("PyQt5 Core Widget Imports", True, "All core PyQt5 widgets imported successfully")
             return True
 
-        except ImportError as e:
+    except ImportError as e:
             self.log_test("PyQt5 Core Widget Imports", False, f"Import error: {e}")
             return False
-
     def test_2_qtcharts_fallback(self):
         """Test 2: Verify QtCharts import with fallback handling"""
-        try:
+    try:
             # Test QtCharts import with fallback
-            try:
+    try:
                 from PyQt5.QtChart import QChart, QChartView, QLineSeries, QValueAxis
+
                 charts_available = True
                 message = "QtCharts available and imported successfully"
-            except ImportError:
+    except ImportError:
                 QChart = QChartView = QLineSeries = QValueAxis = None
                 charts_available = False
                 message = "QtCharts not available - fallback handling working correctly"
@@ -86,30 +144,30 @@ class GUIFrameworkMigrationTest:
             self.log_test("QtCharts Import with Fallback", True, message)
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.log_test("QtCharts Import with Fallback", False, f"Error: {e}")
             return False
-
     def test_3_main_window_import(self):
         """Test 3: Verify main window GUI class imports"""
-        try:
+    try:
             from gui.enhanced_main_window import EnhancedMainWindow
+
             self.log_test("Enhanced Main Window Import", True, "Main GUI class imported successfully")
             return True
 
-        except ImportError as e:
+    except ImportError as e:
             self.log_test("Enhanced Main Window Import", False, f"Import error: {e}")
             return False
-
     def test_4_gui_dialogs_import(self):
         """Test 4: Verify GUI dialog imports"""
-        try:
+    try:
             # Test optional dialog imports
-            try:
+    try:
                 from gui.gui_enhancements_dialogs import ApplicationSettingsDialog
+
                 dialog_available = True
                 message = "GUI enhancement dialogs imported successfully"
-            except ImportError:
+    except ImportError:
                 ApplicationSettingsDialog = None
                 dialog_available = False
                 message = "GUI dialogs not available - handled gracefully"
@@ -117,15 +175,14 @@ class GUIFrameworkMigrationTest:
             self.log_test("GUI Dialog Imports", True, message)
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.log_test("GUI Dialog Imports", False, f"Error: {e}")
             return False
-
     def test_5_application_creation(self):
         """Test 5: Create QApplication instance"""
-        try:
-            from PyQt5.QtWidgets import QApplication
+    try:
             from PyQt5.QtCore import Qt
+            from PyQt5.QtWidgets import QApplication
 
             # Create application if it doesn't exist
             if QApplication.instance() is None:
@@ -139,13 +196,12 @@ class GUIFrameworkMigrationTest:
             self.log_test("QApplication Creation", True, message)
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.log_test("QApplication Creation", False, f"Error: {e}")
             return False
-
     def test_6_main_window_instantiation(self):
         """Test 6: Create main window instance"""
-        try:
+    try:
             if self.app is None:
                 self.test_5_application_creation()
 
@@ -167,15 +223,14 @@ class GUIFrameworkMigrationTest:
 
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.log_test("Main Window Instantiation", False, f"Error: {e}")
             return False
-
     def test_7_widget_functionality(self):
         """Test 7: Test basic widget functionality"""
-        try:
-            from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel
+    try:
             from PyQt5.QtCore import Qt
+            from PyQt5.QtWidgets import QLabel, QPushButton, QVBoxLayout, QWidget
 
             # Create test widget
             test_widget = QWidget()
@@ -204,25 +259,22 @@ class GUIFrameworkMigrationTest:
 
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.log_test("Basic Widget Functionality", False, f"Error: {e}")
             return False
-
     def test_8_signal_slot_system(self):
         """Test 8: Test PyQt5 signal/slot system"""
-        try:
-            from PyQt5.QtWidgets import QWidget, QPushButton
-            from PyQt5.QtCore import pyqtSignal, QObject
+    try:
+            from PyQt5.QtCore import QObject, pyqtSignal
+            from PyQt5.QtWidgets import QPushButton, QWidget
 
-            class TestSignals(QObject):
+class TestSignals(QObject):
                 test_signal = pyqtSignal(str)
-
-                def __init__(self):
+    def __init__(self):
                     super().__init__()
                     self.signal_received = False
                     self.received_message = ""
-
-                def handle_signal(self, message):
+    def handle_signal(self, message):
                     self.signal_received = True
                     self.received_message = message
 
@@ -240,34 +292,30 @@ class GUIFrameworkMigrationTest:
             self.log_test("Signal/Slot System", True, "PyQt5 signals and slots working correctly")
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.log_test("Signal/Slot System", False, f"Error: {e}")
             return False
-
     def test_9_threading_support(self):
         """Test 9: Test PyQt5 threading support"""
-        try:
-            from PyQt5.QtCore import QThread, QObject, pyqtSignal, QTimer
+    try:
+            from PyQt5.QtCore import QObject, QThread, QTimer, pyqtSignal
 
-            class TestWorker(QObject):
+class TestWorker(QObject):
                 finished = pyqtSignal()
-
-                def run(self):
+    def run(self):
                     # Simulate work
                     time.sleep(0.1)
                     self.finished.emit()
 
-            class TestThread(QThread):
-                def __init__(self):
+class TestThread(QThread):
+    def __init__(self):
                     super().__init__()
                     self.worker = TestWorker()
                     self.worker.moveToThread(self)
                     self.finished_received = False
-
-                def run(self):
+    def run(self):
                     self.worker.run()
-
-                def handle_finished(self):
+    def handle_finished(self):
                     self.finished_received = True
 
             # Create and start thread
@@ -282,23 +330,22 @@ class GUIFrameworkMigrationTest:
             self.log_test("Threading Support", True, "PyQt5 threading working correctly")
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.log_test("Threading Support", False, f"Error: {e}")
             return False
-
     def test_10_config_manager_integration(self):
         """Test 10: Test EnhancedConfigManager.get() method integration"""
-        try:
+    try:
             # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 
             # Test ConfigManager instantiation
             config_manager = EnhancedConfigManager()
 
             # Test config methods (ConfigParser style)
-            try:
+    try:
                 db_config = config_manager.get_db_config()
                 test_value = db_config.get('host', 'localhost')
-            except Exception:
+    except Exception:
                 # Fallback if no config file
                 test_value = 'localhost'
 
@@ -310,13 +357,12 @@ class GUIFrameworkMigrationTest:
                          f"ConfigManager methods working - test value: '{test_value}'")
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.log_test("ConfigManager Integration", False, f"Error: {e}")
             return False
-
     def test_11_no_pyside6_dependencies(self):
         """Test 11: Verify no PySide6 dependencies remain"""
-        try:
+    try:
             # Check if PySide6 modules are imported
             pyside6_modules = [name for name in sys.modules.keys() if name.startswith('PySide6')]
 
@@ -326,13 +372,14 @@ class GUIFrameworkMigrationTest:
                 return False
 
             # Try to import main module and check for PySide6 usage
-            try:
-                import gui.enhanced_main_window
+    try:
+import gui.enhanced_main_window
+
                 # If it imports without PySide6 errors, we're good
                 self.log_test("No PySide6 Dependencies", True,
                              "No PySide6 modules found in sys.modules")
                 return True
-            except Exception as e:
+    except Exception as e:
                 if "PySide6" in str(e):
                     self.log_test("No PySide6 Dependencies", False,
                                  f"PySide6 dependency found: {e}")
@@ -343,15 +390,15 @@ class GUIFrameworkMigrationTest:
                                  "No PySide6 dependencies detected")
                     return True
 
-        except Exception as e:
+    except Exception as e:
             self.log_test("No PySide6 Dependencies", False, f"Error checking dependencies: {e}")
             return False
-
     def test_12_responsive_ui_behavior(self):
         """Test 12: Test responsive UI behavior"""
-        try:
+    try:
             from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QSizePolicy
             from PyQt5.QtCore import QSize, Qt
+
 from src.enhanced_config_manager import EnhancedConfigManager
 
             # Create responsive widget
@@ -381,10 +428,9 @@ from src.enhanced_config_manager import EnhancedConfigManager
 
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.log_test("Responsive UI Behavior", False, f"Error: {e}")
             return False
-
     def run_all_tests(self):
         """Run all GUI framework migration tests"""
         print("=" * 80)
@@ -411,42 +457,39 @@ from src.enhanced_config_manager import EnhancedConfigManager
         total_tests = len(tests)
 
         for test_func in tests:
-            try:
+    try:
                 if test_func():
                     passed_tests += 1
-            except Exception as e:
-                print(f"[FAIL]: {test_func.__name__} - Unexpected error: {e}")
-                traceback.print_exc()
-
+    except Exception as e:
+        print(f"[FAIL]: {test_func.__name__} - Unexpected error: {e}")
+        traceback.print_exc()
         print()
         print("=" * 80)
         print("TEST SUMMARY")
         print("=" * 80)
 
         for result in self.test_results:
-            print(f"{result['status']}: {result['name']}")
+        print(f"{result['status']}: {result['name']}")
             if result['message']:
-                print(f"    {result['message']}")
-
+        print(f"    {result['message']}")
         print()
         print(f"PASSED: {passed_tests}/{total_tests} tests")
         print(f"SUCCESS RATE: {(passed_tests/total_tests)*100:.1f}%")
 
         if passed_tests == total_tests:
-            print("\n[SUCCESS] ALL TESTS PASSED - PyQt5 migration is complete and functional!")
+        print("\n[SUCCESS] ALL TESTS PASSED - PyQt5 migration is complete and functional!")
             migration_status = "COMPLETE SUCCESS"
         elif passed_tests >= total_tests * 0.8:
-            print("\n[MOSTLY SUCCESS] MIGRATION MOSTLY SUCCESSFUL - Minor issues detected")
+        print("\n[MOSTLY SUCCESS] MIGRATION MOSTLY SUCCESSFUL - Minor issues detected")
             migration_status = "MOSTLY SUCCESSFUL"
         else:
-            print("\n[ATTENTION] MIGRATION HAS ISSUES - Significant problems detected")
+        print("\n[ATTENTION] MIGRATION HAS ISSUES - Significant problems detected")
             migration_status = "NEEDS ATTENTION"
 
         # Generate comprehensive report
         self.generate_comprehensive_report(migration_status, passed_tests, total_tests)
 
         return passed_tests == total_tests
-
     def generate_comprehensive_report(self, status: str, passed: int, total: int):
         """Generate a comprehensive test report"""
         report = f"""
@@ -521,14 +564,13 @@ The PySide6 to PyQt5 conversion has been tested across {total} critical areas:
 
         # Save report
         report_path = os.path.join(os.path.dirname(__file__), '..', 'docs', 'GUI_Migration_Test_Report.md')
-        try:
+    try:
             with open(report_path, 'w', encoding='utf-8') as f:
                 f.write(report)
-            print(f"\n📄 Detailed report saved to: {report_path}")
-        except Exception as e:
-            print(f"\n⚠️  Could not save report: {e}")
-
-def main():
+        print(f"\n📄 Detailed report saved to: {report_path}")
+    except Exception as e:
+        print(f"\n⚠️  Could not save report: {e}")
+    def main():
     """Main test execution"""
     tester = GUIFrameworkMigrationTest()
     success = tester.run_all_tests()

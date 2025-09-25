@@ -3,12 +3,13 @@ Database Manager
 Handles PostgreSQL database operations
 """
 
-import psycopg2
-from psycopg2.pool import ThreadedConnectionPool
-from psycopg2.extras import RealDictCursor, Json
-from contextlib import contextmanager
-from typing import Dict, List, Optional, Any
 import json
+from contextlib import contextmanager
+from typing import Any, Dict, List, Optional
+
+import psycopg2
+from psycopg2.extras import Json, RealDictCursor
+from psycopg2.pool import ThreadedConnectionPool
 
 # Import centralized logging
 from logging_config import get_logger, get_performance_logger, log_exception
@@ -306,6 +307,7 @@ class DatabaseManager:
                 # Convert raw_data to JSON if it's a dict
                 if 'raw_data' in tax_data and isinstance(tax_data['raw_data'], dict):
                     from psycopg2.extras import Json
+
                     tax_data['raw_data'] = Json(tax_data['raw_data'])
                 
                 cursor.execute(sql, tax_data)
@@ -434,7 +436,7 @@ class DatabaseManager:
                     result = cursor.fetchone()
                     stats['recent_searches'] = result['count'] if result else 0
                 except:
-                    stats['recent_searches'] = 0
+        stats['recent_searches'] = 0
                 
                 logger.info(f"Database statistics retrieved - Properties: {stats.get('properties', 0):,}, "
                           f"Tax Records: {stats.get('tax_records', 0):,}, "

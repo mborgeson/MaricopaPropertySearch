@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from api_client import MockMaricopaAPIClient
 
+
 class FixedMockMaricopaAPIClient(MockMaricopaAPIClient):
     """Fixed version of MockMaricopaAPIClient with missing methods and attributes"""
 
@@ -29,12 +30,13 @@ class FixedMockMaricopaAPIClient(MockMaricopaAPIClient):
     def _rate_limit(self):
         """Mock rate limiting - just track last request time"""
         import time
+
         self.last_request_time = time.time()
 
     def get_tax_history(self, apn: str, years: int = 5):
         """Mock tax history generation"""
-        import random
         import datetime
+        import random
 
         # Generate mock tax records
         tax_records = []
@@ -56,8 +58,8 @@ class FixedMockMaricopaAPIClient(MockMaricopaAPIClient):
 
     def get_sales_history(self, apn: str, years: int = 10):
         """Mock sales history generation"""
-        import random
         import datetime
+        import random
 
         # Generate 0-3 mock sales records
         num_sales = random.randint(0, 3)
@@ -130,8 +132,8 @@ class FixedMockMaricopaAPIClient(MockMaricopaAPIClient):
 
     def get_property_documents(self, apn: str):
         """Mock property documents"""
-        import random
         import datetime
+        import random
 
         # Generate 0-5 mock documents
         num_docs = random.randint(0, 5)
@@ -255,7 +257,8 @@ def test_fixed_mock_client():
     except Exception as e:
         print(f"❌ Test failed: {e}")
         import traceback
+
         traceback.print_exc()
 
-if __name__ == "__main__":
+    if __name__ == "__main__":
     test_fixed_mock_client()

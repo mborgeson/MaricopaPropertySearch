@@ -3,24 +3,25 @@ Performance Test Suite for MaricopaPropertySearch
 Tests performance improvements and validates <3 second target
 """
 
-import time
-import logging
 import asyncio
-from typing import Dict, Any, List
+import logging
 import sys
+import time
 from pathlib import Path
+from typing import Any, Dict, List
 
 # Add src to path
 sys.path.append(str(Path(__file__).parent))
 
-from config_manager import EnhancedConfigManager
-from database_manager import DatabaseManager
 from api_client import MaricopaAPIClient
 from api_client_performance_patch import apply_performance_patch
+from database_manager import DatabaseManager
 from parallel_api_client import HighPerformanceMaricopaAPIClient
-from performance_optimized_data_collector import PerformanceOptimizedDataCollector
-from optimized_web_scraper import OptimizedWebScraperManager
+
+from config_manager import EnhancedConfigManager
 from logging_config import get_logger, get_performance_logger
+from optimized_web_scraper import OptimizedWebScraperManager
+from performance_optimized_data_collector import PerformanceOptimizedDataCollector
 
 logger = get_logger(__name__)
 perf_logger = get_performance_logger(__name__)
@@ -259,7 +260,7 @@ class PerformanceTestSuite:
             try:
                 scraper.close_all_drivers()
             except:
-                pass
+        pass
     
     def generate_performance_comparison(self, results: Dict[str, Dict]) -> Dict[str, Any]:
         """Generate performance comparison report"""

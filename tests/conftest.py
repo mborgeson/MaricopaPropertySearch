@@ -4,17 +4,17 @@ Pytest configuration and fixtures for MaricopaPropertySearch testing
 This file provides shared fixtures and configuration for all test modules.
 Supports testing of the 4 unified components with comprehensive mock data.
 """
-
-import pytest
 import asyncio
 import json
-import tempfile
+import logging
 import os
 import sys
+import tempfile
 from pathlib import Path
-from typing import Dict, List, Any, Optional
-from unittest.mock import Mock, MagicMock, patch
-import logging
+from typing import Any, Dict, List, Optional
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
 
 # Add src directory to path for imports
 project_root = Path(__file__).parent.parent
@@ -32,17 +32,13 @@ logger = logging.getLogger(__name__)
 # ============================================================================
 # PYTEST CONFIGURATION
 # ============================================================================
-
-
-def pytest_configure(config):
+    def pytest_configure(config):
     """Configure pytest with custom markers and settings."""
     # Ensure test directories exist
     test_dirs = ["htmlcov", "test-reports", "test-data"]
     for directory in test_dirs:
         (project_root / directory).mkdir(exist_ok=True)
-
-
-def pytest_collection_modifyitems(config, items):
+    def pytest_collection_modifyitems(config, items):
     """Modify test collection to add markers based on test names."""
     for item in items:
         # Auto-mark based on test file location
@@ -66,7 +62,7 @@ def pytest_collection_modifyitems(config, items):
 
 
 @pytest.fixture(scope="session")
-def event_loop():
+    def event_loop():
     """Create an event loop for async tests."""
     loop = asyncio.new_event_loop()
     yield loop
@@ -74,20 +70,20 @@ def event_loop():
 
 
 @pytest.fixture
-def temp_dir():
+    def temp_dir():
     """Provide a temporary directory for test files."""
     with tempfile.TemporaryDirectory() as temp_dir:
         yield Path(temp_dir)
 
 
 @pytest.fixture
-def test_config():
+    def test_config():
     """Provide test configuration dictionary."""
     return TEST_CONFIG.copy()
 
 
 @pytest.fixture
-def test_data_config():
+    def test_data_config():
     """Provide test data configuration."""
     return TEST_DATA_CONFIG.copy()
 
@@ -98,7 +94,7 @@ def test_data_config():
 
 
 @pytest.fixture
-def mock_property_data():
+    def mock_property_data():
     """Generate realistic mock property data."""
     return {
         "apn": "10215009",
@@ -126,7 +122,7 @@ def mock_property_data():
 
 
 @pytest.fixture
-def mock_tax_history():
+    def mock_tax_history():
     """Generate realistic tax history data."""
     return [
         {
@@ -154,7 +150,7 @@ def mock_tax_history():
 
 
 @pytest.fixture
-def mock_api_responses():
+    def mock_api_responses():
     """Mock API response data for different scenarios."""
     return {
         "success": {
@@ -187,7 +183,7 @@ def mock_api_responses():
 
 
 @pytest.fixture
-def mock_api_client():
+    def mock_api_client():
     """Mock UnifiedMaricopaAPIClient for testing."""
     client = Mock()
     client.session = Mock()
@@ -199,7 +195,7 @@ def mock_api_client():
 
 
 @pytest.fixture
-def mock_data_collector():
+    def mock_data_collector():
     """Mock UnifiedDataCollector for testing."""
     collector = Mock()
     collector.api_client = Mock()
@@ -211,7 +207,7 @@ def mock_data_collector():
 
 
 @pytest.fixture
-def mock_database_manager():
+    def mock_database_manager():
     """Mock ThreadSafeDatabaseManager for testing."""
     db_manager = Mock()
     db_manager.connection_pool = Mock()
@@ -222,7 +218,7 @@ def mock_database_manager():
 
 
 @pytest.fixture
-def mock_gui_launcher():
+    def mock_gui_launcher():
     """Mock UnifiedGUILauncher for testing."""
     launcher = Mock()
     launcher.platform_detector = Mock()
@@ -242,7 +238,7 @@ def mock_gui_launcher():
 
 
 @pytest.fixture
-def mock_environment():
+    def mock_environment():
     """Mock environment variables for testing."""
     env_vars = {
         "DISPLAY": ":0",
@@ -260,24 +256,23 @@ def mock_environment():
 
 
 @pytest.fixture
-def performance_timer():
+    def performance_timer():
     """Timer fixture for performance testing."""
-    import time
+import time
 
-    class Timer:
-        def __init__(self):
+
+class Timer:
+    def __init__(self):
             self.start_time = None
             self.end_time = None
-
-        def start(self):
+    def start(self):
             self.start_time = time.perf_counter()
-
-        def stop(self):
+    def stop(self):
             self.end_time = time.perf_counter()
             return self.elapsed
 
         @property
-        def elapsed(self):
+    def elapsed(self):
             if self.start_time and self.end_time:
                 return self.end_time - self.start_time
             return None
@@ -286,7 +281,7 @@ def performance_timer():
 
 
 @pytest.fixture
-def benchmark_baseline():
+    def benchmark_baseline():
     """Provide performance benchmark baselines."""
     return {
         "api_response_time": 0.1,  # seconds

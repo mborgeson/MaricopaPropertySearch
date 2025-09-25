@@ -4,8 +4,8 @@ Comprehensive DatabaseManager Test Suite
 Tests all database functionality and ConfigManager integration
 """
 
-import sys
 import os
+import sys
 import traceback
 from pathlib import Path
 
@@ -14,11 +14,13 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "src"))
 
 try:
-    from config_manager import ConfigManager
-    from database_manager import DatabaseManager
-    from logging_config import get_logger, setup_logging
-    import time
     import json
+    import time
+
+    from database_manager import DatabaseManager
+
+    from config_manager import ConfigManager
+    from logging_config import get_logger, setup_logging
 
     # Initialize logging
     setup_logging()
@@ -86,7 +88,7 @@ class DatabaseManagerTester:
             print(f"❌ Test suite failed with error: {e}")
             traceback.print_exc()
 
-        finally:
+    finally:
             self.cleanup()
             self.generate_report()
 

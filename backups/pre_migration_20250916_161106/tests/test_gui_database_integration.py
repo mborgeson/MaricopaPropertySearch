@@ -4,13 +4,14 @@ Test GUI Database Integration
 Tests that the GUI properly initializes and uses DatabaseManager
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add the src directory to the Python path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "src"))
+
 
 def test_gui_database_integration():
     print("=" * 60)
@@ -23,8 +24,9 @@ def test_gui_database_integration():
         # Test 1: Import GUI components
         print("\n1. Testing GUI imports...")
 
-        from config_manager import ConfigManager
         from database_manager import DatabaseManager
+
+        from config_manager import ConfigManager
         from logging_config import setup_logging
 
         setup_logging()
@@ -38,7 +40,7 @@ def test_gui_database_integration():
         # Test connectivity
         if db_manager.test_connection():
             print("[PASS] DatabaseManager initialized and connected successfully")
-            results['db_init'] = True
+            results["db_init"] = True
 
             # Test key method that the GUI uses
             print("\n3. Testing GUI-required methods...")
@@ -50,11 +52,15 @@ def test_gui_database_integration():
             if property_data:
                 print(f"[PASS] get_property_details returned data for APN {test_apn}")
                 print(f"        Owner: {property_data.get('owner_name', 'N/A')}")
-                print(f"        Address: {property_data.get('property_address', 'N/A')}")
-                results['gui_method'] = True
+                print(
+                    f"        Address: {property_data.get('property_address', 'N/A')}"
+                )
+                results["gui_method"] = True
             else:
-                print(f"[FAIL] get_property_details returned no data for APN {test_apn}")
-                results['gui_method'] = False
+                print(
+                    f"[FAIL] get_property_details returned no data for APN {test_apn}"
+                )
+                results["gui_method"] = False
 
             # Test search methods used by GUI
             print("\n4. Testing search methods...")
@@ -62,35 +68,35 @@ def test_gui_database_integration():
             owner_results = db_manager.search_properties_by_owner("Test Owner")
             if len(owner_results) > 0:
                 print(f"[PASS] Owner search working ({len(owner_results)} results)")
-                results['search_owner'] = True
+                results["search_owner"] = True
             else:
                 print(f"[FAIL] Owner search failed")
-                results['search_owner'] = False
+                results["search_owner"] = False
 
             address_results = db_manager.search_properties_by_address("Test Street")
             if len(address_results) > 0:
                 print(f"[PASS] Address search working ({len(address_results)} results)")
-                results['search_address'] = True
+                results["search_address"] = True
             else:
                 print(f"[FAIL] Address search failed")
-                results['search_address'] = False
+                results["search_address"] = False
 
             # Test database stats (used by GUI status indicators)
             print("\n5. Testing database statistics for GUI...")
             stats = db_manager.get_database_stats()
-            if stats and 'properties' in stats:
+            if stats and "properties" in stats:
                 print(f"[PASS] Database stats available for GUI")
                 print(f"        Total properties: {stats['properties']:,}")
                 print(f"        Tax records: {stats['tax_records']:,}")
                 print(f"        Sales records: {stats['sales_records']:,}")
-                results['stats'] = True
+                results["stats"] = True
             else:
                 print(f"[FAIL] Database stats not available")
-                results['stats'] = False
+                results["stats"] = False
 
         else:
             print("[FAIL] DatabaseManager connection failed")
-            results['db_init'] = False
+            results["db_init"] = False
 
         # Cleanup
         db_manager.close()
@@ -99,8 +105,10 @@ def test_gui_database_integration():
     except Exception as e:
         print(f"[ERROR] Test failed: {str(e)}")
         import traceback
+
         traceback.print_exc()
-        results['error'] = str(e)
+
+    results["error"] = str(e)
 
     # Generate report
     print("\n" + "=" * 60)
@@ -108,11 +116,11 @@ def test_gui_database_integration():
     print("=" * 60)
 
     test_results = [
-        ('DatabaseManager Initialization', results.get('db_init', False)),
-        ('GUI Property Details Method', results.get('gui_method', False)),
-        ('GUI Owner Search', results.get('search_owner', False)),
-        ('GUI Address Search', results.get('search_address', False)),
-        ('GUI Database Statistics', results.get('stats', False)),
+        ("DatabaseManager Initialization", results.get("db_init", False)),
+        ("GUI Property Details Method", results.get("gui_method", False)),
+        ("GUI Owner Search", results.get("search_owner", False)),
+        ("GUI Address Search", results.get("search_address", False)),
+        ("GUI Database Statistics", results.get("stats", False)),
     ]
 
     passed_tests = 0
@@ -125,7 +133,9 @@ def test_gui_database_integration():
     total_tests = len(test_results)
     success_rate = (passed_tests / total_tests) * 100 if total_tests > 0 else 0
 
-    print(f"\nOVERALL RESULT: {passed_tests}/{total_tests} tests passed ({success_rate:.1f}%)")
+    print(
+        f"\nOVERALL RESULT: {passed_tests}/{total_tests} tests passed ({success_rate:.1f}%)"
+    )
 
     if passed_tests == total_tests:
         print(f"\n[SUCCESS] GUI-DatabaseManager integration is working correctly!")
@@ -138,10 +148,11 @@ def test_gui_database_integration():
     else:
         print(f"\n[WARNING] Some GUI integration issues detected")
 
-    if 'error' in results:
+    if "error" in results:
         print(f"\nERROR DETAILS: {results['error']}")
 
     print("=" * 60)
+
 
 if __name__ == "__main__":
     test_gui_database_integration()

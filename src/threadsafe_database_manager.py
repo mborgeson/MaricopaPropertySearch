@@ -8,16 +8,15 @@ to the unified database manager that consolidates features from:
 - database_manager.py (base implementation)
 - threadsafe_database_manager.py (advanced features)
 """
+import logging
 
 # Import all functionality from the unified manager
 from .database_manager_unified import (
-    # Main class
-    UnifiedDatabaseManager as ThreadSafeDatabaseManager,
-    # Aliases for backward compatibility
     DatabaseManager,
 )
-
-import logging
+from .database_manager_unified import (
+    UnifiedDatabaseManager as ThreadSafeDatabaseManager,  # Main class; Aliases for backward compatibility
+)
 from .logging_config import get_logger
 
 logger = get_logger(__name__)

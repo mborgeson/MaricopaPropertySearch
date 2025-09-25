@@ -4,11 +4,11 @@ Comprehensive Diagnostic for RUN_APPLICATION.py
 Identifies all issues preventing proper execution
 """
 
-import sys
 import os
 import subprocess
-from pathlib import Path
+import sys
 import traceback
+from pathlib import Path
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -28,15 +28,19 @@ class ApplicationDiagnostic:
         try:
             # Try importing main components
             from src.config_manager import ConfigManager
+
             self.successes.append("ConfigManager imports successfully")
 
             from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
             self.successes.append("ThreadSafeDatabaseManager imports successfully")
 
             from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+
             self.successes.append("EnhancedPropertySearchApp imports successfully")
 
             from src.logging_config import setup_logging
+
             self.successes.append("Logging setup imports successfully")
 
         except ImportError as e:
@@ -93,7 +97,7 @@ class ApplicationDiagnostic:
                     full_path.mkdir(parents=True, exist_ok=True)
                     self.warnings.append(f"  -> Created missing directory: {dir_path}")
                 except:
-                    self.issues.append(f"  -> Failed to create directory: {dir_path}")
+        self.issues.append(f"  -> Failed to create directory: {dir_path}")
 
     def check_database_config(self):
         """Check database configuration"""
@@ -101,6 +105,7 @@ class ApplicationDiagnostic:
 
         try:
             from src.config_manager import ConfigManager
+
             config = ConfigManager()
 
             # Check database settings
@@ -128,6 +133,7 @@ class ApplicationDiagnostic:
 
         try:
             from PyQt5.QtWidgets import QApplication
+
             self.successes.append("PyQt5 available")
 
             # Check if we can create QApplication
@@ -156,6 +162,7 @@ class ApplicationDiagnostic:
             # Create a test script that imports and checks
             test_code = '''
 import sys
+
 sys.path.insert(0, r"{root}")
 sys.path.insert(0, r"{src}")
 

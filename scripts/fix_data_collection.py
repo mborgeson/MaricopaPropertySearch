@@ -3,7 +3,6 @@
 Fix Data Collection Issues
 Specifically addresses tax and sales data collection problems
 """
-
 import sys
 from pathlib import Path
 
@@ -11,12 +10,10 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
-
-
-def add_enhanced_collection_methods():
+    def add_enhanced_collection_methods():
     """Add enhanced data collection methods to the main window"""
-    print("\n[DATA FIX] Adding enhanced collection methods")
-    print("-" * 50)
+        print("\n[DATA FIX] Adding enhanced collection methods")
+        print("-" * 50)
 
     window_file = project_root / "src" / "gui" / "enhanced_main_window.py"
 
@@ -36,7 +33,7 @@ def add_enhanced_collection_methods():
 
         logger.info(f"Starting enhanced data collection for APN: {apn}")
 
-        try:
+try:
             # Initialize collection results
             results = {
                 'property': None,
@@ -61,7 +58,7 @@ def add_enhanced_collection_methods():
             progress.setLabelText(f"Collecting basic property data for {apn}...")
             QApplication.processEvents()
 
-            try:
+try:
                 if hasattr(self, 'api_client') and self.api_client:
                     property_data = self.api_client.get_property_details(apn)
                     if property_data:
@@ -72,7 +69,7 @@ def add_enhanced_collection_methods():
                         logger.warning(f"No property data found for {apn}")
                 else:
                     results['errors'].append("API client not available")
-            except Exception as e:
+except Exception as e:
                 error_msg = f"Property data error: {e}"
                 results['errors'].append(error_msg)
                 logger.error(error_msg)
@@ -85,7 +82,7 @@ def add_enhanced_collection_methods():
             progress.setLabelText(f"Collecting tax information for {apn}...")
             QApplication.processEvents()
 
-            try:
+try:
                 if hasattr(self, 'api_client') and self.api_client:
                     # Try tax history first
                     tax_data = self.api_client.get_tax_history(apn)
@@ -101,7 +98,7 @@ def add_enhanced_collection_methods():
                         logger.warning(f"No tax data found for {apn}")
                 else:
                     results['errors'].append("Cannot get tax data - API not available")
-            except Exception as e:
+except Exception as e:
                 error_msg = f"Tax data error: {e}"
                 results['errors'].append(error_msg)
                 logger.error(error_msg)
@@ -114,7 +111,7 @@ def add_enhanced_collection_methods():
             progress.setLabelText(f"Collecting sales history for {apn}...")
             QApplication.processEvents()
 
-            try:
+try:
                 if hasattr(self, 'api_client') and self.api_client:
                     sales_data = self.api_client.get_sales_history(apn)
                     if sales_data:
@@ -125,7 +122,7 @@ def add_enhanced_collection_methods():
                         logger.warning(f"No sales data found for {apn}")
                 else:
                     results['errors'].append("Cannot get sales data - API not available")
-            except Exception as e:
+except Exception as e:
                 error_msg = f"Sales data error: {e}"
                 results['errors'].append(error_msg)
                 logger.error(error_msg)
@@ -135,7 +132,7 @@ def add_enhanced_collection_methods():
             QApplication.processEvents()
 
             # Step 4: Store in database if available
-            try:
+try:
                 if hasattr(self, 'db_manager') and self.db_manager:
                     if results['property']:
                         self.db_manager.store_property_data(apn, results['property'])
@@ -144,7 +141,7 @@ def add_enhanced_collection_methods():
                     if results['sales']:
                         self.db_manager.store_sales_data(apn, results['sales'])
                     logger.info(f"Data stored in database for {apn}")
-            except Exception as e:
+except Exception as e:
                 logger.warning(f"Database storage failed: {e}")
                 results['errors'].append(f"Database storage failed: {e}")
 
@@ -174,7 +171,7 @@ def add_enhanced_collection_methods():
 
             return results['success']
 
-        except Exception as e:
+except Exception as e:
             logger.error(f"Enhanced collection failed: {e}")
             QMessageBox.critical(self, "Collection Error", f"Data collection failed: {e}")
             return False
@@ -188,21 +185,18 @@ def add_enhanced_collection_methods():
 
             with open(window_file, "w", encoding="utf-8") as f:
                 f.write("\n".join(lines))
-
-            print("[OK] Added enhanced_collect_property_data method")
+        print("[OK] Added enhanced_collect_property_data method")
             return True
 
         else:
-            print("[INFO] Enhanced collection method already exists")
+        print("[INFO] Enhanced collection method already exists")
             return True
 
     return False
-
-
-def update_manual_collect_button():
+    def update_manual_collect_button():
     """Update the manual collect button to use enhanced method"""
-    print("\n[DATA FIX] Updating manual collect button")
-    print("-" * 50)
+        print("\n[DATA FIX] Updating manual collect button")
+        print("-" * 50)
 
     window_file = project_root / "src" / "gui" / "enhanced_main_window.py"
 
@@ -267,20 +261,16 @@ def update_manual_collect_button():
 
                 with open(window_file, "w", encoding="utf-8") as f:
                     f.write("\n".join(lines))
-
-                print("[OK] Updated manual_collect_data method")
+        print("[OK] Updated manual_collect_data method")
                 return True
-
         print("[WARNING] manual_collect_data method not found")
         return False
 
     return False
-
-
-def improve_error_handling():
+    def improve_error_handling():
     """Improve error handling in data collection"""
-    print("\n[DATA FIX] Improving error handling")
-    print("-" * 50)
+        print("\n[DATA FIX] Improving error handling")
+        print("-" * 50)
 
     # Add better error handling to API client
     api_file = project_root / "src" / "api_client.py"
@@ -294,17 +284,17 @@ def improve_error_handling():
             method = '''
     def test_connection(self):
         """Test if API connection is working"""
-        try:
+try:
             # Simple test request
             response = self._make_request('/health', timeout=5)
             return response is not None
-        except:
-            try:
+except:
+try:
                 # Alternative test - just check if we can reach the base URL
                 response = self.session.get(self.base_url, timeout=5)
                 return response.status_code == 200
-            except:
-                return False
+except:
+                    return False
 '''
 
             # Add the method
@@ -324,19 +314,15 @@ def improve_error_handling():
 
             with open(api_file, "w", encoding="utf-8") as f:
                 f.write("\n".join(lines))
-
-            print("[OK] Added test_connection method to API client")
-
+        print("[OK] Added test_connection method to API client")
         print("[INFO] API client error handling checked")
         return True
 
     return False
-
-
-def main():
-    print("=" * 60)
-    print(" FIXING DATA COLLECTION ISSUES")
-    print("=" * 60)
+    def main():
+        print("=" * 60)
+        print(" FIXING DATA COLLECTION ISSUES")
+        print("=" * 60)
 
     fixes_applied = []
 
@@ -351,28 +337,26 @@ def main():
         fixes_applied.append("Error handling improvements")
 
     # Summary
-    print("\n" + "=" * 60)
-    print(" DATA COLLECTION FIX SUMMARY")
-    print("=" * 60)
+        print("\n" + "=" * 60)
+        print(" DATA COLLECTION FIX SUMMARY")
+        print("=" * 60)
 
     if fixes_applied:
         print(f"\n[OK] Successfully applied {len(fixes_applied)} fixes:")
         for fix in fixes_applied:
-            print(f"  - {fix}")
+        print(f"  - {fix}")
     else:
         print("\n[WARNING] No fixes were applied")
-
-    print("\n[EXPECTED IMPROVEMENTS]")
-    print("- Manual Collect should now provide detailed feedback")
-    print("- Tax and sales data collection will show progress")
-    print("- Better error messages when data isn't available")
-    print("- Enhanced data collection with fallback options")
-
-    print("\n[TEST STEPS]")
-    print("1. Restart application: python RUN_APPLICATION.py")
-    print("2. Search for a property")
-    print("3. Select a row and click 'Manual Collect (Immediate)'")
-    print("4. Should see progress dialog and detailed results")
+        print("\n[EXPECTED IMPROVEMENTS]")
+        print("- Manual Collect should now provide detailed feedback")
+        print("- Tax and sales data collection will show progress")
+        print("- Better error messages when data isn't available")
+        print("- Enhanced data collection with fallback options")
+        print("\n[TEST STEPS]")
+        print("1. Restart application: python RUN_APPLICATION.py")
+        print("2. Search for a property")
+        print("3. Select a row and click 'Manual Collect (Immediate)'")
+        print("4. Should see progress dialog and detailed results")
 
     return 0
 

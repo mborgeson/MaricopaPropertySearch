@@ -90,16 +90,15 @@ CONTEXT_MENU_ITEMS = [
         "shortcut": "Ctrl+C"
     }
 ]
-
 def add_keyboard_shortcuts_to_main_window(main_window):
     """
     Add additional keyboard shortcuts to the main window
     This function should be called in the setup_ui method
     """
-    from PyQt5.QtWidgets import QShortcut
     from PyQt5.QtCore import Qt
     from PyQt5.QtGui import QKeySequence
-    
+    from PyQt5.QtWidgets import QShortcut
+
     # Create shortcuts dictionary to store references
     main_window.shortcuts = {}
     
@@ -108,13 +107,12 @@ def add_keyboard_shortcuts_to_main_window(main_window):
             shortcut = QShortcut(QKeySequence(shortcut_key), main_window)
             shortcut.activated.connect(getattr(main_window, method_name))
             main_window.shortcuts[shortcut_key] = shortcut
-
 def create_enhanced_toolbar(main_window):
     """
     Create an enhanced toolbar with quick access buttons
     """
-    from PyQt5.QtWidgets import QToolBar, QPushButton, QAction
     from PyQt5.QtCore import Qt
+    from PyQt5.QtWidgets import QAction, QPushButton, QToolBar
     
     toolbar = main_window.addToolBar("Quick Actions")
     toolbar.setMovable(False)
@@ -193,15 +191,13 @@ def create_enhanced_toolbar(main_window):
             main_window.toolbar_buttons[button_config["action"]] = button
     
     return toolbar
-
 def add_context_menu_to_results_table(main_window):
     """
     Add context menu to the results table
     """
-    from PyQt5.QtWidgets import QMenu
     from PyQt5.QtCore import Qt
-    
-    def show_context_menu(position):
+    from PyQt5.QtWidgets import QMenu
+def show_context_menu(position):
         if not main_window.results_table.itemAt(position):
             return
             
@@ -219,14 +215,13 @@ def add_context_menu_to_results_table(main_window):
     
     main_window.results_table.setContextMenuPolicy(Qt.CustomContextMenu)
     main_window.results_table.customContextMenuRequested.connect(show_context_menu)
-
 def enhance_status_bar(main_window):
     """
     Enhance the status bar with additional information widgets
     """
-    from PyQt5.QtWidgets import QLabel, QProgressBar
     from PyQt5.QtCore import QTimer
-    
+    from PyQt5.QtWidgets import QLabel, QProgressBar
+
     # Collection status label
     main_window.collection_status_label = QLabel("Collection: Stopped")
     main_window.status_bar.addPermanentWidget(main_window.collection_status_label)
@@ -250,7 +245,6 @@ def enhance_status_bar(main_window):
     status_update_timer.timeout.connect(lambda: update_enhanced_status_bar(main_window))
     status_update_timer.start(2000)  # Update every 2 seconds
     main_window.status_update_timer = status_update_timer
-
 def update_enhanced_status_bar(main_window):
     """Update enhanced status bar information"""
     try:
@@ -281,7 +275,7 @@ def update_enhanced_status_bar(main_window):
                 main_window.db_status_label.setText("DB: Connected")
                 main_window.db_status_label.setStyleSheet("color: green;")
             except:
-                main_window.db_status_label.setText("DB: Error")
+                    main_window.db_status_label.setText("DB: Error")
                 main_window.db_status_label.setStyleSheet("color: red; font-weight: bold;")
                 
     except Exception as e:
@@ -298,7 +292,6 @@ def refresh_selected_property(self):
         if apn and self.background_manager.is_running():
             self.background_manager.add_job(apn, JobPriority.HIGH)
             self.status_bar.showMessage(f"Refreshing data for APN: {apn}", 3000)
-
 def force_collect_selected_property(self):
     \"\"\"Force data collection for currently selected property\"\"\"
     current_row = self.results_table.currentRow()
@@ -311,7 +304,6 @@ def force_collect_selected_property(self):
                 self.background_manager.worker.cache.clear_property_cache(apn)
             self.background_manager.add_job(apn, JobPriority.CRITICAL)
             self.status_bar.showMessage(f"Force collecting data for APN: {apn}", 3000)
-
 def export_selected_results(self):
     \"\"\"Export only selected table rows\"\"\"
     selected_rows = set()
@@ -327,7 +319,6 @@ def export_selected_results(self):
     
     # Use existing export logic but with filtered results
     self._export_results_data(selected_results, "selected_results")
-
 def copy_apn_to_clipboard(self):
     \"\"\"Copy selected property APN to clipboard\"\"\"
     current_row = self.results_table.currentRow()
@@ -337,7 +328,6 @@ def copy_apn_to_clipboard(self):
         if apn:
             QApplication.clipboard().setText(apn)
             self.status_bar.showMessage(f"Copied APN to clipboard: {apn}", 2000)
-
 def cancel_current_operation(self):
     \"\"\"Cancel current search or background operation\"\"\"
     # Cancel search worker
@@ -351,7 +341,6 @@ def cancel_current_operation(self):
     # Cancel batch operations
     if hasattr(self.bg_status_widget, 'batch_tracker'):
         self.bg_status_widget.batch_tracker.cancel_current_batch()
-
 def keyPressEvent(self, event):
     \"\"\"Handle additional keyboard events\"\"\"
     # Handle Escape key for cancellation
@@ -362,17 +351,17 @@ def keyPressEvent(self, event):
 """
 
 if __name__ == "__main__":
-    print("GUI Integration Enhancements")
-    print("=" * 50)
-    print("This module provides additional enhancements for the enhanced_main_window.py")
-    print("Features included:")
-    print("- Additional keyboard shortcuts")
-    print("- Enhanced toolbar with quick action buttons")
-    print("- Context menu for results table")
-    print("- Enhanced status bar with detailed information")
-    print("- Additional utility methods")
-    print()
-    print("To integrate these features, add the following to enhanced_main_window.py:")
-    print("1. Import this module")
-    print("2. Call the enhancement functions in setup_ui()")
-    print("3. Add the additional methods to the main window class")
+        print("GUI Integration Enhancements")
+        print("=" * 50)
+        print("This module provides additional enhancements for the enhanced_main_window.py")
+        print("Features included:")
+        print("- Additional keyboard shortcuts")
+        print("- Enhanced toolbar with quick action buttons")
+        print("- Context menu for results table")
+        print("- Enhanced status bar with detailed information")
+        print("- Additional utility methods")
+        print()
+        print("To integrate these features, add the following to enhanced_main_window.py:")
+        print("1. Import this module")
+        print("2. Call the enhancement functions in setup_ui()")
+        print("3. Add the additional methods to the main window class")

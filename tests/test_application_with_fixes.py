@@ -6,19 +6,17 @@ Comprehensive test to verify the application works after fixing:
 2. DatabaseManager get_property_details -> get_property_by_apn
 3. Tax and sales history display
 """
-
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
-
-def test_config_manager():
+    def test_config_manager():
     """Test ConfigManager with new get method"""
-    print("\n🔍 Testing EnhancedConfigManager.get() method...")
+        print("\n🔍 Testing EnhancedConfigManager.get() method...")
 
-    try:
+try:
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 
         # Initialize ConfigManager
@@ -26,7 +24,7 @@ def test_config_manager():
 
         # Test the new get method
         if not hasattr(config, 'get'):
-            print("❌ ERROR: EnhancedConfigManager.get() method not found!")
+        print("❌ ERROR: EnhancedConfigManager.get() method not found!")
             return False
 
         # Test with various types
@@ -38,20 +36,17 @@ def test_config_manager():
 
         test_value = config.get('test_key', 'default')  # string default
         print(f"  ✓ String default test: {test_value}")
-
         print("✅ EnhancedConfigManager.get() method working correctly!")
         return True
 
-    except Exception as e:
+except Exception as e:
         print(f"❌ Error testing ConfigManager: {e}")
         return False
-
-
-def test_database_manager():
+    def test_database_manager():
     """Test DatabaseManager methods"""
-    print("\n🔍 Testing DatabaseManager methods...")
+        print("\n🔍 Testing DatabaseManager methods...")
 
-    try:
+try:
         # MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 
@@ -59,39 +54,38 @@ def test_database_manager():
         db_methods = dir(DatabaseManager)
 
         if 'get_property_by_apn' not in db_methods:
-            print("❌ ERROR: ThreadSafeDatabaseManager.get_property_by_apn() not found!")
+        print("❌ ERROR: ThreadSafeDatabaseManager.get_property_by_apn() not found!")
             return False
         print("  ✓ get_property_by_apn() method exists")
 
         if 'get_tax_history' not in db_methods:
-            print("❌ ERROR: ThreadSafeDatabaseManager.get_tax_history() not found!")
+        print("❌ ERROR: ThreadSafeDatabaseManager.get_tax_history() not found!")
             return False
         print("  ✓ get_tax_history() method exists")
 
         if 'get_sales_history' not in db_methods:
-            print("❌ ERROR: ThreadSafeDatabaseManager.get_sales_history() not found!")
+        print("❌ ERROR: ThreadSafeDatabaseManager.get_sales_history() not found!")
             return False
         print("  ✓ get_sales_history() method exists")
-
         print("✅ DatabaseManager methods verified!")
         return True
 
-    except Exception as e:
+except Exception as e:
         print(f"❌ Error testing DatabaseManager: {e}")
         return False
-
-
-def test_gui_imports():
+    def test_gui_imports():
     """Test GUI imports without AttributeError"""
-    print("\n🔍 Testing GUI imports...")
+        print("\n🔍 Testing GUI imports...")
 
-    try:
+try:
         # Test importing the enhanced main window
-        from src.gui.enhanced_main_window import EnhancedMainWindow
+from src.gui.enhanced_main_window import EnhancedMainWindow
+
         print("  ✓ EnhancedMainWindow imported successfully")
 
         # Test importing GUI dialogs
-        from src.gui.gui_enhancements_dialogs import ApplicationSettingsDialog
+from src.gui.gui_enhancements_dialogs import ApplicationSettingsDialog
+
         print("  ✓ ApplicationSettingsDialog imported successfully")
 
         # Check if the dialog can use ConfigManager
@@ -100,33 +94,30 @@ def test_gui_imports():
 
         # The dialog should be able to call config.get() now
         if hasattr(config, 'get'):
-            print("  ✓ ApplicationSettingsDialog can use config.get()")
+        print("  ✓ ApplicationSettingsDialog can use config.get()")
         else:
-            print("❌ ERROR: EnhancedConfigManager.get() missing for dialog!")
+        print("❌ ERROR: EnhancedConfigManager.get() missing for dialog!")
             return False
-
         print("✅ GUI imports work without AttributeError!")
         return True
 
-    except AttributeError as ae:
+except AttributeError as ae:
         print(f"❌ AttributeError in GUI: {ae}")
         return False
-    except Exception as e:
+except Exception as e:
         print(f"❌ Error testing GUI: {e}")
         return False
-
-
-def test_application_integration():
+    def test_application_integration():
     """Test full application integration"""
-    print("\n🔍 Testing application integration...")
+        print("\n🔍 Testing application integration...")
 
-    try:
+try:
         # Import all key components
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         # MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.enhanced_config_manager import EnhancedConfigManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
         # Initialize components
         config = EnhancedConfigManager()
@@ -138,27 +129,24 @@ from src.enhanced_config_manager import EnhancedConfigManager
 
         # Check if API client has required methods
         if hasattr(api_client, 'get_property_details'):
-            print("  ✓ API client has get_property_details()")
+        print("  ✓ API client has get_property_details()")
 
         if hasattr(api_client, 'get_tax_history'):
-            print("  ✓ API client has get_tax_history()")
+        print("  ✓ API client has get_tax_history()")
 
         if hasattr(api_client, 'get_sales_history'):
-            print("  ✓ API client has get_sales_history()")
-
+        print("  ✓ API client has get_sales_history()")
         print("✅ Application integration successful!")
         return True
 
-    except Exception as e:
+except Exception as e:
         print(f"❌ Error in application integration: {e}")
         return False
-
-
-def run_comprehensive_test():
+    def run_comprehensive_test():
     """Run all tests and report results"""
-    print("=" * 60)
-    print("🧪 HIVE MIND FIXES - COMPREHENSIVE APPLICATION TEST")
-    print("=" * 60)
+        print("=" * 60)
+        print("🧪 HIVE MIND FIXES - COMPREHENSIVE APPLICATION TEST")
+        print("=" * 60)
 
     results = []
 
@@ -169,9 +157,9 @@ def run_comprehensive_test():
     results.append(("Application Integration", test_application_integration()))
 
     # Report final results
-    print("\n" + "=" * 60)
-    print("📊 FINAL TEST RESULTS")
-    print("=" * 60)
+        print("\n" + "=" * 60)
+        print("📊 FINAL TEST RESULTS")
+        print("=" * 60)
 
     all_passed = True
     for test_name, passed in results:
@@ -179,14 +167,13 @@ def run_comprehensive_test():
         print(f"  {test_name}: {status}")
         if not passed:
             all_passed = False
-
-    print("\n" + "=" * 60)
+        print("\n" + "=" * 60)
     if all_passed:
         print("🎉 ALL TESTS PASSED! Application is ready to run.")
         print("🚀 The hive mind swarm has successfully fixed all issues!")
     else:
         print("⚠️ Some tests failed. Please review the errors above.")
-    print("=" * 60)
+        print("=" * 60)
 
     return all_passed
 

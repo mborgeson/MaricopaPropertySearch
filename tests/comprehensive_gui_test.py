@@ -3,14 +3,13 @@
 Comprehensive GUI Test Suite for Maricopa Property Search Application
 Tests all GUI components in src/gui/enhanced_main_window.py
 """
-
-import sys
 import os
-import unittest
-import tempfile
 import sqlite3
-from unittest.mock import Mock, patch, MagicMock
+import sys
+import tempfile
+import unittest
 from pathlib import Path
+from unittest.mock import MagicMock, Mock, patch
 
 # Add the src directory to the path
 sys.path.insert(
@@ -19,49 +18,45 @@ sys.path.insert(
 
 # PyQt5 imports
 try:
-    from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QToolBar
     from PyQt5.QtCore import Qt, QTimer
     from PyQt5.QtTest import QTest
+    from PyQt5.QtWidgets import QApplication, QMainWindow, QTabWidget, QToolBar
 
     PYQT5_AVAILABLE = True
 except ImportError:
     PYQT5_AVAILABLE = False
-    print("⚠️ PyQt5 not available - will perform limited analysis")
+        print("⚠️ PyQt5 not available - will perform limited analysis")
 
 
 class GUITestFramework:
     """Framework for GUI testing with mock data and component validation"""
-
     def __init__(self):
         self.app = None
         self.main_window = None
         self.test_results = {}
         self.errors = []
         self.setup_app()
-
     def setup_app(self):
         """Initialize QApplication for testing"""
         if not PYQT5_AVAILABLE:
             return
-        try:
+    try:
             if QApplication.instance() is None:
                 self.app = QApplication(sys.argv)
             else:
                 self.app = QApplication.instance()
-        except Exception as e:
-            print(f"⚠️ Could not initialize QApplication: {e}")
+    except Exception as e:
+        print(f"⚠️ Could not initialize QApplication: {e}")
             self.app = None
-
     def import_gui_module(self):
         """Import the GUI module with error handling"""
-        try:
+    try:
             from gui.enhanced_main_window import EnhancedMainWindow
 
             return EnhancedMainWindow
-        except ImportError as e:
+    except ImportError as e:
             self.errors.append(f"Failed to import EnhancedMainWindow: {e}")
             return None
-
     def test_component_initialization(self):
         """Test main window component initialization"""
         print("🔍 Testing Component Initialization...")
@@ -70,7 +65,7 @@ class GUITestFramework:
         if not MainWindowClass:
             return False
 
-        try:
+    try:
             # Test basic window creation
             self.main_window = MainWindowClass()
 
@@ -103,10 +98,9 @@ class GUITestFramework:
 
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.errors.append(f"Component initialization failed: {e}")
             return False
-
     def test_ui_setup(self):
         """Test UI setup and layout creation"""
         print("🔍 Testing UI Setup...")
@@ -114,18 +108,18 @@ class GUITestFramework:
         if not self.main_window:
             return False
 
-        try:
+    try:
             # Test if setup_ui method exists and runs
             if hasattr(self.main_window, "setup_ui"):
                 self.test_results["setup_ui_method"] = "✅ PASS - Method exists"
 
                 # Try to call setup_ui (may already be called in __init__)
-                try:
+    try:
                     self.main_window.setup_ui()
                     self.test_results["setup_ui_execution"] = (
                         "✅ PASS - Executes without error"
                     )
-                except Exception as e:
+    except Exception as e:
                     self.test_results["setup_ui_execution"] = (
                         f"⚠️ WARNING - Error during setup: {e}"
                     )
@@ -143,10 +137,9 @@ class GUITestFramework:
 
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.errors.append(f"UI setup test failed: {e}")
             return False
-
     def test_search_components(self):
         """Test property search components"""
         print("🔍 Testing Search Components...")
@@ -154,7 +147,7 @@ class GUITestFramework:
         if not self.main_window:
             return False
 
-        try:
+    try:
             # Test search input field
             if (
                 hasattr(self.main_window, "search_input")
@@ -207,10 +200,9 @@ class GUITestFramework:
 
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.errors.append(f"Search components test failed: {e}")
             return False
-
     def test_results_table(self):
         """Test results table component"""
         print("🔍 Testing Results Table...")
@@ -218,7 +210,7 @@ class GUITestFramework:
         if not self.main_window:
             return False
 
-        try:
+    try:
             # Test results table existence
             if (
                 hasattr(self.main_window, "results_table")
@@ -248,10 +240,9 @@ class GUITestFramework:
 
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.errors.append(f"Results table test failed: {e}")
             return False
-
     def test_tab_widgets(self):
         """Test tab widget components"""
         print("🔍 Testing Tab Widgets...")
@@ -259,7 +250,7 @@ class GUITestFramework:
         if not self.main_window:
             return False
 
-        try:
+    try:
             # Look for tab widgets in the main window
             tab_widgets = self.main_window.findChildren(QTabWidget)
 
@@ -290,10 +281,9 @@ class GUITestFramework:
 
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.errors.append(f"Tab widgets test failed: {e}")
             return False
-
     def test_data_collection_buttons(self):
         """Test data collection and batch processing buttons"""
         print("🔍 Testing Data Collection Buttons...")
@@ -301,7 +291,7 @@ class GUITestFramework:
         if not self.main_window:
             return False
 
-        try:
+    try:
             # Look for data collection related methods
             data_collection_methods = [
                 "start_background_collection",
@@ -338,10 +328,9 @@ class GUITestFramework:
 
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.errors.append(f"Data collection buttons test failed: {e}")
             return False
-
     def test_menu_and_toolbar(self):
         """Test menu bar and toolbar components"""
         print("🔍 Testing Menu and Toolbar...")
@@ -349,7 +338,7 @@ class GUITestFramework:
         if not self.main_window:
             return False
 
-        try:
+    try:
             # Test menu bar
             menu_bar = self.main_window.menuBar()
             if menu_bar:
@@ -382,10 +371,9 @@ class GUITestFramework:
 
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.errors.append(f"Menu and toolbar test failed: {e}")
             return False
-
     def test_signal_connections(self):
         """Test signal and slot connections"""
         print("🔍 Testing Signal Connections...")
@@ -393,7 +381,7 @@ class GUITestFramework:
         if not self.main_window:
             return False
 
-        try:
+    try:
             # Test if connect_signals method exists
             if hasattr(self.main_window, "connect_signals"):
                 self.test_results["connect_signals_method"] = (
@@ -401,12 +389,12 @@ class GUITestFramework:
                 )
 
                 # Try to call it (may already be called)
-                try:
+    try:
                     self.main_window.connect_signals()
                     self.test_results["connect_signals_execution"] = (
                         "✅ PASS - Executes without error"
                     )
-                except Exception as e:
+    except Exception as e:
                     self.test_results["connect_signals_execution"] = (
                         f"⚠️ WARNING - Error: {e}"
                     )
@@ -422,22 +410,21 @@ class GUITestFramework:
                 and self.main_window.search_input
             ):
                 # Check if returnPressed signal is connected
-                try:
+    try:
                     # This is a bit tricky to test without triggering the signal
                     self.test_results["search_input_signals"] = (
                         "✅ INFO - Search input available for signal testing"
                     )
-                except Exception as e:
+    except Exception as e:
                     self.test_results["search_input_signals"] = (
                         f"⚠️ WARNING - Signal test error: {e}"
                     )
 
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.errors.append(f"Signal connections test failed: {e}")
             return False
-
     def test_error_handling(self):
         """Test error handling mechanisms"""
         print("🔍 Testing Error Handling...")
@@ -445,7 +432,7 @@ class GUITestFramework:
         if not self.main_window:
             return False
 
-        try:
+    try:
             # Test if error handling methods exist
             error_handling_methods = [
                 "show_error_message",
@@ -474,10 +461,9 @@ class GUITestFramework:
 
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.errors.append(f"Error handling test failed: {e}")
             return False
-
     def run_comprehensive_test(self):
         """Run all GUI tests and generate report"""
         print("🚀 Starting Comprehensive GUI Test Suite...")
@@ -497,18 +483,16 @@ class GUITestFramework:
 
         success_count = 0
         for test_method in test_methods:
-            try:
+    try:
                 if test_method():
                     success_count += 1
-            except Exception as e:
+    except Exception as e:
                 self.errors.append(f"Test method {test_method.__name__} failed: {e}")
-
         print(
             f"\n📊 Test Summary: {success_count}/{len(test_methods)} test categories completed"
         )
 
         return self.generate_report()
-
     def generate_report(self):
         """Generate comprehensive test report"""
         report = {
@@ -531,13 +515,10 @@ class GUITestFramework:
         }
 
         return report
-
-
-def run_gui_tests():
+    def run_gui_tests():
     """Main function to run GUI tests"""
     try:
         from datetime import datetime
-
         print("🔧 Initializing GUI Test Framework...")
         framework = GUITestFramework()
 
@@ -550,15 +531,14 @@ def run_gui_tests():
         print("=" * 80)
 
         for test_name, result in report["test_results"].items():
-            print(f"{test_name:30} | {result}")
+        print(f"{test_name:30} | {result}")
 
         if report["errors"]:
-            print("\n" + "=" * 80)
-            print("🚨 ERRORS ENCOUNTERED")
-            print("=" * 80)
+        print("\n" + "=" * 80)
+        print("🚨 ERRORS ENCOUNTERED")
+        print("=" * 80)
             for i, error in enumerate(report["errors"], 1):
-                print(f"{i:2}. {error}")
-
+        print(f"{i:2}. {error}")
         print("\n" + "=" * 80)
         print("📈 SUMMARY STATISTICS")
         print("=" * 80)
@@ -572,7 +552,7 @@ def run_gui_tests():
         # Calculate success rate
         if summary["total_tests"] > 0:
             success_rate = (summary["passed"] / summary["total_tests"]) * 100
-            print(f"📊 Success Rate: {success_rate:.1f}%")
+        print(f"📊 Success Rate: {success_rate:.1f}%")
 
         return report
 
@@ -586,15 +566,15 @@ if __name__ == "__main__":
 
     # Save report to file
     if report:
-        import json
+import json
         from datetime import datetime
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         filename = f"gui_test_report_{timestamp}.json"
 
-        try:
+    try:
             with open(filename, "w") as f:
                 json.dump(report, f, indent=2)
-            print(f"\n💾 Test report saved to: {filename}")
-        except Exception as e:
-            print(f"⚠️ Could not save report: {e}")
+        print(f"\n💾 Test report saved to: {filename}")
+    except Exception as e:
+        print(f"⚠️ Could not save report: {e}")

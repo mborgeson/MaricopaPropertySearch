@@ -2,7 +2,6 @@
 """
 Fix for MockMaricopaAPIClient issues found during testing
 """
-
 import sys
 from pathlib import Path
 
@@ -13,7 +12,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 class FixedMockMaricopaAPIClient(MockMaricopaAPIClient):
     """Fixed version of MockMaricopaAPIClient with missing methods and attributes"""
-
     def __init__(self, config_manager):
         super().__init__(config_manager)
 
@@ -25,16 +23,15 @@ class FixedMockMaricopaAPIClient(MockMaricopaAPIClient):
 
         # Initialize session for compatibility
         self.session = None
-
     def _rate_limit(self):
         """Mock rate limiting - just track last request time"""
-        import time
-        self.last_request_time = time.time()
+import time
 
+        self.last_request_time = time.time()
     def get_tax_history(self, apn: str, years: int = 5):
         """Mock tax history generation"""
-        import random
-        import datetime
+import datetime
+import random
 
         # Generate mock tax records
         tax_records = []
@@ -53,11 +50,10 @@ class FixedMockMaricopaAPIClient(MockMaricopaAPIClient):
             tax_records.append(tax_record)
 
         return tax_records
-
     def get_sales_history(self, apn: str, years: int = 10):
         """Mock sales history generation"""
-        import random
-        import datetime
+import datetime
+import random
 
         # Generate 0-3 mock sales records
         num_sales = random.randint(0, 3)
@@ -77,14 +73,12 @@ class FixedMockMaricopaAPIClient(MockMaricopaAPIClient):
             sales_records.append(sales_record)
 
         return sales_records
-
     def get_property_details(self, apn: str):
         """Mock property details that calls comprehensive info"""
         return self.get_comprehensive_property_info(apn)
-
     def get_comprehensive_property_info(self, apn: str):
         """Mock comprehensive property information"""
-        import random
+import random
 
         # Generate detailed mock property data
         mock_property = self._generate_mock_property(apn)
@@ -113,10 +107,9 @@ class FixedMockMaricopaAPIClient(MockMaricopaAPIClient):
         })
 
         return mock_property
-
     def get_tax_information(self, apn: str):
         """Mock comprehensive tax information"""
-        import time
+import time
 
         tax_data = {
             'apn': apn,
@@ -127,11 +120,10 @@ class FixedMockMaricopaAPIClient(MockMaricopaAPIClient):
         }
 
         return tax_data
-
     def get_property_documents(self, apn: str):
         """Mock property documents"""
-        import random
-        import datetime
+import datetime
+import random
 
         # Generate 0-5 mock documents
         num_docs = random.randint(0, 5)
@@ -148,7 +140,6 @@ class FixedMockMaricopaAPIClient(MockMaricopaAPIClient):
             documents.append(doc)
 
         return documents
-
     def bulk_property_search(self, apns: list):
         """Mock bulk property search"""
         results = {}
@@ -158,10 +149,9 @@ class FixedMockMaricopaAPIClient(MockMaricopaAPIClient):
             results[apn] = self._generate_mock_property(apn)
 
         return results
-
     def search_all_property_types(self, query: str, limit: int = 50):
         """Mock search all property types"""
-        import random
+import random
 
         results = {
             'real_property': [],
@@ -180,7 +170,6 @@ class FixedMockMaricopaAPIClient(MockMaricopaAPIClient):
                 results[category].append(mock_property)
 
         return results
-
     def get_detailed_property_data(self, apn: str):
         """Mock detailed property data"""
         return {
@@ -203,12 +192,10 @@ class FixedMockMaricopaAPIClient(MockMaricopaAPIClient):
             'sketches': {'mock': 'sketch_data'},
             'mapids': {'mock': 'map_data'}
         }
-
-def test_fixed_mock_client():
+    def test_fixed_mock_client():
     """Test the fixed mock client"""
     # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
-
-    print("Testing Fixed Mock API Client...")
+        print("Testing Fixed Mock API Client...")
 
     config_manager = EnhancedConfigManager()
     client = FixedMockMaricopaAPIClient(config_manager)
@@ -220,44 +207,38 @@ def test_fixed_mock_client():
         print("Testing get_tax_history...")
         tax_history = client.get_tax_history(test_apn)
         print(f"✅ Tax history: {len(tax_history)} records")
-
         print("Testing get_sales_history...")
         sales_history = client.get_sales_history(test_apn)
         print(f"✅ Sales history: {len(sales_history)} records")
-
         print("Testing get_property_details...")
         details = client.get_property_details(test_apn)
         print(f"✅ Property details: {len(details.keys())} fields")
-
         print("Testing get_comprehensive_property_info...")
         comp_info = client.get_comprehensive_property_info(test_apn)
         print(f"✅ Comprehensive info: {len(comp_info.keys())} fields")
-
         print("Testing get_tax_information...")
         tax_info = client.get_tax_information(test_apn)
         print(f"✅ Tax information: {tax_info['data_sources']}")
-
         print("Testing get_property_documents...")
         documents = client.get_property_documents(test_apn)
         print(f"✅ Documents: {len(documents)} records")
-
         print("Testing bulk_property_search...")
         bulk_results = client.bulk_property_search([test_apn, "12345002"])
         print(f"✅ Bulk search: {len(bulk_results)} properties")
-
         print("Testing search_all_property_types...")
         all_types = client.search_all_property_types("TEST")
         total_results = sum(len(results) for results in all_types.values())
         print(f"✅ All property types: {total_results} total results")
-
         print("\n✅ All tests passed! Fixed mock client is working correctly.")
 
     except Exception as e:
         print(f"❌ Test failed: {e}")
-        import traceback
+import traceback
+
 from src.api_client_unified import UnifiedMaricopaAPIClient
 from src.enhanced_config_manager import EnhancedConfigManager
+
         traceback.print_exc()
 
-if __name__ == "__main__":
+    if __name__ == "__main__":
     test_fixed_mock_client()

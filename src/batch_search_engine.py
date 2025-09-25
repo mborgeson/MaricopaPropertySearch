@@ -3,21 +3,20 @@
 Batch Search Engine
 Advanced batch/parallel processing system for property searches with optimized performance
 """
-
 import asyncio
-import time
+import json
 import logging
-from concurrent.futures import ThreadPoolExecutor, as_completed, Future
+import queue
+import threading
+import time
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Optional, Any, Callable, Set, Union
-from threading import Lock, RLock, Event
-import threading
-import queue
-import json
+from threading import Event, Lock, RLock
+from typing import Any, Callable, Dict, List, Optional, Set, Union
 
-from PyQt5.QtCore import QThread, pyqtSignal, QObject
+from PyQt5.QtCore import QObject, QThread, pyqtSignal
 
 from logging_config import get_logger, get_performance_logger
 
@@ -61,10 +60,8 @@ class BatchSearchRequest:
     error: Optional[str] = None
     retry_count: int = 0
     max_retries: int = 3
-
     def __hash__(self):
         return hash((self.identifier, self.search_type))
-
     def __eq__(self, other):
         if not isinstance(other, BatchSearchRequest):
             return False
@@ -94,7 +91,6 @@ class BatchSearchJob:
 
 class RateLimiter:
     """Advanced rate limiter for API calls and web scraping"""
-
     def __init__(
         self,
         api_calls_per_second: float = 2.0,
@@ -111,7 +107,6 @@ class RateLimiter:
         self.last_api_refill = time.time()
         self.last_scraper_refill = time.time()
         self.lock = Lock()
-
     def acquire_api_token(self, timeout: float = 5.0) -> bool:
         """Acquire token for API call with timeout"""
         start_time = time.time()
@@ -133,7 +128,6 @@ class RateLimiter:
             time.sleep(0.1)  # Short pause before retry
 
         return False
-
     def acquire_scraper_token(self, timeout: float = 10.0) -> bool:
         """Acquire token for web scraper call with timeout"""
         start_time = time.time()
@@ -161,7 +155,6 @@ class RateLimiter:
 
 class ConnectionPoolManager:
     """Database connection pooling for batch operations"""
-
     def __init__(self, db_managerThreadSafeDatabaseManager, pool_size: int = 10):
         self.db_manager = db_manager
         self.pool_size = pool_size
@@ -171,56 +164,52 @@ class ConnectionPoolManager:
 
         # Pre-populate some connections
         self._initialize_pool()
-
     def _initialize_pool(self):
         """Initialize connection pool with a few connections"""
         initial_size = min(3, self.pool_size)
         for _ in range(initial_size):
-            try:
+    try:
                 conn = self.db_manager.get_connection()
                 self.connections.put(conn, block=False)
                 self.total_connections += 1
-            except Exception as e:
+    except Exception as e:
                 logger.warning(f"Failed to create initial connection: {e}")
                 break
-
     def acquire_connection(self, timeout: float = 5.0):
         """Get connection from pool or create new one"""
-        try:
+    try:
             # Try to get existing connection first
             return self.connections.get(timeout=timeout)
-        except queue.Empty:
+    except queue.Empty:
             # Create new connection if pool is empty and we haven't hit limit
             with self.lock:
                 if self.total_connections < self.pool_size:
-                    try:
+    try:
                         conn = self.db_manager.get_connection()
                         self.total_connections += 1
                         return conn
-                    except Exception as e:
+    except Exception as e:
                         logger.error(f"Failed to create new connection: {e}")
                         raise
 
             # If we hit the limit, wait for a connection to be returned
             return self.connections.get(timeout=timeout)
-
     def release_connection(self, connection):
         """Return connection to pool"""
-        try:
+    try:
             self.connections.put(connection, block=False)
-        except queue.Full:
+    except queue.Full:
             # Pool is full, close this connection
-            try:
+    try:
                 connection.close()
                 with self.lock:
                     self.total_connections -= 1
-            except Exception as e:
+    except Exception as e:
                 logger.warning(f"Error closing excess connection: {e}")
 
 
 class BatchSearchEngine:
     """Advanced batch search engine with parallel processing and optimization"""
-
     def __init__(
         self,
         api_clientUnifiedMaricopaAPIClient,
@@ -271,7 +260,6 @@ class BatchSearchEngine:
             f"Max concurrent jobs: {max_concurrent_jobs}, "
             f"Max concurrent per job: {max_concurrent_per_job}"
         )
-
     def submit_batch_search(
         self,
         identifiers: List[str],
@@ -339,13 +327,12 @@ class BatchSearchEngine:
         )
 
         return job_id
-
     def _execute_batch_job(self, batch_job: BatchSearchJob):
         """Execute a complete batch job"""
         job_id = batch_job.job_id
         start_time = time.time()
 
-        try:
+    try:
             batch_job.started_at = datetime.now()
             batch_job.status = "running"
 
@@ -390,22 +377,21 @@ class BatchSearchEngine:
 
             # Final callback
             if batch_job.callback:
-                try:
+    try:
                     batch_job.callback(batch_job)
-                except Exception as e:
+    except Exception as e:
                     logger.error(f"Error in batch job callback: {e}")
 
-        except Exception as e:
+    except Exception as e:
             batch_job.status = "failed"
             logger.error(f"Batch job {job_id} failed: {e}")
             raise
 
-        finally:
+    finally:
             # Cleanup
             with self.jobs_lock:
                 if job_id in self.job_futures:
                     del self.job_futures[job_id]
-
     def _execute_sequential(self, batch_job: BatchSearchJob):
         """Execute batch job sequentially"""
         logger.debug(f"Executing batch job {batch_job.job_id} in SEQUENTIAL mode")
@@ -421,7 +407,6 @@ class BatchSearchEngine:
 
             if batch_job.callback:
                 batch_job.callback(batch_job)
-
     def _execute_parallel(self, batch_job: BatchSearchJob):
         """Execute batch job in full parallel mode"""
         logger.debug(f"Executing batch job {batch_job.job_id} in PARALLEL mode")
@@ -446,7 +431,6 @@ class BatchSearchEngine:
 
                 if self.shutdown_event.is_set():
                     break
-
     def _execute_hybrid(self, batch_job: BatchSearchJob):
         """Execute batch job using hybrid approach"""
         logger.debug(f"Executing batch job {batch_job.job_id} in HYBRID mode")
@@ -494,7 +478,6 @@ class BatchSearchEngine:
             batch_job.progress = completed / total_requests * 100
             if batch_job.callback:
                 batch_job.callback(batch_job)
-
     def _execute_batch_subset(
         self, requests: List[BatchSearchRequest], max_workers: int
     ) -> int:
@@ -515,7 +498,6 @@ class BatchSearchEngine:
                     break
 
         return completed_count
-
     def _execute_single_request(self, request: BatchSearchRequest):
         """Execute a single search request with error handling and retries"""
         request.started_at = datetime.now()
@@ -524,7 +506,7 @@ class BatchSearchEngine:
         )
 
         for attempt in range(request.max_retries + 1):
-            try:
+    try:
                 if self.shutdown_event.is_set():
                     request.error = "Shutdown requested"
                     return
@@ -548,7 +530,7 @@ class BatchSearchEngine:
                 )
                 return
 
-            except Exception as e:
+    except Exception as e:
                 request.retry_count = attempt
                 error_msg = f"Attempt {attempt + 1} failed: {str(e)}"
 
@@ -561,77 +543,73 @@ class BatchSearchEngine:
                     logger.error(
                         f"Request failed after {request.max_retries + 1} attempts: {error_msg}"
                     )
-
     def _search_by_apn(self, apn: str) -> Optional[Dict]:
         """Search for property by APN using fresh data collection"""
         # Always collect fresh data - no cache fallback
         if not self.rate_limiter.acquire_api_token():
             raise TimeoutError("Rate limit timeout for API call")
 
-        try:
+    try:
             # Get comprehensive property info with fresh data
             result = self.api_client.get_comprehensive_property_info(apn)
 
             if result:
                 # Save to database
                 connection = self.connection_pool.acquire_connection()
-                try:
+    try:
                     success = self.db_manager.save_comprehensive_property_data(result)
                     if not success:
                         logger.warning(f"Failed to save property data for APN: {apn}")
-                finally:
+    finally:
                     self.connection_pool.release_connection(connection)
 
             return result
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"API search failed for APN {apn}: {e}")
             raise
-
     def _search_by_address(self, address: str) -> List[Dict]:
         """Search for properties by address using fresh data"""
         if not self.rate_limiter.acquire_api_token():
             raise TimeoutError("Rate limit timeout for API call")
 
-        try:
+    try:
             results = self.api_client.search_by_address(address, limit=50)
 
             # Save all results to database
             connection = self.connection_pool.acquire_connection()
-            try:
+    try:
                 for result in results:
                     self.db_manager.insert_property(result)
-            finally:
+    finally:
                 self.connection_pool.release_connection(connection)
 
             return results
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"API search failed for address {address}: {e}")
             raise
-
     def _search_by_owner(self, owner_name: str) -> List[Dict]:
         """Search for properties by owner name using fresh data"""
         if not self.rate_limiter.acquire_api_token():
             raise TimeoutError("Rate limit timeout for API call")
 
-        try:
+    try:
             results = self.api_client.search_by_owner(owner_name, limit=50)
 
             # Save all results to database
             connection = self.connection_pool.acquire_connection()
-            try:
+    try:
                 for result in results:
                     self.db_manager.insert_property(result)
-            finally:
+    finally:
                 self.connection_pool.release_connection(connection)
 
             return results
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"API search failed for owner {owner_name}: {e}")
             raise
-
     def get_job_status(self, job_id: str) -> Optional[Dict[str, Any]]:
         """Get status of a batch job"""
         with self.jobs_lock:
@@ -661,7 +639,6 @@ class BatchSearchEngine:
                 "mode": job.mode.value,
                 "max_concurrent": job.max_concurrent,
             }
-
     def get_job_results(self, job_id: str) -> Optional[List[Dict]]:
         """Get results from completed batch job"""
         with self.jobs_lock:
@@ -692,7 +669,6 @@ class BatchSearchEngine:
                 results.append(result_entry)
 
             return results
-
     def cancel_job(self, job_id: str) -> bool:
         """Cancel a running batch job"""
         with self.jobs_lock:
@@ -709,7 +685,6 @@ class BatchSearchEngine:
 
             logger.info(f"Cancelled batch job {job_id}")
             return True
-
     def get_engine_statistics(self) -> Dict[str, Any]:
         """Get comprehensive engine statistics"""
         with self.stats_lock:
@@ -735,7 +710,6 @@ class BatchSearchEngine:
                 "scraper_calls_per_second": self.rate_limiter.scraper_calls_per_second,
             },
         }
-
     def cleanup_completed_jobs(self, max_age_hours: int = 24):
         """Clean up old completed jobs"""
         cutoff_time = datetime.now() - timedelta(hours=max_age_hours)
@@ -758,7 +732,6 @@ class BatchSearchEngine:
             logger.info(f"Cleaned up {removed_count} old batch jobs")
 
         return removed_count
-
     def shutdown(self):
         """Gracefully shutdown the batch search engine"""
         logger.info("Shutting down batch search engine...")
@@ -783,12 +756,10 @@ class BatchSearchWorker(QThread):
     job_progress = pyqtSignal(str, float)  # job_id, progress
     job_completed = pyqtSignal(str, dict)  # job_id, results
     job_failed = pyqtSignal(str, str)  # job_id, error
-
     def __init__(self, batch_engine: BatchSearchEngine):
         super().__init__()
         self.batch_engine = batch_engine
         self.current_job_id = None
-
     def start_batch_search(
         self,
         identifiers: List[str],
@@ -802,10 +773,9 @@ class BatchSearchWorker(QThread):
         self.mode = mode
         self.priority = priority
         self.start()
-
     def run(self):
         """Execute batch search in background thread"""
-        try:
+    try:
             # Submit batch job
             self.current_job_id = self.batch_engine.submit_batch_search(
                 identifiers=self.identifiers,
@@ -838,11 +808,10 @@ class BatchSearchWorker(QThread):
                 error_msg = f"Job failed with status: {status.get('status', 'unknown') if status else 'not found'}"
                 self.job_failed.emit(self.current_job_id, error_msg)
 
-        except Exception as e:
+    except Exception as e:
             error_msg = f"Batch search worker error: {str(e)}"
             logger.error(error_msg)
             self.job_failed.emit(self.current_job_id or "unknown", error_msg)
-
     def _progress_callback(self, batch_job: BatchSearchJob):
         """Handle progress updates from batch job"""
         if self.current_job_id:

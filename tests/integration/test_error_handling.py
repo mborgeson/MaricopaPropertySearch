@@ -1,17 +1,17 @@
 """
 Integration tests for error handling and graceful degradation
 """
-
-import pytest
 import time
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
+
 import psycopg2
-from requests.exceptions import ConnectionError, Timeout, HTTPError
+import pytest
+from requests.exceptions import ConnectionError, HTTPError, Timeout
+
 
 @pytest.mark.integration
 class TestNetworkErrorHandling:
     """Test handling of network-related errors"""
-    
     def test_api_timeout_graceful_handling(self, app_config, mock_api_client):
         """Test that API timeouts are handled gracefully"""
         
@@ -19,16 +19,15 @@ class TestNetworkErrorHandling:
         with patch.object(mock_api_client, 'search_by_owner') as mock_search:
             mock_search.side_effect = Timeout("API request timed out")
             
-            try:
+    try:
                 results = mock_api_client.search_by_owner("SMITH", timeout=5)
-            except Exception as e:
+    except Exception as e:
                 # Should not raise unhandled timeout
                 assert not isinstance(e, Timeout), "Timeout should be handled gracefully"
-                
     def test_api_connection_error_fallback(self, app_config, test_database):
         """Test fallback to database when API is unavailable"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
-        
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+
         # Create app with connection error simulation
         app = EnhancedPropertySearchApp(app_config)
         
@@ -45,7 +44,6 @@ class TestNetworkErrorHandling:
                 # Should get results from database
                 assert len(results) > 0
                 mock_db.assert_called_once()
-                
     def test_partial_data_source_failure(self, app_config):
         """Test handling when some data sources fail but others succeed"""
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.api_client import MockMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
@@ -65,16 +63,15 @@ class TestNetworkErrorHandling:
                 results = api_client.search_by_owner("SMITH")
                 enhanced_data = {}
                 
-                try:
+    try:
                     enhanced_data = scraper.enhance_property_data("101-01-001A")
-                except:
-                    pass  # Scraper failure should be handled
+    except:
+            pass  # Scraper failure should be handled
                     
                 assert len(results) > 0, "Should get API results despite scraper failure"
                 
         api_client.close()
         scraper.close()
-        
     def test_network_recovery_detection(self, app_config, network_simulator):
         """Test that system detects network recovery"""
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.api_client import MockMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
@@ -83,11 +80,11 @@ class TestNetworkErrorHandling:
         
         # Start with network failure
         with network_simulator.apply_condition('offline'):
-            try:
+    try:
                 status = client.get_api_status()
                 assert status['status'] != 'online', "Should detect network offline"
-            except:
-                pass  # Expected to fail
+    except:
+            pass  # Expected to fail
                 
         # Network comes back online
         with network_simulator.apply_condition('normal'):
@@ -99,7 +96,6 @@ class TestNetworkErrorHandling:
 @pytest.mark.integration
 class TestDatabaseErrorHandling:
     """Test database-related error handling"""
-    
     def test_database_connection_failure_handling(self, app_config):
         """Test handling when database connection fails"""
         # MIGRATED: # MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
@@ -115,13 +111,12 @@ class TestDatabaseErrorHandling:
         assert not connection_ok, "Should detect failed connection"
         
         # Should not raise unhandled exceptions
-        try:
+    try:
             results = db.search_properties_by_owner("SMITH")
             assert results == [], "Should return empty results on connection failure"
-        except Exception as e:
+    except Exception as e:
             # Should only raise handled exceptions with user-friendly messages
             assert "connection" in str(e).lower() or "database" in str(e).lower()
-            
     def test_database_connection_recovery(self, test_database, app_config):
         """Test database connection recovery after temporary failure"""
         
@@ -139,7 +134,6 @@ class TestDatabaseErrorHandling:
         # Should recover automatically
         connection_ok = test_database.test_connection()
         assert connection_ok, "Should recover connection"
-        
     def test_database_query_timeout_handling(self, test_database):
         """Test handling of database query timeouts"""
         
@@ -156,7 +150,6 @@ class TestDatabaseErrorHandling:
             # Should handle timeout gracefully
             results = test_database.search_properties_by_owner("SMITH")
             assert results == [], "Should return empty results on timeout"
-            
     def test_database_constraint_violation_handling(self, test_database):
         """Test handling of database constraint violations"""
         
@@ -171,7 +164,7 @@ class TestDatabaseErrorHandling:
             'assessed_value': 200000
         }
         
-        try:
+    try:
             with test_database.get_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
@@ -185,16 +178,15 @@ class TestDatabaseErrorHandling:
                 """, duplicate_property)
                 conn.commit()
                 
-        except psycopg2.IntegrityError:
+    except psycopg2.IntegrityError:
             # This is expected - should handle constraint violations
             pass
-        except Exception as e:
+    except Exception as e:
             pytest.fail(f"Should handle constraint violations gracefully: {e}")
 
 @pytest.mark.integration
 class TestDataInconsistencyHandling:
     """Test handling of inconsistent or malformed data"""
-    
     def test_malformed_api_response_handling(self, app_config):
         """Test handling when API returns malformed data"""
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.api_client import MockMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
@@ -216,7 +208,6 @@ class TestDataInconsistencyHandling:
             assert isinstance(results, list), "Should return list even with malformed data"
             
         client.close()
-        
     def test_missing_required_fields_handling(self, test_database):
         """Test handling when required fields are missing"""
         
@@ -227,7 +218,7 @@ class TestDataInconsistencyHandling:
             'assessed_value': 200000
         }
         
-        try:
+    try:
             with test_database.get_connection() as conn:
                 cursor = conn.cursor()
                 # This should fail due to NOT NULL constraints
@@ -237,12 +228,11 @@ class TestDataInconsistencyHandling:
                 """, incomplete_property)
                 conn.commit()
                 
-        except psycopg2.IntegrityError:
+    except psycopg2.IntegrityError:
             # Expected - should handle missing required fields
             pass
-        except Exception as e:
+    except Exception as e:
             pytest.fail(f"Should handle missing fields gracefully: {e}")
-            
     def test_inconsistent_data_between_sources(self, app_config):
         """Test handling when different data sources return inconsistent information"""
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.api_client import MockMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
@@ -278,7 +268,6 @@ class TestDataInconsistencyHandling:
                 
         api_client.close()
         scraper.close()
-        
     def test_special_characters_in_data(self, test_database):
         """Test handling of special characters in property data"""
         
@@ -292,7 +281,7 @@ class TestDataInconsistencyHandling:
             'assessed_value': 200000
         }
         
-        try:
+    try:
             with test_database.get_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute("""
@@ -310,18 +299,17 @@ class TestDataInconsistencyHandling:
                 results = test_database.search_properties_by_owner("O'CONNOR")
                 assert len(results) > 0, "Should find property with special characters"
                 
-        except Exception as e:
+    except Exception as e:
             pytest.fail(f"Should handle special characters: {e}")
 
 @pytest.mark.integration
 @pytest.mark.gui
 class TestUIErrorHandling:
     """Test error handling in the user interface"""
-    
     def test_user_friendly_error_messages(self, qt_app, app_config):
         """Test that error messages are user-friendly, not technical"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
-        
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+
         window = EnhancedPropertySearchApp(app_config)
         window.show()
         qt_app.processEvents()
@@ -353,11 +341,10 @@ class TestUIErrorHandling:
                         assert term not in error_message, f"Should not show technical term: {term}"
                         
         window.close()
-        
     def test_error_recovery_workflow(self, qt_app, app_config):
         """Test that users can recover from errors easily"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
-        
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+
         window = EnhancedPropertySearchApp(app_config)
         window.show()
         qt_app.processEvents()
@@ -383,11 +370,10 @@ class TestUIErrorHandling:
                 assert "error" not in status.lower(), "Should clear error message on successful search"
                 
         window.close()
-        
     def test_partial_results_display(self, qt_app, app_config):
         """Test display of partial results when some operations fail"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
-        
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+
         window = EnhancedPropertySearchApp(app_config)
         window.show()
         qt_app.processEvents()
@@ -419,7 +405,6 @@ class TestUIErrorHandling:
 @pytest.mark.integration
 class TestSystemRecoveryPatterns:
     """Test system recovery and resilience patterns"""
-    
     def test_automatic_retry_with_backoff(self, app_config):
         """Test automatic retry with exponential backoff"""
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.api_client import MockMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
@@ -428,7 +413,7 @@ class TestSystemRecoveryPatterns:
         
         # Mock intermittent failures
         call_count = 0
-        def failing_request(*args, **kwargs):
+    def failing_request(*args, **kwargs):
             nonlocal call_count
             call_count += 1
             if call_count < 3:  # Fail first 2 calls
@@ -438,7 +423,7 @@ class TestSystemRecoveryPatterns:
         with patch.object(client, '_make_request', side_effect=failing_request):
             start_time = time.time()
             
-            try:
+    try:
                 result = client.search_by_owner("SMITH")
                 elapsed = time.time() - start_time
                 
@@ -447,12 +432,11 @@ class TestSystemRecoveryPatterns:
                 assert elapsed > 1.0, "Should include backoff delays"
                 assert result is not None, "Should eventually succeed"
                 
-            except Exception as e:
+    except Exception as e:
                 # Even if it fails, should be a graceful failure
                 assert "retry" in str(e).lower() or "timeout" in str(e).lower()
                 
         client.close()
-        
     def test_graceful_degradation_modes(self, app_config, test_database):
         """Test graceful degradation when services are partially available"""
         
@@ -480,19 +464,18 @@ class TestSystemRecoveryPatterns:
             
             # Mock the availability
             # In real implementation, would test actual degraded performance
-            
     def test_resource_cleanup_on_failure(self, app_config):
         """Test that resources are properly cleaned up when operations fail"""
         # MIGRATED: # MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.api_client import MockMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 from src.api_client_unified import UnifiedMaricopaAPIClient
 from src.threadsafe_database_manager import ThreadSafeDatabaseManager
-        
+
         db = ThreadSafeDatabaseManager(app_config)
         client = MockMaricopaAPIClient(app_config)
         
         # Simulate operation that fails mid-way
-        try:
+    try:
             with patch.object(db, 'get_connection') as mock_conn:
                 mock_connection = MagicMock()
                 mock_conn.return_value.__enter__ = Mock(return_value=mock_connection)
@@ -503,7 +486,7 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
                 
                 results = db.search_properties_by_owner("SMITH")
                 
-        except Exception:
+    except Exception:
             pass  # Expected to fail
             
         # Resources should still be properly managed

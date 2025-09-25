@@ -3,15 +3,21 @@
 Test that the background data collection fix works properly
 """
 
-import sys
 import os
+import sys
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from src.database_manager import DatabaseManager
-from src.background_data_collector import BackgroundDataWorker, BackgroundDataCollectionManager, JobPriority
-from src.config_manager import ConfigManager
 from src.api_client import MaricopaAPIClient
-from src.logging_config import setup_logging, get_logger
+from src.background_data_collector import (
+    BackgroundDataCollectionManager,
+    BackgroundDataWorker,
+    JobPriority,
+)
+from src.config_manager import ConfigManager
+from src.database_manager import DatabaseManager
+from src.logging_config import get_logger, setup_logging
+
 
 def test_api_client_initialization():
     """Test that BackgroundDataWorker properly initializes API client"""
@@ -101,8 +107,8 @@ def test_api_client_initialization():
         logger.error(f"Test failed: {e}")
         print(f"\nERROR: TEST FAILED: {e}")
         import traceback
+
         traceback.print_exc()
 
-
-if __name__ == "__main__":
+    if __name__ == "__main__":
     test_api_client_initialization()

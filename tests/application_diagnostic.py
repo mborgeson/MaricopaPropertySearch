@@ -3,12 +3,11 @@
 Comprehensive Diagnostic for RUN_APPLICATION.py
 Identifies all issues preventing proper execution
 """
-
-import sys
 import os
 import subprocess
-from pathlib import Path
+import sys
 import traceback
+from pathlib import Path
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -21,37 +20,32 @@ class ApplicationDiagnostic:
         self.issues = []
         self.warnings = []
         self.successes = []
-
     def check_imports(self):
         """Check if all imports in RUN_APPLICATION.py work"""
         print("\n[1] Checking Imports...")
 
-        try:
+    try:
             # Try importing main components
             # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
             self.successes.append("ConfigManager imports successfully")
-
-            from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
             self.successes.append("ThreadSafeDatabaseManager imports successfully")
-
-            from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
             self.successes.append("EnhancedPropertySearchApp imports successfully")
-
-            from src.logging_config import setup_logging
+from src.logging_config import setup_logging
 
             self.successes.append("Logging setup imports successfully")
 
-        except ImportError as e:
+    except ImportError as e:
             self.issues.append(f"Import Error: {e}")
             return False
-        except Exception as e:
+    except Exception as e:
             self.issues.append(f"Unexpected import error: {e}")
             return False
 
         return True
-
     def check_config_files(self):
         """Check if configuration files exist"""
         print("\n[2] Checking Configuration Files...")
@@ -74,7 +68,6 @@ class ApplicationDiagnostic:
                     self.warnings.append(
                         f"  -> Example found: {file_path}.example (copy this to {file_path})"
                     )
-
     def check_directories(self):
         """Check if required directories exist"""
         print("\n[3] Checking Directory Structure...")
@@ -95,17 +88,16 @@ class ApplicationDiagnostic:
             else:
                 self.issues.append(f"Directory missing: {dir_path}")
                 # Try to create it
-                try:
+    try:
                     full_path.mkdir(parents=True, exist_ok=True)
                     self.warnings.append(f"  -> Created missing directory: {dir_path}")
-                except:
-                    self.issues.append(f"  -> Failed to create directory: {dir_path}")
-
+    except:
+                        self.issues.append(f"  -> Failed to create directory: {dir_path}")
     def check_database_config(self):
         """Check database configuration"""
         print("\n[4] Checking Database Configuration...")
 
-        try:
+    try:
             # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
             config = EnhancedConfigManager()
 
@@ -116,23 +108,22 @@ class ApplicationDiagnostic:
 
                 if db_enabled:
                     # Try to get database config
-                    try:
+    try:
                         db_config = config.get_database_config()
                         if db_config:
                             self.successes.append("Database configuration loaded")
-                    except Exception as e:
+    except Exception as e:
                         self.warnings.append(f"Database config error: {e}")
             else:
                 self.issues.append("ConfigManager missing get_database_enabled method")
 
-        except Exception as e:
+    except Exception as e:
             self.issues.append(f"Cannot check database config: {e}")
-
     def check_gui_dependencies(self):
         """Check PyQt5 and GUI dependencies"""
         print("\n[5] Checking GUI Dependencies...")
 
-        try:
+    try:
             from PyQt5.QtWidgets import QApplication
 
             self.successes.append("PyQt5 available")
@@ -143,11 +134,10 @@ class ApplicationDiagnostic:
                 app = QApplication(sys.argv)
             self.successes.append("QApplication can be created")
 
-        except ImportError:
+    except ImportError:
             self.issues.append("PyQt5 not installed or not working")
-        except Exception as e:
+    except Exception as e:
             self.issues.append(f"GUI dependency error: {e}")
-
     def test_application_launch(self):
         """Try to actually run the application in test mode"""
         print("\n[6] Testing Application Launch...")
@@ -159,10 +149,11 @@ class ApplicationDiagnostic:
             return
 
         # Try a dry run (just imports and checks, no GUI)
-        try:
+    try:
             # Create a test script that imports and checks
             test_code = """
 import sys
+
 sys.path.insert(0, r"{root}")
 sys.path.insert(0, r"{src}")
 
@@ -174,10 +165,10 @@ from src.enhanced_config_manager import EnhancedConfigManager
 
 # Check functions
 config = EnhancedConfigManager()
-print("Config loaded")
+        print("Config loaded")
 
 # Don't actually create GUI or database
-print("Import test successful")
+        print("Import test successful")
 """.format(
                 root=project_root, src=project_root / "src"
             )
@@ -194,11 +185,10 @@ print("Import test successful")
             else:
                 self.issues.append(f"Application import test failed: {result.stderr}")
 
-        except subprocess.TimeoutExpired:
+    except subprocess.TimeoutExpired:
             self.warnings.append("Application test timed out")
-        except Exception as e:
+    except Exception as e:
             self.issues.append(f"Application launch test error: {e}")
-
     def generate_report(self):
         """Generate diagnostic report"""
         print("\n" + "=" * 70)
@@ -206,49 +196,46 @@ print("Import test successful")
         print("=" * 70)
 
         if self.issues:
-            print(f"\n[CRITICAL] ISSUES ({len(self.issues)}):")
+        print(f"\n[CRITICAL] ISSUES ({len(self.issues)}):")
             for i, issue in enumerate(self.issues, 1):
-                print(f"  {i}. {issue}")
+        print(f"  {i}. {issue}")
 
         if self.warnings:
-            print(f"\n[WARNING] WARNINGS ({len(self.warnings)}):")
+        print(f"\n[WARNING] WARNINGS ({len(self.warnings)}):")
             for i, warning in enumerate(self.warnings, 1):
-                print(f"  {i}. {warning}")
+        print(f"  {i}. {warning}")
 
         if self.successes:
-            print(f"\n[OK] WORKING COMPONENTS ({len(self.successes)}):")
+        print(f"\n[OK] WORKING COMPONENTS ({len(self.successes)}):")
             for success in self.successes[:5]:  # Show first 5
-                print(f"  [OK] {success}")
+        print(f"  [OK] {success}")
             if len(self.successes) > 5:
-                print(f"  ... and {len(self.successes)-5} more")
-
+        print(f"  ... and {len(self.successes)-5} more")
         print("\n" + "=" * 70)
 
         if not self.issues:
-            print(" [OK] NO CRITICAL ISSUES FOUND")
+        print(" [OK] NO CRITICAL ISSUES FOUND")
         else:
-            print(f" [WARNING] {len(self.issues)} CRITICAL ISSUES NEED ATTENTION")
-
+        print(f" [WARNING] {len(self.issues)} CRITICAL ISSUES NEED ATTENTION")
         print("=" * 70)
 
         # Generate fix suggestions
         if self.issues:
-            print("\n[FIXES] SUGGESTED FIXES:")
+        print("\n[FIXES] SUGGESTED FIXES:")
             for i, issue in enumerate(self.issues, 1):
-                print(f"\n{i}. Issue: {issue}")
+        print(f"\n{i}. Issue: {issue}")
 
                 # Suggest fixes based on issue type
                 if "Import Error" in issue:
-                    print("   Fix: Check if module exists and is in correct location")
+        print("   Fix: Check if module exists and is in correct location")
                 elif "Directory missing" in issue:
-                    print("   Fix: Create the missing directory or check path")
+        print("   Fix: Create the missing directory or check path")
                 elif "ConfigManager" in issue:
-                    print("   Fix: Verify config_manager.py has all required methods")
+        print("   Fix: Verify config_manager.py has all required methods")
                 elif "PyQt5" in issue:
-                    print("   Fix: Install PyQt5: pip install PyQt5")
+        print("   Fix: Install PyQt5: pip install PyQt5")
                 elif "configuration missing" in issue:
-                    print("   Fix: Copy .env.example to .env and configure")
-
+        print("   Fix: Copy .env.example to .env and configure")
     def run_diagnostic(self):
         """Run all diagnostic checks"""
         print("Starting Application Diagnostic...")
@@ -264,15 +251,12 @@ print("Import test successful")
         self.generate_report()
 
         return len(self.issues) == 0
-
-
-def main():
+    def main():
     diagnostic = ApplicationDiagnostic()
     success = diagnostic.run_diagnostic()
-
-    print("\n" + "=" * 70)
-    print(" NEXT STEPS:")
-    print("=" * 70)
+        print("\n" + "=" * 70)
+        print(" NEXT STEPS:")
+        print("=" * 70)
 
     if success:
         print("\n1. Run the application:")

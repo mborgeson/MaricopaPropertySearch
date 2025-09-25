@@ -4,45 +4,85 @@ Enhanced Main Window with Background Data Collection
 Integrates automatic background data collection for seamless user experience
 """
 
-import sys
-from PyQt5.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QLineEdit, QPushButton, QTabWidget, QTableWidget, 
-    QTableWidgetItem, QTextEdit, QProgressBar, QMessageBox,
-    QComboBox, QSpinBox, QCheckBox, QGroupBox, QSplitter,
-    QHeaderView, QApplication, QMenuBar, QMenu,
-    QAction, QFileDialog, QDialog, QFrame, QSizePolicy,
-    QSlider, QFormLayout, QListWidget, QListWidgetItem,
-    QPushButton, QButtonGroup, QRadioButton, QScrollArea, QShortcut, QToolBar, QMenu
-)
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QObject, QSettings
-from PyQt5.QtGui import QFont, QIcon, QPixmap, QColor, QPalette, QKeySequence
-from typing import Dict, List, Optional, Any
-import json
 import csv
-from pathlib import Path
-from datetime import datetime
+import json
+import sys
 import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+from api_client import MaricopaAPIClient, MockMaricopaAPIClient
 
 # Import application modules
 from database_manager import DatabaseManager
-from api_client import MaricopaAPIClient, MockMaricopaAPIClient
-from web_scraper import WebScraperManager, MockWebScraperManager
-from background_data_collector import BackgroundDataCollectionManager, JobPriority
-from user_action_logger import UserActionLogger, get_user_action_logger
-
-# Import centralized logging
-from logging_config import get_logger, get_search_logger, get_performance_logger, log_exception
-
-# Import GUI enhancement dialogs
-from gui.gui_enhancements_dialogs import (
-    ApplicationSettingsDialog, DataCollectionSettingsDialog, CacheManagementDialog,
-    BatchSearchDialog, ParallelProcessingDialog, DataSourceConfigurationDialog
+from PyQt5.QtCore import QObject, QSettings, Qt, QThread, QTimer, pyqtSignal
+from PyQt5.QtGui import QColor, QFont, QIcon, QKeySequence, QPalette, QPixmap
+from PyQt5.QtWidgets import (
+    QAction,
+    QApplication,
+    QButtonGroup,
+    QCheckBox,
+    QComboBox,
+    QDialog,
+    QFileDialog,
+    QFormLayout,
+    QFrame,
+    QGridLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QLineEdit,
+    QListWidget,
+    QListWidgetItem,
+    QMainWindow,
+    QMenu,
+    QMenuBar,
+    QMessageBox,
+    QProgressBar,
+    QPushButton,
+    QRadioButton,
+    QScrollArea,
+    QShortcut,
+    QSizePolicy,
+    QSlider,
+    QSpinBox,
+    QSplitter,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QTextEdit,
+    QToolBar,
+    QVBoxLayout,
+    QWidget,
 )
+
+from background_data_collector import BackgroundDataCollectionManager, JobPriority
 
 # Import enhanced batch search integration
 from batch_search_integration import BatchSearchIntegrationManager
 from enhanced_batch_search_dialog import EnhancedBatchSearchDialog
+
+# Import GUI enhancement dialogs
+from gui.gui_enhancements_dialogs import (
+    ApplicationSettingsDialog,
+    BatchSearchDialog,
+    CacheManagementDialog,
+    DataCollectionSettingsDialog,
+    DataSourceConfigurationDialog,
+    ParallelProcessingDialog,
+)
+
+# Import centralized logging
+from logging_config import (
+    get_logger,
+    get_performance_logger,
+    get_search_logger,
+    log_exception,
+)
+from user_action_logger import UserActionLogger, get_user_action_logger
+from web_scraper import MockWebScraperManager, WebScraperManager
 
 logger = get_logger(__name__)
 search_logger = get_search_logger(__name__)
@@ -881,8 +921,8 @@ class PropertyDetailsDialog(QDialog):
             return
         
         # Show progress dialog
-        from PyQt5.QtWidgets import QProgressDialog
         from PyQt5.QtCore import Qt
+        from PyQt5.QtWidgets import QProgressDialog
         
         progress = QProgressDialog("Collecting property data...", "Cancel", 0, 100, self)
         progress.setWindowModality(Qt.WindowModal)
@@ -1091,8 +1131,8 @@ class PropertyDetailsDialog(QDialog):
             logger.info(f"Cleared cache for APN {apn}")
         
         # Show progress dialog
-        from PyQt5.QtWidgets import QProgressDialog
         from PyQt5.QtCore import Qt
+        from PyQt5.QtWidgets import QProgressDialog
         
         progress = QProgressDialog("Refreshing property data...", "Cancel", 0, 100, self)
         progress.setWindowModality(Qt.WindowModal)
@@ -1659,7 +1699,7 @@ class EnhancedPropertySearchApp(QMainWindow):
             api_status = self.api_client.get_api_status()
             status_messages.append(f"API: {api_status.get('status', 'Unknown')}")
         except:
-            status_messages.append("API: Error")
+        status_messages.append("API: Error")
         
         # Check background collection status
         bg_status = "Running" if self.background_manager.is_running() else "Stopped"
@@ -1762,6 +1802,7 @@ class EnhancedPropertySearchApp(QMainWindow):
             if isinstance(raw_data, str):
                 try:
                     import json
+
                     raw_data = json.loads(raw_data)
                 except (json.JSONDecodeError, TypeError):
                     raw_data = {}
@@ -1871,7 +1912,7 @@ class EnhancedPropertySearchApp(QMainWindow):
                 sales_type = type(self.db_manager.get_sales_history(apn)).__name__
                 logger.debug(f"Data types for {apn}: tax_records={tax_type}, sales_records={sales_type}")
             except:
-                pass  # Don't let debug logging cause more errors
+        pass  # Don't let debug logging cause more errors
             
             return {'text': 'Unknown', 'complete': False, 'collecting': False}
     
@@ -1882,7 +1923,7 @@ class EnhancedPropertySearchApp(QMainWindow):
             # For now, return a placeholder
             return "Recent"
         except:
-            return "Unknown"
+        return "Unknown"
     
     def handle_search_error(self, error_message: str):
         """Handle search errors"""
@@ -2169,7 +2210,7 @@ class EnhancedPropertySearchApp(QMainWindow):
             dialog = PropertyDetailsDialog(property_data, self.db_manager, 
                                          self.background_manager, self)
             dialog.exec_()
-    
+
     def show_collection_stats(self):
         """Show collection statistics"""
         status = self.background_manager.get_collection_status()
@@ -2251,11 +2292,13 @@ class EnhancedPropertySearchApp(QMainWindow):
         """Show data collection settings dialog"""
         dialog = DataCollectionSettingsDialog(self.background_manager, self)
         dialog.exec_()
-    
+
     def show_cache_management_dialog(self):
         """Show cache management dialog"""
         dialog = CacheManagementDialog(self.background_manager, self)
-        dialog.exec_()    def refresh_current_data(self):
+        dialog.exec_()
+
+    def refresh_current_data(self):
         """Refresh data for currently displayed results - CRASH-SAFE VERSION"""
         try:
             # Check if we have results to refresh
@@ -2326,16 +2369,20 @@ class EnhancedPropertySearchApp(QMainWindow):
                                        "Check the application logs for more details.")
                     logger.error(f"Error in refresh_current_data: {e}")
                     import traceback
+
                     traceback.print_exc()
 
-        except Exception as e:
+    except Exception as e:
             # Ultimate catch-all to prevent crash
             QMessageBox.critical(self, "Critical Error", 
                                f"Unexpected error during refresh: {str(e)}\n"
                                "The application will continue running.")
             logger.error(f"Critical error in refresh_current_data: {e}")
             import traceback
-            traceback.print_exc()    def force_data_collection(self):
+
+            traceback.print_exc()
+
+    def force_data_collection(self):
         """Force data collection ignoring cache - CRASH-SAFE VERSION"""
         try:
             # Check if we have results to collect data for
@@ -2439,15 +2486,17 @@ class EnhancedPropertySearchApp(QMainWindow):
                                        "Check the application logs for more details.")
                     logger.error(f"Error in force_data_collection: {e}")
                     import traceback
+
                     traceback.print_exc()
 
-        except Exception as e:
+    except Exception as e:
             # Ultimate catch-all to prevent crash
             QMessageBox.critical(self, "Critical Error", 
                                f"Unexpected error during force collection: {str(e)}\n"
                                "The application will continue running.")
             logger.error(f"Critical error in force_data_collection: {e}")
             import traceback
+
             traceback.print_exc()
 
     def _continue_force_collection(self, apns):
@@ -2621,12 +2670,12 @@ class EnhancedPropertySearchApp(QMainWindow):
         """Show parallel processing configuration dialog"""
         dialog = ParallelProcessingDialog(self.background_manager, self)
         dialog.exec_()
-    
+
     def show_data_source_dialog(self):
         """Show data source configuration dialog"""
         dialog = DataSourceConfigurationDialog(self.config, self.api_client, self.scraper, self)
         dialog.exec_()
-    
+
     def show_about(self):
         """Show about dialog"""
         about_text = """
@@ -2807,7 +2856,7 @@ class EnhancedPropertySearchApp(QMainWindow):
                 self.collection_status_label.setText("Collection: Stopped")
                 self.collection_status_label.setStyleSheet("color: red;")
         except:
-            pass
+        pass
     
     def refresh_selected_property(self):
         """Refresh data for currently selected property"""

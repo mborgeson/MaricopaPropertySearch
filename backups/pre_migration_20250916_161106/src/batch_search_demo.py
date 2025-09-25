@@ -4,8 +4,8 @@ Batch Search System Demo
 Demonstrates the batch/parallel search processing system capabilities
 """
 
-import sys
 import os
+import sys
 import time
 from pathlib import Path
 
@@ -14,16 +14,15 @@ PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
-from config_manager import ConfigManager
-from database_manager import DatabaseManager
 from api_client import MaricopaAPIClient, MockMaricopaAPIClient
-from web_scraper import WebScraperManager, MockWebScraperManager
+from database_manager import DatabaseManager
+
 from background_data_collector import BackgroundDataCollectionManager
-from batch_search_integration import (
-    BatchSearchIntegrationManager, 
-    BatchSearchJobType
-)
-from logging_config import setup_logging, get_logger
+from batch_search_integration import BatchSearchIntegrationManager, BatchSearchJobType
+from config_manager import ConfigManager
+from logging_config import get_logger, setup_logging
+from web_scraper import MockWebScraperManager, WebScraperManager
+
 
 def demonstrate_batch_search():
     """Demonstrate batch search capabilities"""
@@ -234,7 +233,9 @@ def demonstrate_batch_search():
     except Exception as e:
         print(f"✗ Demo failed with error: {e}")
         import traceback
+
         traceback.print_exc()
+
     finally:
         # Cleanup
         try:
@@ -244,7 +245,7 @@ def demonstrate_batch_search():
                 background_manager.stop_collection()
             print("✓ Cleanup completed")
         except:
-            pass
+        pass
 
 if __name__ == "__main__":
     demonstrate_batch_search()

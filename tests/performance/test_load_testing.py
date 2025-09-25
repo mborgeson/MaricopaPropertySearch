@@ -1,15 +1,15 @@
 """
 Load testing and concurrent user simulation
 """
-
-import pytest
-import time
-import threading
 import concurrent.futures
-from unittest.mock import Mock, patch
-import psutil
 import os
+import threading
+import time
 from statistics import mean, median, stdev
+from unittest.mock import Mock, patch
+
+import psutil
+import pytest
 
 # Load testing parameters
 CONCURRENT_USERS = [1, 5, 10, 25]
@@ -22,7 +22,6 @@ TARGET_ERROR_RATE = 0.05  # Less than 5% errors
 @pytest.mark.slow
 class TestConcurrentUserLoad:
     """Test application behavior under concurrent user load"""
-
     def test_single_user_baseline_performance(
         self, test_database, app_config, performance_timer
     ):
@@ -63,11 +62,9 @@ class TestConcurrentUserLoad:
             "95th_percentile": percentile_95,
             "response_times": response_times,
         }
-
     def test_concurrent_database_access(self, test_database, app_config):
         """Test database performance under concurrent access"""
-
-        def concurrent_search(user_id, search_term, results_dict):
+    def concurrent_search(user_id, search_term, results_dict):
             """Simulate single user performing searches"""
             user_response_times = []
             user_errors = 0
@@ -75,7 +72,7 @@ class TestConcurrentUserLoad:
             start_time = time.time()
 
             while time.time() - start_time < 10:  # 10 second test
-                try:
+    try:
                     search_start = time.perf_counter()
 
                     results = test_database.search_properties_by_owner(
@@ -88,7 +85,7 @@ class TestConcurrentUserLoad:
                     # Brief pause between searches
                     time.sleep(0.2)
 
-                except Exception as e:
+    except Exception as e:
                     user_errors += 1
 
             results_dict[user_id] = {
@@ -98,7 +95,7 @@ class TestConcurrentUserLoad:
 
         # Test with different concurrent user counts
         for user_count in CONCURRENT_USERS:
-            print(f"\nTesting with {user_count} concurrent users...")
+        print(f"\nTesting with {user_count} concurrent users...")
 
             results_dict = {}
             threads = []
@@ -134,8 +131,7 @@ class TestConcurrentUserLoad:
                     if (len(all_response_times) + total_errors) > 0
                     else 0
                 )
-
-                print(
+        print(
                     f"  Users: {user_count}, Avg Response: {avg_response:.3f}s, "
                     f"95th Percentile: {percentile_95:.3f}s, Error Rate: {error_rate:.3%}"
                 )
@@ -153,14 +149,12 @@ class TestConcurrentUserLoad:
                 assert (
                     error_rate < TARGET_ERROR_RATE
                 ), f"Error rate {error_rate:.3%} too high"
-
     def test_memory_usage_under_load(self, test_database, app_config):
         """Test memory usage remains stable under load"""
 
         process = psutil.Process(os.getpid())
         initial_memory = process.memory_info().rss / 1024 / 1024  # MB
-
-        def memory_intensive_search(iterations):
+    def memory_intensive_search(iterations):
             """Perform searches that could cause memory leaks"""
             for i in range(iterations):
                 # Large result set search
@@ -198,7 +192,6 @@ class TestConcurrentUserLoad:
         final_memory = process.memory_info().rss / 1024 / 1024  # MB
         max_memory = max(memory_samples)
         memory_growth = final_memory - initial_memory
-
         print(
             f"Memory - Initial: {initial_memory:.2f}MB, Max: {max_memory:.2f}MB, "
             f"Final: {final_memory:.2f}MB, Growth: {memory_growth:.2f}MB"
@@ -209,18 +202,16 @@ class TestConcurrentUserLoad:
         assert (
             max_memory < initial_memory + 150
         ), f"Peak memory {max_memory:.2f}MB too high"
-
     def test_connection_pool_under_load(self, test_database, app_config):
         """Test database connection pool behavior under load"""
-
-        def stress_connections(user_id, duration_seconds):
+    def stress_connections(user_id, duration_seconds):
             """Stress test database connections"""
             start_time = time.time()
             operations = 0
             errors = 0
 
             while time.time() - start_time < duration_seconds:
-                try:
+    try:
                     # Get connection from pool
                     with test_database.get_connection() as conn:
                         cursor = conn.cursor()
@@ -229,9 +220,9 @@ class TestConcurrentUserLoad:
 
                     operations += 1
 
-                except Exception as e:
+    except Exception as e:
                     errors += 1
-                    print(f"Connection error for user {user_id}: {e}")
+        print(f"Connection error for user {user_id}: {e}")
 
                 # Brief pause
                 time.sleep(0.05)
@@ -255,7 +246,6 @@ class TestConcurrentUserLoad:
             if (total_operations + total_errors) > 0
             else 0
         )
-
         print(
             f"Connection pool test - Operations: {total_operations}, Errors: {total_errors}, "
             f"Error Rate: {error_rate:.3%}"
@@ -272,7 +262,6 @@ class TestConcurrentUserLoad:
 @pytest.mark.slow
 class TestScalabilityLimits:
     """Test application scalability limits and breaking points"""
-
     def test_large_result_set_handling(self, test_database, performance_timer):
         """Test handling of large result sets"""
 
@@ -287,8 +276,7 @@ class TestScalabilityLimits:
             results = test_database.search_properties_by_owner("", limit=size)
 
             elapsed = performance_timer.stop()
-
-            print(f"Result set size {size}: {elapsed:.3f}s")
+        print(f"Result set size {size}: {elapsed:.3f}s")
 
             # Performance should scale reasonably
             max_time = 0.5 + (size * 0.002)  # Base time + linear scale
@@ -296,11 +284,9 @@ class TestScalabilityLimits:
                 elapsed < max_time
             ), f"Large result set ({size}) took {elapsed:.3f}s, max {max_time:.3f}s"
             assert len(results) <= size, f"Should not return more than {size} results"
-
     def test_sustained_load_performance(self, test_database):
         """Test performance under sustained load over time"""
-
-        def sustained_search_load():
+    def sustained_search_load():
             """Generate sustained search load"""
             search_terms = ["SMITH", "JONES", "WILLIAMS", "BROWN", "DAVIS"]
             response_times = []
@@ -312,13 +298,13 @@ class TestScalabilityLimits:
 
                 search_start = time.perf_counter()
 
-                try:
+    try:
                     results = test_database.search_properties_by_owner(term, limit=20)
                     search_time = time.perf_counter() - search_start
                     response_times.append(search_time)
 
-                except Exception as e:
-                    print(f"Search error: {e}")
+    except Exception as e:
+        print(f"Search error: {e}")
 
                 time.sleep(0.1)  # 10 searches per second per user
 
@@ -343,8 +329,7 @@ class TestScalabilityLimits:
             overall_95th = sorted(all_response_times)[
                 int(len(all_response_times) * 0.95)
             ]
-
-            print(
+        print(
                 f"Sustained load - Early avg: {early_avg:.3f}s, Late avg: {late_avg:.3f}s, "
                 f"Overall avg: {overall_avg:.3f}s, 95th: {overall_95th:.3f}s"
             )
@@ -358,13 +343,11 @@ class TestScalabilityLimits:
             assert (
                 overall_95th < TARGET_RESPONSE_TIME_95TH
             ), f"95th percentile {overall_95th:.3f}s exceeds target"
-
     def test_resource_exhaustion_handling(self, test_database, app_config):
         """Test behavior when system resources are exhausted"""
-
-        def resource_intensive_operation(operation_id):
+    def resource_intensive_operation(operation_id):
             """Simulate resource-intensive operations"""
-            try:
+    try:
                 # Memory-intensive operation
                 large_data = []
                 for i in range(1000):
@@ -386,7 +369,7 @@ class TestScalabilityLimits:
 
                 return len(processed)
 
-            except Exception as e:
+    except Exception as e:
                 return f"Error: {e}"
 
         # Simulate resource exhaustion
@@ -400,19 +383,18 @@ class TestScalabilityLimits:
             errors = 0
 
             for future in concurrent.futures.as_completed(futures):
-                try:
+    try:
                     result = future.result(timeout=10)
                     if isinstance(result, str) and result.startswith("Error"):
                         errors += 1
                     else:
                         results.append(result)
-                except Exception as e:
+    except Exception as e:
                     errors += 1
 
         success_rate = (
             len(results) / (len(results) + errors) if (len(results) + errors) > 0 else 0
         )
-
         print(
             f"Resource exhaustion test - Successes: {len(results)}, Errors: {errors}, "
             f"Success rate: {success_rate:.3%}"
@@ -422,10 +404,9 @@ class TestScalabilityLimits:
         assert (
             success_rate > 0.7
         ), f"Success rate {success_rate:.3%} too low under resource pressure"
-
     def _ensure_large_dataset(self, db_manager, min_count):
         """Ensure database has large dataset for testing"""
-        try:
+    try:
             with db_manager.get_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute("SELECT COUNT(*) FROM properties")
@@ -463,18 +444,17 @@ class TestScalabilityLimits:
                             conn.commit()
 
                     conn.commit()
-                    print(
+        print(
                         f"Added {min_count - current_count} test properties for load testing"
                     )
 
-        except Exception as e:
-            print(f"Error creating large dataset: {e}")
+    except Exception as e:
+        print(f"Error creating large dataset: {e}")
 
 
 @pytest.mark.performance
 class TestPerformanceDegradation:
     """Test performance degradation patterns"""
-
     def test_cache_effectiveness_under_load(self, app_config):
         """Test that caching remains effective under load"""
         from search_cache import SearchCache
@@ -490,8 +470,7 @@ class TestPerformanceDegradation:
 
         for search_term, results in common_searches:
             cache.put(f"owner_{search_term}", results)
-
-        def concurrent_cache_access(user_id, access_count):
+    def concurrent_cache_access(user_id, access_count):
             """Simulate concurrent cache access"""
             cache_hits = 0
             cache_misses = 0
@@ -526,7 +505,6 @@ class TestPerformanceDegradation:
             if (total_hits + total_misses) > 0
             else 0
         )
-
         print(
             f"Cache performance - Hits: {total_hits}, Misses: {total_misses}, "
             f"Hit rate: {hit_rate:.3%}"

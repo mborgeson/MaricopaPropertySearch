@@ -1,8 +1,7 @@
 #!/usr/bin/env python
 """Quick test to verify RUN_APPLICATION.py works"""
-
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
 project_root = Path(__file__).parent.parent
@@ -26,7 +25,6 @@ except subprocess.TimeoutExpired as e:
         print("Output:", str(e.stdout)[:500])
         sys.exit(1)
 except Exception as e:
-    print(f"[ERROR] {e}")
+        print(f"[ERROR] {e}")
     sys.exit(1)
-
-print("[OK] Test complete")
+        print("[OK] Test complete")

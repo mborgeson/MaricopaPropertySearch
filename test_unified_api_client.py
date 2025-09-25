@@ -3,38 +3,38 @@
 Comprehensive Test Suite for Unified API Client
 Tests all consolidated features from the 8 merged API client variants
 """
-
-import sys
-import os
-import time
-import threading
 import asyncio
-from concurrent.futures import ThreadPoolExecutor
+import os
+import sys
+import threading
+import time
 import unittest
-from unittest.mock import Mock, patch, MagicMock
+from concurrent.futures import ThreadPoolExecutor
+from unittest.mock import MagicMock, Mock, patch
 
 # Add src directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
 try:
-    from api_client_unified import UnifiedMaricopaAPIClient, BatchAPIRequest, AdaptiveRateLimiter
-    print("✅ Successfully imported UnifiedMaricopaAPIClient")
+    from api_client_unified import (
+        AdaptiveRateLimiter,
+        BatchAPIRequest,
+        UnifiedMaricopaAPIClient,
+    )
+        print("✅ Successfully imported UnifiedMaricopaAPIClient")
 except ImportError as e:
-    print(f"❌ Import error: {e}")
+        print(f"❌ Import error: {e}")
     sys.exit(1)
 
 class TestUnifiedAPIClient(unittest.TestCase):
     """Test suite for unified API client functionality"""
-
     def setUp(self):
         """Set up test fixtures"""
         self.client = UnifiedMaricopaAPIClient()
-
     def tearDown(self):
         """Clean up after tests"""
         if hasattr(self.client, 'cleanup'):
             self.client.cleanup()
-
     def test_client_initialization(self):
         """Test that client initializes with all required components"""
         print("\n🔍 Testing client initialization...")
@@ -48,10 +48,8 @@ class TestUnifiedAPIClient(unittest.TestCase):
         # Check configuration
         self.assertEqual(self.client.base_url, "https://mcassessor.maricopa.gov/api")
         self.assertIn("ca1a11a6", self.client.token)
-
         print("✅ Client initialization test passed")
-
-    def test_cache_functionality(self):
+def test_cache_functionality(self):
         """Test caching system with TTL"""
         print("\n🔍 Testing cache functionality...")
 
@@ -75,10 +73,8 @@ class TestUnifiedAPIClient(unittest.TestCase):
         time.sleep(1.1)
         expired = self.client._get_cached_data(key1)
         self.assertIsNone(expired)
-
         print("✅ Cache functionality test passed")
-
-    def test_rate_limiter(self):
+def test_rate_limiter(self):
         """Test adaptive rate limiting"""
         print("\n🔍 Testing rate limiter...")
 
@@ -96,10 +92,8 @@ class TestUnifiedAPIClient(unittest.TestCase):
         # Test rate limiting after burst
         acquired = rate_limiter.acquire(timeout=0.1)
         self.assertFalse(acquired, "Should not acquire token after burst exhausted")
-
         print("✅ Rate limiter test passed")
-
-    def test_batch_request_structure(self):
+def test_batch_request_structure(self):
         """Test batch request data structure"""
         print("\n🔍 Testing batch request structure...")
 
@@ -126,11 +120,10 @@ class TestUnifiedAPIClient(unittest.TestCase):
 
         self.assertEqual(request, request2)  # Same type and identifier
         self.assertEqual(hash(request), hash(request2))
-
         print("✅ Batch request structure test passed")
 
     @patch('requests.Session.get')
-    def test_synchronous_api_call(self, mock_get):
+def test_synchronous_api_call(self, mock_get):
         """Test synchronous API calls with mocked responses"""
         print("\n🔍 Testing synchronous API calls...")
 
@@ -153,17 +146,14 @@ class TestUnifiedAPIClient(unittest.TestCase):
 
         # Verify rate limiting was applied
         mock_get.assert_called_once()
-
         print("✅ Synchronous API call test passed")
-
-    def test_thread_safety(self):
+def test_thread_safety(self):
         """Test thread safety of the unified client"""
         print("\n🔍 Testing thread safety...")
 
         results = []
         errors = []
-
-        def worker_thread(thread_id):
+def worker_thread(thread_id):
             try:
                 # Simulate concurrent API calls
                 with patch('requests.Session.get') as mock_get:
@@ -196,10 +186,8 @@ class TestUnifiedAPIClient(unittest.TestCase):
         # Verify results
         self.assertEqual(len(errors), 0, f"Thread safety errors: {errors}")
         self.assertEqual(len(results), 5, "Not all threads completed successfully")
-
         print("✅ Thread safety test passed")
-
-    def test_performance_metrics(self):
+def test_performance_metrics(self):
         """Test performance tracking functionality"""
         print("\n🔍 Testing performance metrics...")
 
@@ -217,12 +205,10 @@ class TestUnifiedAPIClient(unittest.TestCase):
         for key, value in stats.items():
             if isinstance(value, (int, float)):
                 self.assertGreaterEqual(value, 0, f"Metric {key} should be non-negative")
-
         print("✅ Performance metrics test passed")
-
 def run_integration_tests():
     """Run integration tests that require the full environment"""
-    print("\n🔧 Running integration tests...")
+        print("\n🔧 Running integration tests...")
 
     try:
         client = UnifiedMaricopaAPIClient()
@@ -240,27 +226,26 @@ def run_integration_tests():
 
         for method in required_methods:
             if hasattr(client, method):
-                print(f"✅ Method {method} exists")
+        print(f"✅ Method {method} exists")
             else:
-                print(f"❌ Method {method} missing")
+        print(f"❌ Method {method} missing")
                 return False
 
         # Test configuration
         if hasattr(client, 'token') and client.token and "ca1a11a6" in client.token:
-            print("✅ API token configured correctly")
+        print("✅ API token configured correctly")
         else:
-            print("❌ API token not configured")
+        print("❌ API token not configured")
 
         return True
 
     except Exception as e:
         print(f"❌ Integration test failed: {e}")
         return False
-
 def main():
     """Main test runner"""
-    print("🚀 Starting Unified API Client Test Suite")
-    print("=" * 60)
+        print("🚀 Starting Unified API Client Test Suite")
+        print("=" * 60)
 
     # Run integration tests first
     integration_success = run_integration_tests()
@@ -270,7 +255,7 @@ def main():
         return 1
 
     # Run unit tests
-    print("\n🧪 Running unit tests...")
+        print("\n🧪 Running unit tests...")
 
     # Create test suite
     loader = unittest.TestLoader()
@@ -281,9 +266,9 @@ def main():
     result = runner.run(suite)
 
     # Summary
-    print("\n" + "=" * 60)
-    print("📊 TEST SUMMARY")
-    print("=" * 60)
+        print("\n" + "=" * 60)
+        print("📊 TEST SUMMARY")
+        print("=" * 60)
 
     if result.wasSuccessful():
         print("✅ ALL TESTS PASSED")
@@ -299,14 +284,14 @@ def main():
         print(f"   Errors: {len(result.errors)}")
 
         if result.failures:
-            print("\n📝 FAILURES:")
+        print("\n📝 FAILURES:")
             for test, traceback in result.failures:
-                print(f"   {test}: {traceback}")
+        print(f"   {test}: {traceback}")
 
         if result.errors:
-            print("\n🔥 ERRORS:")
+        print("\n🔥 ERRORS:")
             for test, traceback in result.errors:
-                print(f"   {test}: {traceback}")
+        print(f"   {test}: {traceback}")
 
         return 1
 

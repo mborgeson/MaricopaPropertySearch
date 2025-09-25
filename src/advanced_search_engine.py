@@ -3,23 +3,22 @@ Advanced Search Engine with Fuzzy Matching and Geographic Filtering
 Phase 6 Advanced Features - Sophisticated search capabilities beyond basic API queries
 Provides fuzzy string matching, geographic radius search, and multi-criteria filtering
 """
-
-import re
-import math
+import json
 import logging
+import math
+import re
 import time
-from typing import Dict, List, Optional, Any, Tuple, Union, Set
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from threading import Lock
 from enum import Enum
 from pathlib import Path
-import json
+from threading import Lock
+from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
 # For fuzzy string matching
 try:
+import unicodedata
     from difflib import SequenceMatcher
-    import unicodedata
 
     FUZZY_SEARCH_AVAILABLE = True
 except ImportError:
@@ -27,7 +26,7 @@ except ImportError:
 
 # For geographic calculations
 try:
-    import geopy
+import geopy
     from geopy.distance import geodesic
     from geopy.geocoders import Nominatim
 
@@ -68,7 +67,6 @@ class GeographicPoint:
     latitude: float
     longitude: float
     address: Optional[str] = None
-
     def distance_to(self, other: "GeographicPoint") -> float:
         """Calculate distance in miles to another point"""
         if not GEOPY_AVAILABLE:
@@ -78,7 +76,6 @@ class GeographicPoint:
         return geodesic(
             (self.latitude, self.longitude), (other.latitude, other.longitude)
         ).miles
-
     def _haversine_distance(self, other: "GeographicPoint") -> float:
         """Haversine formula for calculating distance between coordinates"""
         R = 3959  # Earth's radius in miles
@@ -147,36 +144,31 @@ class SearchResult:
     distance_miles: Optional[float] = None
     matched_fields: List[str] = field(default_factory=list)
     search_source: str = "unknown"
-
     def get_display_address(self) -> str:
         """Get formatted address for display"""
         return self.property_data.get("address", "Address not available")
-
     def get_apn(self) -> str:
         """Get APN for this property"""
         return self.property_data.get("apn", "")
-
     def get_assessed_value(self) -> float:
         """Get assessed value as float"""
         value_str = self.property_data.get("assessed_value", "0")
         if isinstance(value_str, str):
             # Remove currency symbols and commas
             value_str = re.sub(r"[$,]", "", value_str)
-            try:
+    try:
                 return float(value_str)
-            except ValueError:
+    except ValueError:
                 return 0.0
         return float(value_str) if value_str else 0.0
 
 
 class FuzzyMatcher:
     """Advanced fuzzy string matching with configurable algorithms"""
-
     def __init__(self, threshold: float = 0.85):
         self.threshold = threshold
         self.cache = {}
         self.cache_lock = Lock()
-
     def calculate_similarity(self, str1: str, str2: str) -> float:
         """Calculate similarity score between two strings"""
         if not str1 or not str2:
@@ -217,7 +209,6 @@ class FuzzyMatcher:
                     del self.cache[key]
 
         return final_score
-
     def _normalize_string(self, text: str) -> str:
         """Normalize string for comparison"""
         if not text:
@@ -235,7 +226,6 @@ class FuzzyMatcher:
         text = re.sub(r"\s+", " ", text).strip()
 
         return text
-
     def find_best_matches(
         self, query: str, candidates: List[str], max_results: int = 10
     ) -> List[Tuple[str, float]]:
@@ -255,7 +245,6 @@ class FuzzyMatcher:
 
 class GeographicCalculator:
     """Geographic calculations and address geocoding"""
-
     def __init__(self):
         self.geocoder = None
 
@@ -265,7 +254,6 @@ class GeographicCalculator:
         # Cache for geocoded addresses
         self.geocode_cache = {}
         self.cache_lock = Lock()
-
     def geocode_address(self, address: str) -> Optional[GeographicPoint]:
         """Convert address to geographic coordinates"""
         if not address:
@@ -280,7 +268,7 @@ class GeographicCalculator:
             logger.warning("Geocoding not available - geopy not installed")
             return None
 
-        try:
+    try:
             # Add "Maricopa County, AZ" if not present
             search_address = address
             if "arizona" not in address.lower() and "az" not in address.lower():
@@ -301,11 +289,10 @@ class GeographicCalculator:
 
                 return point
 
-        except Exception as e:
+    except Exception as e:
             logger.warning(f"Geocoding failed for '{address}': {str(e)}")
 
         return None
-
     def find_properties_in_radius(
         self,
         center: GeographicPoint,
@@ -339,8 +326,7 @@ class AdvancedSearchEngine:
     """
     Advanced search engine with fuzzy matching, geographic filtering, and multi-criteria search
     """
-
-    def __init__(
+def __init__(
         self,
         api_client: Optional[EnhancedMaricopaAPIClient] = None,
         database_manager=None,
@@ -367,7 +353,6 @@ class AdvancedSearchEngine:
         logger.info("Advanced Search Engine initialized")
         logger.info(f"Fuzzy search available: {FUZZY_SEARCH_AVAILABLE}")
         logger.info(f"Geographic search available: {GEOPY_AVAILABLE}")
-
     def search(self, criteria: SearchCriteria) -> List[SearchResult]:
         """
         Execute advanced search with specified criteria
@@ -387,7 +372,7 @@ class AdvancedSearchEngine:
 
         results = []
 
-        try:
+    try:
             if criteria.search_mode == SearchMode.EXACT_MATCH:
                 results = self._exact_search(criteria)
 
@@ -434,12 +419,11 @@ class AdvancedSearchEngine:
                 f"Search completed: {result_count} results in {search_time:.2f}s"
             )
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Advanced search failed: {str(e)}")
             raise
 
         return results
-
     def _exact_search(self, criteria: SearchCriteria) -> List[SearchResult]:
         """Perform exact match search"""
         results = []
@@ -452,7 +436,7 @@ class AdvancedSearchEngine:
         ]
 
         for search_type, search_method in search_methods:
-            try:
+    try:
                 api_result = search_method(
                     identifier=criteria.query,
                     search_type=search_type,
@@ -469,12 +453,11 @@ class AdvancedSearchEngine:
                     results.append(search_result)
                     break  # Found exact match
 
-            except Exception as e:
+    except Exception as e:
                 logger.warning(f"Exact search failed for {search_type}: {str(e)}")
                 continue
 
         return results
-
     def _fuzzy_search(self, criteria: SearchCriteria) -> List[SearchResult]:
         """Perform fuzzy string matching search"""
         results = []
@@ -511,7 +494,6 @@ class AdvancedSearchEngine:
                 results.append(search_result)
 
         return results
-
     def _geographic_search(self, criteria: SearchCriteria) -> List[SearchResult]:
         """Perform geographic radius search"""
         results = []
@@ -543,7 +525,6 @@ class AdvancedSearchEngine:
             results.append(search_result)
 
         return results
-
     def _multi_criteria_search(self, criteria: SearchCriteria) -> List[SearchResult]:
         """Perform multi-criteria filtered search"""
         results = []
@@ -568,7 +549,6 @@ class AdvancedSearchEngine:
                 results.append(search_result)
 
         return results
-
     def _boolean_search(self, criteria: SearchCriteria) -> List[SearchResult]:
         """Perform boolean query search"""
         # This is a simplified boolean search - could be expanded with proper query parsing
@@ -593,23 +573,22 @@ class AdvancedSearchEngine:
                 results.append(search_result)
 
         return results
-
     def _get_search_candidates(self, criteria: SearchCriteria) -> List[Dict[str, Any]]:
         """Get candidate properties for search operations"""
         candidates = []
 
         # If we have a database manager, query it for candidates
         if self.database_manager:
-            try:
+    try:
                 # This would be implemented based on the database schema
                 # For now, return empty list
                 logger.info("Database search candidates not implemented")
-            except Exception as e:
+    except Exception as e:
                 logger.warning(f"Database candidate search failed: {str(e)}")
 
         # If query is specific enough, try API search
         if criteria.query and len(criteria.query) > 3:
-            try:
+    try:
                 # Try different search approaches
                 search_types = ["apn", "address", "owner"]
 
@@ -623,11 +602,10 @@ class AdvancedSearchEngine:
                     if api_result.success and api_result.data:
                         candidates.append(api_result.data)
 
-            except Exception as e:
+    except Exception as e:
                 logger.warning(f"API candidate search failed: {str(e)}")
 
         return candidates
-
     def _matches_criteria(
         self, property_data: Dict[str, Any], criteria: SearchCriteria
     ) -> bool:
@@ -678,7 +656,6 @@ class AdvancedSearchEngine:
                 return False
 
         return True
-
     def _calculate_multi_criteria_relevance(
         self, property_data: Dict[str, Any], criteria: SearchCriteria
     ) -> float:
@@ -714,7 +691,6 @@ class AdvancedSearchEngine:
         # This would require date parsing from the property data
 
         return score / factors if factors > 0 else 0.0
-
     def _parse_boolean_query(self, query: str) -> List[Dict[str, Any]]:
         """Parse boolean query into searchable components"""
         # Simplified boolean parsing - could be enhanced with proper parser
@@ -732,7 +708,6 @@ class AdvancedSearchEngine:
                 query_parts.append({"term": term, "operator": current_op})
 
         return query_parts
-
     def _evaluate_boolean_query(
         self, property_data: Dict[str, Any], query_parts: List[Dict[str, Any]]
     ) -> bool:
@@ -762,7 +737,6 @@ class AdvancedSearchEngine:
                 result = result and not term_match
 
         return result
-
     def _apply_filters(
         self, results: List[SearchResult], criteria: SearchCriteria
     ) -> List[SearchResult]:
@@ -786,7 +760,6 @@ class AdvancedSearchEngine:
             filtered_results.append(result)
 
         return filtered_results
-
     def _sort_results(
         self, results: List[SearchResult], sort_by: SortOrder
     ) -> List[SearchResult]:
@@ -816,7 +789,6 @@ class AdvancedSearchEngine:
             pass
 
         return results
-
     def _extract_numeric_value(self, value: Union[str, int, float]) -> float:
         """Extract numeric value from string"""
         if isinstance(value, (int, float)):
@@ -828,11 +800,10 @@ class AdvancedSearchEngine:
         # Remove currency symbols, commas, and other non-numeric characters
         numeric_str = re.sub(r"[^\d.]", "", str(value))
 
-        try:
+    try:
             return float(numeric_str) if numeric_str else 0.0
-        except ValueError:
+    except ValueError:
             return 0.0
-
     def _extract_year(self, value: Union[str, int]) -> int:
         """Extract year from string or return as int"""
         if isinstance(value, int):
@@ -847,7 +818,6 @@ class AdvancedSearchEngine:
             return int(year_match.group())
 
         return 0
-
     def export_results(
         self, results: List[SearchResult], format: str = "json", filename: str = None
     ) -> str:
@@ -876,7 +846,7 @@ class AdvancedSearchEngine:
                 json.dump(export_data, f, indent=2, default=str)
 
         elif format.lower() == "csv":
-            import csv
+import csv
 
             with open(filepath, "w", newline="") as f:
                 if results:
@@ -902,7 +872,6 @@ class AdvancedSearchEngine:
 
         logger.info(f"Exported {len(results)} results to {filepath}")
         return str(filepath)
-
     def get_search_statistics(self) -> Dict[str, Any]:
         """Get search engine statistics"""
         return {
@@ -917,7 +886,7 @@ class AdvancedSearchEngine:
 
 
 # Convenience functions for common search operations
-def fuzzy_property_search(
+    def fuzzy_property_search(
     query: str, threshold: float = 0.85, max_results: int = 10
 ) -> List[SearchResult]:
     """Convenience function for fuzzy property search"""
@@ -931,9 +900,7 @@ def fuzzy_property_search(
     )
 
     return engine.search(criteria)
-
-
-def geographic_property_search(
+    def geographic_property_search(
     address: str, radius_miles: float = 1.0, max_results: int = 20
 ) -> List[SearchResult]:
     """Convenience function for geographic property search"""

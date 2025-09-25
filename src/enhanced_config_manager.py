@@ -3,12 +3,11 @@
 Enhanced Configuration Manager
 Extended configuration for background data collection system
 """
-
 import json
 import logging
-from pathlib import Path
-from typing import Dict, Any, Optional
 import os
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 from config_manager import ConfigManager
 
@@ -17,13 +16,11 @@ logger = logging.getLogger(__name__)
 
 class EnhancedConfigManager(ConfigManager):
     """Enhanced configuration manager with background collection settings"""
-
     def __init__(self, config_file: Optional[str] = None):
         super().__init__()
 
         # Add default background collection settings
         self._add_background_collection_defaults()
-
     def _add_background_collection_defaults(self):
         """Add default configuration for background data collection"""
 
@@ -74,23 +71,18 @@ class EnhancedConfigManager(ConfigManager):
 
         if "ui_updates" not in self.config:
             self.config["ui_updates"] = ui_defaults
-
     def get_background_collection_config(self) -> Dict[str, Any]:
         """Get background collection configuration"""
         return self.config.get("background_collection", {})
-
     def get_database_pool_config(self) -> Dict[str, Any]:
         """Get database connection pool configuration"""
         return self.config.get("database_pool", {})
-
     def get_performance_config(self) -> Dict[str, Any]:
         """Get performance monitoring configuration"""
         return self.config.get("performance", {})
-
     def get_ui_config(self) -> Dict[str, Any]:
         """Get UI update configuration"""
         return self.config.get("ui_updates", {})
-
     def set_background_collection_setting(self, key: str, value: Any):
         """Set a specific background collection setting"""
         if "background_collection" not in self.config:
@@ -99,7 +91,6 @@ class EnhancedConfigManager(ConfigManager):
         self.config["background_collection"][key] = value
         self.save_config()
         logger.info(f"Updated background collection setting {key} = {value}")
-
     def enable_high_performance_mode(self):
         """Enable high performance mode for background collection"""
         logger.info("Enabling high performance mode")
@@ -119,7 +110,6 @@ class EnhancedConfigManager(ConfigManager):
         self.config["performance"]["log_slow_operations"] = True
 
         self.save_config()
-
     def enable_conservative_mode(self):
         """Enable conservative mode for limited resources"""
         logger.info("Enabling conservative mode")
@@ -138,10 +128,9 @@ class EnhancedConfigManager(ConfigManager):
         self.config["performance"]["log_slow_operations"] = False
 
         self.save_config()
-
     def get_optimized_config_for_system(self) -> Dict[str, Any]:
         """Get configuration optimized for the current system"""
-        import psutil
+import psutil
 
         # Get system information
         cpu_count = psutil.cpu_count()
@@ -174,7 +163,6 @@ class EnhancedConfigManager(ConfigManager):
         )
 
         return optimized_config
-
     def create_example_config(self, output_path: Optional[str] = None) -> str:
         """Create an example configuration file with all enhanced settings"""
 
@@ -242,7 +230,7 @@ class EnhancedConfigManager(ConfigManager):
 
         output_file = Path(output_path)
 
-        try:
+    try:
             with open(output_file, "w", encoding="utf-8") as f:
                 json.dump(example_config, f, indent=4, ensure_ascii=False)
 
@@ -251,10 +239,9 @@ class EnhancedConfigManager(ConfigManager):
             )
             return str(output_file.absolute())
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error creating example config: {e}")
             raise
-
     def validate_enhanced_config(self) -> Dict[str, Any]:
         """Validate the enhanced configuration and return validation results"""
 
@@ -307,8 +294,8 @@ class EnhancedConfigManager(ConfigManager):
             validation_results["valid"] = False
 
         # System-based recommendations
-        try:
-            import psutil
+    try:
+import psutil
 
             cpu_count = psutil.cpu_count()
 
@@ -323,7 +310,7 @@ class EnhancedConfigManager(ConfigManager):
                     f"Database connection pool may use significant memory (system has {memory_gb:.1f}GB)"
                 )
 
-        except ImportError:
+    except ImportError:
             validation_results["warnings"].append(
                 "psutil not available for system resource validation"
             )
@@ -343,9 +330,7 @@ class EnhancedConfigManager(ConfigManager):
             logger.info(f"Config recommendation: {rec}")
 
         return validation_results
-
-
-def main():
+    def main():
     """Example usage of enhanced configuration manager"""
     logging.basicConfig(level=logging.INFO)
 
@@ -357,20 +342,19 @@ def main():
     if not validation["valid"]:
         print("Configuration validation failed!")
         for error in validation["errors"]:
-            print(f"ERROR: {error}")
+        print(f"ERROR: {error}")
         return 1
 
     # Create example config
     example_path = config_manager.create_example_config()
-    print(f"Example configuration created: {example_path}")
+        print(f"Example configuration created: {example_path}")
 
     # Show current settings
-    print("\nCurrent Background Collection Settings:")
+        print("\nCurrent Background Collection Settings:")
     bg_config = config_manager.get_background_collection_config()
     for key, value in bg_config.items():
         print(f"  {key}: {value}")
-
-    print("\nCurrent Database Pool Settings:")
+        print("\nCurrent Database Pool Settings:")
     pool_config = config_manager.get_database_pool_config()
     for key, value in pool_config.items():
         print(f"  {key}: {value}")

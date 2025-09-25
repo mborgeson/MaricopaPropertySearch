@@ -3,8 +3,9 @@
 Test the complete fix for both database and data collection issues
 """
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
 # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
@@ -12,6 +13,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from improved_automatic_data_collector import ImprovedMaricopaDataCollector
 from logging_config import setup_logging
+
 
 def test_complete_fix():
     """Test both the database fix and improved data collector"""
@@ -119,11 +121,14 @@ def test_complete_fix():
     except Exception as e:
         print(f"\n[ERROR] Complete fix test failed: {e}")
         import traceback
+
 from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.enhanced_config_manager import EnhancedConfigManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
         traceback.print_exc()
-        return False
+
+    return False
 
 if __name__ == "__main__":
     success = test_complete_fix()

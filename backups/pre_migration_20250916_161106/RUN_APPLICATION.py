@@ -10,15 +10,15 @@ This launcher automatically detects the environment and adapts accordingly:
 Consolidates RUN_APPLICATION.py and RUN_APPLICATION_FIXED.py into one smart launcher.
 """
 
-import sys
-import os
-import subprocess
-import platform
-from pathlib import Path
 import logging
+import os
+import platform
+import subprocess
+import sys
+import tempfile
 import traceback
 from datetime import datetime
-import tempfile
+from pathlib import Path
 
 # Add src directory to path
 src_dir = Path(__file__).parent / "src"
@@ -75,7 +75,7 @@ class PlatformDetector:
                 content = proc_version.read_text().lower()
                 return 'microsoft' in content or 'wsl' in content
         except:
-            pass
+        pass
         return False
 
     def _check_uname(self) -> bool:
@@ -84,7 +84,7 @@ class PlatformDetector:
             if hasattr(os, 'uname'):
                 return 'microsoft' in os.uname().release.lower()
         except:
-            pass
+        pass
         return False
 
     def _detect_display(self) -> bool:
@@ -105,12 +105,15 @@ class PlatformDetector:
         try:
             # Try to create a simple Qt application to test display
             import tempfile
+
             test_script = '''
 import sys
 import os
+
 os.environ["QT_QPA_PLATFORM"] = os.environ.get("QT_QPA_PLATFORM", "xcb")
 try:
     from PyQt5.QtWidgets import QApplication
+
     app = QApplication([])
     app.quit()
     print("DISPLAY_OK")
@@ -129,9 +132,9 @@ except Exception as e:
                 try:
                     os.unlink(temp_file)
                 except:
-                    pass
+        pass
         except:
-            pass
+        pass
         return False
 
     def _can_use_gui(self) -> bool:
@@ -288,6 +291,7 @@ class SmartLogger:
         """Try to setup advanced logging with the app's logging config"""
         try:
             from src.logging_config import setup_logging
+
             setup_logging()
 
             # Create user action log directory
@@ -296,7 +300,7 @@ class SmartLogger:
 
             return True
         except:
-            return False
+        return False
 
     def _setup_basic_logging(self) -> bool:
         """Setup basic logging as fallback"""
@@ -311,7 +315,7 @@ class SmartLogger:
             )
             return True
         except:
-            return False
+        return False
 
 class DatabaseChecker:
     """Smart database connection checking"""
@@ -350,7 +354,7 @@ class DatabaseChecker:
                 db.close()
                 return True
         except:
-            pass
+        pass
         return False
 
     def _test_basic_db(self) -> bool:
@@ -367,7 +371,7 @@ class DatabaseChecker:
                     db.close()
                 return True
         except:
-            pass
+        pass
         return False
 
 class ApplicationLauncher:
@@ -410,9 +414,9 @@ class ApplicationLauncher:
 
     def _create_qt_application(self):
         """Create QApplication with proper setup"""
-        from PyQt5.QtWidgets import QApplication
         from PyQt5.QtCore import Qt
-        from PyQt5.QtGui import QPalette, QColor
+        from PyQt5.QtGui import QColor, QPalette
+        from PyQt5.QtWidgets import QApplication
 
         # Handle the case where QApplication already exists
         app = QApplication.instance()
@@ -461,6 +465,7 @@ class ApplicationLauncher:
         try:
             # Try to import a basic version
             from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+
             main_window = EnhancedPropertySearchApp()
         except:
             # Create a very basic window
@@ -476,8 +481,15 @@ class ApplicationLauncher:
 
     def _create_basic_window(self):
         """Create a basic functional window"""
-        from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout,
-                                    QLabel, QPushButton, QLineEdit, QTextEdit)
+        from PyQt5.QtWidgets import (
+            QLabel,
+            QLineEdit,
+            QMainWindow,
+            QPushButton,
+            QTextEdit,
+            QVBoxLayout,
+            QWidget,
+        )
 
         class BasicPropertySearch(QMainWindow):
             def __init__(self):
@@ -517,7 +529,13 @@ class ApplicationLauncher:
 
     def _create_minimal_window(self):
         """Create minimal window for testing"""
-        from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel, QPushButton
+        from PyQt5.QtWidgets import (
+            QLabel,
+            QMainWindow,
+            QPushButton,
+            QVBoxLayout,
+            QWidget,
+        )
 
         class MinimalWindow(QMainWindow):
             def __init__(self):
@@ -579,6 +597,7 @@ class ApplicationLauncher:
         """Show welcome message for enhanced mode"""
         try:
             from PyQt5.QtWidgets import QMessageBox
+
             QMessageBox.information(
                 parent,
                 "Welcome to Maricopa Property Search",
@@ -591,7 +610,7 @@ class ApplicationLauncher:
                 "<i>All actions are logged for debugging purposes</i>"
             )
         except:
-            print("[INFO] Welcome message could not be displayed")
+        print("[INFO] Welcome message could not be displayed")
 
     def _launch_console_mode(self) -> int:
         """Launch in console mode for headless environments"""

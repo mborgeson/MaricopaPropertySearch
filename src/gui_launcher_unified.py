@@ -21,16 +21,15 @@ Features:
 - Testing mode support for headless environments
 - Comprehensive error handling and recovery
 """
-
-import sys
-import os
-import subprocess
-import platform
-from pathlib import Path
 import logging
+import os
+import platform
+import subprocess
+import sys
+import tempfile
 import traceback
 from datetime import datetime
-import tempfile
+from pathlib import Path
 
 # Add src directory to path
 src_dir = Path(__file__).parent.parent / "src"
@@ -49,7 +48,6 @@ HEADER = """
 
 class PlatformDetector:
     """Intelligent platform detection and environment setup"""
-
     def __init__(self):
         self.is_windows = platform.system() == "Windows"
         self.is_linux = platform.system() == "Linux"
@@ -57,7 +55,6 @@ class PlatformDetector:
         self.has_display = self._detect_display()
         self.can_use_gui = self._can_use_gui()
         self.qt_platform = self._determine_qt_platform()
-
     def _detect_wsl(self) -> bool:
         """Detect if we're running in WSL"""
         if not self.is_linux:
@@ -81,7 +78,6 @@ class PlatformDetector:
         ]
 
         return any(wsl_indicators)
-
     def _check_proc_version(self) -> bool:
         """Check /proc/version for WSL"""
         try:
@@ -92,7 +88,6 @@ class PlatformDetector:
         except:
             pass
         return False
-
     def _check_uname(self) -> bool:
         """Check uname for WSL"""
         try:
@@ -101,7 +96,6 @@ class PlatformDetector:
         except:
             pass
         return False
-
     def _detect_display(self) -> bool:
         """Detect if display is available"""
         if self.is_windows:
@@ -119,7 +113,6 @@ class PlatformDetector:
 
         # Test if display is actually working
         return self._test_display_connection()
-
     def _test_display_connection(self) -> bool:
         """Test if we can actually connect to the display"""
         try:
@@ -127,14 +120,16 @@ class PlatformDetector:
             test_script = """
 import sys
 import os
+
 os.environ["QT_QPA_PLATFORM"] = os.environ.get("QT_QPA_PLATFORM", "xcb")
 try:
     from PyQt5.QtWidgets import QApplication
+
     app = QApplication([])
     app.quit()
-    print("DISPLAY_OK")
+        print("DISPLAY_OK")
 except Exception as e:
-    print(f"DISPLAY_ERROR: {e}")
+        print(f"DISPLAY_ERROR: {e}")
 """
             with tempfile.NamedTemporaryFile(mode="w", suffix=".py", delete=False) as f:
                 f.write(test_script)
@@ -152,11 +147,10 @@ except Exception as e:
                 try:
                     os.unlink(temp_file)
                 except:
-                    pass
+            pass
         except:
             pass
         return False
-
     def _can_use_gui(self) -> bool:
         """Determine if GUI can be used"""
         if self.is_windows:
@@ -168,7 +162,6 @@ except Exception as e:
 
         # Regular Linux
         return self.has_display
-
     def _determine_qt_platform(self) -> str:
         """Determine the best Qt platform to use"""
         if self.is_windows:
@@ -185,8 +178,7 @@ except Exception as e:
                 return "offscreen"
         else:
             return "offscreen"  # Headless mode
-
-    def setup_environment(self):
+def setup_environment(self):
         """Setup environment variables for Qt"""
         # Set Qt platform
         if not os.environ.get("QT_QPA_PLATFORM"):
@@ -200,7 +192,6 @@ except Exception as e:
         elif self.qt_platform == "xcb":
             # Ensure we try xcb first, fallback to offscreen
             os.environ["QT_QPA_PLATFORM"] = "xcb"
-
         print(f"[ENV] Platform: {platform.system()}")
         print(f"[ENV] WSL detected: {self.is_wsl}")
         print(f"[ENV] Display available: {self.has_display}")
@@ -212,10 +203,8 @@ except Exception as e:
 
 class DependencyManager:
     """Smart dependency checking and handling"""
-
     def __init__(self, platform_detector):
         self.platform = platform_detector
-
     def check_dependencies(self) -> tuple[bool, list, list]:
         """Check dependencies and return status, missing, and optional"""
         print("[CHECK] Checking dependencies...")
@@ -244,9 +233,9 @@ class DependencyManager:
         for package, pip_name in essential_packages.items():
             try:
                 __import__(package)
-                print(f"  [OK] {package} installed")
+        print(f"  [OK] {package} installed")
             except ImportError:
-                print(f"  [X] {package} missing (ESSENTIAL)")
+        print(f"  [X] {package} missing (ESSENTIAL)")
                 missing_essential.append(pip_name)
 
         # Check important packages
@@ -254,46 +243,44 @@ class DependencyManager:
             try:
                 module_name = package if package != "beautifulsoup4" else "bs4"
                 __import__(module_name)
-                print(f"  [OK] {package} installed")
+        print(f"  [OK] {package} installed")
             except ImportError:
-                print(f"  [!] {package} missing (important for full functionality)")
+        print(f"  [!] {package} missing (important for full functionality)")
                 missing_important.append(pip_name)
 
         # Check optional packages
         for package, pip_name in optional_packages.items():
             try:
                 __import__(package)
-                print(f"  [OK] {package} installed (optional)")
+        print(f"  [OK] {package} installed (optional)")
             except ImportError:
-                print(f"  [INFO] {package} not installed (optional)")
+        print(f"  [INFO] {package} not installed (optional)")
                 missing_optional.append(pip_name)
 
         # Can proceed if essential packages are available
         can_proceed = len(missing_essential) == 0
 
         if missing_essential:
-            print(
+        print(
                 f"\n[ERROR] Missing essential dependencies: {', '.join(missing_essential)}"
             )
-            print("Install with:")
-            print(f"  pip install {' '.join(missing_essential)}")
+        print("Install with:")
+        print(f"  pip install {' '.join(missing_essential)}")
 
         if missing_important:
-            print(
+        print(
                 f"\n[WARNING] Missing important dependencies: {', '.join(missing_important)}"
             )
-            print("For full functionality, install with:")
-            print(f"  pip install {' '.join(missing_important)}")
+        print("For full functionality, install with:")
+        print(f"  pip install {' '.join(missing_important)}")
 
         return can_proceed, missing_essential, missing_important + missing_optional
 
 
 class SmartLogger:
     """Intelligent logging setup"""
-
     def __init__(self):
         self.log_dir = project_root / "logs"
-
     def setup_logging(self) -> bool:
         """Setup logging with fallback options"""
         print("\n[LOG] Setting up logging...")
@@ -304,20 +291,18 @@ class SmartLogger:
 
             # Try advanced logging first
             if self._setup_advanced_logging():
-                print("  [OK] Advanced logging initialized")
+        print("  [OK] Advanced logging initialized")
                 return True
 
             # Fallback to basic logging
             if self._setup_basic_logging():
-                print("  [OK] Basic logging initialized")
+        print("  [OK] Basic logging initialized")
                 return True
 
         except Exception as e:
-            print(f"  [WARNING] Logging setup failed: {e}")
-
+        print(f"  [WARNING] Logging setup failed: {e}")
         print("  [INFO] Continuing without file logging")
         return True  # Always continue
-
     def _setup_advanced_logging(self) -> bool:
         """Try to setup advanced logging with the app's logging config"""
         try:
@@ -331,8 +316,7 @@ class SmartLogger:
 
             return True
         except:
-            return False
-
+                return False
     def _setup_basic_logging(self) -> bool:
         """Setup basic logging as fallback"""
         try:
@@ -346,12 +330,11 @@ class SmartLogger:
             )
             return True
         except:
-            return False
+                return False
 
 
 class DatabaseChecker:
     """Smart database connection checking"""
-
     def check_database(self) -> bool:
         """Check database with multiple fallback strategies"""
         print("\n[DB] Checking database connection...")
@@ -359,25 +342,23 @@ class DatabaseChecker:
         try:
             # Try unified database manager
             if self._test_unified_db():
-                print("  [OK] Unified database connection successful")
+        print("  [OK] Unified database connection successful")
                 return True
 
             # Try threadsafe database manager
             if self._test_threadsafe_db():
-                print("  [OK] ThreadSafe database connection successful")
+        print("  [OK] ThreadSafe database connection successful")
                 return True
 
         except Exception as e:
-            print(f"  [WARNING] Database check failed: {e}")
-
+        print(f"  [WARNING] Database check failed: {e}")
         print("  [INFO] Running without database (mock data mode)")
         return False
-
     def _test_unified_db(self) -> bool:
         """Test unified database manager"""
         try:
-            from enhanced_config_manager import EnhancedConfigManager
             from database_manager_unified import UnifiedDatabaseManager
+            from enhanced_config_manager import EnhancedConfigManager
 
             config = EnhancedConfigManager()
             db = UnifiedDatabaseManager(config)
@@ -388,7 +369,6 @@ class DatabaseChecker:
         except:
             pass
         return False
-
     def _test_threadsafe_db(self) -> bool:
         """Test threadsafe database manager"""
         try:
@@ -408,20 +388,18 @@ class DatabaseChecker:
 
 class SplashScreenManager:
     """Manage splash screen display with platform awareness"""
-
     def __init__(self, platform_detector):
         self.platform = platform_detector
         self.splash = None
-
     def create_splash_screen(self, mode="enhanced"):
         """Create splash screen appropriate for the mode"""
         if not self.platform.can_use_gui:
             return None
 
         try:
-            from PyQt5.QtWidgets import QSplashScreen
             from PyQt5.QtCore import Qt
             from PyQt5.QtGui import QPixmap
+            from PyQt5.QtWidgets import QSplashScreen
 
             # Create splash screen
             splash_pix = QPixmap(500, 300)
@@ -459,10 +437,9 @@ class SplashScreenManager:
             return self.splash
 
         except Exception as e:
-            print(f"[WARNING] Could not create splash screen: {e}")
+        print(f"[WARNING] Could not create splash screen: {e}")
             return None
-
-    def update_splash_message(self, message):
+def update_splash_message(self, message):
         """Update splash screen message"""
         if self.splash:
             try:
@@ -472,26 +449,23 @@ class SplashScreenManager:
                     message, Qt.AlignCenter | Qt.AlignBottom, Qt.black
                 )
             except:
-                pass
-
-    def close_splash(self):
+            pass
+def close_splash(self):
         """Close splash screen"""
         if self.splash:
             try:
                 self.splash.close()
                 self.splash = None
             except:
-                pass
+            pass
 
 
 class ApplicationLauncher:
     """Smart application launcher with multiple fallback strategies"""
-
     def __init__(self, platform_detector, has_database=False):
         self.platform = platform_detector
         self.has_database = has_database
         self.splash_manager = SplashScreenManager(platform_detector)
-
     def launch(self) -> int:
         """Launch the application with intelligent fallbacks"""
         print("\n[START] Starting application...")
@@ -500,10 +474,9 @@ class ApplicationLauncher:
         try:
             return self._try_launch_strategies()
         except Exception as e:
-            print(f"\n[ERROR] All launch strategies failed: {e}")
-            print(traceback.format_exc())
+        print(f"\n[ERROR] All launch strategies failed: {e}")
+        print(traceback.format_exc())
             return 1
-
     def _try_launch_strategies(self) -> int:
         """Try different launch strategies in order of preference"""
         strategies = [
@@ -516,19 +489,18 @@ class ApplicationLauncher:
 
         for strategy_name, strategy_func in strategies:
             try:
-                print(f"[LAUNCH] Trying {strategy_name}...")
+        print(f"[LAUNCH] Trying {strategy_name}...")
                 return strategy_func()
             except Exception as e:
-                print(f"[LAUNCH] {strategy_name} failed: {e}")
+        print(f"[LAUNCH] {strategy_name} failed: {e}")
                 continue
 
         raise Exception("All launch strategies failed")
-
-    def _create_qt_application(self):
+def _create_qt_application(self):
         """Create QApplication with proper setup"""
-        from PyQt5.QtWidgets import QApplication
         from PyQt5.QtCore import Qt
-        from PyQt5.QtGui import QPalette, QColor
+        from PyQt5.QtGui import QColor, QPalette
+        from PyQt5.QtWidgets import QApplication
 
         # Handle the case where QApplication already exists
         app = QApplication.instance()
@@ -549,7 +521,6 @@ class ApplicationLauncher:
         app.setPalette(palette)
 
         return app
-
     def _launch_enhanced_gui(self) -> int:
         """Try to launch the full enhanced GUI"""
         app = self._create_qt_application()
@@ -567,7 +538,8 @@ class ApplicationLauncher:
 
             # Import enhanced components
             from enhanced_config_manager import EnhancedConfigManager
-            from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
             # Create configuration
             config_manager = EnhancedConfigManager()
@@ -580,7 +552,7 @@ class ApplicationLauncher:
             )
 
             # Create main window
-            print("[GUI] Creating enhanced main window...")
+        print("[GUI] Creating enhanced main window...")
             main_window = EnhancedPropertySearchApp()
 
             return self._run_gui_application(
@@ -590,7 +562,6 @@ class ApplicationLauncher:
         except Exception as e:
             self.splash_manager.close_splash()
             raise e
-
     def _launch_basic_gui(self) -> int:
         """Try to launch basic GUI without enhanced features"""
         app = self._create_qt_application()
@@ -601,7 +572,7 @@ class ApplicationLauncher:
         try:
             # Try to import a basic version or create simple one
             try:
-                from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
                 main_window = EnhancedPropertySearchApp()
             except:
@@ -613,36 +584,32 @@ class ApplicationLauncher:
         except Exception as e:
             self.splash_manager.close_splash()
             raise e
-
     def _launch_fixed_gui(self) -> int:
         """Launch fixed GUI (minimal testing functionality)"""
         app = self._create_qt_application()
-
         print("[GUI] Creating fixed test window...")
         main_window = self._create_fixed_test_window()
 
         return self._run_gui_application(app, main_window, "Fixed")
-
     def _launch_minimal_gui(self) -> int:
         """Launch minimal GUI for testing"""
         app = self._create_qt_application()
         main_window = self._create_minimal_window()
         return self._run_gui_application(app, main_window, "Minimal")
-
-    def _create_basic_window(self):
+def _create_basic_window(self):
         """Create a basic functional window"""
         from PyQt5.QtWidgets import (
-            QMainWindow,
-            QWidget,
-            QVBoxLayout,
             QLabel,
-            QPushButton,
             QLineEdit,
+            QMainWindow,
+            QPushButton,
             QTextEdit,
+            QVBoxLayout,
+            QWidget,
         )
 
-        class BasicPropertySearch(QMainWindow):
-            def __init__(self):
+class BasicPropertySearch(QMainWindow):
+    def __init__(self):
                 super().__init__()
                 self.setWindowTitle("Maricopa Property Search - Basic Mode")
                 self.resize(800, 600)
@@ -666,8 +633,7 @@ class ApplicationLauncher:
                 layout.addWidget(self.results_area)
 
                 self.setCentralWidget(central)
-
-            def perform_search(self):
+def perform_search(self):
                 search_term = self.search_input.text()
                 if search_term:
                     self.results_area.append(f"Searching for: {search_term}")
@@ -678,14 +644,13 @@ class ApplicationLauncher:
                     self.results_area.append("Please enter a search term")
 
         return BasicPropertySearch()
-
-    def _create_fixed_test_window(self):
+def _create_fixed_test_window(self):
         """Create fixed test window (based on launch_gui_fixed.py)"""
-        from PyQt5.QtWidgets import QMainWindow, QWidget, QVBoxLayout, QLabel
         from PyQt5.QtCore import Qt
+        from PyQt5.QtWidgets import QLabel, QMainWindow, QVBoxLayout, QWidget
 
-        class FixedTestWindow(QMainWindow):
-            def __init__(self):
+class FixedTestWindow(QMainWindow):
+    def __init__(self):
                 super().__init__()
                 self.setWindowTitle("Maricopa Property Search - Fixed")
                 self.resize(800, 600)
@@ -702,19 +667,18 @@ class ApplicationLauncher:
                 self.setCentralWidget(central)
 
         return FixedTestWindow()
-
-    def _create_minimal_window(self):
+def _create_minimal_window(self):
         """Create minimal window for testing"""
         from PyQt5.QtWidgets import (
-            QMainWindow,
-            QWidget,
-            QVBoxLayout,
             QLabel,
+            QMainWindow,
             QPushButton,
+            QVBoxLayout,
+            QWidget,
         )
 
-        class MinimalWindow(QMainWindow):
-            def __init__(self):
+class MinimalWindow(QMainWindow):
+    def __init__(self):
                 super().__init__()
                 self.setWindowTitle("Maricopa Property Search - Test Mode")
                 self.resize(400, 300)
@@ -740,7 +704,6 @@ class ApplicationLauncher:
                 self.setCentralWidget(central)
 
         return MinimalWindow()
-
     def _run_gui_application(
         self, app, main_window, mode_name, show_welcome=False
     ) -> int:
@@ -749,9 +712,9 @@ class ApplicationLauncher:
 
         # In offscreen mode, just test creation
         if os.environ.get("QT_QPA_PLATFORM") == "offscreen":
-            print(f"\n[SUCCESS] {mode_name} application initialized in headless mode!")
-            print("Note: Running in offscreen mode - GUI won't be visible")
-            print("Application would be functional if display were available")
+        print(f"\n[SUCCESS] {mode_name} application initialized in headless mode!")
+        print("Note: Running in offscreen mode - GUI won't be visible")
+        print("Application would be functional if display were available")
             self.splash_manager.close_splash()
             return 0
 
@@ -765,24 +728,22 @@ class ApplicationLauncher:
             # Show welcome message for enhanced mode
             if show_welcome:
                 self._show_welcome_message(main_window)
-
-            print(f"\n[SUCCESS] {mode_name} application window displayed!")
-            print("=" * 50)
+        print(f"\n[SUCCESS] {mode_name} application window displayed!")
+        print("=" * 50)
 
             # Run the application
             return app.exec_()
 
         except Exception as e:
-            print(f"[ERROR] Failed to show {mode_name} window: {e}")
+        print(f"[ERROR] Failed to show {mode_name} window: {e}")
             # Even if show fails, we succeeded in creating it
             if os.environ.get("QT_QPA_PLATFORM") != "offscreen":
-                print("Switching to offscreen mode...")
+        print("Switching to offscreen mode...")
                 os.environ["QT_QPA_PLATFORM"] = "offscreen"
-                print("[SUCCESS] Application running in offscreen mode")
+        print("[SUCCESS] Application running in offscreen mode")
             self.splash_manager.close_splash()
             return 0
-
-    def _show_welcome_message(self, parent):
+def _show_welcome_message(self, parent):
         """Show welcome message for enhanced mode"""
         try:
             from PyQt5.QtWidgets import QMessageBox
@@ -805,16 +766,13 @@ class ApplicationLauncher:
                 "<i>All actions are logged for debugging purposes</i>",
             )
         except:
-            print("[INFO] Welcome message could not be displayed")
-
+                print("[INFO] Welcome message could not be displayed")
     def _launch_console_mode(self) -> int:
         """Launch in console mode for headless environments"""
         print("\n[CONSOLE] Starting in console mode...")
         print("This would run the application in text mode")
         print("(Console mode not implemented yet)")
         return 0
-
-
 def show_application_info():
     """Show application information and instructions"""
     info_text = f"""
@@ -843,25 +801,23 @@ def show_application_info():
 
 🚀 Starting unified launcher...
 """
-    print(info_text)
-
-
+        print(info_text)
 def main():
     """Main entry point with intelligent environment handling"""
-    print(HEADER)
-    print(f"Starting at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print("=" * 72)
+        print(HEADER)
+        print(f"Starting at: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print("=" * 72)
 
     # Show application information
     show_application_info()
 
     # Phase 1: Platform Detection and Environment Setup
-    print("\n=== PHASE 1: Platform Detection ===")
+        print("\n=== PHASE 1: Platform Detection ===")
     platform_detector = PlatformDetector()
     platform_detector.setup_environment()
 
     # Phase 2: Dependency Management
-    print("\n=== PHASE 2: Dependency Check ===")
+        print("\n=== PHASE 2: Dependency Check ===")
     dependency_manager = DependencyManager(platform_detector)
     can_proceed, missing_essential, missing_other = (
         dependency_manager.check_dependencies()
@@ -873,12 +829,12 @@ def main():
         return 1
 
     # Phase 3: Logging Setup
-    print("\n=== PHASE 3: Logging Setup ===")
+        print("\n=== PHASE 3: Logging Setup ===")
     logger = SmartLogger()
     logger.setup_logging()
 
     # Phase 4: Database Check
-    print("\n=== PHASE 4: Database Check ===")
+        print("\n=== PHASE 4: Database Check ===")
     db_checker = DatabaseChecker()
     has_database = db_checker.check_database()
 
@@ -886,7 +842,7 @@ def main():
         print("[INFO] Application will run with mock data for testing")
 
     # Phase 5: Application Launch
-    print("\n=== PHASE 5: Application Launch ===")
+        print("\n=== PHASE 5: Application Launch ===")
     launcher = ApplicationLauncher(platform_detector, has_database)
     return launcher.launch()
 

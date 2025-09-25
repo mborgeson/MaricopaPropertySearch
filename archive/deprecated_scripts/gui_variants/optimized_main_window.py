@@ -3,34 +3,71 @@ Optimized Main Window for Maricopa Property Search Application
 Enhanced PyQt5-based GUI interface with advanced search capabilities
 """
 
-import sys
-from PyQt5.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QLineEdit, QPushButton, QTabWidget, QTableWidget, 
-    QTableWidgetItem, QTextEdit, QProgressBar, QMessageBox,
-    QComboBox, QSpinBox, QCheckBox, QGroupBox, QSplitter,
-    QHeaderView, QApplication, QStatusBar, QMenuBar, QMenu,
-    QAction, QFileDialog, QDialog, QCompleter, QSlider,
-    QDoubleSpinBox, QListWidget, QListWidgetItem, QFrame,
-    QScrollArea, QButtonGroup, QRadioButton
-)
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QStringListModel, QSortFilterProxyModel
-from PyQt5.QtGui import QFont, QIcon, QPixmap, QPalette
-import logging
-from typing import Dict, List, Optional, Any
-import json
 import csv
-from pathlib import Path
-from datetime import datetime
+import json
+import logging
+import sys
 import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 # Import application modules
 from optimized_database_manager import OptimizedDatabaseManager, SearchFilters
+from PyQt5.QtCore import (
+    QSortFilterProxyModel,
+    QStringListModel,
+    Qt,
+    QThread,
+    QTimer,
+    pyqtSignal,
+)
+from PyQt5.QtGui import QFont, QIcon, QPalette, QPixmap
+from PyQt5.QtWidgets import (
+    QAction,
+    QApplication,
+    QButtonGroup,
+    QCheckBox,
+    QComboBox,
+    QCompleter,
+    QDialog,
+    QDoubleSpinBox,
+    QFileDialog,
+    QFrame,
+    QGridLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QLineEdit,
+    QListWidget,
+    QListWidgetItem,
+    QMainWindow,
+    QMenu,
+    QMenuBar,
+    QMessageBox,
+    QProgressBar,
+    QPushButton,
+    QRadioButton,
+    QScrollArea,
+    QSlider,
+    QSpinBox,
+    QSplitter,
+    QStatusBar,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
+)
+
 from src.optimized_search_worker import OptimizedSearchWorker, SearchWorkerPool
-from src.search_validator import SearchValidator, SearchType, ValidationResult
 from src.search_cache import SearchCache, SearchHistory
+from src.search_validator import SearchType, SearchValidator, ValidationResult
+
 # MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient, MockMaricopaAPIClient
-from src.web_scraper import WebScraperManager, MockWebScraperManager
+from src.web_scraper import MockWebScraperManager, WebScraperManager
 
 logger = logging.getLogger(__name__)
 
@@ -679,7 +716,7 @@ class OptimizedPropertySearchApp(QMainWindow):
             api_status = self.api_client.get_api_status()
             status_messages.append(f"API: {api_status.get('status', 'Unknown')}")
         except:
-            status_messages.append("API: Error")
+        status_messages.append("API: Error")
         
         # Check cache status
         cache_stats = self.search_cache.get_stats()
@@ -993,7 +1030,7 @@ class OptimizedPropertySearchApp(QMainWindow):
         layout.addLayout(button_layout)
         
         dialog.exec_()
-    
+
     def clear_search_history(self, parent_dialog):
         """Clear search history"""
         reply = QMessageBox.question(
@@ -1173,10 +1210,12 @@ class OptimizedPropertySearchApp(QMainWindow):
             
             # Import the original PropertyDetailsDialog
             from gui.main_window import PropertyDetailsDialog
+
 from src.api_client_unified import UnifiedMaricopaAPIClient
+
             dialog = PropertyDetailsDialog(property_data, self.db_manager, self)
             dialog.exec_()
-    
+
     def export_results(self):
         """Export search results to CSV"""
         if not self.current_results:

@@ -3,17 +3,14 @@
 Quick Environment Check Script
 Non-interactive verification of core dependencies
 """
-
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add project to path
 PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch")
 sys.path.insert(0, str(PROJECT_ROOT))
-
-
-def check_environment():
+    def check_environment():
     """Quick environment check"""
     issues = []
 
@@ -28,15 +25,15 @@ def check_environment():
     critical_packages = ["pandas", "PyQt5", "psycopg2", "requests", "selenium"]
 
     for package in critical_packages:
-        try:
+try:
             __import__(package)
-        except ImportError as e:
+except ImportError as e:
             issues.append(f"Missing package: {package} - {e}")
 
     # Check database connection
-    try:
-        import psycopg2
-        from dotenv import load_dotenv
+try:
+import psycopg2
+from dotenv import load_dotenv
 
         env_path = PROJECT_ROOT / ".env"
         if env_path.exists():
@@ -52,15 +49,13 @@ def check_environment():
 
         conn = psycopg2.connect(**conn_params)
         conn.close()
-    except Exception as e:
+except Exception as e:
         issues.append(f"Database connection failed: {e}")
 
     return issues
-
-
-def main():
+    def main():
     """Main check function"""
-    print("Checking environment...")
+        print("Checking environment...")
 
     issues = check_environment()
 
@@ -70,7 +65,7 @@ def main():
     else:
         print("FAIL: Environment issues detected:")
         for issue in issues:
-            print(f"  - {issue}")
+        print(f"  - {issue}")
         print("\nRun 'python scripts\\verify_dependencies.py' for detailed diagnostics")
         return 1
 

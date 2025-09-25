@@ -2,15 +2,13 @@
 """
 Fix absolute imports to relative imports in the src directory
 """
-
+import glob
 import os
 import re
-import glob
-
 
 def fix_imports_in_file(file_path):
     """Fix absolute src.* imports to relative imports in a single file"""
-    try:
+try:
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
 
@@ -25,18 +23,16 @@ def fix_imports_in_file(file_path):
         )
 
         if content != original_content:
-            print(f"Fixing imports in: {file_path}")
+        print(f"Fixing imports in: {file_path}")
             with open(file_path, "w", encoding="utf-8") as f:
                 f.write(content)
             return True
         return False
 
-    except Exception as e:
+except Exception as e:
         print(f"Error processing {file_path}: {e}")
         return False
-
-
-def main():
+    def main():
     """Fix imports in all Python files in the src directory"""
     src_dir = os.path.join(os.path.dirname(__file__), "..", "src")
 
@@ -46,15 +42,13 @@ def main():
         for file in files:
             if file.endswith(".py"):
                 python_files.append(os.path.join(root, file))
-
-    print(f"Found {len(python_files)} Python files to process...")
+        print(f"Found {len(python_files)} Python files to process...")
 
     fixed_count = 0
     for file_path in python_files:
         if fix_imports_in_file(file_path):
             fixed_count += 1
-
-    print(f"\nFixed imports in {fixed_count} files")
+        print(f"\nFixed imports in {fixed_count} files")
 
 
 if __name__ == "__main__":

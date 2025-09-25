@@ -2,10 +2,10 @@
 """
 Fix PostgreSQL database user permissions
 """
+import sys
 
 import psycopg2
 from psycopg2 import OperationalError
-import sys
 
 try:
     # Connect as postgres user
@@ -19,8 +19,7 @@ try:
 
     connection.autocommit = True
     cursor = connection.cursor()
-
-    print("Connected as postgres user")
+        print("Connected as postgres user")
 
     # Check if property_user exists
     cursor.execute("SELECT 1 FROM pg_roles WHERE rolname = 'property_user'")
@@ -56,8 +55,7 @@ try:
     cursor.execute("GRANT ALL ON SCHEMA public TO property_user")
     cursor.execute("GRANT ALL ON ALL TABLES IN SCHEMA public TO property_user")
     cursor.execute("GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO property_user")
-
-    print("SUCCESS: property_user setup complete")
+        print("SUCCESS: property_user setup complete")
 
     # Test connection as property_user
     connection.close()
@@ -73,9 +71,9 @@ try:
     test_cursor = test_connection.cursor()
     test_cursor.execute("SELECT current_user")
     current_user = test_cursor.fetchone()[0]
-    print(f"SUCCESS: Connected as {current_user}")
+        print(f"SUCCESS: Connected as {current_user}")
 
     test_connection.close()
 
 except Exception as e:
-    print(f"ERROR: {e}")
+        print(f"ERROR: {e}")

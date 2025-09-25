@@ -7,26 +7,26 @@ Tests performance targets and regression detection for:
 - Database Manager query performance
 - GUI Launcher startup time
 """
-
-import pytest
-import time
 import asyncio
-import threading
-from concurrent.futures import ThreadPoolExecutor
-from unittest.mock import Mock, patch
-import psutil
 import gc
 
 # Import components for benchmarking
 import sys
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
+from unittest.mock import Mock, patch
+
+import psutil
+import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 from api_client_unified import UnifiedMaricopaAPIClient
-from unified_data_collector import UnifiedDataCollector
-from threadsafe_database_manager import ThreadSafeDatabaseManager
 from gui_launcher_unified import UnifiedGUILauncher
+from threadsafe_database_manager import ThreadSafeDatabaseManager
+from unified_data_collector import UnifiedDataCollector
 
 
 class TestPerformanceBenchmarks:
@@ -55,16 +55,14 @@ class TestPerformanceBenchmarks:
     def memory_monitor(self):
         """Memory monitoring utility."""
 
-        class MemoryMonitor:
-            def __init__(self):
+class MemoryMonitor:
+    def __init__(self):
                 self.initial_memory = psutil.Process().memory_info().rss / 1024 / 1024
                 self.peak_memory = self.initial_memory
-
-            def update_peak(self):
+    def update_peak(self):
                 current_memory = psutil.Process().memory_info().rss / 1024 / 1024
                 self.peak_memory = max(self.peak_memory, current_memory)
-
-            def get_usage(self):
+    def get_usage(self):
                 return self.peak_memory - self.initial_memory
 
         return MemoryMonitor()
@@ -181,16 +179,14 @@ class TestPerformanceBenchmarks:
             db_manager = ThreadSafeDatabaseManager(
                 config=performance_config["database"]
             )
-
-        def concurrent_operation():
+    def concurrent_operation():
             """Single database operation for concurrent testing."""
             connection = db_manager.get_connection()
             # Simulate work
             time.sleep(0.001)
             db_manager.release_connection(connection)
             return True
-
-        def concurrent_workload():
+    def concurrent_workload():
             """Execute multiple concurrent database operations."""
             with ThreadPoolExecutor(max_workers=10) as executor:
                 futures = [executor.submit(concurrent_operation) for _ in range(50)]
@@ -210,8 +206,7 @@ class TestPerformanceBenchmarks:
         """Benchmark GUI launcher startup performance."""
         with patch("gui_launcher_unified.get_logger"):
             with patch.dict("os.environ", mock_environment):
-
-                def startup_operation():
+    def startup_operation():
                     launcher = UnifiedGUILauncher()
                     # Mock platform detection to avoid actual system calls
                     launcher.platform_detector.detect_platform = Mock(
@@ -317,8 +312,7 @@ class TestPerformanceBenchmarks:
             "apn": "10215009",
             "address": "10000 W Missouri Ave",
         }
-
-        def missouri_ave_workflow():
+    def missouri_ave_workflow():
             """Complete Missouri Avenue workflow."""
             # Initialize components
             with patch("api_client_unified.get_api_logger"):
@@ -413,8 +407,7 @@ class TestPerformanceBenchmarks:
         self, benchmark, performance_config, mock_property_data
     ):
         """Stress test benchmark for system stability."""
-
-        def stress_test_workload():
+    def stress_test_workload():
             """High-load stress test workload."""
             # Initialize components
             with patch("api_client_unified.get_api_logger"):
@@ -463,8 +456,7 @@ class TestPerformanceBenchmarks:
         mock_response.status_code = 200
         mock_response.json.return_value = {"success": True, "data": mock_property_data}
         api_client.session.get.return_value = mock_response
-
-        def cache_test_workload():
+    def cache_test_workload():
             """Test cache performance with repeated requests."""
             # First request (cache miss)
             result1 = api_client.search_property("10215009")

@@ -7,12 +7,13 @@ Comprehensive test to verify the application works after fixing:
 3. Tax and sales history display
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
+
 
 def test_config_manager():
     """Test ConfigManager with new get method"""
@@ -25,18 +26,18 @@ def test_config_manager():
         config = ConfigManager()
 
         # Test the new get method
-        if not hasattr(config, 'get'):
+        if not hasattr(config, "get"):
             print("❌ ERROR: ConfigManager.get() method not found!")
             return False
 
         # Test with various types
-        test_value = config.get('test_key', True)  # boolean default
+        test_value = config.get("test_key", True)  # boolean default
         print(f"  ✓ Boolean default test: {test_value}")
 
-        test_value = config.get('test_key', 100)  # integer default
+        test_value = config.get("test_key", 100)  # integer default
         print(f"  ✓ Integer default test: {test_value}")
 
-        test_value = config.get('test_key', 'default')  # string default
+        test_value = config.get("test_key", "default")  # string default
         print(f"  ✓ String default test: {test_value}")
 
         print("✅ ConfigManager.get() method working correctly!")
@@ -52,23 +53,23 @@ def test_database_manager():
     print("\n🔍 Testing DatabaseManager methods...")
 
     try:
-        from src.database_manager import DatabaseManager
         from src.config_manager import ConfigManager
+        from src.database_manager import DatabaseManager
 
         # Check if get_property_by_apn exists
         db_methods = dir(DatabaseManager)
 
-        if 'get_property_by_apn' not in db_methods:
+        if "get_property_by_apn" not in db_methods:
             print("❌ ERROR: DatabaseManager.get_property_by_apn() not found!")
             return False
         print("  ✓ get_property_by_apn() method exists")
 
-        if 'get_tax_history' not in db_methods:
+        if "get_tax_history" not in db_methods:
             print("❌ ERROR: DatabaseManager.get_tax_history() not found!")
             return False
         print("  ✓ get_tax_history() method exists")
 
-        if 'get_sales_history' not in db_methods:
+        if "get_sales_history" not in db_methods:
             print("❌ ERROR: DatabaseManager.get_sales_history() not found!")
             return False
         print("  ✓ get_sales_history() method exists")
@@ -88,18 +89,21 @@ def test_gui_imports():
     try:
         # Test importing the enhanced main window
         from src.gui.enhanced_main_window import EnhancedMainWindow
+
         print("  ✓ EnhancedMainWindow imported successfully")
 
         # Test importing GUI dialogs
         from src.gui.gui_enhancements_dialogs import ApplicationSettingsDialog
+
         print("  ✓ ApplicationSettingsDialog imported successfully")
 
         # Check if the dialog can use ConfigManager
         from src.config_manager import ConfigManager
+
         config = ConfigManager()
 
         # The dialog should be able to call config.get() now
-        if hasattr(config, 'get'):
+        if hasattr(config, "get"):
             print("  ✓ ApplicationSettingsDialog can use config.get()")
         else:
             print("❌ ERROR: ConfigManager.get() missing for dialog!")
@@ -122,8 +126,8 @@ def test_application_integration():
 
     try:
         # Import all key components
-        from src.config_manager import ConfigManager
         from src.api_client import MaricopaAPIClient
+        from src.config_manager import ConfigManager
 
         # Initialize components
         config = ConfigManager()
@@ -134,13 +138,13 @@ def test_application_integration():
         print("  ✓ API client initialized")
 
         # Check if API client has required methods
-        if hasattr(api_client, 'get_property_details'):
+        if hasattr(api_client, "get_property_details"):
             print("  ✓ API client has get_property_details()")
 
-        if hasattr(api_client, 'get_tax_history'):
+        if hasattr(api_client, "get_tax_history"):
             print("  ✓ API client has get_tax_history()")
 
-        if hasattr(api_client, 'get_sales_history'):
+        if hasattr(api_client, "get_sales_history"):
             print("  ✓ API client has get_sales_history()")
 
         print("✅ Application integration successful!")

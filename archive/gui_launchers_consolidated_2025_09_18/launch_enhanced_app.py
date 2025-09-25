@@ -4,8 +4,8 @@ Enhanced Property Search Application Launcher
 Launches the property search app with background data collection
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add src directory to path
@@ -13,9 +13,10 @@ src_dir = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_dir))
 
 import logging
-from PyQt5.QtWidgets import QApplication, QSplashScreen, QMessageBox
+
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QPixmap, QFont
+from PyQt5.QtGui import QFont, QPixmap
+from PyQt5.QtWidgets import QApplication, QMessageBox, QSplashScreen
 
 # Import application modules
 # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
@@ -147,6 +148,7 @@ def main():
         
         # Test database connection early
         from threadsafe_database_manager import ThreadSafeDatabaseManager
+
         try:
             db_test = ThreadSafeDatabaseManager(config_manager)
             if not db_test.test_connection():
@@ -214,8 +216,9 @@ def main():
 
 if __name__ == "__main__":
     import traceback
+
 from src.enhanced_config_manager import EnhancedConfigManager
-    
+
     try:
         exit_code = main()
         sys.exit(exit_code)

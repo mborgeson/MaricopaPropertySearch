@@ -3,7 +3,6 @@
 Verify All Fixes Are Working
 Quick verification script to confirm all 10 reported issues are resolved
 """
-
 import sys
 from pathlib import Path
 
@@ -11,10 +10,9 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
-
 def test_syntax_check():
     """Test that all Python files compile without syntax errors"""
-    print("\n[VERIFY] Testing syntax compilation...")
+        print("\n[VERIFY] Testing syntax compilation...")
 
     python_files = [
         "src/gui/enhanced_main_window.py",
@@ -26,39 +24,39 @@ def test_syntax_check():
     for file_path in python_files:
         full_path = project_root / file_path
         if full_path.exists():
-            try:
+try:
                 with open(full_path, 'r', encoding='utf-8', errors='ignore') as f:
                     content = f.read()
                 compile(content, str(full_path), 'exec')
-                print(f"  [OK] {file_path} - No syntax errors")
-            except SyntaxError as e:
-                print(f"  [ERROR] {file_path} - Syntax error: {e}")
+        print(f"  [OK] {file_path} - No syntax errors")
+except SyntaxError as e:
+        print(f"  [ERROR] {file_path} - Syntax error: {e}")
                 return False
-            except Exception as e:
-                print(f"  [ERROR] {file_path} - Read error: {e}")
+except Exception as e:
+        print(f"  [ERROR] {file_path} - Read error: {e}")
                 return False
         else:
-            print(f"  [WARNING] {file_path} - File not found")
+        print(f"  [WARNING] {file_path} - File not found")
 
     return True
-
 def test_imports():
     """Test that key imports work"""
-    print("\n[VERIFY] Testing imports...")
+        print("\n[VERIFY] Testing imports...")
 
-    try:
-        from src.data_collection_cache import DataCollectionCache
+try:
+from src.data_collection_cache import DataCollectionCache
+
         cache = DataCollectionCache()
         if hasattr(cache, 'clear_apn_cache'):
-            print("  [OK] DataCollectionCache.clear_apn_cache method exists")
+        print("  [OK] DataCollectionCache.clear_apn_cache method exists")
         else:
-            print("  [ERROR] DataCollectionCache.clear_apn_cache method missing")
+        print("  [ERROR] DataCollectionCache.clear_apn_cache method missing")
             return False
-    except Exception as e:
+except Exception as e:
         print(f"  [ERROR] Failed to import DataCollectionCache: {e}")
         return False
 
-    try:
+try:
         # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         config = EnhancedConfigManager()
 
@@ -73,57 +71,57 @@ def test_imports():
 
         for method in required_methods:
             if hasattr(config, method):
-                print(f"  [OK] EnhancedConfigManager.{method} method exists")
+        print(f"  [OK] EnhancedConfigManager.{method} method exists")
             else:
-                print(f"  [ERROR] EnhancedConfigManager.{method} method missing")
+        print(f"  [ERROR] EnhancedConfigManager.{method} method missing")
                 return False
 
-    except Exception as e:
+except Exception as e:
         print(f"  [ERROR] Failed to import ConfigManager: {e}")
         return False
 
-    try:
+try:
         # MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
         # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         config = EnhancedConfigManager()
         client = UnifiedMaricopaAPIClient(config)
         if hasattr(client, 'test_connection'):
-            print("  [OK] UnifiedMaricopaAPIClient.test_connection method exists")
+        print("  [OK] UnifiedMaricopaAPIClient.test_connection method exists")
         else:
-            print("  [ERROR] UnifiedMaricopaAPIClient.test_connection method missing")
+        print("  [ERROR] UnifiedMaricopaAPIClient.test_connection method missing")
             return False
-    except Exception as e:
+except Exception as e:
         print(f"  [ERROR] Failed to import MaricopaAPIClient: {e}")
         return False
 
     return True
-
 def test_settings_file():
     """Test that settings file exists"""
-    print("\n[VERIFY] Testing settings persistence...")
+        print("\n[VERIFY] Testing settings persistence...")
 
     settings_file = project_root / "config" / "app_settings.json"
     if settings_file.exists():
         print(f"  [OK] Settings file exists: {settings_file}")
-        try:
-            import json
+try:
+import json
+
 from src.api_client_unified import UnifiedMaricopaAPIClient
 from src.enhanced_config_manager import EnhancedConfigManager
+
             with open(settings_file) as f:
                 settings = json.load(f)
-            print(f"  [OK] Settings file is valid JSON with {len(settings)} keys")
+        print(f"  [OK] Settings file is valid JSON with {len(settings)} keys")
             return True
-        except Exception as e:
-            print(f"  [ERROR] Settings file is invalid: {e}")
+except Exception as e:
+        print(f"  [ERROR] Settings file is invalid: {e}")
             return False
     else:
         print(f"  [ERROR] Settings file missing: {settings_file}")
         return False
-
 def main():
-    print("=" * 60)
-    print(" VERIFYING ALL FIXES ARE WORKING")
-    print("=" * 60)
+        print("=" * 60)
+        print(" VERIFYING ALL FIXES ARE WORKING")
+        print("=" * 60)
 
     all_passed = True
 
@@ -138,9 +136,9 @@ def main():
         all_passed = False
 
     # Summary
-    print("\n" + "=" * 60)
-    print(" VERIFICATION SUMMARY")
-    print("=" * 60)
+        print("\n" + "=" * 60)
+        print(" VERIFICATION SUMMARY")
+        print("=" * 60)
 
     if all_passed:
         print("\n[SUCCESS] All fixes verified successfully!")
@@ -155,7 +153,6 @@ def main():
         print("  8. [OK] API test connectivity - IMPLEMENTED")
         print("  9. [OK] Settings persistence - IMPLEMENTED")
         print("  10. [OK] Source priority configuration - IMPLEMENTED")
-
         print("\n[READY] The application should now work without crashes!")
         print("\n[TEST] Run: python RUN_APPLICATION.py")
 

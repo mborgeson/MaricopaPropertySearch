@@ -8,17 +8,14 @@ This script validates that:
 3. All necessary imports and method calls are correct
 4. No reference to self.results_table exists in PropertyDetailsDialog context
 """
-
-import sys
-import os
 import ast
+import os
+import sys
 
 # Add the project root to the path
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
-
-
-def validate_fix():
+    def validate_fix():
     """Validate that the manual_collect_data fix is correct"""
     enhanced_main_window_path = os.path.join(
         project_root, "src", "gui", "enhanced_main_window.py"
@@ -27,16 +24,15 @@ def validate_fix():
     if not os.path.exists(enhanced_main_window_path):
         print(f"ERROR: File not found: {enhanced_main_window_path}")
         return False
-
-    print("Validating manual_collect_data fix...")
+        print("Validating manual_collect_data fix...")
 
     with open(enhanced_main_window_path, "r", encoding="utf-8") as f:
         content = f.read()
 
     # Parse the AST to find the manual_collect_data method
-    try:
+try:
         tree = ast.parse(content)
-    except SyntaxError as e:
+except SyntaxError as e:
         print(f"ERROR: Syntax error in file: {e}")
         return False
 
@@ -64,39 +60,38 @@ def validate_fix():
     if not manual_collect_method:
         print("ERROR: manual_collect_data method not found in PropertyDetailsDialog")
         return False
-
-    print("OK: PropertyDetailsDialog class found")
-    print("OK: manual_collect_data method found")
+        print("OK: PropertyDetailsDialog class found")
+        print("OK: manual_collect_data method found")
 
     # Check method content for correct implementation
     method_source = ast.get_source_segment(content, manual_collect_method)
     if method_source:
         # Check that it uses property_data instead of results_table
         if "self.property_data.get('apn'," in method_source:
-            print("OK: Method correctly uses self.property_data.get('apn')")
+        print("OK: Method correctly uses self.property_data.get('apn')")
         else:
-            print("ERROR: Method does not use self.property_data.get('apn')")
+        print("ERROR: Method does not use self.property_data.get('apn')")
             return False
 
         # Check that it doesn't use results_table
         if "self.results_table" in method_source:
-            print("ERROR: Method still references self.results_table")
+        print("ERROR: Method still references self.results_table")
             return False
         else:
-            print("OK: Method does not reference self.results_table")
+        print("OK: Method does not reference self.results_table")
 
         # Check that it uses background_manager properly
         if "self.background_manager" in method_source:
-            print("OK: Method uses self.background_manager")
+        print("OK: Method uses self.background_manager")
         else:
-            print("ERROR: Method does not use self.background_manager")
+        print("ERROR: Method does not use self.background_manager")
             return False
 
         # Check for proper error handling
         if "try:" in method_source and "except Exception" in method_source:
-            print("OK: Method has proper error handling")
+        print("OK: Method has proper error handling")
         else:
-            print("ERROR: Method lacks proper error handling")
+        print("ERROR: Method lacks proper error handling")
             return False
 
     # Check imports
@@ -114,9 +109,8 @@ def validate_fix():
     else:
         print("ERROR: QTimer import not found")
         return False
-
-    print("\nSUCCESS: All validation checks passed!")
-    print("The manual_collect_data AttributeError fix appears to be correct.")
+        print("\nSUCCESS: All validation checks passed!")
+        print("The manual_collect_data AttributeError fix appears to be correct.")
     return True
 
 

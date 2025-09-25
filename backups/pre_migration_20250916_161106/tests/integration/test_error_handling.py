@@ -2,11 +2,13 @@
 Integration tests for error handling and graceful degradation
 """
 
-import pytest
 import time
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
+
 import psycopg2
-from requests.exceptions import ConnectionError, Timeout, HTTPError
+import pytest
+from requests.exceptions import ConnectionError, HTTPError, Timeout
+
 
 @pytest.mark.integration
 class TestNetworkErrorHandling:
@@ -28,7 +30,7 @@ class TestNetworkErrorHandling:
     def test_api_connection_error_fallback(self, app_config, test_database):
         """Test fallback to database when API is unavailable"""
         from src.gui.enhanced_main_window import EnhancedPropertySearchApp
-        
+
         # Create app with connection error simulation
         app = EnhancedPropertySearchApp(app_config)
         
@@ -68,7 +70,7 @@ class TestNetworkErrorHandling:
                 try:
                     enhanced_data = scraper.enhance_property_data("101-01-001A")
                 except:
-                    pass  # Scraper failure should be handled
+        pass  # Scraper failure should be handled
                     
                 assert len(results) > 0, "Should get API results despite scraper failure"
                 
@@ -87,7 +89,7 @@ class TestNetworkErrorHandling:
                 status = client.get_api_status()
                 assert status['status'] != 'online', "Should detect network offline"
             except:
-                pass  # Expected to fail
+        pass  # Expected to fail
                 
         # Network comes back online
         with network_simulator.apply_condition('normal'):
@@ -103,7 +105,7 @@ class TestDatabaseErrorHandling:
     def test_database_connection_failure_handling(self, app_config):
         """Test handling when database connection fails"""
         from src.database_manager import DatabaseManager
-        
+
         # Create database manager with invalid config
         bad_config = app_config
         bad_config._config['database']['host'] = 'nonexistent-host'
@@ -483,8 +485,8 @@ class TestSystemRecoveryPatterns:
             
     def test_resource_cleanup_on_failure(self, app_config):
         """Test that resources are properly cleaned up when operations fail"""
-        from src.database_manager import DatabaseManager
         from src.api_client import MockMaricopaAPIClient
+        from src.database_manager import DatabaseManager
         
         db = DatabaseManager(app_config)
         client = MockMaricopaAPIClient(app_config)

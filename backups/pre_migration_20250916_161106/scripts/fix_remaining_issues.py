@@ -4,23 +4,25 @@ Fix Script for Remaining Application Issues
 Based on systematic testing results
 """
 
+import os
 import sys
 from pathlib import Path
-import os
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
 
+
 def check_webscraper_signature():
     """Check and document WebScraperManager signature"""
     print("\n[CHECK 1] WebScraperManager Signature")
-    print("-"*50)
+    print("-" * 50)
 
     try:
-        from src.web_scraper import WebScraperManager
         import inspect
+
+        from src.web_scraper import WebScraperManager
 
         sig = inspect.signature(WebScraperManager.__init__)
         print(f"Current signature: {sig}")
@@ -29,7 +31,7 @@ def check_webscraper_signature():
         params = list(sig.parameters.keys())
         print(f"Parameters: {params}")
 
-        if 'config_manager' in params:
+        if "config_manager" in params:
             print("[INFO] WebScraperManager expects config_manager")
             print("[FIX] When creating, use: WebScraperManager(config)")
         else:
@@ -41,14 +43,16 @@ def check_webscraper_signature():
         print(f"[ERROR] {e}")
         return False
 
+
 def check_background_collector_signature():
     """Check BackgroundDataCollectionManager signature"""
     print("\n[CHECK 2] BackgroundDataCollectionManager Signature")
-    print("-"*50)
+    print("-" * 50)
 
     try:
-        from src.background_data_collector import BackgroundDataCollectionManager
         import inspect
+
+        from src.background_data_collector import BackgroundDataCollectionManager
 
         sig = inspect.signature(BackgroundDataCollectionManager.__init__)
         print(f"Current signature: {sig}")
@@ -71,17 +75,18 @@ def check_background_collector_signature():
         print(f"[ERROR] {e}")
         return False
 
+
 def test_correct_initialization():
     """Test with correct initialization"""
     print("\n[CHECK 3] Test Correct Initialization")
-    print("-"*50)
+    print("-" * 50)
 
     try:
+        from src.api_client import MaricopaAPIClient
+        from src.background_data_collector import BackgroundDataCollectionManager
         from src.config_manager import ConfigManager
         from src.database_manager import DatabaseManager
-        from src.api_client import MaricopaAPIClient
         from src.web_scraper import WebScraperManager
-        from src.background_data_collector import BackgroundDataCollectionManager
 
         config = ConfigManager()
 
@@ -118,10 +123,11 @@ def test_correct_initialization():
         print(f"[ERROR] Initialization test failed: {e}")
         return False
 
+
 def create_run_test():
     """Create a test that actually runs the app briefly"""
     print("\n[CHECK 4] Creating Run Test")
-    print("-"*50)
+    print("-" * 50)
 
     test_file = project_root / "tests" / "quick_run_test.py"
 
@@ -164,10 +170,9 @@ print("[OK] Test complete")
 
     # Run it
     import subprocess
+
     result = subprocess.run(
-        [sys.executable, str(test_file)],
-        capture_output=True,
-        text=True
+        [sys.executable, str(test_file)], capture_output=True, text=True
     )
 
     print(result.stdout)
@@ -176,10 +181,11 @@ print("[OK] Test complete")
 
     return result.returncode == 0
 
+
 def main():
-    print("="*60)
+    print("=" * 60)
     print(" FIXING REMAINING APPLICATION ISSUES")
-    print("="*60)
+    print("=" * 60)
 
     # Run checks
     check_webscraper_signature()
@@ -187,9 +193,9 @@ def main():
     test_correct_initialization()
     create_run_test()
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print(" SUMMARY")
-    print("="*60)
+    print("=" * 60)
 
     print("\nThe issues were in the TEST SCRIPT, not the application!")
     print("\n[FINDINGS]")
@@ -206,6 +212,7 @@ def main():
     print("This is non-critical as it's only a fallback feature")
 
     return 0
+
 
 if __name__ == "__main__":
     sys.exit(main())

@@ -12,15 +12,14 @@ This script tests all the critical fixes implemented by the hive mind swarm:
 Test Agent: Verification and validation of all hive mind fixes
 Created: 2025-01-12
 """
-
-import sys
-import os
-import unittest
-import traceback
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
-import tempfile
 import configparser
+import os
+import sys
+import tempfile
+import traceback
+import unittest
+from pathlib import Path
+from unittest.mock import MagicMock, Mock, patch
 
 # Add project root to path
 project_root = Path(__file__).parent.parent.resolve()
@@ -28,12 +27,10 @@ sys.path.insert(0, str(project_root))
 
 class TestHiveMindFixes(unittest.TestCase):
     """Test all hive mind fixes work correctly"""
-
     def setUp(self):
         """Set up test environment"""
         self.project_root = project_root
         self.test_results = []
-
     def log_test_result(self, test_name, success, message="", exception=None):
         """Log test results for final report"""
         self.test_results.append({
@@ -42,12 +39,11 @@ class TestHiveMindFixes(unittest.TestCase):
             'message': message,
             'exception': str(exception) if exception else None
         })
-
     def test_01_config_manager_get_method(self):
         """Test EnhancedConfigManager.get() method works properly"""
         print("\n=== Testing EnhancedConfigManager.get() method ===")
 
-        try:
+    try:
             # Import ConfigManager
             # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 
@@ -102,21 +98,19 @@ class TestHiveMindFixes(unittest.TestCase):
                     # Test 6: get() with nonexistent section
                     result = config_manager.get('test_key', default='fallback', section='nonexistent')
                     self.assertEqual(result, 'fallback', f"Expected 'fallback', got '{result}'")
-
-            print("✅ EnhancedConfigManager.get() method: ALL TESTS PASSED")
+        print("✅ EnhancedConfigManager.get() method: ALL TESTS PASSED")
             self.log_test_result("EnhancedConfigManager.get() method", True, "All tests passed")
 
-        except Exception as e:
-            print(f"❌ EnhancedConfigManager.get() method: FAILED - {e}")
-            print(traceback.format_exc())
+    except Exception as e:
+        print(f"❌ EnhancedConfigManager.get() method: FAILED - {e}")
+        print(traceback.format_exc())
             self.log_test_result("EnhancedConfigManager.get() method", False, "Test failed", e)
             self.fail(f"EnhancedConfigManager.get() method test failed: {e}")
-
     def test_02_database_manager_methods(self):
         """Test DatabaseManager methods exist and work"""
         print("\n=== Testing DatabaseManager Methods ===")
 
-        try:
+    try:
             # MIGRATED: # MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 
@@ -159,9 +153,9 @@ class TestHiveMindFixes(unittest.TestCase):
                 # This was mentioned in the task but might not be implemented
                 has_get_property_by_apn = hasattr(db_manager, 'get_property_by_apn')
                 if has_get_property_by_apn:
-                    print("✅ get_property_by_apn method exists")
+        print("✅ get_property_by_apn method exists")
                 else:
-                    print("⚠️  get_property_by_apn method not found (might not be implemented)")
+        print("⚠️  get_property_by_apn method not found (might not be implemented)")
 
                 # Test 4: Test connection method structure (mocked)
                 with patch.object(db_manager, 'get_connection') as mock_get_conn:
@@ -174,26 +168,25 @@ class TestHiveMindFixes(unittest.TestCase):
 
                     result = db_manager.test_connection()
                     self.assertTrue(result, "test_connection should return True when mocked properly")
-
-            print("✅ DatabaseManager methods: ALL TESTS PASSED")
+        print("✅ DatabaseManager methods: ALL TESTS PASSED")
             self.log_test_result("DatabaseManager methods", True, "All required methods exist and basic structure is correct")
 
-        except Exception as e:
-            print(f"❌ DatabaseManager methods: FAILED - {e}")
-            print(traceback.format_exc())
+    except Exception as e:
+        print(f"❌ DatabaseManager methods: FAILED - {e}")
+        print(traceback.format_exc())
             self.log_test_result("DatabaseManager methods", False, "Test failed", e)
             self.fail(f"DatabaseManager methods test failed: {e}")
-
     def test_03_gui_import_without_attributeerror(self):
         """Test GUI can be imported without AttributeError"""
         print("\n=== Testing GUI Import (AttributeError Check) ===")
 
-        try:
+    try:
             # Test 1: Import enhanced_main_window
-            try:
-                from src.gui.enhanced_main_window import EnhancedMainWindow
-                print("✅ Enhanced main window imported successfully")
-            except AttributeError as ae:
+    try:
+from src.gui.enhanced_main_window import EnhancedMainWindow
+
+        print("✅ Enhanced main window imported successfully")
+    except AttributeError as ae:
                 raise AssertionError(f"AttributeError in enhanced_main_window import: {ae}")
 
             # Test 2: Try to instantiate the class structure (without actual GUI)
@@ -205,7 +198,7 @@ class TestHiveMindFixes(unittest.TestCase):
                             with patch('src.gui.enhanced_main_window.BackgroundDataCollectionManager'):
                                 with patch('src.gui.enhanced_main_window.UserActionLogger'):
                                     # Check if class can be defined without AttributeError
-                                    try:
+    try:
                                         # Just check if we can access the class definition
                                         class_exists = hasattr(sys.modules['src.gui.enhanced_main_window'], 'EnhancedMainWindow')
                                         self.assertTrue(class_exists, "EnhancedMainWindow class not found")
@@ -231,28 +224,26 @@ class TestHiveMindFixes(unittest.TestCase):
                                                     missing_display_methods.append(method)
 
                                             if missing_display_methods:
-                                                print(f"⚠️  Some display methods not found: {missing_display_methods}")
+        print(f"⚠️  Some display methods not found: {missing_display_methods}")
                                             else:
-                                                print("✅ All expected display methods found")
+        print("✅ All expected display methods found")
 
-                                    except AttributeError as ae:
+    except AttributeError as ae:
                                         raise AssertionError(f"AttributeError when accessing GUI class: {ae}")
-
-            print("✅ GUI Import: ALL TESTS PASSED")
+        print("✅ GUI Import: ALL TESTS PASSED")
             self.log_test_result("GUI import without AttributeError", True, "GUI imported successfully without AttributeError")
 
-        except Exception as e:
-            print(f"❌ GUI Import: FAILED - {e}")
-            print(traceback.format_exc())
+    except Exception as e:
+        print(f"❌ GUI Import: FAILED - {e}")
+        print(traceback.format_exc())
             self.log_test_result("GUI import without AttributeError", False, "Test failed", e)
             self.fail(f"GUI import test failed: {e}")
-
     def test_04_tax_sales_display_functions(self):
         """Test tax and sales history display functions work"""
         print("\n=== Testing Tax and Sales Display Functions ===")
 
-        try:
-            from src.gui.enhanced_main_window import EnhancedMainWindow
+    try:
+from src.gui.enhanced_main_window import EnhancedMainWindow
 
             # Check if display methods exist in the class
             display_methods = [
@@ -272,24 +263,23 @@ class TestHiveMindFixes(unittest.TestCase):
                     found_methods.append(method_name)
                 else:
                     missing_methods.append(method_name)
-
-            print(f"Found display methods: {found_methods}")
+        print(f"Found display methods: {found_methods}")
             if missing_methods:
-                print(f"Missing display methods: {missing_methods}")
+        print(f"Missing display methods: {missing_methods}")
 
             # Test that we have at least some tax/sales display functionality
             has_tax_display = any('tax' in method.lower() for method in found_methods)
             has_sales_display = any('sales' in method.lower() for method in found_methods)
 
             if not has_tax_display:
-                print("⚠️  No tax display methods found")
+        print("⚠️  No tax display methods found")
             else:
-                print("✅ Tax display methods found")
+        print("✅ Tax display methods found")
 
             if not has_sales_display:
-                print("⚠️  No sales display methods found")
+        print("⚠️  No sales display methods found")
             else:
-                print("✅ Sales display methods found")
+        print("✅ Sales display methods found")
 
             # Test mock functionality of display methods (if they exist)
             if found_methods:
@@ -313,7 +303,7 @@ class TestHiveMindFixes(unittest.TestCase):
                                         ]
 
                                         for method in found_methods:
-                                            try:
+    try:
                                                 method_func = getattr(mock_instance, method)
                                                 if 'tax' in method.lower():
                                                     method_func(test_data)
@@ -321,31 +311,29 @@ class TestHiveMindFixes(unittest.TestCase):
                                                     method_func(test_data)
                                                 else:
                                                     method_func(test_data)
-                                            except Exception as e:
-                                                print(f"⚠️  Method {method} test failed: {e}")
-
-            print("✅ Tax and Sales Display Functions: TESTS COMPLETED")
+    except Exception as e:
+        print(f"⚠️  Method {method} test failed: {e}")
+        print("✅ Tax and Sales Display Functions: TESTS COMPLETED")
             self.log_test_result("Tax and sales display functions", True,
                                f"Found methods: {found_methods}, Missing methods: {missing_methods}")
 
-        except Exception as e:
-            print(f"❌ Tax and Sales Display Functions: FAILED - {e}")
-            print(traceback.format_exc())
+    except Exception as e:
+        print(f"❌ Tax and Sales Display Functions: FAILED - {e}")
+        print(traceback.format_exc())
             self.log_test_result("Tax and sales display functions", False, "Test failed", e)
             self.fail(f"Tax and sales display functions test failed: {e}")
-
     def test_05_integration_smoke_test(self):
         """Smoke test to ensure all components can work together"""
         print("\n=== Integration Smoke Test ===")
 
-        try:
+    try:
             # Test that all main components can be imported together
             # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
             # MIGRATED: # MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             # MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.enhanced_config_manager import EnhancedConfigManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
             # Test basic integration
             with patch('src.database_manager.ThreadedConnectionPool'):
@@ -368,63 +356,56 @@ from src.enhanced_config_manager import EnhancedConfigManager
                         # Test EnhancedConfigManager.get() method in context
                         if hasattr(mock_config, 'get'):
                             result = mock_config.get('test_key', 'default_value')
-
-            print("✅ Integration Smoke Test: PASSED")
+        print("✅ Integration Smoke Test: PASSED")
             self.log_test_result("Integration smoke test", True, "All components can be imported and instantiated together")
 
-        except Exception as e:
-            print(f"❌ Integration Smoke Test: FAILED - {e}")
-            print(traceback.format_exc())
+    except Exception as e:
+        print(f"❌ Integration Smoke Test: FAILED - {e}")
+        print(traceback.format_exc())
             self.log_test_result("Integration smoke test", False, "Test failed", e)
             self.fail(f"Integration smoke test failed: {e}")
-
-def print_test_summary(test_results):
+    def print_test_summary(test_results):
     """Print a comprehensive test summary"""
-    print("\n" + "="*70)
-    print("HIVE MIND FIXES VERIFICATION TEST RESULTS")
-    print("="*70)
+        print("\n" + "="*70)
+        print("HIVE MIND FIXES VERIFICATION TEST RESULTS")
+        print("="*70)
 
     passed_tests = [r for r in test_results if r['success']]
     failed_tests = [r for r in test_results if not r['success']]
-
-    print(f"Total Tests: {len(test_results)}")
-    print(f"Passed: {len(passed_tests)}")
-    print(f"Failed: {len(failed_tests)}")
-    print(f"Success Rate: {len(passed_tests)/len(test_results)*100:.1f}%")
-
-    print("\n--- PASSED TESTS ---")
+        print(f"Total Tests: {len(test_results)}")
+        print(f"Passed: {len(passed_tests)}")
+        print(f"Failed: {len(failed_tests)}")
+        print(f"Success Rate: {len(passed_tests)/len(test_results)*100:.1f}%")
+        print("\n--- PASSED TESTS ---")
     for test in passed_tests:
         print(f"✅ {test['test']}")
         if test['message']:
-            print(f"   Message: {test['message']}")
+        print(f"   Message: {test['message']}")
 
     if failed_tests:
         print("\n--- FAILED TESTS ---")
         for test in failed_tests:
-            print(f"❌ {test['test']}")
+        print(f"❌ {test['test']}")
             if test['message']:
-                print(f"   Message: {test['message']}")
+        print(f"   Message: {test['message']}")
             if test['exception']:
-                print(f"   Exception: {test['exception']}")
-
-    print("\n--- CONCLUSIONS ---")
+        print(f"   Exception: {test['exception']}")
+        print("\n--- CONCLUSIONS ---")
     if len(failed_tests) == 0:
         print("🎉 ALL HIVE MIND FIXES ARE WORKING CORRECTLY!")
         print("The hive mind swarm successfully resolved all critical issues.")
     else:
         print("⚠️  Some issues remain:")
         for test in failed_tests:
-            print(f"   - {test['test']}: {test['message']}")
-
-    print("\n" + "="*70)
-
-def main():
+        print(f"   - {test['test']}: {test['message']}")
+        print("\n" + "="*70)
+    def main():
     """Main test execution"""
-    print("🧪 HIVE MIND FIXES VERIFICATION TEST")
-    print("=" * 50)
-    print("Testing all critical fixes implemented by the hive mind swarm")
-    print("Testing in project:", project_root)
-    print()
+        print("🧪 HIVE MIND FIXES VERIFICATION TEST")
+        print("=" * 50)
+        print("Testing all critical fixes implemented by the hive mind swarm")
+        print("Testing in project:", project_root)
+        print()
 
     # Run tests
     test_suite = unittest.TestLoader().loadTestsFromTestCase(TestHiveMindFixes)

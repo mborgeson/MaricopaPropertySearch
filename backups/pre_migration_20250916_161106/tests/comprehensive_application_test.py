@@ -4,10 +4,10 @@ Comprehensive End-to-End Application Testing Suite
 Tests all application functionality after recent fixes.
 """
 
+import json
 import os
 import sys
 import time
-import json
 import traceback
 from datetime import datetime
 from pathlib import Path
@@ -108,6 +108,7 @@ class ComprehensiveApplicationTest:
 
         try:
             from config_manager import ConfigManager
+
             config_manager = ConfigManager()
 
             # Test configuration loading
@@ -150,6 +151,7 @@ class ComprehensiveApplicationTest:
 
         try:
             from database_manager import DatabaseManager
+
             from threadsafe_database_manager import ThreadSafeDatabaseManager
 
             # Test basic database manager
@@ -257,6 +259,7 @@ class ComprehensiveApplicationTest:
             # Test PyQt5 availability
             try:
                 from PyQt5.QtWidgets import QApplication
+
                 self.log_test_result("PyQt5 Import", "PASS", "PyQt5 available")
             except ImportError:
                 self.log_test_result("PyQt5 Import", "FAIL", "PyQt5 not available")
@@ -266,6 +269,7 @@ class ComprehensiveApplicationTest:
             # Test main window import
             try:
                 from gui.enhanced_main_window import EnhancedMainWindow
+
                 self.log_test_result("Main Window Import", "PASS", "EnhancedMainWindow imported")
             except ImportError as e:
                 self.log_test_result("Main Window Import", "FAIL", f"Import error: {str(e)}")
@@ -288,6 +292,7 @@ class ComprehensiveApplicationTest:
 
         try:
             import logging
+
             from logging_config import setup_logging
 
             # Test logging setup
@@ -359,8 +364,9 @@ class ComprehensiveApplicationTest:
 
         # Memory usage test
         try:
-            import psutil
             import os
+
+            import psutil
 
             process = psutil.Process(os.getpid())
             memory_mb = process.memory_info().rss / 1024 / 1024
@@ -469,7 +475,8 @@ class ComprehensiveApplicationTest:
         except Exception as e:
             print(f"CRITICAL ERROR during testing: {str(e)}")
             traceback.print_exc()
-            self.results['critical_issues'].append(f"Testing framework error: {str(e)}")
+
+    self.results['critical_issues'].append(f"Testing framework error: {str(e)}")
 
         overall_duration = time.time() - overall_start
 

@@ -3,19 +3,18 @@
 Fix Default Settings Application in Enhanced Main Window
 This script fixes the issue where default settings are not being properly applied to UI components.
 """
-
 import os
 import re
 import shutil
 from datetime import datetime
 
+
 def backup_file(filepath):
     """Create a backup of the file"""
     backup_path = f"{filepath}.backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     shutil.copy2(filepath, backup_path)
-    print(f"Created backup: {backup_path}")
+        print(f"Created backup: {backup_path}")
     return backup_path
-
 def fix_apply_settings_method(content):
     """Fix the apply_settings_to_ui method"""
     
@@ -88,7 +87,6 @@ def fix_apply_settings_method(content):
     new_content = content[:start_idx] + new_method + content[end_idx:]
     
     return new_content
-
 def main():
     """Apply fixes to the enhanced main window"""
     
@@ -100,8 +98,7 @@ def main():
     if not os.path.exists(main_window_path):
         print(f"Error: File not found: {main_window_path}")
         return False
-    
-    print(f"Fixing default settings in: {main_window_path}")
+        print(f"Fixing default settings in: {main_window_path}")
     
     # Create backup
     backup_path = backup_file(main_window_path)
@@ -110,7 +107,6 @@ def main():
         # Read the current file
         with open(main_window_path, 'r', encoding='utf-8') as f:
             content = f.read()
-        
         print("Applying fixes...")
         
         # Apply fixes
@@ -119,7 +115,6 @@ def main():
         # Write the fixed content
         with open(main_window_path, 'w', encoding='utf-8') as f:
             f.write(content)
-        
         print("[SUCCESS] Successfully applied default settings fixes!")
         print()
         print("Fixed issues:")

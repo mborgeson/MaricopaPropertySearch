@@ -5,21 +5,22 @@ Automatically collects property data in the background without blocking the UI
 """
 
 import asyncio
+import json
 import logging
 import time
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from queue import Queue, Empty, PriorityQueue
-from threading import Lock, Event
-from typing import Dict, List, Optional, Any, Callable
-import json
+from queue import Empty, PriorityQueue, Queue
+from threading import Event, Lock
+from typing import Any, Callable, Dict, List, Optional
 
-from PyQt5.QtCore import QThread, pyqtSignal, QObject, QTimer
+from PyQt5.QtCore import QObject, QThread, QTimer, pyqtSignal
 from PyQt5.QtWidgets import QApplication
 
 from improved_automatic_data_collector import ImprovedMaricopaDataCollector
+
 # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 from logging_config import get_logger
@@ -31,6 +32,7 @@ logger = get_logger(__name__)
 
 class JobPriority(Enum):
     """Job priority levels"""
+
     LOW = 3
     NORMAL = 2
     HIGH = 1
@@ -40,6 +42,7 @@ class JobPriority(Enum):
 @dataclass
 class DataCollectionJob:
     """Data collection job definition"""
+
     apn: str
     priority: JobPriority
     created_at: datetime = field(default_factory=datetime.now)
@@ -71,7 +74,9 @@ class DataCollectionStats:
         """Record successful job completion"""
         self.jobs_completed += 1
         self.total_processing_time += processing_time
-        self.avg_processing_time = self.total_processing_time / max(1, self.jobs_completed)
+        self.avg_processing_time = self.total_processing_time / max(
+            1, self.jobs_completed
+        )
 
     def record_job_failure(self):
         """Record job failure"""
@@ -83,12 +88,12 @@ class DataCollectionStats:
         success_rate = (self.jobs_completed / max(1, total_jobs)) * 100
 
         return {
-            'jobs_submitted': self.jobs_submitted,
-            'jobs_completed': self.jobs_completed,
-            'jobs_failed': self.jobs_failed,
-            'success_rate_percent': success_rate,
-            'avg_processing_time': self.avg_processing_time,
-            'total_processing_time': self.total_processing_time
+            "jobs_submitted": self.jobs_submitted,
+            "jobs_completed": self.jobs_completed,
+            "jobs_failed": self.jobs_failed,
+            "success_rate_percent": success_rate,
+            "avg_processing_time": self.avg_processing_time,
+            "total_processing_time": self.total_processing_time,
         }
 
 
@@ -105,11 +110,11 @@ class DataCollectionCache:
         with self.lock:
             if apn in self.cache:
                 cached_item = self.cache[apn]
-                age = time.time() - cached_item['timestamp']
+                age = time.time() - cached_item["timestamp"]
 
                 if age < self.ttl_seconds:
                     logger.debug(f"Cache hit for APN {apn} (age: {age:.0f}s)")
-                    return cached_item['data']
+                    return cached_item["data"]
                 else:
                     # Expired, remove from cache
                     del self.cache[apn]
@@ -120,10 +125,7 @@ class DataCollectionCache:
     def cache_data(self, apn: str, data: Dict):
         """Cache data for future use"""
         with self.lock:
-            self.cache[apn] = {
-                'data': data,
-                'timestamp': time.time()
-            }
+            self.cache[apn] = {"data": data, "timestamp": time.time()}
             logger.debug(f"Cached data for APN {apn}")
 
     def clear_expired(self):
@@ -131,8 +133,9 @@ class DataCollectionCache:
         with self.lock:
             current_time = time.time()
             expired_apns = [
-                apn for apn, item in self.cache.items()
-                if current_time - item['timestamp'] > self.ttl_seconds
+                apn
+                for apn, item in self.cache.items()
+                if current_time - item["timestamp"] > self.ttl_seconds
             ]
 
             for apn in expired_apns:
@@ -145,8 +148,8 @@ class DataCollectionCache:
         """Get cache statistics"""
         with self.lock:
             return {
-                'total_entries': len(self.cache),
-                'cache_size_mb': len(json.dumps(self.cache)) / (1024 * 1024)
+                "total_entries": len(self.cache),
+                "cache_size_mb": len(json.dumps(self.cache)) / (1024 * 1024),
             }
 
 
@@ -174,11 +177,15 @@ class BackgroundDataWorker(QThread):
             config_manager = EnhancedConfigManager()
             api_client = UnifiedMaricopaAPIClient(config_manager)
             self.data_collector = ImprovedMaricopaDataCollector(db_manager, api_client)
-            logger.info("BackgroundDataWorker: Successfully initialized with working API client")
+            logger.info(
+                "BackgroundDataWorker: Successfully initialized with working API client"
+            )
         except Exception as e:
             logger.error(f"BackgroundDataWorker: Failed to initialize API client: {e}")
             # Fallback to None but log the issue
-            self.data_collector = ImprovedMaricopaDataCollector(db_manager, api_client=None)
+            self.data_collector = ImprovedMaricopaDataCollector(
+                db_manager, api_client=None
+            )
 
         # Statistics and caching
         self.stats = DataCollectionStats()
@@ -188,9 +195,16 @@ class BackgroundDataWorker(QThread):
         self.jobs_completed_count = 0
         self.total_jobs_count = 0
 
-        logger.info(f"Background data worker initialized with {max_concurrent_jobs} concurrent jobs")
+        logger.info(
+            f"Background data worker initialized with {max_concurrent_jobs} concurrent jobs"
+        )
 
-    def add_job(self, apn: str, priority: JobPriority = JobPriority.NORMAL, force_fresh: bool = False) -> bool:
+    def add_job(
+        self,
+        apn: str,
+        priority: JobPriority = JobPriority.NORMAL,
+        force_fresh: bool = False,
+    ) -> bool:
         """Add a job to the queue"""
         try:
             # Check if job already exists for this APN (avoid duplicates)
@@ -212,7 +226,9 @@ class BackgroundDataWorker(QThread):
             self.total_jobs_count += 1
             self.stats.jobs_submitted += 1
 
-            logger.info(f"Added collection job for APN {apn} with priority {priority.name}")
+            logger.info(
+                f"Added collection job for APN {apn} with priority {priority.name}"
+            )
             return True
 
         except Exception as e:
@@ -263,9 +279,9 @@ class BackgroundDataWorker(QThread):
             if not job.force_fresh and not self._needs_data_collection(apn):
                 logger.info(f"APN {apn} has recent data, skipping collection")
                 result = {
-                    'apn': apn,
-                    'skipped': True,
-                    'reason': 'Recent data available'
+                    "apn": apn,
+                    "skipped": True,
+                    "reason": "Recent data available",
                 }
                 self._handle_job_success(job, result)
                 return
@@ -288,7 +304,10 @@ class BackgroundDataWorker(QThread):
             logger.info(f"Starting data collection for APN {apn}")
 
             # Validate that data collector has API client
-            if not hasattr(self.data_collector, 'api_client') or self.data_collector.api_client is None:
+            if (
+                not hasattr(self.data_collector, "api_client")
+                or self.data_collector.api_client is None
+            ):
                 raise Exception("Data collector API client is not initialized")
 
             # Use the comprehensive data collection method
@@ -298,9 +317,11 @@ class BackgroundDataWorker(QThread):
             self.cache.cache_data(job.apn, result)
 
             processing_time = time.time() - start_time
-            result['processing_time'] = processing_time
+            result["processing_time"] = processing_time
 
-            logger.info(f"Data collection completed for APN {job.apn} in {processing_time:.2f}s")
+            logger.info(
+                f"Data collection completed for APN {job.apn} in {processing_time:.2f}s"
+            )
             return result
 
         except Exception as e:
@@ -309,9 +330,9 @@ class BackgroundDataWorker(QThread):
             logger.error(error_msg)
 
             return {
-                'apn': job.apn,
-                'error': error_msg,
-                'processing_time': processing_time
+                "apn": job.apn,
+                "error": error_msg,
+                "processing_time": processing_time,
             }
 
     def _handle_job_completion(self, job: DataCollectionJob, future):
@@ -321,9 +342,9 @@ class BackgroundDataWorker(QThread):
             job.result = result
             job.completed_at = datetime.now()
 
-            if 'error' in result:
+            if "error" in result:
                 # Job failed
-                self._handle_job_failure(job, result['error'])
+                self._handle_job_failure(job, result["error"])
             else:
                 # Job succeeded
                 self._handle_job_success(job, result)
@@ -342,8 +363,8 @@ class BackgroundDataWorker(QThread):
             del self.active_jobs[apn]
 
         # Update statistics
-        if 'processing_time' in result:
-            self.stats.record_job_completion(result['processing_time'])
+        if "processing_time" in result:
+            self.stats.record_job_completion(result["processing_time"])
 
         self.jobs_completed_count += 1
 
@@ -391,8 +412,7 @@ class BackgroundDataWorker(QThread):
         # Check if we have recent tax data (current year)
         current_year = datetime.now().year
         has_current_tax = any(
-            record.get('tax_year') == current_year
-            for record in tax_records
+            record.get("tax_year") == current_year for record in tax_records
         )
 
         if not has_current_tax:
@@ -414,10 +434,12 @@ class BackgroundDataWorker(QThread):
             stats = self.stats.get_stats()
             cache_stats = self.cache.get_cache_stats()
 
-            logger.info(f"Worker stats: {stats['jobs_completed']} completed, "
-                       f"{stats['jobs_failed']} failed, "
-                       f"{stats['success_rate_percent']:.1f}% success rate, "
-                       f"cache: {cache_stats['total_entries']} entries")
+            logger.info(
+                f"Worker stats: {stats['jobs_completed']} completed, "
+                f"{stats['jobs_failed']} failed, "
+                f"{stats['success_rate_percent']:.1f}% success rate, "
+                f"cache: {cache_stats['total_entries']} entries"
+            )
 
     def stop_worker(self):
         """Stop the worker thread gracefully"""
@@ -432,11 +454,11 @@ class BackgroundDataWorker(QThread):
     def get_queue_status(self) -> Dict[str, Any]:
         """Get current queue status"""
         return {
-            'pending_jobs': self.job_queue.qsize(),
-            'active_jobs': len(self.active_jobs),
-            'completed_jobs': self.jobs_completed_count,
-            'total_jobs': self.total_jobs_count,
-            'worker_running': self.isRunning(),
+            "pending_jobs": self.job_queue.qsize(),
+            "active_jobs": len(self.active_jobs),
+            "completed_jobs": self.jobs_completed_count,
+            "total_jobs": self.total_jobs_count,
+            "worker_running": self.isRunning(),
         }
 
 
@@ -497,7 +519,12 @@ class BackgroundDataCollectionManager(QObject):
         """Check if collection is currently running"""
         return self.worker and self.worker.isRunning()
 
-    def collect_data_for_apn(self, apn: str, priority: JobPriority = JobPriority.CRITICAL, force_fresh: bool = False) -> bool:
+    def collect_data_for_apn(
+        self,
+        apn: str,
+        priority: JobPriority = JobPriority.CRITICAL,
+        force_fresh: bool = False,
+    ) -> bool:
         """Request immediate data collection for a specific APN"""
         if not self.worker or not self.worker.isRunning():
             logger.warning("Background worker not running")
@@ -505,23 +532,28 @@ class BackgroundDataCollectionManager(QObject):
 
         return self.worker.add_job(apn, priority, force_fresh)
 
-    def collect_batch_data(self, apns: List[str], priority: JobPriority = JobPriority.HIGH, force_fresh: bool = False) -> Dict[str, Any]:
+    def collect_batch_data(
+        self,
+        apns: List[str],
+        priority: JobPriority = JobPriority.HIGH,
+        force_fresh: bool = False,
+    ) -> Dict[str, Any]:
         """Request batch data collection for multiple APNs with comprehensive feedback"""
         if not self.worker or not self.worker.isRunning():
             logger.warning("Background worker not running for batch collection")
             return {
-                'success': False,
-                'error': 'Background worker not running',
-                'jobs_added': 0,
-                'total_requested': len(apns)
+                "success": False,
+                "error": "Background worker not running",
+                "jobs_added": 0,
+                "total_requested": len(apns),
             }
 
         if not apns:
             return {
-                'success': True,
-                'jobs_added': 0,
-                'total_requested': 0,
-                'message': 'No APNs provided'
+                "success": True,
+                "jobs_added": 0,
+                "total_requested": 0,
+                "message": "No APNs provided",
             }
 
         jobs_added = 0
@@ -535,40 +567,42 @@ class BackgroundDataCollectionManager(QObject):
                 failed_apns.append(apn.strip())
 
         result = {
-            'success': jobs_added > 0,
-            'jobs_added': jobs_added,
-            'total_requested': len(apns),
-            'failed_apns': failed_apns
+            "success": jobs_added > 0,
+            "jobs_added": jobs_added,
+            "total_requested": len(apns),
+            "failed_apns": failed_apns,
         }
 
         if failed_apns:
-            result['warning'] = f"{len(failed_apns)} APNs failed to queue"
+            result["warning"] = f"{len(failed_apns)} APNs failed to queue"
 
-        logger.info(f"Batch collection: {jobs_added}/{len(apns)} jobs added successfully")
+        logger.info(
+            f"Batch collection: {jobs_added}/{len(apns)} jobs added successfully"
+        )
         return result
 
     def get_collection_status(self) -> Dict[str, Any]:
         """Get current collection status"""
         if not self.worker:
             return {
-                'status': 'stopped',
-                'pending_jobs': 0,
-                'active_jobs': 0,
-                'completed_jobs': 0,
-                'total_jobs': 0
+                "status": "stopped",
+                "pending_jobs": 0,
+                "active_jobs": 0,
+                "completed_jobs": 0,
+                "total_jobs": 0,
             }
 
         queue_status = self.worker.get_queue_status()
         stats = self.worker.stats.get_stats()
 
         return {
-            'status': 'running' if self.worker.isRunning() else 'stopped',
-            'pending_jobs': queue_status['pending_jobs'],
-            'active_jobs': queue_status['active_jobs'],
-            'completed_jobs': queue_status['completed_jobs'],
-            'total_jobs': queue_status['total_jobs'],
-            'success_rate': f"{stats['success_rate_percent']:.1f}%",
-            'avg_processing_time': f"{stats['avg_processing_time']:.2f}s"
+            "status": "running" if self.worker.isRunning() else "stopped",
+            "pending_jobs": queue_status["pending_jobs"],
+            "active_jobs": queue_status["active_jobs"],
+            "completed_jobs": queue_status["completed_jobs"],
+            "total_jobs": queue_status["total_jobs"],
+            "success_rate": f"{stats['success_rate_percent']:.1f}%",
+            "avg_processing_time": f"{stats['avg_processing_time']:.2f}s",
         }
 
     def _emit_progress_update(self):
@@ -582,12 +616,16 @@ class BackgroundDataCollectionManager(QObject):
 
 
 # Convenience functions for standalone usage
-def create_background_manager(db_manager, max_concurrent_jobs: int = 3) -> BackgroundDataCollectionManager:
+def create_background_manager(
+    db_manager, max_concurrent_jobs: int = 3
+) -> BackgroundDataCollectionManager:
     """Create a background data collection manager"""
     return BackgroundDataCollectionManager(db_manager, max_concurrent_jobs)
 
 
-def start_background_collection(db_manager, max_concurrent_jobs: int = 3) -> BackgroundDataCollectionManager:
+def start_background_collection(
+    db_manager, max_concurrent_jobs: int = 3
+) -> BackgroundDataCollectionManager:
     """Start background collection and return the manager"""
     manager = create_background_manager(db_manager, max_concurrent_jobs)
     manager.start_collection()

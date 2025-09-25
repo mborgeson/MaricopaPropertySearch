@@ -12,6 +12,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
 
+
 def test_syntax_check():
     """Test that all Python files compile without syntax errors"""
     print("\n[VERIFY] Testing syntax compilation...")
@@ -20,16 +21,16 @@ def test_syntax_check():
         "src/gui/enhanced_main_window.py",
         "src/data_collection_cache.py",
         "src/config_manager.py",
-        "src/api_client.py"
+        "src/api_client.py",
     ]
 
     for file_path in python_files:
         full_path = project_root / file_path
         if full_path.exists():
             try:
-                with open(full_path, 'r', encoding='utf-8', errors='ignore') as f:
+                with open(full_path, "r", encoding="utf-8", errors="ignore") as f:
                     content = f.read()
-                compile(content, str(full_path), 'exec')
+                compile(content, str(full_path), "exec")
                 print(f"  [OK] {file_path} - No syntax errors")
             except SyntaxError as e:
                 print(f"  [ERROR] {file_path} - Syntax error: {e}")
@@ -42,14 +43,16 @@ def test_syntax_check():
 
     return True
 
+
 def test_imports():
     """Test that key imports work"""
     print("\n[VERIFY] Testing imports...")
 
     try:
         from src.data_collection_cache import DataCollectionCache
+
         cache = DataCollectionCache()
-        if hasattr(cache, 'clear_apn_cache'):
+        if hasattr(cache, "clear_apn_cache"):
             print("  [OK] DataCollectionCache.clear_apn_cache method exists")
         else:
             print("  [ERROR] DataCollectionCache.clear_apn_cache method missing")
@@ -60,15 +63,16 @@ def test_imports():
 
     try:
         from src.config_manager import ConfigManager
+
         config = ConfigManager()
 
         # Test all the methods that were missing
         required_methods = [
-            'get_database_enabled',
-            'get_api_client_type',
-            'get_web_scraper_type',
-            'get_logging_enabled',
-            'get_source_priority'
+            "get_database_enabled",
+            "get_api_client_type",
+            "get_web_scraper_type",
+            "get_logging_enabled",
+            "get_source_priority",
         ]
 
         for method in required_methods:
@@ -85,9 +89,10 @@ def test_imports():
     try:
         from src.api_client import MaricopaAPIClient
         from src.config_manager import ConfigManager
+
         config = ConfigManager()
         client = MaricopaAPIClient(config)
-        if hasattr(client, 'test_connection'):
+        if hasattr(client, "test_connection"):
             print("  [OK] MaricopaAPIClient.test_connection method exists")
         else:
             print("  [ERROR] MaricopaAPIClient.test_connection method missing")
@@ -98,6 +103,7 @@ def test_imports():
 
     return True
 
+
 def test_settings_file():
     """Test that settings file exists"""
     print("\n[VERIFY] Testing settings persistence...")
@@ -107,6 +113,7 @@ def test_settings_file():
         print(f"  [OK] Settings file exists: {settings_file}")
         try:
             import json
+
             with open(settings_file) as f:
                 settings = json.load(f)
             print(f"  [OK] Settings file is valid JSON with {len(settings)} keys")
@@ -117,6 +124,7 @@ def test_settings_file():
     else:
         print(f"  [ERROR] Settings file missing: {settings_file}")
         return False
+
 
 def main():
     print("=" * 60)
@@ -161,6 +169,7 @@ def main():
         print("\n[FAILURE] Some issues remain - check errors above")
 
     return 0 if all_passed else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

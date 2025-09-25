@@ -14,15 +14,14 @@ CONSOLIDATION MAPPING:
 
 Created as part of WAVE 2: DRY PRINCIPLE CONSOLIDATION EXECUTION
 """
-
+import logging
 import os
 import re
-import sys
 import shutil
-import logging
-from pathlib import Path
-from typing import List, Dict, Tuple, Set
+import sys
 from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Set, Tuple
 
 # Configure logging
 logging.basicConfig(
@@ -37,7 +36,6 @@ logger = logging.getLogger(__name__)
 
 class ImportMigrator:
     """Handles migration of imports across the codebase"""
-
     def __init__(self, project_root: str, dry_run: bool = False):
         self.project_root = Path(project_root)
         self.dry_run = dry_run
@@ -117,7 +115,6 @@ class ImportMigrator:
             # Test files that might be testing specific versions
             'test_api_client_comparison.py'
         ]
-
     def should_exclude_file(self, file_path: Path) -> bool:
         """Check if file should be excluded from migration"""
         file_str = str(file_path)
@@ -125,7 +122,6 @@ class ImportMigrator:
             if pattern in file_str or file_path.name.startswith('.'):
                 return True
         return False
-
     def backup_file(self, file_path: Path) -> None:
         """Create backup of file before modification"""
         if self.dry_run:
@@ -139,7 +135,6 @@ class ImportMigrator:
         # Copy file to backup location
         shutil.copy2(file_path, backup_file_path)
         logger.debug(f"Backed up: {file_path} → {backup_file_path}")
-
     def update_imports_in_content(self, content: str, file_path: Path) -> Tuple[str, int]:
         """Update import statements in file content"""
         updated_content = content
@@ -201,7 +196,6 @@ class ImportMigrator:
                         updates_count += old_matches
 
         return updated_content, updates_count
-
     def migrate_file(self, file_path: Path) -> bool:
         """Migrate imports in a single file"""
         try:
@@ -234,7 +228,6 @@ class ImportMigrator:
             logger.error(f"Error processing file {file_path}: {e}")
             self.migration_stats['errors'] += 1
             return False
-
     def find_python_files(self) -> List[Path]:
         """Find all Python files to process"""
         python_files = []
@@ -245,7 +238,6 @@ class ImportMigrator:
 
         logger.info(f"Found {len(python_files)} Python files to process")
         return python_files
-
     def run_migration(self) -> Dict[str, int]:
         """Run the complete migration process"""
         logger.info("="*80)
@@ -282,10 +274,9 @@ class ImportMigrator:
             logger.info("RECOMMENDATION: Test the application thoroughly before removing backup files")
 
         return self.migration_stats
-
 def main():
     """Main migration script entry point"""
-    import argparse
+import argparse
 
     parser = argparse.ArgumentParser(description='Migrate imports for DRY consolidation')
     parser.add_argument('--dry-run', action='store_true',

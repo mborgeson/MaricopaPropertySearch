@@ -1,11 +1,11 @@
 """
 End-to-end tests for complete user workflows using Playwright
 """
-
-import pytest
 import asyncio
 import time
 from pathlib import Path
+
+import pytest
 
 # Playwright imports - only import if available
 try:
@@ -38,9 +38,9 @@ class TestCompleteUserWorkflows:
     @pytest.fixture(scope="class")
     def app_process(self):
         """Start the application process for testing"""
-        import subprocess
-        import sys
-        import time
+import subprocess
+import sys
+import time
 
         # Start application
         app_path = (
@@ -60,7 +60,6 @@ class TestCompleteUserWorkflows:
         # Clean up
         process.terminate()
         process.wait()
-
     def test_new_user_complete_search_workflow(self, app_process):
         """Test complete workflow for new user performing first search"""
 
@@ -70,15 +69,14 @@ class TestCompleteUserWorkflows:
             context = browser.new_context()
             page = context.new_page()
 
-            try:
+    try:
                 # Since this is a desktop app, we'll test the workflow conceptually
                 # In a real scenario, you'd use PyAutoGUI or similar for desktop automation
                 self._simulate_new_user_workflow()
 
-            finally:
+    finally:
                 context.close()
                 browser.close()
-
     def test_power_user_rapid_search_workflow(self, app_process):
         """Test rapid sequential searches by power user"""
 
@@ -108,7 +106,6 @@ class TestCompleteUserWorkflows:
         average_time = total_time / len(search_sequences)
 
         assert average_time < 1.5, f"Average search time {average_time:.2f}s too slow"
-
     def test_error_recovery_complete_workflow(self, app_process):
         """Test complete workflow including error conditions and recovery"""
 
@@ -120,7 +117,6 @@ class TestCompleteUserWorkflows:
 
         # Test partial data scenarios
         self._simulate_partial_data_workflow()
-
     def test_data_export_workflow(self, app_process):
         """Test complete data export workflow"""
 
@@ -133,7 +129,6 @@ class TestCompleteUserWorkflows:
 
         # Verify exported file
         self._verify_exported_data()
-
     def test_property_details_workflow(self, app_process):
         """Test complete property details viewing workflow"""
 
@@ -146,7 +141,6 @@ class TestCompleteUserWorkflows:
 
         # Navigate through detail tabs
         self._simulate_detail_navigation()
-
     def _simulate_new_user_workflow(self):
         """Simulate a new user's first experience"""
         # Step 1: Application appears professional and ready
@@ -168,7 +162,6 @@ class TestCompleteUserWorkflows:
         # Step 5: Background enhancement works transparently
         enhancement_transparent = self._check_background_enhancement()
         assert enhancement_transparent, "Background enhancement should be transparent"
-
     def _simulate_search_operation(self, search_type, term):
         """Simulate a search operation"""
         # In real implementation, would use PyAutoGUI or similar
@@ -183,7 +176,6 @@ class TestCompleteUserWorkflows:
 
         elapsed = time.time() - start_time
         return elapsed < 2.0  # Should complete within 2 seconds
-
     def _simulate_network_failure_recovery(self):
         """Simulate network failure and recovery scenario"""
 
@@ -207,7 +199,6 @@ class TestCompleteUserWorkflows:
         assert (
             recovery_time < 10.0
         ), "Network recovery enhancement should complete quickly"
-
     def _simulate_database_recovery(self):
         """Simulate database connectivity issues and recovery"""
 
@@ -218,7 +209,6 @@ class TestCompleteUserWorkflows:
         # Simulate connection recovery
         recovery_success = self._simulate_database_reconnection()
         assert recovery_success, "Database connection should recover automatically"
-
     def _simulate_partial_data_workflow(self):
         """Simulate workflow with partial data availability"""
 
@@ -229,7 +219,6 @@ class TestCompleteUserWorkflows:
         # User should be informed about data completeness
         data_completeness_indicated = self._check_data_completeness_indication()
         assert data_completeness_indicated, "Should indicate data completeness status"
-
     def _simulate_export_operation(self):
         """Simulate CSV export operation"""
 
@@ -240,7 +229,6 @@ class TestCompleteUserWorkflows:
 
         export_time = time.time() - export_start
         return export_time < 2.0  # Should export quickly
-
     def _simulate_property_details_view(self):
         """Simulate viewing detailed property information"""
 
@@ -251,7 +239,6 @@ class TestCompleteUserWorkflows:
 
         details_time = time.time() - details_start
         return details_time < 1.0  # Details should load quickly
-
     def _simulate_detail_navigation(self):
         """Simulate navigating through property detail tabs"""
 
@@ -265,52 +252,42 @@ class TestCompleteUserWorkflows:
 
             tab_time = time.time() - tab_start
             assert tab_time < 0.2, f"Tab switch to {tab} should be instantaneous"
-
     def _check_application_appearance(self):
         """Check if application appears professional"""
         # Mock appearance check
         return True  # Application should pass visual inspection
-
     def _check_interface_clarity(self):
         """Check if interface is clear and intuitive"""
         # Mock interface clarity check
         return True  # Interface should be self-explanatory
-
     def _simulate_first_search(self):
         """Simulate new user's first search"""
         return self._simulate_search_operation("Owner Name", "SMITH")
-
     def _check_results_clarity(self):
         """Check if search results are clear and professional"""
         # Mock results clarity check
         return True  # Results should be well-formatted
-
     def _check_background_enhancement(self):
         """Check if background enhancement is transparent to user"""
         # Mock background enhancement check
         return True  # Should not interfere with user interaction
-
     def _simulate_database_only_search(self):
         """Simulate search using only database"""
         # Mock database-only search
         return [{"apn": "101-01-001A", "owner_name": "SMITH, JOHN"}]
-
     def _simulate_enhanced_results(self):
         """Simulate results enhanced with API data"""
         # Mock enhanced results
         return [{"apn": "101-01-001A", "owner_name": "SMITH, JOHN", "enhanced": True}]
-
     def _check_database_failure_handling(self):
         """Check if database failures are handled gracefully"""
         # Mock database failure handling check
         return True  # Should show user-friendly error messages
-
     def _simulate_database_reconnection(self):
         """Simulate automatic database reconnection"""
         # Mock reconnection attempt
         time.sleep(0.5)  # Reconnection delay
         return True  # Should reconnect successfully
-
     def _simulate_partial_data_search(self):
         """Simulate search returning partial data"""
         # Mock partial data results
@@ -318,12 +295,10 @@ class TestCompleteUserWorkflows:
             {"apn": "101-01-001A", "owner_name": "SMITH, JOHN", "status": "complete"},
             {"apn": "101-01-002B", "owner_name": "SMITH, JANE", "status": "partial"},
         ]
-
     def _check_data_completeness_indication(self):
         """Check if data completeness is indicated to user"""
         # Mock data completeness indication check
         return True  # Should show status indicators
-
     def _verify_exported_data(self):
         """Verify that exported data is valid"""
         # Mock export verification
@@ -344,7 +319,6 @@ class TestCompleteUserWorkflows:
 @pytest.mark.slow
 class TestVisualRegression:
     """Test visual appearance and regression"""
-
     def test_application_visual_consistency(self):
         """Test that application maintains visual consistency"""
 
@@ -356,7 +330,6 @@ class TestVisualRegression:
 
         # Assert no unexpected visual changes
         assert len(visual_changes) == 0, f"Unexpected visual changes: {visual_changes}"
-
     def test_responsive_layout_behavior(self):
         """Test that layout responds appropriately to window resizing"""
 
@@ -366,7 +339,6 @@ class TestVisualRegression:
         for width, height in window_sizes:
             layout_valid = self._test_layout_at_size(width, height)
             assert layout_valid, f"Layout should be valid at {width}x{height}"
-
     def test_loading_state_appearance(self):
         """Test appearance of loading states"""
 
@@ -382,7 +354,6 @@ class TestVisualRegression:
             assert (
                 appearance_professional
             ), f"Loading state {state} should appear professional"
-
     def _capture_key_screenshots(self):
         """Capture screenshots of key application states"""
         return {
@@ -391,17 +362,14 @@ class TestVisualRegression:
             "property_details": "property_details.png",
             "error_state": "error_state.png",
         }
-
     def _compare_with_baseline(self, screenshots):
         """Compare screenshots with baseline images"""
         # Mock visual comparison
         return []  # No changes detected
-
     def _test_layout_at_size(self, width, height):
         """Test layout validity at specific window size"""
         # Mock layout testing
         return True  # Layout should adapt properly
-
     def _test_loading_state_appearance(self, state):
         """Test appearance of specific loading state"""
         # Mock loading state appearance testing
@@ -412,7 +380,6 @@ class TestVisualRegression:
 @pytest.mark.accessibility
 class TestAccessibilityCompliance:
     """Test accessibility compliance and usability"""
-
     def test_keyboard_navigation(self):
         """Test complete keyboard navigation"""
 
@@ -423,7 +390,6 @@ class TestAccessibilityCompliance:
         # Test keyboard shortcuts
         shortcuts_work = self._test_keyboard_shortcuts()
         assert shortcuts_work, "Keyboard shortcuts should work"
-
     def test_screen_reader_compatibility(self):
         """Test compatibility with screen readers"""
 
@@ -434,34 +400,28 @@ class TestAccessibilityCompliance:
         # Test that important information is announced
         announcements_present = self._test_screen_reader_announcements()
         assert announcements_present, "Important changes should be announced"
-
     def test_color_contrast_compliance(self):
         """Test color contrast meets WCAG standards"""
 
         # Test contrast ratios
         contrast_compliant = self._test_color_contrast()
         assert contrast_compliant, "Color contrast should meet WCAG AA standards"
-
     def _test_tab_order(self):
         """Test logical tab order through interface"""
         # Mock tab order testing
         return True  # Tab order should be search type -> input -> button -> results
-
     def _test_keyboard_shortcuts(self):
         """Test keyboard shortcuts functionality"""
         # Mock keyboard shortcut testing
         return True  # Enter should trigger search, etc.
-
     def _test_aria_labels(self):
         """Test presence of ARIA labels"""
         # Mock ARIA label testing
         return True  # All controls should have labels
-
     def _test_screen_reader_announcements(self):
         """Test screen reader announcements"""
         # Mock screen reader testing
         return True  # Search results, errors should be announced
-
     def _test_color_contrast(self):
         """Test color contrast ratios"""
         # Mock color contrast testing

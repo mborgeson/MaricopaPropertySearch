@@ -97,17 +97,20 @@ def test_comprehensive_database_integration():
     except Exception as e:
         print(f"- Database save failed: {e}")
         import traceback
+
 from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.enhanced_config_manager import EnhancedConfigManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
         traceback.print_exc()
-        return False
+
+    return False
     
     finally:
         try:
             db_manager.close()
         except:
-            pass
+        pass
 
 if __name__ == "__main__":
     success = test_comprehensive_database_integration()

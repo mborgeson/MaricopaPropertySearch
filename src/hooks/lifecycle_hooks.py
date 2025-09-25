@@ -2,25 +2,25 @@
 Application Lifecycle Hooks
 Handles startup, shutdown, and lifecycle events for the Maricopa Property Search application
 """
-
 import asyncio
 import logging
 import os
-import psutil
 import signal
 import sys
 import threading
 import time
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Dict, Optional
+
+import psutil
 
 from hook_manager import (
     Hook,
     HookContext,
+    HookPriority,
     HookResult,
     HookStatus,
-    HookPriority,
     get_hook_manager,
 )
 from logging_config import get_logger, log_exception
@@ -30,7 +30,6 @@ logger = get_logger(__name__)
 
 class ApplicationStartupHook(Hook):
     """Hook executed during application startup"""
-
     def __init__(self):
         super().__init__("application_startup", HookPriority.HIGHEST)
         self.startup_time = None
@@ -94,11 +93,9 @@ class ApplicationStartupHook(Hook):
             logger.error(f"Application startup failed: {e}")
             log_exception(logger, e, "application startup")
             return HookResult(status=HookStatus.FAILED, error=e)
-
-    def _register_cleanup_handlers(self):
+def _register_cleanup_handlers(self):
         """Register signal handlers for graceful shutdown"""
-
-        def signal_handler(signum, frame):
+def signal_handler(signum, frame):
             logger.info(f"Received signal {signum}, initiating graceful shutdown...")
             # Emit shutdown hook
             from hook_manager import emit_hook
@@ -110,8 +107,7 @@ class ApplicationStartupHook(Hook):
         signal.signal(signal.SIGTERM, signal_handler)
 
         self.initialization_steps.append("Signal handlers registered")
-
-    def _initialize_directories(self, project_root: Optional[str]):
+def _initialize_directories(self, project_root: Optional[str]):
         """Initialize required application directories"""
         if project_root:
             dirs_to_create = ["logs", "cache", "exports", "backups", "temp"]
@@ -124,8 +120,7 @@ class ApplicationStartupHook(Hook):
             self.initialization_steps.append(
                 f"Directories initialized: {dirs_to_create}"
             )
-
-    def _log_configuration_info(self, config_manager):
+def _log_configuration_info(self, config_manager):
         """Log configuration information"""
         try:
             db_config = config_manager.get_db_config()
@@ -145,7 +140,6 @@ class ApplicationStartupHook(Hook):
 
 class ApplicationShutdownHook(Hook):
     """Hook executed during application shutdown"""
-
     def __init__(self):
         super().__init__("application_shutdown", HookPriority.HIGHEST)
         self.shutdown_time = None
@@ -190,11 +184,10 @@ class ApplicationShutdownHook(Hook):
             logger.error(f"Application shutdown error: {e}")
             log_exception(logger, e, "application shutdown")
             return HookResult(status=HookStatus.FAILED, error=e)
-
-    def _cleanup_temp_files(self):
+def _cleanup_temp_files(self):
         """Clean up temporary files"""
         try:
-            import tempfile
+import tempfile
 
             temp_dir = Path(tempfile.gettempdir())
             app_temp_files = list(temp_dir.glob("maricopa_*"))
@@ -211,8 +204,7 @@ class ApplicationShutdownHook(Hook):
 
         except Exception as e:
             logger.warning(f"Temp file cleanup failed: {e}")
-
-    def _cleanup_database(self, database_manager):
+def _cleanup_database(self, database_manager):
         """Clean up database connections"""
         try:
             if hasattr(database_manager, "pool") and database_manager.pool:
@@ -221,8 +213,7 @@ class ApplicationShutdownHook(Hook):
                 self.cleanup_results.append("Database connections closed")
         except Exception as e:
             logger.warning(f"Database cleanup error: {e}")
-
-    def _cleanup_api_client(self, api_client):
+def _cleanup_api_client(self, api_client):
         """Clean up API client connections"""
         try:
             if hasattr(api_client, "session"):
@@ -231,7 +222,6 @@ class ApplicationShutdownHook(Hook):
                 self.cleanup_results.append("API client closed")
         except Exception as e:
             logger.warning(f"API client cleanup error: {e}")
-
     def _calculate_uptime(self) -> Optional[timedelta]:
         """Calculate application uptime"""
         try:
@@ -247,8 +237,7 @@ class ApplicationShutdownHook(Hook):
             logger.debug(f"Could not calculate uptime: {e}")
 
         return None
-
-    def _generate_shutdown_report(self, uptime: Optional[timedelta]):
+def _generate_shutdown_report(self, uptime: Optional[timedelta]):
         """Generate final shutdown report"""
         try:
             hook_manager = get_hook_manager()
@@ -282,7 +271,6 @@ class ApplicationShutdownHook(Hook):
 
 class ResourceMonitorHook(Hook):
     """Hook for monitoring system resources"""
-
     def __init__(self):
         super().__init__("resource_monitor", HookPriority.LOW)
         self.last_check = None
@@ -351,7 +339,6 @@ class ResourceMonitorHook(Hook):
 
 class HealthCheckHook(Hook):
     """Hook for application health checks"""
-
     def __init__(self):
         super().__init__("health_check", HookPriority.NORMAL)
         self.last_health_check = None
@@ -405,7 +392,6 @@ class HealthCheckHook(Hook):
         except Exception as e:
             logger.error(f"Health check failed: {e}")
             return HookResult(status=HookStatus.FAILED, error=e)
-
     def _check_database_health(self, database_manager) -> Dict[str, Any]:
         """Check database connectivity and health"""
         try:
@@ -424,7 +410,6 @@ class HealthCheckHook(Hook):
                 "error": str(e),
                 "last_check": datetime.now().isoformat(),
             }
-
     def _check_api_health(self, api_client) -> Dict[str, Any]:
         """Check API connectivity and health"""
         try:
@@ -443,7 +428,6 @@ class HealthCheckHook(Hook):
                 "error": str(e),
                 "last_check": datetime.now().isoformat(),
             }
-
     def _check_disk_space(self) -> Dict[str, Any]:
         """Check available disk space"""
         try:
@@ -493,8 +477,6 @@ def trigger_startup(config_manager=None, database_manager=None, project_root=Non
         database_manager=database_manager,
         project_root=project_root,
     )
-
-
 def trigger_shutdown(database_manager=None, api_client=None):
     """Trigger application shutdown hook"""
     from hook_manager import emit_hook
@@ -505,8 +487,6 @@ def trigger_shutdown(database_manager=None, api_client=None):
         database_manager=database_manager,
         api_client=api_client,
     )
-
-
 def trigger_health_check(database_manager=None, api_client=None):
     """Trigger health check hook"""
     from hook_manager import emit_hook
@@ -517,8 +497,6 @@ def trigger_health_check(database_manager=None, api_client=None):
         database_manager=database_manager,
         api_client=api_client,
     )
-
-
 def trigger_resource_monitor():
     """Trigger resource monitoring hook"""
     from hook_manager import emit_hook

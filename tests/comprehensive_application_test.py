@@ -3,11 +3,10 @@
 Comprehensive End-to-End Application Testing Suite
 Tests all application functionality after recent fixes.
 """
-
+import json
 import os
 import sys
 import time
-import json
 import traceback
 from datetime import datetime
 from pathlib import Path
@@ -33,7 +32,6 @@ class ComprehensiveApplicationTest:
         self.project_root = Path(__file__).parent.parent
         self.config_path = self.project_root / 'config' / 'config.ini'
         self.log_dir = self.project_root / 'logs'
-
     def log_test_result(self, test_name, status, message, duration=0, details=None):
         """Log individual test results"""
         self.results['total_tests'] += 1
@@ -55,7 +53,6 @@ class ComprehensiveApplicationTest:
 
         self.results['test_details'].append(test_result)
         print(f"[{status}] {test_name}: {message}")
-
     def test_environment_setup(self):
         """Test 1: Environment and Dependencies"""
         print("\n" + "="*80)
@@ -97,7 +94,6 @@ class ComprehensiveApplicationTest:
 
         duration = time.time() - start_time
         print(f"Environment setup test completed in {duration:.2f} seconds")
-
     def test_configuration_management(self):
         """Test 2: Configuration Management"""
         print("\n" + "="*80)
@@ -106,7 +102,7 @@ class ComprehensiveApplicationTest:
 
         start_time = time.time()
 
-        try:
+    try:
             # MIGRATED: # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
             config_manager = EnhancedConfigManager()
 
@@ -133,13 +129,12 @@ class ComprehensiveApplicationTest:
                 self.log_test_result("Config Loading", "FAIL", "Failed to load configuration")
                 self.results['critical_issues'].append("Configuration loading failed")
 
-        except Exception as e:
+    except Exception as e:
             self.log_test_result("Config Manager Import", "FAIL", f"Import error: {str(e)}")
             self.results['critical_issues'].append(f"ConfigManager import failed: {str(e)}")
 
         duration = time.time() - start_time
         print(f"Configuration test completed in {duration:.2f} seconds")
-
     def test_database_connectivity(self):
         """Test 3: Database Connectivity"""
         print("\n" + "="*80)
@@ -148,7 +143,7 @@ class ComprehensiveApplicationTest:
 
         start_time = time.time()
 
-        try:
+    try:
             # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             from threadsafe_database_manager import ThreadSafeDatabaseManager
 
@@ -167,13 +162,12 @@ class ComprehensiveApplicationTest:
             ts_db_manager = ThreadSafeDatabaseManager()
             self.log_test_result("ThreadSafe DB Manager", "PASS", "ThreadSafeDatabaseManager initialized")
 
-        except Exception as e:
+    except Exception as e:
             self.log_test_result("Database Manager", "FAIL", f"Error: {str(e)}")
             self.results['critical_issues'].append(f"Database manager error: {str(e)}")
 
         duration = time.time() - start_time
         print(f"Database test completed in {duration:.2f} seconds")
-
     def test_api_client(self):
         """Test 4: API Client Functionality"""
         print("\n" + "="*80)
@@ -182,7 +176,7 @@ class ComprehensiveApplicationTest:
 
         start_time = time.time()
 
-        try:
+    try:
             # MIGRATED: from api_client import APIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 
             api_client = APIClient()
@@ -191,25 +185,24 @@ class ComprehensiveApplicationTest:
             # Test with a sample APN (non-blocking test)
             test_apn = "123-45-678"
             if hasattr(api_client, 'search_property_by_apn'):
-                try:
+    try:
                     # This should be a non-blocking test
                     result = api_client.search_property_by_apn(test_apn, timeout=5)
                     if result:
                         self.log_test_result("API Search Test", "PASS", f"API search returned data")
                     else:
                         self.log_test_result("API Search Test", "WARN", "API search returned no data (expected for test APN)")
-                except Exception as api_e:
+    except Exception as api_e:
                     self.log_test_result("API Search Test", "WARN", f"API search failed: {str(api_e)} (may be expected)")
             else:
                 self.log_test_result("API Search Method", "FAIL", "search_property_by_apn method not found")
 
-        except Exception as e:
+    except Exception as e:
             self.log_test_result("API Client", "FAIL", f"Error: {str(e)}")
             self.results['warnings'].append(f"API client error: {str(e)}")
 
         duration = time.time() - start_time
         print(f"API client test completed in {duration:.2f} seconds")
-
     def test_background_data_collection(self):
         """Test 5: Background Data Collection"""
         print("\n" + "="*80)
@@ -218,7 +211,7 @@ class ComprehensiveApplicationTest:
 
         start_time = time.time()
 
-        try:
+    try:
             from background_data_collector import BackgroundDataCollector
 
             collector = BackgroundDataCollector()
@@ -235,13 +228,12 @@ class ComprehensiveApplicationTest:
             else:
                 self.log_test_result("Stop Method", "FAIL", "stop_collection method missing")
 
-        except Exception as e:
+    except Exception as e:
             self.log_test_result("Background Collector", "FAIL", f"Error: {str(e)}")
             self.results['critical_issues'].append(f"Background data collection error: {str(e)}")
 
         duration = time.time() - start_time
         print(f"Background data collection test completed in {duration:.2f} seconds")
-
     def test_gui_components(self):
         """Test 6: GUI Components (Non-Display Test)"""
         print("\n" + "="*80)
@@ -250,34 +242,35 @@ class ComprehensiveApplicationTest:
 
         start_time = time.time()
 
-        try:
+    try:
             # Test GUI imports without initializing display
-            import sys
+import sys
 
             # Test PyQt5 availability
-            try:
+    try:
                 from PyQt5.QtWidgets import QApplication
+
                 self.log_test_result("PyQt5 Import", "PASS", "PyQt5 available")
-            except ImportError:
+    except ImportError:
                 self.log_test_result("PyQt5 Import", "FAIL", "PyQt5 not available")
                 self.results['critical_issues'].append("PyQt5 not available")
                 return
 
             # Test main window import
-            try:
+    try:
                 from gui.enhanced_main_window import EnhancedMainWindow
+
                 self.log_test_result("Main Window Import", "PASS", "EnhancedMainWindow imported")
-            except ImportError as e:
+    except ImportError as e:
                 self.log_test_result("Main Window Import", "FAIL", f"Import error: {str(e)}")
                 self.results['critical_issues'].append(f"EnhancedMainWindow import failed: {str(e)}")
 
-        except Exception as e:
+    except Exception as e:
             self.log_test_result("GUI Components", "FAIL", f"Error: {str(e)}")
             self.results['critical_issues'].append(f"GUI component error: {str(e)}")
 
         duration = time.time() - start_time
         print(f"GUI components test completed in {duration:.2f} seconds")
-
     def test_logging_system(self):
         """Test 7: Logging System"""
         print("\n" + "="*80)
@@ -286,9 +279,10 @@ class ComprehensiveApplicationTest:
 
         start_time = time.time()
 
-        try:
-            import logging
-            from logging_config import setup_logging
+    try:
+import logging
+
+from logging_config import setup_logging
 
             # Test logging setup
             logger = setup_logging()
@@ -307,13 +301,12 @@ class ComprehensiveApplicationTest:
             else:
                 self.log_test_result("Logging Setup", "FAIL", "Logging setup returned None")
 
-        except Exception as e:
+    except Exception as e:
             self.log_test_result("Logging System", "FAIL", f"Error: {str(e)}")
             self.results['warnings'].append(f"Logging system error: {str(e)}")
 
         duration = time.time() - start_time
         print(f"Logging system test completed in {duration:.2f} seconds")
-
     def test_file_operations(self):
         """Test 8: File Operations"""
         print("\n" + "="*80)
@@ -329,12 +322,12 @@ class ComprehensiveApplicationTest:
 
             # Test write permissions
             test_file = export_dir / 'test_write.txt'
-            try:
+    try:
                 with open(test_file, 'w') as f:
                     f.write("Test write operation")
                 test_file.unlink()  # Delete test file
                 self.log_test_result("Write Permissions", "PASS", "Write permissions verified")
-            except Exception as e:
+    except Exception as e:
                 self.log_test_result("Write Permissions", "FAIL", f"Write test failed: {str(e)}")
         else:
             self.log_test_result("Export Directory", "FAIL", "Export directory missing")
@@ -348,7 +341,6 @@ class ComprehensiveApplicationTest:
 
         duration = time.time() - start_time
         print(f"File operations test completed in {duration:.2f} seconds")
-
     def run_stress_tests(self):
         """Test 9: Stress Tests"""
         print("\n" + "="*80)
@@ -358,9 +350,10 @@ class ComprehensiveApplicationTest:
         start_time = time.time()
 
         # Memory usage test
-        try:
-            import psutil
-            import os
+    try:
+import os
+
+import psutil
 
             process = psutil.Process(os.getpid())
             memory_mb = process.memory_info().rss / 1024 / 1024
@@ -374,15 +367,15 @@ class ComprehensiveApplicationTest:
                 self.log_test_result("Memory Usage", "FAIL", f"Memory usage: {memory_mb:.1f} MB (excessive)")
                 self.results['critical_issues'].append(f"Excessive memory usage: {memory_mb:.1f} MB")
 
-        except ImportError:
+    except ImportError:
             self.log_test_result("Memory Test", "WARN", "psutil not available for memory testing")
 
         # Configuration loading stress test
-        try:
+    try:
             # MIGRATED: # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.enhanced_config_manager import EnhancedConfigManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
             load_times = []
             for i in range(10):
@@ -396,12 +389,11 @@ from src.enhanced_config_manager import EnhancedConfigManager
             else:
                 self.log_test_result("Config Load Speed", "WARN", f"Slow config loading: {avg_load_time:.3f}s")
 
-        except Exception as e:
+    except Exception as e:
             self.log_test_result("Config Stress Test", "FAIL", f"Error: {str(e)}")
 
         duration = time.time() - start_time
         print(f"Stress tests completed in {duration:.2f} seconds")
-
     def analyze_application_health(self):
         """Analyze overall application health"""
         print("\n" + "="*80)
@@ -427,7 +419,6 @@ from src.enhanced_config_manager import EnhancedConfigManager
                 self.results['application_health'] = 'FAIR'
             else:
                 self.results['application_health'] = 'POOR'
-
         print(f"Overall Health: {self.results['application_health']}")
         print(f"Success Rate: {passed_tests}/{total_tests} ({success_rate*100:.1f}%)")
         print(f"Critical Issues: {critical_issues}")
@@ -440,17 +431,14 @@ from src.enhanced_config_manager import EnhancedConfigManager
             self.results['recommendations'].append("Review and resolve warnings for optimal performance")
         if success_rate < 0.8:
             self.results['recommendations'].append("Investigate and fix failing tests")
-
     def generate_report(self):
         """Generate comprehensive test report"""
         report_path = self.project_root / 'tests' / 'comprehensive_test_report.json'
 
         with open(report_path, 'w') as f:
             json.dump(self.results, f, indent=2)
-
         print(f"\nDetailed test report saved to: {report_path}")
         return report_path
-
     def run_all_tests(self):
         """Run all comprehensive tests"""
         print("STARTING COMPREHENSIVE APPLICATION TESTING")
@@ -458,7 +446,7 @@ from src.enhanced_config_manager import EnhancedConfigManager
 
         overall_start = time.time()
 
-        try:
+    try:
             self.test_environment_setup()
             self.test_configuration_management()
             self.test_database_connectivity()
@@ -469,15 +457,15 @@ from src.enhanced_config_manager import EnhancedConfigManager
             self.test_file_operations()
             self.run_stress_tests()
 
-        except Exception as e:
-            print(f"CRITICAL ERROR during testing: {str(e)}")
-            traceback.print_exc()
-            self.results['critical_issues'].append(f"Testing framework error: {str(e)}")
+    except Exception as e:
+        print(f"CRITICAL ERROR during testing: {str(e)}")
+        traceback.print_exc()
+
+    self.results['critical_issues'].append(f"Testing framework error: {str(e)}")
 
         overall_duration = time.time() - overall_start
 
         self.analyze_application_health()
-
         print("\n" + "="*80)
         print("TESTING COMPLETE")
         print("="*80)
@@ -485,31 +473,30 @@ from src.enhanced_config_manager import EnhancedConfigManager
 
         report_path = self.generate_report()
         return self.results, report_path
-
-def main():
+    def main():
     """Main test execution"""
     tester = ComprehensiveApplicationTest()
     results, report_path = tester.run_all_tests()
 
     # Print summary
-    print("\n" + "="*80)
-    print("TEST SUMMARY")
-    print("="*80)
-    print(f"Application Health: {results['application_health']}")
-    print(f"Tests Passed: {results['passed_tests']}")
-    print(f"Tests Failed: {results['failed_tests']}")
-    print(f"Critical Issues: {len(results['critical_issues'])}")
-    print(f"Warnings: {len(results['warnings'])}")
+        print("\n" + "="*80)
+        print("TEST SUMMARY")
+        print("="*80)
+        print(f"Application Health: {results['application_health']}")
+        print(f"Tests Passed: {results['passed_tests']}")
+        print(f"Tests Failed: {results['failed_tests']}")
+        print(f"Critical Issues: {len(results['critical_issues'])}")
+        print(f"Warnings: {len(results['warnings'])}")
 
     if results['critical_issues']:
         print("\nCRITICAL ISSUES:")
         for issue in results['critical_issues']:
-            print(f"  • {issue}")
+        print(f"  • {issue}")
 
     if results['recommendations']:
         print("\nRECOMMENDATIONS:")
         for rec in results['recommendations']:
-            print(f"  • {rec}")
+        print(f"  • {rec}")
 
     return results['application_health']
 

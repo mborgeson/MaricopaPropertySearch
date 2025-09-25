@@ -3,11 +3,11 @@ Search Input Validation and Sanitization
 Comprehensive validation for search inputs with security protection
 """
 
-import re
 import logging
-from typing import Dict, List, Optional, Tuple, Any
+import re
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple
 
 logger = logging.getLogger(__name__)
 

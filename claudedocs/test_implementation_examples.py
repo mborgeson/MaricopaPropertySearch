@@ -3,19 +3,19 @@
 Test Implementation Examples for Authoritative Modules
 Provides concrete test code examples for critical testing scenarios
 """
+import json
+import subprocess
+import sys
+import threading
+import time
+import unittest.mock as mock
+from pathlib import Path
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
-import unittest.mock as mock
-from unittest.mock import Mock, patch, MagicMock
-import time
-import threading
-import json
-from pathlib import Path
-import sys
-import subprocess
-from PyQt5.QtWidgets import QApplication
-from PyQt5.QtTest import QTest
 from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtTest import QTest
+from PyQt5.QtWidgets import QApplication
 
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -28,28 +28,27 @@ class TestRunApplication:
     Unit tests for RUN_APPLICATION.py - Application entry point
     Coverage Target: 95%
     """
-    
     def test_dependency_validation_success(self):
         """Test that all required dependencies are properly detected"""
         with patch('subprocess.check_call') as mock_check:
             mock_check.return_value = None
             
             # Import after patching to avoid actual dependency checks
-            import RUN_APPLICATION
+import RUN_APPLICATION
+
             result = RUN_APPLICATION.check_dependencies()
             
             assert result is True
             assert "Dependencies validated successfully" in result
-    
     def test_dependency_validation_missing_package(self):
         """Test handling of missing dependencies"""
         with patch('__import__', side_effect=ImportError("No module named 'missing_package'")):
-            import RUN_APPLICATION
+import RUN_APPLICATION
+
             result = RUN_APPLICATION.check_dependencies()
             
             assert result is False
             assert "missing_package" in str(result)
-    
     def test_database_connection_check(self):
         """Test database connectivity validation"""
         mock_config = Mock()
@@ -63,22 +62,20 @@ class TestRunApplication:
         
         with patch('psycopg2.connect') as mock_connect:
             mock_connect.return_value.cursor.return_value.__enter__.return_value = Mock()
-            
-            import RUN_APPLICATION
+import RUN_APPLICATION
+
             result = RUN_APPLICATION.check_database_connection(mock_config)
             
             assert result is True
             mock_connect.assert_called_once()
-    
     def test_application_launch_sequence(self):
         """Test complete application launch workflow"""
         with patch.multiple('RUN_APPLICATION',
                           check_dependencies=Mock(return_value=True),
                           check_database_connection=Mock(return_value=True),
                           setup_logging=Mock(return_value=True)):
-            
-            import RUN_APPLICATION
-            
+import RUN_APPLICATION
+
             # Mock QApplication to avoid GUI creation in tests
             with patch('PyQt5.QtWidgets.QApplication') as mock_app:
                 result = RUN_APPLICATION.main()
@@ -94,7 +91,8 @@ class TestRunApplication:
         with patch.multiple('RUN_APPLICATION',
                           check_dependencies=Mock(return_value=True),
                           check_database_connection=Mock(return_value=True)):
-            import RUN_APPLICATION
+import RUN_APPLICATION
+
             RUN_APPLICATION.main()
         
         startup_time = time.time() - start_time
@@ -127,20 +125,18 @@ class TestThreadsafeDatabaseManager:
         """Create database manager instance for testing"""
         with patch('psycopg2.pool.ThreadedConnectionPool'):
             from threadsafe_database_manager import ThreadSafeDatabaseManager
+
             return ThreadSafeDatabaseManager(mock_config_manager)
-    
     def test_connection_pool_initialization(self, db_manager):
         """Test connection pool is properly initialized"""
         assert db_manager._connection_pool is not None
         assert db_manager.min_connections == 5
         assert db_manager.max_connections == 20
-    
     def test_concurrent_read_operations(self, db_manager):
         """Test multiple simultaneous read operations"""
         results = []
         errors = []
-        
-        def perform_search(search_term):
+    def perform_search(search_term):
             try:
                 result = db_manager.search_properties_by_owner(search_term)
                 results.append(result)
@@ -165,14 +161,12 @@ class TestThreadsafeDatabaseManager:
             assert len(errors) == 0, f"Errors in concurrent reads: {errors}"
             assert len(results) == 10
             assert mock_search.call_count == 10
-    
     def test_concurrent_write_operations(self, db_manager):
         """Test multiple simultaneous write operations maintain data integrity"""
         success_count = 0
         error_count = 0
         lock = threading.Lock()
-        
-        def insert_property_data(property_data):
+    def insert_property_data(property_data):
             nonlocal success_count, error_count
             try:
                 result = db_manager.insert_property_data(property_data)
@@ -236,12 +230,10 @@ class TestAPIClient:
         """Create API client instance for testing"""
         # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
         return UnifiedMaricopaAPIClient(mock_config_manager)
-    
     def test_api_authentication(self, api_client):
         """Test API authentication headers are properly set"""
         assert api_client.session.headers['AUTHORIZATION'] == 'test_api_token'
         assert api_client.session.headers['Accept'] == 'application/json'
-    
     def test_rate_limiting_compliance(self, api_client):
         """Test rate limiting prevents too frequent requests"""
         with patch('requests.Session.get') as mock_get:
@@ -256,7 +248,6 @@ class TestAPIClient:
             
             # Should take at least min_request_interval between calls
             assert elapsed_time >= api_client.min_request_interval
-    
     def test_request_retry_logic(self, api_client):
         """Test API request retry on failures"""
         with patch('requests.Session.get') as mock_get:
@@ -271,11 +262,10 @@ class TestAPIClient:
             
             assert mock_get.call_count == 3  # Retried twice
             assert result['result'] == 'success'
-    
     def test_timeout_handling(self, api_client):
         """Test proper handling of request timeouts"""
-        import requests
-        
+import requests
+
         with patch('requests.Session.get') as mock_get:
             mock_get.side_effect = requests.Timeout("Request timed out")
             
@@ -325,7 +315,6 @@ class TestEnhancedMainWindow:
             'background_manager': Mock(),
             'config_manager': Mock()
         }
-    
     def test_gui_initialization(self, qapp, mock_managers):
         """Test GUI initializes without errors"""
         with patch.multiple('enhanced_main_window',
@@ -333,12 +322,12 @@ class TestEnhancedMainWindow:
                           MaricopaAPIClient=lambda x: mock_managers['api_client']):
             
             from gui.enhanced_main_window import EnhancedMainWindow
+
             window = EnhancedMainWindow()
             
             assert window.windowTitle() == "Maricopa Property Search - Enhanced"
             assert window.search_input is not None
             assert window.results_table is not None
-    
     def test_search_form_validation(self, qapp, mock_managers):
         """Test search form validation prevents invalid searches"""
         from gui.enhanced_main_window import EnhancedMainWindow
@@ -354,7 +343,6 @@ class TestEnhancedMainWindow:
             # Should show validation message
             # Note: In real test, would check for QMessageBox or status message
             assert not window.search_button.isEnabled() or window.search_input.text() == ""
-    
     def test_result_table_population(self, qapp, mock_managers):
         """Test search results populate table correctly"""
         mock_results = [
@@ -365,6 +353,7 @@ class TestEnhancedMainWindow:
         with patch.multiple('enhanced_main_window',
                           DatabaseManager=lambda x: mock_managers['db_manager']):
             from gui.enhanced_main_window import EnhancedMainWindow
+
             window = EnhancedMainWindow()
             
             # Simulate search results
@@ -421,23 +410,23 @@ class TestWebScraper:
         driver.get.return_value = None
         driver.quit.return_value = None
         return driver
-    
     def test_chrome_driver_initialization(self, mock_config_manager):
         """Test Chrome WebDriver initializes correctly"""
         with patch('selenium.webdriver.Chrome') as mock_chrome:
             mock_chrome.return_value = Mock()
             
             from web_scraper import WebScraperManager
+
             scraper = WebScraperManager(mock_config_manager)
             
             driver = scraper._get_driver()
             assert driver is not None
             mock_chrome.assert_called_once()
-    
     def test_property_data_extraction(self, mock_config_manager, mock_driver):
         """Test property data extraction accuracy"""
         with patch('selenium.webdriver.Chrome', return_value=mock_driver):
             from web_scraper import WebScraperManager
+
             scraper = WebScraperManager(mock_config_manager)
             
             # Mock web page elements
@@ -447,11 +436,11 @@ class TestWebScraper:
             
             assert result is not None
             assert 'owner' in result or 'error' in result
-    
     def test_resource_cleanup(self, mock_config_manager, mock_driver):
         """Test WebDriver resources are properly cleaned up"""
         with patch('selenium.webdriver.Chrome', return_value=mock_driver):
             from web_scraper import WebScraperManager
+
             scraper = WebScraperManager(mock_config_manager)
             
             # Ensure cleanup happens
@@ -488,7 +477,6 @@ class TestSearchWorkflowIntegration:
         }
         
         return components
-    
     def test_end_to_end_property_search_by_owner(self, integrated_components):
         """Test complete search workflow from input to enhanced results"""
         # This would test the full pipeline:
@@ -514,7 +502,6 @@ class TestSearchWorkflowIntegration:
         assert final_result['owner'] == 'John Smith'
         assert final_result['tax_amount'] == 2500.00
         assert 'source' in final_result
-    
     def test_multi_source_data_consolidation(self, integrated_components):
         """Test consolidation of data from multiple sources"""
         apn = '123-45-678'
@@ -556,13 +543,13 @@ class TestPerformanceBenchmarks:
     Performance and load testing scenarios
     Validates system performance under various conditions
     """
-    
     def test_concurrent_user_simulation(self):
         """Simulate 10 concurrent users performing searches"""
-        import concurrent.futures
+import concurrent.futures
+
 from src.api_client_unified import UnifiedMaricopaAPIClient
-        
-        def simulate_user_search(user_id):
+
+    def simulate_user_search(user_id):
             # Mock user search behavior
             time.sleep(0.1)  # Simulate user thinking time
             search_terms = ['Smith', 'Johnson', 'Brown', 'Davis', 'Wilson']

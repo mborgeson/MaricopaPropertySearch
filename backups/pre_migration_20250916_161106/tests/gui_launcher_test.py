@@ -4,28 +4,29 @@ GUI Launcher Test Script
 Tests the main application launcher and verifies component initialization
 """
 
-import sys
 import os
-from pathlib import Path
+import sys
 import traceback
+from pathlib import Path
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
 
+
 def test_dependencies():
     """Test if all required dependencies are available"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("TESTING DEPENDENCIES")
-    print("="*60)
+    print("=" * 60)
 
     required = [
-        ('PyQt5', 'PyQt5.QtWidgets'),
-        ('psycopg2', 'psycopg2'),
-        ('requests', 'requests'),
-        ('beautifulsoup4', 'bs4'),
-        ('lxml', 'lxml')
+        ("PyQt5", "PyQt5.QtWidgets"),
+        ("psycopg2", "psycopg2"),
+        ("requests", "requests"),
+        ("beautifulsoup4", "bs4"),
+        ("lxml", "lxml"),
     ]
 
     results = []
@@ -40,14 +41,16 @@ def test_dependencies():
 
     return results
 
+
 def test_configuration():
     """Test configuration loading"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("TESTING CONFIGURATION")
-    print("="*60)
+    print("=" * 60)
 
     try:
         from src.config_manager import ConfigManager
+
         config = ConfigManager()
         print("[OK] Configuration loaded successfully")
 
@@ -62,11 +65,12 @@ def test_configuration():
         print(f"[X] Configuration failed: {e}")
         return False, str(e)
 
+
 def test_database_connection():
     """Test database connection if enabled"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("TESTING DATABASE")
-    print("="*60)
+    print("=" * 60)
 
     try:
         from src.config_manager import ConfigManager
@@ -90,14 +94,16 @@ def test_database_connection():
         print(f"[WARNING] Database test skipped: {e}")
         return None, str(e)
 
+
 def test_gui_initialization():
     """Test GUI component initialization"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("TESTING GUI INITIALIZATION")
-    print("="*60)
+    print("=" * 60)
 
     try:
         from PyQt5.QtWidgets import QApplication
+
         from src.config_manager import ConfigManager
         from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
@@ -118,38 +124,38 @@ def test_gui_initialization():
         components = []
 
         # Check search components
-        if hasattr(window, 'search_type_combo'):
-            components.append(('Search Type Selector', True))
+        if hasattr(window, "search_type_combo"):
+            components.append(("Search Type Selector", True))
         else:
-            components.append(('Search Type Selector', False))
+            components.append(("Search Type Selector", False))
 
-        if hasattr(window, 'search_input'):
-            components.append(('Search Input Field', True))
+        if hasattr(window, "search_input"):
+            components.append(("Search Input Field", True))
         else:
-            components.append(('Search Input Field', False))
+            components.append(("Search Input Field", False))
 
-        if hasattr(window, 'search_button'):
-            components.append(('Search Button', True))
+        if hasattr(window, "search_button"):
+            components.append(("Search Button", True))
         else:
-            components.append(('Search Button', False))
+            components.append(("Search Button", False))
 
         # Check results table
-        if hasattr(window, 'results_table'):
-            components.append(('Results Table', True))
+        if hasattr(window, "results_table"):
+            components.append(("Results Table", True))
         else:
-            components.append(('Results Table', False))
+            components.append(("Results Table", False))
 
         # Check batch search integration
-        if hasattr(window, 'batch_search_manager'):
-            components.append(('Batch Search Manager', True))
+        if hasattr(window, "batch_search_manager"):
+            components.append(("Batch Search Manager", True))
         else:
-            components.append(('Batch Search Manager', False))
+            components.append(("Batch Search Manager", False))
 
         # Check background data collector
-        if hasattr(window, 'background_manager'):
-            components.append(('Background Data Collector', True))
+        if hasattr(window, "background_manager"):
+            components.append(("Background Data Collector", True))
         else:
-            components.append(('Background Data Collector', False))
+            components.append(("Background Data Collector", False))
 
         print("\nComponent Status:")
         for comp_name, status in components:
@@ -167,16 +173,19 @@ def test_gui_initialization():
     except Exception as e:
         print(f"[X] GUI initialization failed: {e}")
         traceback.print_exc()
-        return False, str(e)
+
+    return False, str(e)
+
 
 def test_batch_search_dialog():
     """Test batch search dialog"""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("TESTING BATCH SEARCH DIALOG")
-    print("="*60)
+    print("=" * 60)
 
     try:
         from PyQt5.QtWidgets import QApplication
+
         from src.enhanced_batch_search_dialog import EnhancedBatchSearchDialog
 
         app = QApplication.instance()
@@ -189,9 +198,9 @@ def test_batch_search_dialog():
         print("[OK] Batch search dialog created")
 
         # Check components
-        has_file_input = hasattr(dialog, 'file_path_input')
-        has_browse_button = hasattr(dialog, 'browse_button')
-        has_progress = hasattr(dialog, 'overall_progress')
+        has_file_input = hasattr(dialog, "file_path_input")
+        has_browse_button = hasattr(dialog, "browse_button")
+        has_progress = hasattr(dialog, "overall_progress")
 
         print(f"  - File input: {'OK' if has_file_input else 'X'}")
         print(f"  - Browse button: {'OK' if has_browse_button else 'X'}")
@@ -205,38 +214,39 @@ def test_batch_search_dialog():
         print(f"[X] Batch search dialog test failed: {e}")
         return False, str(e)
 
+
 def run_full_test():
     """Run complete test suite"""
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print(" MARICOPA PROPERTY SEARCH - GUI LAUNCHER TEST SUITE")
-    print("="*70)
+    print("=" * 70)
 
     test_results = {}
 
     # Test dependencies
     dep_results = test_dependencies()
-    test_results['dependencies'] = all(status for _, status, _ in dep_results)
+    test_results["dependencies"] = all(status for _, status, _ in dep_results)
 
     # Test configuration
     config_ok, config_msg = test_configuration()
-    test_results['configuration'] = config_ok
+    test_results["configuration"] = config_ok
 
     # Test database
     db_ok, db_msg = test_database_connection()
-    test_results['database'] = db_ok if db_ok is not None else True
+    test_results["database"] = db_ok if db_ok is not None else True
 
     # Test GUI initialization
     gui_ok, gui_msg = test_gui_initialization()
-    test_results['gui'] = gui_ok
+    test_results["gui"] = gui_ok
 
     # Test batch search
     batch_ok, batch_msg = test_batch_search_dialog()
-    test_results['batch_search'] = batch_ok
+    test_results["batch_search"] = batch_ok
 
     # Summary
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     print(" TEST SUMMARY")
-    print("="*70)
+    print("=" * 70)
 
     for test_name, passed in test_results.items():
         status = "PASSED" if passed else "FAILED"
@@ -245,14 +255,15 @@ def run_full_test():
 
     all_passed = all(test_results.values())
 
-    print("\n" + "="*70)
+    print("\n" + "=" * 70)
     if all_passed:
         print(" [OK] ALL TESTS PASSED - GUI LAUNCHER IS FUNCTIONAL")
     else:
         print(" [WARNING] SOME TESTS FAILED - REVIEW OUTPUT ABOVE")
-    print("="*70)
+    print("=" * 70)
 
     return all_passed
+
 
 if __name__ == "__main__":
     try:
@@ -264,4 +275,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n\nFATAL ERROR: {e}")
         traceback.print_exc()
-        sys.exit(1)
+
+    sys.exit(1)

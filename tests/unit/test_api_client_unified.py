@@ -5,27 +5,28 @@ Tests the consolidated API client that combines 6 previous implementations
 with features including rate limiting, connection pooling, and error handling.
 """
 
-import pytest
 import asyncio
 import json
-import time
-from unittest.mock import Mock, patch, AsyncMock, MagicMock
-from requests.exceptions import RequestException, HTTPError, Timeout
-import aiohttp
 
 # Import the component under test
 import sys
+import time
 from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
+
+import aiohttp
+import pytest
+from requests.exceptions import HTTPError, RequestException, Timeout
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 from api_client_unified import (
-    UnifiedMaricopaAPIClient,
-    PropertyDataCache,
-    BatchAPIRequest,
     APIClientConfig,
-    RateLimiter,
+    BatchAPIRequest,
     ConnectionPoolManager,
+    PropertyDataCache,
+    RateLimiter,
+    UnifiedMaricopaAPIClient,
 )
 
 

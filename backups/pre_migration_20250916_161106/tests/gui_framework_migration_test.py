@@ -7,12 +7,12 @@ This test verifies that the PySide6 to PyQt5 conversion is complete and function
 Tests all GUI components, dialogs, charts, and event handling.
 """
 
-import sys
 import os
-import traceback
+import sys
 import time
+import traceback
 from datetime import datetime
-from typing import List, Dict, Optional, Any, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 # Add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'src'))
@@ -41,26 +41,88 @@ class GUIFrameworkMigrationTest:
         """Test 1: Verify all PyQt5 imports work correctly"""
         try:
             # Core PyQt5 imports
-            from PyQt5.QtWidgets import (
-                QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
-                QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem,
-                QStatusBar, QSplitter, QFrame, QTabWidget, QGroupBox, QGridLayout,
-                QScrollArea, QProgressBar, QTextEdit, QComboBox, QCheckBox,
-                QMessageBox, QDialog, QDialogButtonBox, QFormLayout, QSpinBox,
-                QDateEdit, QCalendarWidget, QButtonGroup, QRadioButton, QListWidget,
-                QListWidgetItem, QHeaderView, QMenu, QSizePolicy, QTreeWidget,
-                QTreeWidgetItem, QToolBar, QSlider, QDoubleSpinBox, QAction
-            )
             from PyQt5.QtCore import (
-                Qt, QThread, pyqtSignal, QTimer, QSize, QRect, QPoint, QDate,
-                QPropertyAnimation, QEasingCurve, QParallelAnimationGroup,
-                QSequentialAnimationGroup, QAbstractAnimation, QObject, QRunnable,
-                QThreadPool, QMutex, QMutexLocker, QSettings, QEventLoop
+                QAbstractAnimation,
+                QDate,
+                QEasingCurve,
+                QEventLoop,
+                QMutex,
+                QMutexLocker,
+                QObject,
+                QParallelAnimationGroup,
+                QPoint,
+                QPropertyAnimation,
+                QRect,
+                QRunnable,
+                QSequentialAnimationGroup,
+                QSettings,
+                QSize,
+                Qt,
+                QThread,
+                QThreadPool,
+                QTimer,
+                pyqtSignal,
             )
             from PyQt5.QtGui import (
-                QFont, QPalette, QColor, QPixmap, QIcon, QPainter,
-                QBrush, QPen, QLinearGradient, QRadialGradient, QFontMetrics,
-                QMovie, QCursor, QDragEnterEvent, QDropEvent, QDragMoveEvent
+                QBrush,
+                QColor,
+                QCursor,
+                QDragEnterEvent,
+                QDragMoveEvent,
+                QDropEvent,
+                QFont,
+                QFontMetrics,
+                QIcon,
+                QLinearGradient,
+                QMovie,
+                QPainter,
+                QPalette,
+                QPen,
+                QPixmap,
+                QRadialGradient,
+            )
+            from PyQt5.QtWidgets import (
+                QAction,
+                QApplication,
+                QButtonGroup,
+                QCalendarWidget,
+                QCheckBox,
+                QComboBox,
+                QDateEdit,
+                QDialog,
+                QDialogButtonBox,
+                QDoubleSpinBox,
+                QFormLayout,
+                QFrame,
+                QGridLayout,
+                QGroupBox,
+                QHBoxLayout,
+                QHeaderView,
+                QLabel,
+                QLineEdit,
+                QListWidget,
+                QListWidgetItem,
+                QMainWindow,
+                QMenu,
+                QMessageBox,
+                QProgressBar,
+                QPushButton,
+                QRadioButton,
+                QScrollArea,
+                QSizePolicy,
+                QSlider,
+                QSpinBox,
+                QSplitter,
+                QStatusBar,
+                QTableWidget,
+                QTableWidgetItem,
+                QTabWidget,
+                QTextEdit,
+                QToolBar,
+                QTreeWidget,
+                QTreeWidgetItem,
+                QVBoxLayout,
+                QWidget,
             )
 
             self.log_test("PyQt5 Core Widget Imports", True, "All core PyQt5 widgets imported successfully")
@@ -76,6 +138,7 @@ class GUIFrameworkMigrationTest:
             # Test QtCharts import with fallback
             try:
                 from PyQt5.QtChart import QChart, QChartView, QLineSeries, QValueAxis
+
                 charts_available = True
                 message = "QtCharts available and imported successfully"
             except ImportError:
@@ -94,6 +157,7 @@ class GUIFrameworkMigrationTest:
         """Test 3: Verify main window GUI class imports"""
         try:
             from gui.enhanced_main_window import EnhancedMainWindow
+
             self.log_test("Enhanced Main Window Import", True, "Main GUI class imported successfully")
             return True
 
@@ -107,6 +171,7 @@ class GUIFrameworkMigrationTest:
             # Test optional dialog imports
             try:
                 from gui.gui_enhancements_dialogs import ApplicationSettingsDialog
+
                 dialog_available = True
                 message = "GUI enhancement dialogs imported successfully"
             except ImportError:
@@ -124,8 +189,8 @@ class GUIFrameworkMigrationTest:
     def test_5_application_creation(self):
         """Test 5: Create QApplication instance"""
         try:
-            from PyQt5.QtWidgets import QApplication
             from PyQt5.QtCore import Qt
+            from PyQt5.QtWidgets import QApplication
 
             # Create application if it doesn't exist
             if QApplication.instance() is None:
@@ -174,8 +239,8 @@ class GUIFrameworkMigrationTest:
     def test_7_widget_functionality(self):
         """Test 7: Test basic widget functionality"""
         try:
-            from PyQt5.QtWidgets import QWidget, QVBoxLayout, QPushButton, QLabel
             from PyQt5.QtCore import Qt
+            from PyQt5.QtWidgets import QLabel, QPushButton, QVBoxLayout, QWidget
 
             # Create test widget
             test_widget = QWidget()
@@ -211,8 +276,8 @@ class GUIFrameworkMigrationTest:
     def test_8_signal_slot_system(self):
         """Test 8: Test PyQt5 signal/slot system"""
         try:
-            from PyQt5.QtWidgets import QWidget, QPushButton
-            from PyQt5.QtCore import pyqtSignal, QObject
+            from PyQt5.QtCore import QObject, pyqtSignal
+            from PyQt5.QtWidgets import QPushButton, QWidget
 
             class TestSignals(QObject):
                 test_signal = pyqtSignal(str)
@@ -247,7 +312,7 @@ class GUIFrameworkMigrationTest:
     def test_9_threading_support(self):
         """Test 9: Test PyQt5 threading support"""
         try:
-            from PyQt5.QtCore import QThread, QObject, pyqtSignal, QTimer
+            from PyQt5.QtCore import QObject, QThread, QTimer, pyqtSignal
 
             class TestWorker(QObject):
                 finished = pyqtSignal()
@@ -328,6 +393,7 @@ class GUIFrameworkMigrationTest:
             # Try to import main module and check for PySide6 usage
             try:
                 import gui.enhanced_main_window
+
                 # If it imports without PySide6 errors, we're good
                 self.log_test("No PySide6 Dependencies", True,
                              "No PySide6 modules found in sys.modules")
@@ -350,8 +416,8 @@ class GUIFrameworkMigrationTest:
     def test_12_responsive_ui_behavior(self):
         """Test 12: Test responsive UI behavior"""
         try:
-            from PyQt5.QtWidgets import QWidget, QVBoxLayout, QLabel, QSizePolicy
             from PyQt5.QtCore import QSize, Qt
+            from PyQt5.QtWidgets import QLabel, QSizePolicy, QVBoxLayout, QWidget
 
             # Create responsive widget
             widget = QWidget()
@@ -417,7 +483,7 @@ class GUIFrameworkMigrationTest:
                 print(f"[FAIL]: {test_func.__name__} - Unexpected error: {e}")
                 traceback.print_exc()
 
-        print()
+    print()
         print("=" * 80)
         print("TEST SUMMARY")
         print("=" * 80)

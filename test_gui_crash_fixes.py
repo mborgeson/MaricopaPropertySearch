@@ -3,14 +3,13 @@
 GUI Crash Fix Validation Suite
 Tests the crash-safe refresh functions and GUI stability improvements
 """
-
-import sys
 import os
-import time
-import threading
-import unittest
-from unittest.mock import Mock, patch, MagicMock
+import sys
 import tempfile
+import threading
+import time
+import unittest
+from unittest.mock import MagicMock, Mock, patch
 
 # Add src directory to path for imports
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
@@ -34,27 +33,20 @@ class MockQProgressDialog:
         self.label = label
         self.value = 0
         print(f"[PROGRESS] Created: {label}")
-
     def setWindowModality(self, modality):
         pass
-
     def setMinimumDuration(self, duration):
         pass
-
     def show(self):
         print(f"[PROGRESS] Showing dialog")
-
-    def setValue(self, value):
+def setValue(self, value):
         self.value = value
         print(f"[PROGRESS] Value: {value}%")
-
-    def setLabelText(self, text):
+def setLabelText(self, text):
         print(f"[PROGRESS] Label: {text}")
-
-    def close(self):
+def close(self):
         print(f"[PROGRESS] Closing dialog")
-
-    def deleteLater(self):
+def deleteLater(self):
         print(f"[PROGRESS] Deleting dialog")
 
 class MockQt:
@@ -70,20 +62,20 @@ sys.modules['PyQt5.QtCore'].Qt = MockQt
 
 try:
     # Import the refresh crash fix functions
-    import importlib.util
+import importlib.util
+
     spec = importlib.util.spec_from_file_location(
         "refresh_crash_fix",
         "/home/mattb/MaricopaPropertySearch/src/gui/refresh_crash_fix.py"
     )
     refresh_module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(refresh_module)
-    print("✅ Successfully imported crash fix functions")
+        print("✅ Successfully imported crash fix functions")
 except Exception as e:
-    print(f"❌ Import error for crash fix: {e}")
+        print(f"❌ Import error for crash fix: {e}")
 
 class TestGUICrashFixes(unittest.TestCase):
     """Test suite for GUI crash fix validation"""
-
     def setUp(self):
         """Set up test fixtures"""
         # Create mock GUI window
@@ -100,8 +92,7 @@ class TestGUICrashFixes(unittest.TestCase):
 
         self.mock_window.background_manager = self.mock_background_manager
         self.mock_window.load_property_details = Mock()
-
-    def test_refresh_property_data_no_property_data(self):
+def test_refresh_property_data_no_property_data(self):
         """Test crash-safe behavior when no property data exists"""
         print("\n🔍 Testing refresh with no property data...")
 
@@ -112,11 +103,10 @@ class TestGUICrashFixes(unittest.TestCase):
         # Execute refresh function with no data
         try:
             refresh_module.refresh_property_data(window_no_data)
-            print("✅ Handled missing property data gracefully")
+        print("✅ Handled missing property data gracefully")
         except Exception as e:
             self.fail(f"Function should handle missing property data: {e}")
-
-    def test_refresh_property_data_with_valid_data(self):
+def test_refresh_property_data_with_valid_data(self):
         """Test refresh with valid property data"""
         print("\n🔍 Testing refresh with valid property data...")
 
@@ -127,12 +117,10 @@ class TestGUICrashFixes(unittest.TestCase):
             self.mock_background_manager.is_running.assert_called_once()
             self.mock_background_manager.collect_data_for_apn.assert_called_once()
             self.mock_window.load_property_details.assert_called_once()
-
-            print("✅ Refresh with valid data completed successfully")
+        print("✅ Refresh with valid data completed successfully")
         except Exception as e:
             self.fail(f"Function should handle valid data: {e}")
-
-    def test_refresh_property_data_no_background_manager(self):
+def test_refresh_property_data_no_background_manager(self):
         """Test crash-safe behavior when background manager is missing"""
         print("\n🔍 Testing refresh with no background manager...")
 
@@ -143,11 +131,10 @@ class TestGUICrashFixes(unittest.TestCase):
 
         try:
             refresh_module.refresh_property_data(window_no_manager)
-            print("✅ Handled missing background manager gracefully")
+        print("✅ Handled missing background manager gracefully")
         except Exception as e:
             self.fail(f"Function should handle missing background manager: {e}")
-
-    def test_refresh_property_data_background_service_not_running(self):
+def test_refresh_property_data_background_service_not_running(self):
         """Test behavior when background service is not running"""
         print("\n🔍 Testing refresh with stopped background service...")
 
@@ -155,11 +142,10 @@ class TestGUICrashFixes(unittest.TestCase):
 
         try:
             refresh_module.refresh_property_data(self.mock_window)
-            print("✅ Handled stopped background service gracefully")
+        print("✅ Handled stopped background service gracefully")
         except Exception as e:
             self.fail(f"Function should handle stopped service: {e}")
-
-    def test_refresh_property_data_background_manager_exception(self):
+def test_refresh_property_data_background_manager_exception(self):
         """Test crash-safe behavior when background manager throws exception"""
         print("\n🔍 Testing refresh with background manager exception...")
 
@@ -167,11 +153,10 @@ class TestGUICrashFixes(unittest.TestCase):
 
         try:
             refresh_module.refresh_property_data(self.mock_window)
-            print("✅ Handled background manager exception gracefully")
+        print("✅ Handled background manager exception gracefully")
         except Exception as e:
             self.fail(f"Function should handle background manager exceptions: {e}")
-
-    def test_update_dialog_status_safe_no_background_manager(self):
+def test_update_dialog_status_safe_no_background_manager(self):
         """Test safe status update with no background manager"""
         print("\n🔍 Testing status update with no background manager...")
 
@@ -180,11 +165,10 @@ class TestGUICrashFixes(unittest.TestCase):
 
         try:
             refresh_module._update_dialog_status_safe(window_no_manager)
-            print("✅ Status update handled missing background manager gracefully")
+        print("✅ Status update handled missing background manager gracefully")
         except Exception as e:
             self.fail(f"Status update should handle missing manager: {e}")
-
-    def test_update_dialog_status_safe_with_valid_data(self):
+def test_update_dialog_status_safe_with_valid_data(self):
         """Test safe status update with valid data"""
         print("\n🔍 Testing status update with valid data...")
 
@@ -197,12 +181,10 @@ class TestGUICrashFixes(unittest.TestCase):
             # Verify status was retrieved and widget updated
             self.mock_background_manager.get_collection_status.assert_called_once()
             self.mock_window.status_widget.update_status.assert_called_once()
-
-            print("✅ Status update with valid data completed successfully")
+        print("✅ Status update with valid data completed successfully")
         except Exception as e:
             self.fail(f"Status update should work with valid data: {e}")
-
-    def test_update_dialog_status_exception_handling(self):
+def test_update_dialog_status_exception_handling(self):
         """Test status update exception handling"""
         print("\n🔍 Testing status update exception handling...")
 
@@ -210,17 +192,15 @@ class TestGUICrashFixes(unittest.TestCase):
 
         try:
             refresh_module._update_dialog_status_safe(self.mock_window)
-            print("✅ Status update handled exception gracefully")
+        print("✅ Status update handled exception gracefully")
         except Exception as e:
             self.fail(f"Status update should handle exceptions: {e}")
-
-    def test_thread_safety_multiple_calls(self):
+def test_thread_safety_multiple_calls(self):
         """Test thread safety with multiple concurrent refresh calls"""
         print("\n🔍 Testing thread safety with concurrent calls...")
 
         errors = []
-
-        def worker_thread(thread_id):
+def worker_thread(thread_id):
             try:
                 # Create separate mock window for each thread
                 thread_window = Mock()
@@ -249,10 +229,9 @@ class TestGUICrashFixes(unittest.TestCase):
         # Verify no errors occurred
         self.assertEqual(len(errors), 0, f"Thread safety errors: {errors}")
         print("✅ Thread safety test passed")
-
 def run_gui_integration_tests():
     """Run integration tests for GUI crash fixes"""
-    print("\n🔧 Running GUI integration tests...")
+        print("\n🔧 Running GUI integration tests...")
 
     try:
         # Check that crash fix functions exist
@@ -260,25 +239,25 @@ def run_gui_integration_tests():
 
         for func_name in required_functions:
             if hasattr(refresh_module, func_name):
-                print(f"✅ Function {func_name} exists")
+        print(f"✅ Function {func_name} exists")
             else:
-                print(f"❌ Function {func_name} missing")
+        print(f"❌ Function {func_name} missing")
                 return False
 
         # Check enhanced_main_window.py exists and has been modified
         gui_file = "/home/mattb/MaricopaPropertySearch/src/gui/enhanced_main_window.py"
         if os.path.exists(gui_file):
-            print("✅ Enhanced main window file exists")
+        print("✅ Enhanced main window file exists")
 
             # Check for crash fix signatures in the file
             with open(gui_file, 'r') as f:
                 content = f.read()
                 if "CRASH-SAFE" in content:
-                    print("✅ Crash-safe functions appear to be applied")
+        print("✅ Crash-safe functions appear to be applied")
                 else:
-                    print("⚠️ Crash-safe functions may not be fully applied")
+        print("⚠️ Crash-safe functions may not be fully applied")
         else:
-            print("❌ Enhanced main window file not found")
+        print("❌ Enhanced main window file not found")
             return False
 
         return True
@@ -286,11 +265,10 @@ def run_gui_integration_tests():
     except Exception as e:
         print(f"❌ GUI integration test failed: {e}")
         return False
-
 def main():
     """Main test runner"""
-    print("🚀 Starting GUI Crash Fix Validation Suite")
-    print("=" * 60)
+        print("🚀 Starting GUI Crash Fix Validation Suite")
+        print("=" * 60)
 
     # Run integration tests first
     integration_success = run_gui_integration_tests()
@@ -300,7 +278,7 @@ def main():
         return 1
 
     # Run unit tests
-    print("\n🧪 Running unit tests...")
+        print("\n🧪 Running unit tests...")
 
     # Create test suite
     loader = unittest.TestLoader()
@@ -311,9 +289,9 @@ def main():
     result = runner.run(suite)
 
     # Summary
-    print("\n" + "=" * 60)
-    print("📊 GUI CRASH FIX TEST SUMMARY")
-    print("=" * 60)
+        print("\n" + "=" * 60)
+        print("📊 GUI CRASH FIX TEST SUMMARY")
+        print("=" * 60)
 
     if result.wasSuccessful():
         print("✅ ALL GUI TESTS PASSED")
@@ -328,14 +306,14 @@ def main():
         print(f"   Errors: {len(result.errors)}")
 
         if result.failures:
-            print("\n📝 FAILURES:")
+        print("\n📝 FAILURES:")
             for test, traceback in result.failures:
-                print(f"   {test}: {traceback}")
+        print(f"   {test}: {traceback}")
 
         if result.errors:
-            print("\n🔥 ERRORS:")
+        print("\n🔥 ERRORS:")
             for test, traceback in result.errors:
-                print(f"   {test}: {traceback}")
+        print(f"   {test}: {traceback}")
 
         return 1
 

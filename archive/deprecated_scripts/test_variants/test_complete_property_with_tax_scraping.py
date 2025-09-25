@@ -99,8 +99,9 @@ def test_complete_property_with_tax_data():
         import traceback
 from src.api_client_unified import UnifiedMaricopaAPIClient
 from src.enhanced_config_manager import EnhancedConfigManager
+
         traceback.print_exc()
-    
+
     finally:
         client.close()
 

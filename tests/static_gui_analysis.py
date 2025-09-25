@@ -3,13 +3,12 @@
 Static GUI Analysis for Maricopa Property Search Application
 Analyzes GUI code structure without requiring GUI initialization
 """
-
-import sys
-import os
 import ast
 import inspect
-from pathlib import Path
+import os
+import sys
 from datetime import datetime
+from pathlib import Path
 
 # Add the src directory to the path
 sys.path.insert(
@@ -19,14 +18,12 @@ sys.path.insert(
 
 class StaticGUIAnalyzer:
     """Analyzes GUI code structure and identifies potential issues"""
-
     def __init__(self):
         self.issues = []
         self.components = {}
         self.methods = {}
         self.imports = {}
         self.gui_file_path = None
-
     def analyze_gui_file(self):
         """Analyze the main GUI file"""
         print("🔍 Starting Static GUI Analysis...")
@@ -46,10 +43,9 @@ class StaticGUIAnalyzer:
         if not self.gui_file_path:
             self.issues.append("❌ CRITICAL: Cannot find enhanced_main_window.py")
             return False
-
         print(f"📁 Found GUI file: {self.gui_file_path}")
 
-        try:
+    try:
             with open(self.gui_file_path, "r", encoding="utf-8") as f:
                 content = f.read()
 
@@ -63,10 +59,9 @@ class StaticGUIAnalyzer:
 
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.issues.append(f"❌ CRITICAL: Failed to parse GUI file: {e}")
             return False
-
     def analyze_imports(self, tree):
         """Analyze import statements"""
         print("📦 Analyzing imports...")
@@ -97,7 +92,6 @@ class StaticGUIAnalyzer:
             else:
                 self.components[f'import_{imp.replace(".", "_")}'] = "❌ MISSING"
                 self.issues.append(f"Missing critical import: {imp}")
-
     def analyze_classes(self, tree):
         """Analyze class definitions"""
         print("🏗️ Analyzing class definitions...")
@@ -135,7 +129,6 @@ class StaticGUIAnalyzer:
             else:
                 self.components[f"class_check_{expected}"] = "❌ MISSING"
                 self.issues.append(f"Expected class not found: {expected}")
-
     def analyze_main_window_class(self, class_node):
         """Analyze the main window class specifically"""
         print("🏠 Analyzing EnhancedMainWindow class...")
@@ -167,7 +160,6 @@ class StaticGUIAnalyzer:
             else:
                 self.components[f"method_{method}"] = "❌ MISSING"
                 self.issues.append(f"Critical method missing: {method}")
-
     def analyze_methods(self, tree):
         """Analyze method definitions and their complexity"""
         print("⚙️ Analyzing method implementations...")
@@ -191,12 +183,11 @@ class StaticGUIAnalyzer:
                         )
 
         self.methods = method_stats
-
     def check_gui_patterns(self):
         """Check for common GUI patterns and potential issues"""
         print("🔍 Checking GUI patterns...")
 
-        try:
+    try:
             with open(self.gui_file_path, "r", encoding="utf-8") as f:
                 content = f.read()
 
@@ -245,9 +236,8 @@ class StaticGUIAnalyzer:
                     "⚠️ LIMITED - Limited progress feedback"
                 )
 
-        except Exception as e:
+    except Exception as e:
             self.issues.append(f"Pattern analysis failed: {e}")
-
     def generate_report(self):
         """Generate comprehensive analysis report"""
         print("\n" + "=" * 80)
@@ -257,30 +247,30 @@ class StaticGUIAnalyzer:
         # Component analysis
         print("\n🏗️ COMPONENT ANALYSIS:")
         for component, status in self.components.items():
-            print(f"  {component:40} | {status}")
+        print(f"  {component:40} | {status}")
 
         # Method statistics
         if self.methods:
-            print(f"\n⚙️ METHOD STATISTICS:")
-            print(f"  Total methods found: {len(self.methods)}")
+        print(f"\n⚙️ METHOD STATISTICS:")
+        print(f"  Total methods found: {len(self.methods)}")
 
             # Top 5 longest methods
             sorted_methods = sorted(
                 self.methods.items(), key=lambda x: x[1]["lines"], reverse=True
             )[:5]
-            print("  Longest methods:")
+        print("  Longest methods:")
             for name, stats in sorted_methods:
-                print(
+        print(
                     f"    {name:30} | {stats['lines']:3} lines | {stats['args']:2} args"
                 )
 
         # Issues found
         if self.issues:
-            print(f"\n🚨 ISSUES IDENTIFIED ({len(self.issues)}):")
+        print(f"\n🚨 ISSUES IDENTIFIED ({len(self.issues)}):")
             for i, issue in enumerate(self.issues, 1):
-                print(f"  {i:2}. {issue}")
+        print(f"  {i:2}. {issue}")
         else:
-            print("\n✅ No critical issues identified!")
+        print("\n✅ No critical issues identified!")
 
         # Summary statistics
         total_components = len(self.components)
@@ -293,7 +283,6 @@ class StaticGUIAnalyzer:
         failed_components = len(
             [c for c in self.components.values() if c.startswith("❌")]
         )
-
         print(f"\n📊 SUMMARY:")
         print(f"  Total components analyzed: {total_components}")
         print(f"  ✅ Passed: {passed_components}")
@@ -303,7 +292,7 @@ class StaticGUIAnalyzer:
 
         if total_components > 0:
             success_rate = (passed_components / total_components) * 100
-            print(f"  📈 Success rate: {success_rate:.1f}%")
+        print(f"  📈 Success rate: {success_rate:.1f}%")
 
         return {
             "timestamp": datetime.now().isoformat(),
@@ -319,9 +308,7 @@ class StaticGUIAnalyzer:
                 "success_rate": success_rate if total_components > 0 else 0,
             },
         }
-
-
-def main():
+    def main():
     """Main analysis function"""
     analyzer = StaticGUIAnalyzer()
 
@@ -331,19 +318,18 @@ def main():
         report = analyzer.generate_report()
 
         # Save report
-        try:
-            import json
+    try:
+import json
 
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"static_gui_analysis_{timestamp}.json"
 
             with open(filename, "w") as f:
                 json.dump(report, f, indent=2)
+        print(f"\n💾 Analysis report saved to: {filename}")
 
-            print(f"\n💾 Analysis report saved to: {filename}")
-
-        except Exception as e:
-            print(f"⚠️ Could not save report: {e}")
+    except Exception as e:
+        print(f"⚠️ Could not save report: {e}")
 
         return report
     else:

@@ -3,9 +3,8 @@
 Batch Search System Demo
 Demonstrates the batch/parallel search processing system capabilities
 """
-
-import sys
 import os
+import sys
 import time
 from pathlib import Path
 
@@ -14,32 +13,31 @@ PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
+from background_data_collector import BackgroundDataCollectionManager
+from batch_search_integration import BatchSearchIntegrationManager, BatchSearchJobType
+from logging_config import get_logger, setup_logging
+
 # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient, MockMaricopaAPIClient
 from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.enhanced_config_manager import EnhancedConfigManager
-from web_scraper import WebScraperManager, MockWebScraperManager
-from background_data_collector import BackgroundDataCollectionManager
-from batch_search_integration import BatchSearchIntegrationManager, BatchSearchJobType
-from logging_config import setup_logging, get_logger
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+from web_scraper import MockWebScraperManager, WebScraperManager
 
 
 def demonstrate_batch_search():
     """Demonstrate batch search capabilities"""
+        print("=" * 60)
+        print("MARICOPA PROPERTY SEARCH - BATCH SEARCH DEMO")
+        print("=" * 60)
+        print()
 
-    print("=" * 60)
-    print("MARICOPA PROPERTY SEARCH - BATCH SEARCH DEMO")
-    print("=" * 60)
-    print()
-
-    try:
+try:
         # Initialize configuration
         config = EnhancedConfigManager()
         logging_config = setup_logging(config)
         logger = get_logger(__name__)
-
         print("✓ Configuration and logging initialized")
 
         # Initialize database
@@ -47,19 +45,19 @@ def demonstrate_batch_search():
         print("✓ Database manager initialized")
 
         # Initialize API client (use mock for demo)
-        try:
+try:
             api_client = UnifiedMaricopaAPIClient(config)
-            print("✓ Using real Maricopa API client")
-        except Exception as e:
-            print(f"⚠ Using mock API client ({e})")
+        print("✓ Using real Maricopa API client")
+except Exception as e:
+        print(f"⚠ Using mock API client ({e})")
             api_client = MockMaricopaAPIClient(config)
 
         # Initialize web scraper (use mock for demo)
-        try:
+try:
             web_scraper = WebScraperManager(config)
-            print("✓ Using real web scraper")
-        except Exception as e:
-            print(f"⚠ Using mock web scraper ({e})")
+        print("✓ Using real web scraper")
+except Exception as e:
+        print(f"⚠ Using mock web scraper ({e})")
             web_scraper = MockWebScraperManager(config)
 
         # Initialize background data collection
@@ -119,25 +117,25 @@ def demonstrate_batch_search():
         ]
 
         for i, demo in enumerate(demos, 1):
-            print(f"DEMO {i}: {demo['name']}")
-            print("-" * 50)
-            print(f"Description: {demo['description']}")
-            print(f"Search Type: {demo['search_type']}")
-            print(f"Items: {len(demo['identifiers'])}")
-            print(f"Job Type: {demo['job_type'].value}")
-            print()
-            print("Search Items:")
+        print(f"DEMO {i}: {demo['name']}")
+        print("-" * 50)
+        print(f"Description: {demo['description']}")
+        print(f"Search Type: {demo['search_type']}")
+        print(f"Items: {len(demo['identifiers'])}")
+        print(f"Job Type: {demo['job_type'].value}")
+        print()
+        print("Search Items:")
             for item in demo["identifiers"]:
-                print(f"  • {item}")
-            print()
+        print(f"  • {item}")
+        print()
 
             # Start batch search with progress callback
-            def progress_callback(job_id, progress, status):
-                print(f"  Progress: {progress:.1f}% - {status}")
+def progress_callback(job_id, progress, status):
+        print(f"  Progress: {progress:.1f}% - {status}")
 
             start_time = time.time()
 
-            try:
+try:
                 job_id = batch_manager.execute_batch_search(
                     identifiers=demo["identifiers"],
                     search_type=demo["search_type"],
@@ -146,18 +144,17 @@ def demonstrate_batch_search():
                     enable_background_collection=True,
                     progress_callback=progress_callback,
                 )
-
-                print(f"✓ Batch job started: {job_id}")
+        print(f"✓ Batch job started: {job_id}")
 
                 # Monitor job completion
                 while True:
                     status = batch_manager.get_job_status(job_id)
                     if not status:
-                        print("✗ Job status not found")
+        print("✗ Job status not found")
                         break
 
                     if status.get("progress", 0) >= 100:
-                        print("✓ Job completed")
+        print("✓ Job completed")
                         break
 
                     time.sleep(0.5)  # Check every 500ms
@@ -165,45 +162,44 @@ def demonstrate_batch_search():
                 # Get results
                 results = batch_manager.get_job_results(job_id)
                 if results:
-                    print(f"✓ Results retrieved")
-                    print(f"  Total Items: {results.total_items}")
-                    print(f"  Successful: {results.successful_items}")
-                    print(f"  Failed: {results.failed_items}")
-                    print(
+        print(f"✓ Results retrieved")
+        print(f"  Total Items: {results.total_items}")
+        print(f"  Successful: {results.successful_items}")
+        print(f"  Failed: {results.failed_items}")
+        print(
                         f"  Processing Time: {results.total_processing_time:.2f} seconds"
                     )
-                    print(
+        print(
                         f"  Average per Item: {results.average_time_per_item:.2f} seconds"
                     )
-                    print(f"  API Calls Used: {results.api_calls_total}")
+        print(f"  API Calls Used: {results.api_calls_total}")
 
                     if results.results:
-                        print(f"  Sample Results:")
+        print(f"  Sample Results:")
                         for result in results.results[:2]:  # Show first 2
                             status_icon = "✓" if result.success else "✗"
-                            print(
+        print(
                                 f"    {status_icon} {result.identifier}: {result.error_message or 'Success'}"
                             )
                 else:
-                    print("✗ No results available")
+        print("✗ No results available")
 
-            except Exception as e:
-                print(f"✗ Demo failed: {e}")
+except Exception as e:
+        print(f"✗ Demo failed: {e}")
 
             elapsed = time.time() - start_time
-            print(f"Demo {i} completed in {elapsed:.2f} seconds")
-            print()
+        print(f"Demo {i} completed in {elapsed:.2f} seconds")
+        print()
 
             if i < len(demos):
-                print("Press Enter to continue to next demo...")
+        print("Press Enter to continue to next demo...")
                 input()
-                print()
+        print()
 
         # Show final statistics
         print("BATCH PROCESSING STATISTICS")
         print("-" * 50)
         stats = batch_manager.get_integration_statistics()
-
         print(f"Total Jobs Processed: {stats['total_jobs_processed']}")
         print(f"Total Items Processed: {stats['total_items_processed']}")
         print(
@@ -216,13 +212,12 @@ def demonstrate_batch_search():
         # Component statistics
         if "batch_search_engine" in stats:
             engine_stats = stats["batch_search_engine"]
-            print("Batch Search Engine Stats:")
-            print(f"  Success Rate: {engine_stats.get('success_rate_percent', 0):.1f}%")
-            print(
+        print("Batch Search Engine Stats:")
+        print(f"  Success Rate: {engine_stats.get('success_rate_percent', 0):.1f}%")
+        print(
                 f"  Connection Pool Size: {engine_stats.get('connection_pool_size', 0)}"
             )
-            print()
-
+        print()
         print("=" * 60)
         print("DEMO COMPLETED SUCCESSFULLY!")
         print("=" * 60)
@@ -238,20 +233,21 @@ def demonstrate_batch_search():
         print("✓ Performance statistics and monitoring")
         print()
 
-    except Exception as e:
+except Exception as e:
         print(f"✗ Demo failed with error: {e}")
-        import traceback
+import traceback
 
         traceback.print_exc()
-    finally:
+
+finally:
         # Cleanup
-        try:
+try:
             if "batch_manager" in locals():
                 batch_manager.shutdown()
             if "background_manager" in locals():
                 background_manager.stop_collection()
-            print("✓ Cleanup completed")
-        except:
+        print("✓ Cleanup completed")
+except:
             pass
 
 

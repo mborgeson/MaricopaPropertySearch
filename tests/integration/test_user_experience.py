@@ -1,10 +1,10 @@
 """
 Integration tests for user experience and professional appearance requirements
 """
-
-import pytest
 import time
 from unittest.mock import Mock, patch
+
+import pytest
 from PyQt5.QtCore import Qt, QTimer
 from PyQt5.QtTest import QTest
 
@@ -13,10 +13,9 @@ from PyQt5.QtTest import QTest
 @pytest.mark.gui
 class TestProfessionalAppearance:
     """Test that application maintains professional appearance"""
-
     def test_application_startup_appearance(self, qt_app, app_config):
         """Test that application appears professional on startup"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
         window = EnhancedPropertySearchApp(app_config)
 
@@ -42,10 +41,9 @@ class TestProfessionalAppearance:
         assert window.search_type_combo.count() > 0
 
         window.close()
-
     def test_search_interface_clarity(self, qt_app, app_config):
         """Test that search interface is clear and intuitive"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
         window = EnhancedPropertySearchApp(app_config)
         window.show()
@@ -70,10 +68,9 @@ class TestProfessionalAppearance:
         assert "search" in button_text.lower() or "find" in button_text.lower()
 
         window.close()
-
     def test_loading_states_professional(self, qt_app, app_config, performance_timer):
         """Test that loading states appear professional and informative"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
         window = EnhancedPropertySearchApp(app_config)
         window.show()
@@ -82,8 +79,7 @@ class TestProfessionalAppearance:
         # Mock a slow search to test loading state
         original_search = window._perform_search
         search_completed = False
-
-        def mock_slow_search():
+    def mock_slow_search():
             nonlocal search_completed
             time.sleep(0.5)  # Simulate processing time
             search_completed = True
@@ -119,10 +115,9 @@ class TestProfessionalAppearance:
 @pytest.mark.gui
 class TestUserWorkflowExperience:
     """Test complete user workflow experiences"""
-
     def test_new_user_first_search_experience(self, qt_app, app_config, test_database):
         """Test the experience for a new user performing their first search"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
         window = EnhancedPropertySearchApp(app_config)
         window.show()
@@ -151,8 +146,7 @@ class TestUserWorkflowExperience:
         # Step 4: User clicks search
         search_completed = False
         original_results = []
-
-        def mock_search():
+    def mock_search():
             nonlocal search_completed, original_results
             # Simulate finding results
             original_results = [
@@ -186,12 +180,11 @@ class TestUserWorkflowExperience:
             assert window.results_table.rowCount() > 0, "Results should appear in table"
 
         window.close()
-
     def test_power_user_rapid_search_experience(
         self, qt_app, app_config, test_database
     ):
         """Test experience for power users doing rapid sequential searches"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
         window = EnhancedPropertySearchApp(app_config)
         window.show()
@@ -220,8 +213,7 @@ class TestUserWorkflowExperience:
 
             # Perform search
             search_completed = False
-
-            def mock_rapid_search():
+    def mock_rapid_search():
                 nonlocal search_completed
                 search_completed = True
                 return []  # Empty results for speed
@@ -249,12 +241,11 @@ class TestUserWorkflowExperience:
         ), f"Average search time {average_time:.3f}s too slow for power users"
 
         window.close()
-
     def test_error_recovery_user_experience(
         self, qt_app, app_config, network_simulator
     ):
         """Test user experience during error conditions"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
         window = EnhancedPropertySearchApp(app_config)
         window.show()
@@ -265,7 +256,7 @@ class TestUserWorkflowExperience:
             window.search_input.setText("SMITH")
 
             # Mock the search to simulate network failure
-            def mock_failing_search():
+    def mock_failing_search():
                 raise ConnectionError("Network unavailable")
 
             with patch.object(
@@ -291,12 +282,11 @@ class TestUserWorkflowExperience:
 @pytest.mark.gui
 class TestDataDisplayExperience:
     """Test how data is displayed to users"""
-
     def test_search_results_presentation(
         self, qt_app, app_config, sample_search_results
     ):
         """Test that search results are presented clearly and professionally"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
         window = EnhancedPropertySearchApp(app_config)
         window.show()
@@ -336,10 +326,9 @@ class TestDataDisplayExperience:
             assert len(first_row_data) > 0, "First row should contain data"
 
         window.close()
-
     def test_property_details_display(self, qt_app, app_config, sample_property_data):
         """Test detailed property information display"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
         window = EnhancedPropertySearchApp(app_config)
         window.show()
@@ -360,10 +349,9 @@ class TestDataDisplayExperience:
                     mock_details.assert_not_called()  # Should not be called yet
 
         window.close()
-
     def test_background_enhancement_indication(self, qt_app, app_config):
         """Test that background data enhancement is indicated to user"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
         window = EnhancedPropertySearchApp(app_config)
         window.show()
@@ -372,7 +360,7 @@ class TestDataDisplayExperience:
         # Simulate background enhancement in progress
         if hasattr(window, "status_label") or hasattr(window, "statusBar"):
             # Mock background enhancement
-            def mock_enhancement():
+    def mock_enhancement():
                 if hasattr(window, "statusBar"):
                     window.statusBar().showMessage(
                         "Enhancing results with additional data..."
@@ -398,17 +386,16 @@ class TestDataDisplayExperience:
 @pytest.mark.performance
 class TestResponsivenessExperience:
     """Test UI responsiveness from user perspective"""
-
     def test_ui_never_freezes_during_search(self, qt_app, app_config):
         """Test that UI remains responsive during search operations"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
         window = EnhancedPropertySearchApp(app_config)
         window.show()
         qt_app.processEvents()
 
         # Mock a potentially long-running search
-        def mock_long_search():
+    def mock_long_search():
             for i in range(10):
                 time.sleep(0.1)  # Simulate work
                 qt_app.processEvents()  # Allow UI updates
@@ -441,10 +428,9 @@ class TestResponsivenessExperience:
             assert clicks_processed > 0, "UI should remain responsive during search"
 
         window.close()
-
     def test_large_result_set_display_performance(self, qt_app, app_config):
         """Test that large result sets don't freeze the UI"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
         window = EnhancedPropertySearchApp(app_config)
         window.show()

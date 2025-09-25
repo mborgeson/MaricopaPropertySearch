@@ -3,10 +3,9 @@
 Property Search Functionality Test Suite
 Tests the search functionality for "10000 W Missouri Ave" to identify issues and bottlenecks
 """
-
-import sys
-import os
 import json
+import os
+import sys
 import time
 import traceback
 from datetime import datetime
@@ -16,21 +15,18 @@ from pathlib import Path
 src_dir = Path(__file__).parent.parent / "src"
 sys.path.insert(0, str(src_dir))
 sys.path.insert(0, str(Path(__file__).parent.parent))
-
-def print_header(title):
+    def print_header(title):
     """Print formatted test section header"""
-    print("\n" + "="*80)
-    print(f" {title}")
-    print("="*80)
-
-def print_result(test_name, success, details=""):
+        print("\n" + "="*80)
+        print(f" {title}")
+        print("="*80)
+    def print_result(test_name, success, details=""):
     """Print formatted test result"""
     status = "[PASS]" if success else "[FAIL]"
-    print(f"{status} {test_name}")
+        print(f"{status} {test_name}")
     if details:
         print(f"      {details}")
-
-def test_configuration():
+    def test_configuration():
     """Test configuration loading"""
     print_header("CONFIGURATION TESTS")
     
@@ -51,15 +47,14 @@ def test_configuration():
     except Exception as e:
         print_result("Configuration Loading", False, str(e))
         return False
-
-def test_database_connection():
+    def test_database_connection():
     """Test database connection"""
     print_header("DATABASE CONNECTION TESTS")
     
     try:
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
-        from src.threadsafe_database_manager import ThreadSafeDatabaseManager
-        
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
         config = EnhancedConfigManager()
         db_manager = ThreadSafeDatabaseManager(config)
         
@@ -82,8 +77,7 @@ def test_database_connection():
     except Exception as e:
         print_result("Database Connection", False, str(e))
         return False
-
-def test_api_client():
+    def test_api_client():
     """Test API client functionality"""
     print_header("API CLIENT TESTS")
     
@@ -109,14 +103,14 @@ def test_api_client():
         
         if search_results:
             result = search_results[0]
-            print(f"      First result APN: {result.get('apn')}")
-            print(f"      Address: {result.get('property_address')}")
-            print(f"      Owner: {result.get('owner_name')}")
+        print(f"      First result APN: {result.get('apn')}")
+        print(f"      Address: {result.get('property_address')}")
+        print(f"      Owner: {result.get('owner_name')}")
             
             # Test detailed property lookup
             apn = result.get('apn')
             if apn:
-                print(f"\nTesting detailed property lookup for APN: {apn}")
+        print(f"\nTesting detailed property lookup for APN: {apn}")
                 start_time = time.time()
                 
                 detailed_info = api_client.get_comprehensive_property_info(apn)
@@ -125,9 +119,9 @@ def test_api_client():
                 print_result("Detailed Property Info", detailed_info is not None, f"Retrieved in {detail_time:.2f}s")
                 
                 if detailed_info:
-                    print(f"      Year Built: {detailed_info.get('year_built')}")
-                    print(f"      Living Area: {detailed_info.get('living_area_sqft')} sqft")
-                    print(f"      Latest Assessed Value: ${detailed_info.get('latest_assessed_value'):,}" if detailed_info.get('latest_assessed_value') else "N/A")
+        print(f"      Year Built: {detailed_info.get('year_built')}")
+        print(f"      Living Area: {detailed_info.get('living_area_sqft')} sqft")
+        print(f"      Latest Assessed Value: ${detailed_info.get('latest_assessed_value'):,}" if detailed_info.get('latest_assessed_value') else "N/A")
                     
                     # Test tax history
                     start_time = time.time()
@@ -157,9 +151,9 @@ def test_api_client():
     except Exception as e:
         print_result("API Client", False, str(e))
         traceback.print_exc()
-        return False
 
-def test_web_scraping():
+    return False
+    def test_web_scraping():
     """Test web scraping functionality"""
     print_header("WEB SCRAPING TESTS")
     
@@ -173,8 +167,8 @@ def test_web_scraping():
         print(f"Scraping config: {scraping_config}")
         
         # For testing, use mock scraper to avoid browser issues
-        from src.web_scraper import MockWebScraperManager
-        
+from src.web_scraper import MockWebScraperManager
+
         scraper = MockWebScraperManager(config)
         
         # Test owner search
@@ -190,7 +184,7 @@ def test_web_scraping():
         if owner_results:
             apn = owner_results[0].get('apn')
             if apn:
-                print(f"\nTesting property scraping for APN: {apn}")
+        print(f"\nTesting property scraping for APN: {apn}")
                 start_time = time.time()
                 
                 property_data = scraper.scrape_property_by_apn(apn)
@@ -199,8 +193,8 @@ def test_web_scraping():
                 print_result("Property Scraping", property_data is not None, f"Scraped in {scrape_time:.2f}s")
                 
                 if property_data:
-                    print(f"      Scraped Owner: {property_data.get('owner_name')}")
-                    print(f"      Scraped Address: {property_data.get('property_address')}")
+        print(f"      Scraped Owner: {property_data.get('owner_name')}")
+        print(f"      Scraped Address: {property_data.get('property_address')}")
         
         scraper.close()
         return True
@@ -208,28 +202,29 @@ def test_web_scraping():
     except Exception as e:
         print_result("Web Scraping", False, str(e))
         traceback.print_exc()
-        return False
 
-def test_background_data_collection():
+    return False
+    def test_background_data_collection():
     """Test background data collection system"""
     print_header("BACKGROUND DATA COLLECTION TESTS")
     
     try:
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
-        from src.threadsafe_database_manager import ThreadSafeDatabaseManager
-        
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
         config = EnhancedConfigManager()
         db_manager = ThreadSafeDatabaseManager(config)
         
         # Test if we can create the background collector
         try:
-            from src.improved_automatic_data_collector import ImprovedMaricopaDataCollector
+from src.improved_automatic_data_collector import ImprovedMaricopaDataCollector
+
             collector = ImprovedMaricopaDataCollector(db_manager)
             print_result("Data Collector Creation", True, "Collector initialized successfully")
             
             # Test data collection for a sample APN (mock mode)
             sample_apn = "123456789"  # Mock APN
-            print(f"\nTesting data collection for sample APN: {sample_apn}")
+        print(f"\nTesting data collection for sample APN: {sample_apn}")
             
             # This would normally collect real data, but should handle gracefully
             start_time = time.time()
@@ -237,7 +232,7 @@ def test_background_data_collection():
                 result = collector.collect_data_for_apn_sync(sample_apn)
                 collection_time = time.time() - start_time
                 print_result("Data Collection", True, f"Completed in {collection_time:.2f}s")
-                print(f"      Result: {result}")
+        print(f"      Result: {result}")
             except Exception as collection_error:
                 collection_time = time.time() - start_time
                 print_result("Data Collection", False, f"Error after {collection_time:.2f}s: {str(collection_error)[:100]}")
@@ -251,8 +246,7 @@ def test_background_data_collection():
     except Exception as e:
         print_result("Background Data Collection", False, str(e))
         return False
-
-def test_complete_search_workflow():
+    def test_complete_search_workflow():
     """Test the complete search workflow from end to end"""
     print_header("COMPLETE SEARCH WORKFLOW TEST")
     
@@ -260,15 +254,15 @@ def test_complete_search_workflow():
     
     try:
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
-        from src.threadsafe_database_manager import ThreadSafeDatabaseManager
-        # MIGRATED: # MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 from src.api_client_unified import UnifiedMaricopaAPIClient
 from src.enhanced_config_manager import EnhancedConfigManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
+        # MIGRATED: # MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
         
         config = EnhancedConfigManager()
         db_manager = ThreadSafeDatabaseManager(config)
         api_client = UnifiedMaricopaAPIClient(config)
-        
         print(f"Testing complete workflow for: {search_term}")
         
         # Step 1: Perform initial search
@@ -280,7 +274,7 @@ from src.enhanced_config_manager import EnhancedConfigManager
         print_result("Initial Search", len(search_results) > 0, f"{len(search_results)} results in {search_time:.2f}s")
         
         if not search_results:
-            print("      No search results found, cannot continue workflow test")
+        print("      No search results found, cannot continue workflow test")
             return False
         
         # Step 2: Get detailed info for first result
@@ -288,9 +282,8 @@ from src.enhanced_config_manager import EnhancedConfigManager
         apn = first_result.get('apn')
         
         if not apn:
-            print("      No APN in first result, cannot continue")
+        print("      No APN in first result, cannot continue")
             return False
-        
         print(f"\n2. Getting detailed info for APN: {apn}")
         start_time = time.time()
         detailed_info = api_client.get_comprehensive_property_info(apn)
@@ -308,7 +301,7 @@ from src.enhanced_config_manager import EnhancedConfigManager
         
         # Step 4: Store property data
         if detailed_info:
-            print(f"\n4. Storing property data in database...")
+        print(f"\n4. Storing property data in database...")
             try:
                 success = db_manager.store_property_data(detailed_info)
                 print_result("Store Property Data", success, "Property data stored successfully")
@@ -331,27 +324,24 @@ from src.enhanced_config_manager import EnhancedConfigManager
     except Exception as e:
         print_result("Complete Workflow", False, str(e))
         traceback.print_exc()
-        return False
 
-def generate_test_report(results):
+    return False
+    def generate_test_report(results):
     """Generate comprehensive test report"""
     print_header("TEST REPORT SUMMARY")
     
     total_tests = len(results)
     passed_tests = sum(1 for result in results.values() if result)
     failed_tests = total_tests - passed_tests
-    
-    print(f"Total Tests: {total_tests}")
-    print(f"Passed: {passed_tests}")
-    print(f"Failed: {failed_tests}")
-    print(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
-    
-    print("\nDetailed Results:")
+        print(f"Total Tests: {total_tests}")
+        print(f"Passed: {passed_tests}")
+        print(f"Failed: {failed_tests}")
+        print(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
+        print("\nDetailed Results:")
     for test_name, success in results.items():
         status = "PASS" if success else "FAIL"
         print(f"  {status}: {test_name}")
-    
-    print("\nRecommendations:")
+        print("\nRecommendations:")
     if not results.get('database'):
         print("  * Database connection issues detected - check PostgreSQL service")
     if not results.get('api'):
@@ -384,13 +374,12 @@ def generate_test_report(results):
         print(f"\nDetailed report saved to: {report_file}")
     except Exception as e:
         print(f"Could not save report: {e}")
-
-def main():
+    def main():
     """Run all tests"""
-    print("MARICOPA PROPERTY SEARCH - COMPREHENSIVE TESTING SUITE")
-    print("="*80)
-    print(f"Test Target: '10000 W Missouri Ave'")
-    print(f"Test Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print("MARICOPA PROPERTY SEARCH - COMPREHENSIVE TESTING SUITE")
+        print("="*80)
+        print(f"Test Target: '10000 W Missouri Ave'")
+        print(f"Test Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
     # Run all tests
     test_results = {
@@ -417,4 +406,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n\nFatal test error: {e}")
         traceback.print_exc()
-        sys.exit(1)
+
+    sys.exit(1)

@@ -3,7 +3,6 @@
 COMPREHENSIVE DIAGNOSIS AND FIX
 This script will diagnose all current issues and implement systematic fixes
 """
-
 import sys
 from pathlib import Path
 
@@ -17,14 +16,14 @@ import json
 
 def diagnose_all_issues():
     """Comprehensive diagnosis of all data issues"""
-    print("="*80)
-    print("COMPREHENSIVE PROPERTY DATA DIAGNOSIS")
-    print("="*80)
+        print("="*80)
+        print("COMPREHENSIVE PROPERTY DATA DIAGNOSIS")
+        print("="*80)
     
     config = EnhancedConfigManager()
     db_manager = ThreadSafeDatabaseManager(config)
     
-    try:
+try:
         # 1. Get all properties from recent searches
         print("\n1. ANALYZING RECENT PROPERTY DATA:")
         print("-"*50)
@@ -41,25 +40,24 @@ def diagnose_all_issues():
             """)
             
             recent_properties = cursor.fetchall()
-            
         print(f"Found {len(recent_properties)} recent properties")
         
         for i, prop in enumerate(recent_properties, 1):
-            print(f"\nProperty {i}:")
-            print(f"  APN: {prop['apn']}")
-            print(f"  Owner: {repr(prop['owner_name'])}")
-            print(f"  Address: {prop['property_address']}")
-            print(f"  Year Built: {repr(prop['year_built'])}")
-            print(f"  Lot Size: {repr(prop['lot_size_sqft'])}")
+        print(f"\nProperty {i}:")
+        print(f"  APN: {prop['apn']}")
+        print(f"  Owner: {repr(prop['owner_name'])}")
+        print(f"  Address: {prop['property_address']}")
+        print(f"  Year Built: {repr(prop['year_built'])}")
+        print(f"  Lot Size: {repr(prop['lot_size_sqft'])}")
             
             raw_data = prop['raw_data']
             if raw_data:
-                print(f"  Raw Data Keys: {list(raw_data.keys())}")
-                print(f"  Raw Data Values:")
+        print(f"  Raw Data Keys: {list(raw_data.keys())}")
+        print(f"  Raw Data Values:")
                 for key, value in raw_data.items():
-                    print(f"    {key}: {repr(value)}")
+        print(f"    {key}: {repr(value)}")
             else:
-                print(f"  Raw Data: None")
+        print(f"  Raw Data: None")
                 
         # 2. Check what fields are actually available in raw_data
         print(f"\n2. ANALYZING RAW_DATA FIELD PATTERNS:")
@@ -77,12 +75,11 @@ def diagnose_all_issues():
                         if key not in non_empty_fields:
                             non_empty_fields[key] = []
                         non_empty_fields[key].append(value)
-        
         print(f"All raw_data keys found: {sorted(all_raw_keys)}")
         print(f"\nFields with actual data:")
         for key, values in non_empty_fields.items():
             unique_values = list(set(values))[:3]  # Show first 3 unique values
-            print(f"  {key}: {unique_values}")
+        print(f"  {key}: {unique_values}")
         
         # 3. Check tax and sales data availability
         print(f"\n3. TAX AND SALES DATA AVAILABILITY:")
@@ -98,9 +95,7 @@ def diagnose_all_issues():
             
             total_tax_records += len(tax_records)
             total_sales_records += len(sales_records)
-            
-            print(f"  {apn}: {len(tax_records)} tax records, {len(sales_records)} sales records")
-        
+        print(f"  {apn}: {len(tax_records)} tax records, {len(sales_records)} sales records")
         print(f"\nTotals: {total_tax_records} tax records, {total_sales_records} sales records")
         
         # 4. Database schema analysis
@@ -119,14 +114,13 @@ def diagnose_all_issues():
             """)
             
             columns = cursor.fetchall()
-            print("Properties table structure:")
+        print("Properties table structure:")
             for col in columns:
-                print(f"  {col['column_name']}: {col['data_type']} {'NULL' if col['is_nullable'] == 'YES' else 'NOT NULL'}")
+        print(f"  {col['column_name']}: {col['data_type']} {'NULL' if col['is_nullable'] == 'YES' else 'NOT NULL'}")
         
         # 5. API vs Database data comparison
         print(f"\n5. POTENTIAL SOLUTIONS:")
         print("-"*50)
-        
         print("Issues identified:")
         print("1. API returns minimal structured data (owner_name, property_address)")
         print("2. Most property details (year_built, lot_size) are None/empty")
@@ -145,39 +139,39 @@ def diagnose_all_issues():
         
         test_property = db_manager.get_property_by_apn('13304014A')
         if test_property:
-            print("Complete test property found:")
+        print("Complete test property found:")
             for key, value in test_property.items():
                 if key not in ['raw_data', 'created_at', 'last_updated']:
-                    print(f"  {key}: {repr(value)}")
+        print(f"  {key}: {repr(value)}")
         else:
-            print("Test property not found - this explains empty tabs issue!")
+        print("Test property not found - this explains empty tabs issue!")
             
-    except Exception as e:
+except Exception as e:
         print(f"Error during diagnosis: {e}")
-        import traceback
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
-from src.enhanced_config_manager import EnhancedConfigManager
-        traceback.print_exc()
-        
-    finally:
-        db_manager.close()
+import traceback
 
-def implement_fixes():
+from src.enhanced_config_manager import EnhancedConfigManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
+        traceback.print_exc()
+
+finally:
+        db_manager.close()
+    def implement_fixes():
     """Implement systematic fixes based on diagnosis"""
-    print(f"\n" + "="*80)
-    print("IMPLEMENTING SYSTEMATIC FIXES")
-    print("="*80)
-    
-    print("The diagnosis shows the core issues:")
-    print("1. API data is incomplete - only basic info is returned")
-    print("2. Properties need individual data collection for complete information")
-    print("3. GUI needs to better guide users to collect missing data")
-    print()
-    print("RECOMMENDED ACTIONS:")
-    print("1. Use 'Collect Complete Property Data' button for any property needing details")
-    print("2. The search results table now shows appropriate placeholders") 
-    print("3. Property details dialog clearly indicates when data needs collection")
-    print("4. Debug system helps identify specific data issues")
+        print(f"\n" + "="*80)
+        print("IMPLEMENTING SYSTEMATIC FIXES")
+        print("="*80)
+        print("The diagnosis shows the core issues:")
+        print("1. API data is incomplete - only basic info is returned")
+        print("2. Properties need individual data collection for complete information")
+        print("3. GUI needs to better guide users to collect missing data")
+        print()
+        print("RECOMMENDED ACTIONS:")
+        print("1. Use 'Collect Complete Property Data' button for any property needing details")
+        print("2. The search results table now shows appropriate placeholders") 
+        print("3. Property details dialog clearly indicates when data needs collection")
+        print("4. Debug system helps identify specific data issues")
 
 if __name__ == "__main__":
     diagnose_all_issues()

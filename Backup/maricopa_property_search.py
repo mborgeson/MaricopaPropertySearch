@@ -4,43 +4,44 @@ Maricopa County Assessor Property Search Tool - Ultimate Edition
 Features: Web Scraping, CSV Import, API Integration, Batch Processing
 Works with real data from multiple sources
 """
-
-import tkinter as tk
-from tkinter import ttk, scrolledtext, messagebox, filedialog
-import requests
-from typing import Dict, List, Optional, Any, Tuple
-import json
-from datetime import datetime
-import threading
-from functools import lru_cache
-from dataclasses import dataclass, asdict, field
-import re
-from urllib.parse import urlencode, quote, unquote
-import webbrowser
 import csv
+import json
 import os
-from pathlib import Path
 import queue
-import time
+import re
 import sys
+import threading
+import time
+import tkinter as tk
 import traceback
+import webbrowser
+from dataclasses import asdict, dataclass, field
+from datetime import datetime
+from functools import lru_cache
+from pathlib import Path
+from tkinter import filedialog, messagebox, scrolledtext, ttk
+from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import quote, unquote, urlencode
+
+import requests
 
 # Selenium Imports for Browser Automation
 from selenium import webdriver
-from selenium.webdriver.common.by import By
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.chrome.service import Service as ChromeService
-from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
+from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.chrome import ChromeDriverManager
 
 # Optional: For web scraping (install with: pip install beautifulsoup4 lxml)
 try:
     from bs4 import BeautifulSoup
+
     SCRAPING_AVAILABLE = True
 except ImportError:
     SCRAPING_AVAILABLE = False
-    print("Note: Install beautifulsoup4 for web scraping: pip install beautifulsoup4 lxml")
+        print("Note: Install beautifulsoup4 for web scraping: pip install beautifulsoup4 lxml")
 
 # ============================================================================
 # Configuration
@@ -84,7 +85,6 @@ class PropertyInfo:
     last_sale_date: Optional[datetime] = None
     last_sale_price: Optional[float] = None
     valuation_history: List[ValuationRecord] = field(default_factory=list)
-    
     def to_display_dict(self) -> Dict[str, str]:
         return {
             "APN": self.apn, "Owner": self.owner_name, "Property Address": self.property_address,
@@ -93,7 +93,6 @@ class PropertyInfo:
             "Bedrooms": self.bedrooms, "Bathrooms": self.bathrooms, "Property Class": self.property_class,
             "Land Use": self.land_use, "Market Value": self.market_value, "Assessed Value": self.assessed_value
         }
-    
     def to_csv_row(self) -> List[str]:
         return [
             self.apn, self.owner_name, self.property_address, self.mailing_address, self.legal_description,
@@ -146,7 +145,7 @@ class CSVImporter:
                     )
                     if prop.apn: properties.append(prop)
         except Exception as e:
-            print(f"CSV import error: {e}")
+        print(f"CSV import error: {e}")
         return properties
 
 # ============================================================================
@@ -155,13 +154,11 @@ class CSVImporter:
 
 class MaricopaAssessorAPI:
     """API client that uses Selenium to control a browser and scrape data."""
-    
     def __init__(self, timeout: int = 30):
         self.timeout = timeout
         self.driver = self._initialize_driver()
         self.csv_importer = CSVImporter()
         self.csv_cache: Dict[str, PropertyInfo] = {}
-
     def _initialize_driver(self):
         """Sets up the Selenium WebDriver."""
         print("Initializing headless Chrome browser...")
@@ -174,14 +171,13 @@ class MaricopaAssessorAPI:
             
             service = ChromeService(ChromeDriverManager().install())
             driver = webdriver.Chrome(service=service, options=chrome_options)
-            print("Browser initialized successfully.")
+        print("Browser initialized successfully.")
             return driver
         except Exception as e:
-            print(f"FATAL: Could not initialize Selenium WebDriver: {e}")
-            print("Please ensure Google Chrome is installed on your system.")
+        print(f"FATAL: Could not initialize Selenium WebDriver: {e}")
+        print("Please ensure Google Chrome is installed on your system.")
             messagebox.showerror("Browser Error", "Could not start Chrome. Please ensure it is installed.")
             return None
-
     def search_by_address(self, address: str) -> List[PropertyInfo]:
         """Searches for a property by address using direct URL navigation."""
         if not self.driver: return []
@@ -196,7 +192,7 @@ class MaricopaAssessorAPI:
             # Wait for the page to load. We'll wait for the body tag as a basic check.
             wait = WebDriverWait(self.driver, self.timeout)
             wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-            print("Results page loaded. Parsing results...")
+        print("Results page loaded. Parsing results...")
             
             # Give a brief moment for JS to render all results
             time.sleep(2)
@@ -205,19 +201,19 @@ class MaricopaAssessorAPI:
             return self._parse_search_results(self.driver.page_source)
 
         except TimeoutException:
-            print("Search results page timed out.")
+        print("Search results page timed out.")
             return []
         except Exception as e:
-            print(f"An error occurred during address search: {e}")
-            traceback.print_exc()
-            return []
+        print(f"An error occurred during address search: {e}")
+        traceback.print_exc()
 
+    return []
     def search_by_apn(self, apn: str, use_scraping: bool = True) -> Optional[PropertyInfo]:
         """Searches for a single property by APN."""
         if not self.driver: return None
         
         if apn in self.csv_cache:
-            print(f"Found APN {apn} in CSV cache.")
+        print(f"Found APN {apn} in CSV cache.")
             return self.csv_cache[apn]
 
         # NEW URL LOGIC
@@ -227,23 +223,23 @@ class MaricopaAssessorAPI:
 
         try:
             wait = WebDriverWait(self.driver, self.timeout)
-            print("Waiting for parcel data to load...")
+        print("Waiting for parcel data to load...")
             # Generic wait to avoid timeout and allow parsing function to execute
             wait.until(EC.presence_of_element_located((By.TAG_NAME, "body")))
-            print("Parcel page loaded.")
+        print("Parcel page loaded.")
             time.sleep(1)
 
             # This parser will be in debug mode to save the HTML
             return self._parse_parcel_page(self.driver.page_source, apn)
 
         except TimeoutException:
-            print("Parcel page timed out or did not load correctly.")
+        print("Parcel page timed out or did not load correctly.")
             return None
         except Exception as e:
-            print(f"An error occurred during APN search: {e}")
-            traceback.print_exc()
-            return None
+        print(f"An error occurred during APN search: {e}")
+        traceback.print_exc()
 
+    return None
     def _parse_search_results(self, html: str) -> List[PropertyInfo]:
         """Parses the HTML of a search results page."""
         print("Parsing new search results page format...")
@@ -254,14 +250,14 @@ class MaricopaAssessorAPI:
         results_table_body = soup.find('tbody', id='rpdata')
         
         if not results_table_body:
-            print("Could not find the results table body ('#rpdata').")
+        print("Could not find the results table body ('#rpdata').")
             return []
 
         # Find all table rows within that body
         for row in results_table_body.find_all('tr'):
             # Check if this row is a "no records found" message
             if 'no parcel records found' in row.text.lower():
-                print("Found 'No parcel records found' message.")
+        print("Found 'No parcel records found' message.")
                 continue
 
             cells = row.find_all('td')
@@ -275,22 +271,19 @@ class MaricopaAssessorAPI:
                     address = cells[2].text.strip()
                     
                     if apn:
-                        print(f"Parsed APN: {apn}, Owner: {owner}")
+        print(f"Parsed APN: {apn}, Owner: {owner}")
                         properties.append(PropertyInfo(apn=apn, owner_name=owner, property_address=address))
                 except IndexError:
-                    print("A row had fewer than 3 cells, skipping.")
+        print("A row had fewer than 3 cells, skipping.")
                     continue # Skip malformed rows
                 except Exception as e:
-                    print(f"Error parsing a result row: {e}")
+        print(f"Error parsing a result row: {e}")
                     continue # Ignore items that can't be parsed
         
         if not properties:
-            print("Could not parse any individual items from the results page.")
+        print("Could not parse any individual items from the results page.")
 
         return properties
-
-    
-
     def get_full_tax_info(self, apn: str) -> List[TaxInfo]:
         """Navigates to Treasurer's site, submits form, and saves results HTML for debugging."""
         print(f"Navigating to Treasurer's site to submit form for APN: {apn}")
@@ -303,7 +296,7 @@ class MaricopaAssessorAPI:
             # Split APN into parts (e.g., 112-05-091B -> 112, 05, 091, B)
             apn_parts = re.match(r'(\d{3})-(\d{2})-(\d{3})([A-Z]?)', apn)
             if not apn_parts:
-                print(f"Invalid APN format for Treasurer's site: {apn}")
+        print(f"Invalid APN format for Treasurer's site: {apn}")
                 return []
 
             book_num = apn_parts.group(1)
@@ -326,36 +319,35 @@ class MaricopaAssessorAPI:
                 txt_split.send_keys(split_char)
 
             # Execute __doPostBack to submit the form
-            print("Executing __doPostBack to submit form...")
+        print("Executing __doPostBack to submit form...")
             self.driver.execute_script(f"__doPostBack('ctl00$cphMainContent$btnSubmit', '')")
 
             # Wait for the URL to change to reflect the parcel number
             wait.until(EC.url_contains(apn))
-            print("Treasurer's results page loaded. Saving HTML for analysis.")
+        print("Treasurer's results page loaded. Saving HTML for analysis.")
             
             debug_path = Path.home() / "maricopa_treasurer_results_page.html"
             with open(debug_path, "w", encoding="utf-8") as f:
                 f.write(self.driver.page_source)
-            print(f"SUCCESS: Saved Treasurer's results page HTML to: {debug_path}")
-            print("ACTION REQUIRED: Please run `read_file` on that new file so I can write the full tax parser.")
+        print(f"SUCCESS: Saved Treasurer's results page HTML to: {debug_path}")
+        print("ACTION REQUIRED: Please run `read_file` on that new file so I can write the full tax parser.")
             
             return []
 
         except TimeoutException:
-            print("Treasurer's page elements not found or results page timed out.")
+        print("Treasurer's page elements not found or results page timed out.")
             return []
         except Exception as e:
-            print(f"An error occurred during Treasurer's site form submission: {e}")
-            traceback.print_exc()
-            return []
+        print(f"An error occurred during Treasurer's site form submission: {e}")
+        traceback.print_exc()
 
+    return []
     def _parse_parcel_page(self, html: str, apn: str) -> Optional[PropertyInfo]:
         """Parses the HTML of a single parcel's detail page."""
         print(f"Parsing new parcel page format for {apn}")
         soup = BeautifulSoup(html, 'html.parser')
         prop = PropertyInfo(apn=apn)
-
-        def get_info_by_header(header_text: str) -> str:
+    def get_info_by_header(header_text: str) -> str:
             try:
                 header_div = soup.find('div', class_='td-header', text=header_text)
                 if header_div and header_div.find_next_sibling('div', class_='td-body'):
@@ -419,7 +411,7 @@ class MaricopaAssessorAPI:
 
             prop.valuation_history = []
             if valuation_section:
-                def to_float(currency_str: str) -> Optional[float]:
+    def to_float(currency_str: str) -> Optional[float]:
                     try:
                         return float(re.sub(r'[$,]', '', currency_str))
                     except (ValueError, TypeError):
@@ -439,17 +431,16 @@ class MaricopaAssessorAPI:
                         prop.valuation_history.append(record)
                     except (AttributeError, ValueError):
                         break
-
-            print("Finished parsing parcel page.")
+        print("Finished parsing parcel page.")
             if not prop.owner_name and not prop.property_address:
-                 print("Could not parse critical info (owner/address), returning None.")
+        print("Could not parse critical info (owner/address), returning None.")
                  return None
             return prop
         except Exception as e:
-            print(f"A critical error occurred during parcel page parsing: {e}")
-            traceback.print_exc()
-            return None
+        print(f"A critical error occurred during parcel page parsing: {e}")
+        traceback.print_exc()
 
+    return None
     def get_tax_info(self, prop_info: PropertyInfo) -> List[TaxInfo]:
         """Constructs a list of TaxInfo objects from the parsed valuation history."""
         tax_history = []
@@ -465,7 +456,6 @@ class MaricopaAssessorAPI:
                 )
                 tax_history.append(tax_info)
         return tax_history
-
     def get_sales_history(self, prop_info: PropertyInfo) -> List[SaleInfo]:
         """Constructs a SaleInfo object from the already-parsed PropertyInfo."""
         if prop_info and prop_info.last_sale_date and prop_info.last_sale_price is not None:
@@ -477,14 +467,12 @@ class MaricopaAssessorAPI:
             )
             return [sale]
         return []
-
     def import_csv_data(self, filepath: str) -> int:
         return self.csv_importer.import_property_csv(filepath)
-
     def quit(self):
         """Closes the browser instance."""
         if self.driver:
-            print("Closing browser...")
+        print("Closing browser...")
             self.driver.quit()
 
 # ============================================================================
@@ -493,7 +481,6 @@ class MaricopaAssessorAPI:
 
 class PropertySearchApp:
     """Enhanced GUI application with multiple data source support"""
-    
     def __init__(self, root: tk.Tk):
         self.root = root
         self.root.title("Maricopa County Property Search Tool - Ultimate Edition")
@@ -513,7 +500,6 @@ class PropertySearchApp:
         
         # Ensure browser is closed when window is closed
         self.root.protocol("WM_DELETE_WINDOW", self.on_closing)
-
     def on_closing(self):
         """Handle window closing event."""
         print("Closing application and browser...")
@@ -521,15 +507,14 @@ class PropertySearchApp:
             self.api.quit()
         self.root.destroy()
 
-    class TextRedirector:
-        def __init__(self, widget, tag="stdout"): self.widget = widget; self.tag = tag
-        def write(self, str_data):
+class TextRedirector:
+    def __init__(self, widget, tag="stdout"): self.widget = widget; self.tag = tag
+    def write(self, str_data):
             self.widget.config(state=tk.NORMAL)
             self.widget.insert(tk.END, str_data, (self.tag,))
             self.widget.see(tk.END)
             self.widget.config(state=tk.DISABLED)
-        def flush(self): pass
-
+    def flush(self): pass
     def _check_dependencies(self):
         if not SCRAPING_AVAILABLE:
             self._set_status("Note: Install beautifulsoup4 for web scraping: pip install beautifulsoup4 lxml")
@@ -544,7 +529,6 @@ class PropertySearchApp:
         style.configure('Header.TLabel', font=('Arial', 12, 'bold'))
         style.configure('Search.TButton', padding=10)
         style.configure('Export.TButton', padding=5)
-    
     def _create_widgets(self):
         main_frame = ttk.Frame(self.root, padding="10")
         main_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
@@ -558,7 +542,6 @@ class PropertySearchApp:
         self._create_results_notebook(main_frame)
         self._create_status_bar(main_frame)
         self._create_toolbar(main_frame)
-    
     def _create_search_frame(self, parent):
         search_frame = ttk.LabelFrame(parent, text="Search Options", padding="10")
         search_frame.grid(row=1, column=0, sticky=(tk.W, tk.E), pady=(0, 10))
@@ -585,7 +568,6 @@ class PropertySearchApp:
         options_frame.grid(row=2, column=0, columnspan=3, sticky=(tk.W, tk.E), pady=(10, 0))
         self.use_csv = tk.BooleanVar(value=False)
         ttk.Checkbutton(options_frame, text="Use Imported CSV Data", variable=self.use_csv).pack(side=tk.LEFT, padx=5)
-    
     def _create_results_notebook(self, parent):
         self.notebook = ttk.Notebook(parent)
         self.notebook.grid(row=2, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
@@ -604,7 +586,6 @@ class PropertySearchApp:
         self.log_frame = ttk.Frame(self.notebook)
         self.notebook.add(self.log_frame, text="Log")
         self._create_log_tab()
-
     def _create_log_tab(self):
         log_container = ttk.Frame(self.log_frame, padding=10)
         log_container.pack(fill=tk.BOTH, expand=True)
@@ -613,11 +594,9 @@ class PropertySearchApp:
         sys.stdout = self.TextRedirector(self.log_text, "stdout")
         sys.stderr = self.TextRedirector(self.log_text, "stderr")
         print("--- Application Log Initialized ---")
-
     def _create_property_tab(self):
         self.property_text = scrolledtext.ScrolledText(self.property_frame, wrap=tk.WORD, width=80, height=25, font=('Courier', 10))
         self.property_text.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
-    
     def _create_tax_tab(self):
         columns = ('Year', 'Assessed', 'Limited', 'Taxes', 'Status')
         self.tax_tree = ttk.Treeview(self.tax_frame, columns=columns, show='headings', height=15)
@@ -626,7 +605,6 @@ class PropertySearchApp:
         self.tax_tree.configure(yscrollcommand=tax_scroll.set)
         self.tax_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(10, 0), pady=10)
         tax_scroll.pack(side=tk.RIGHT, fill=tk.Y, padx=(0, 10), pady=10)
-    
     def _create_sales_tab(self):
         columns = ('Date', 'Price', 'Type', 'Seller', 'Buyer')
         self.sales_tree = ttk.Treeview(self.sales_frame, columns=columns, show='headings', height=15)
@@ -635,7 +613,6 @@ class PropertySearchApp:
         self.sales_tree.configure(yscrollcommand=sales_scroll.set)
         self.sales_tree.pack(side=tk.LEFT, fill=tk.BOTH, expand=True, padx=(10, 0), pady=10)
         sales_scroll.pack(side=tk.RIGHT, fill=tk.Y, padx=(0, 10), pady=10)
-    
     def _create_docs_tab(self):
         docs_container = ttk.Frame(self.docs_frame); docs_container.pack(fill=tk.BOTH, expand=True, padx=10, pady=10)
         ttk.Label(docs_container, text="Official County Links:", font=('Arial', 11, 'bold')).pack(pady=10)
@@ -646,7 +623,6 @@ class PropertySearchApp:
         self.recorder_link_btn.pack(pady=5)
         self.tax_bill_btn = ttk.Button(buttons_frame, text="View Tax Bills", command=self._open_tax_bills, state=tk.DISABLED)
         self.tax_bill_btn.pack(pady=5)
-    
     def _create_toolbar(self, parent):
         toolbar = ttk.LabelFrame(parent, text="Actions", padding="5")
         toolbar.grid(row=3, column=0, sticky=(tk.W, tk.E), pady=(5, 0))
@@ -657,7 +633,6 @@ class PropertySearchApp:
         ttk.Button(toolbar, text="Open Export Folder", command=self._open_export_folder).pack(side=tk.LEFT, padx=5)
         self.data_status = ttk.Label(toolbar, text="CSV Cache: 0 properties")
         self.data_status.pack(side=tk.RIGHT, padx=10)
-    
     def _create_status_bar(self, parent):
         status_frame = ttk.Frame(parent)
         status_frame.grid(row=4, column=0, sticky=(tk.W, tk.E), pady=(5, 0))
@@ -665,17 +640,14 @@ class PropertySearchApp:
         self.status_label = ttk.Label(status_frame, textvariable=self.status_var)
         self.status_label.pack(side=tk.LEFT)
         self.progress = ttk.Progressbar(status_frame, mode='indeterminate', length=100)
-    
     def _bind_events(self):
         self.search_entry.bind('<Return>', lambda e: self._perform_search())
-    
     def _browse_file(self):
         filename = filedialog.askopenfilename(title="Select CSV file", filetypes=[("CSV files", "*.csv"), ("All files", "*.* ")], initialdir=os.path.expanduser("~\Documents"))
         if filename:
             self.search_entry.delete(0, tk.END)
             self.search_entry.insert(0, filename)
             if self.search_type.get() == "apn": self.search_type.set("import")
-    
     def _perform_search(self):
         search_value = self.search_entry.get().strip()
         if not search_value: messagebox.showwarning("Input Required", "Please enter search criteria."); return
@@ -689,7 +661,6 @@ class PropertySearchApp:
             self.progress.pack(side=tk.RIGHT, padx=5); self.progress.start()
             thread = threading.Thread(target=self._search_thread, args=(search_value, search_type), daemon=True)
             thread.start()
-    
     def _search_thread(self, search_value: str, search_type: str):
         try:
             if search_type == "apn":
@@ -704,7 +675,7 @@ class PropertySearchApp:
             elif search_type == "address":
                 properties = self.api.search_by_address(search_value)
                 if properties and properties[0].apn:
-                    print(f"Address search found {len(properties)} result(s). Fetching full details for first APN: {properties[0].apn}")
+        print(f"Address search found {len(properties)} result(s). Fetching full details for first APN: {properties[0].apn}")
                     # Now, get the full details for the first result
                     detailed_property_info = self.api.search_by_apn(properties[0].apn)
                     if detailed_property_info:
@@ -714,7 +685,7 @@ class PropertySearchApp:
                         self.root.after(0, self._load_additional_data, detailed_property_info.apn)
                     else:
                         # If detail fetch fails, show partial info from the list
-                        print("Could not fetch full details, displaying partial info from search list.")
+        print("Could not fetch full details, displaying partial info from search list.")
                         self.current_property = properties[0]
                         self.current_apn = properties[0].apn
                         self.root.after(0, self._display_property_info, properties[0])
@@ -722,11 +693,11 @@ class PropertySearchApp:
                 else:
                     self.root.after(0, self._show_no_results)
         except Exception as e:
-            print(f"An unexpected error occurred in the search thread: {e}"); traceback.print_exc()
-            self.root.after(0, self._show_error, str(e))
+        print(f"An unexpected error occurred in the search thread: {e}"); traceback.print_exc()
+
+    self.root.after(0, self._show_error, str(e))
         finally:
             self.root.after(0, self._search_complete)
-    
     def _import_csv_data(self):
         filepath = self.search_entry.get().strip()
         if not filepath: filepath = filedialog.askopenfilename(title="Select Property CSV file", filetypes=[("CSV files", "*.csv"), ("All files", "*.* ")])
@@ -737,18 +708,16 @@ class PropertySearchApp:
                 messagebox.showinfo("Import Success", f"Imported {count} properties into cache.")
                 self.use_csv.set(True)
             except Exception as e: messagebox.showerror("Import Error", f"Error importing CSV:\n{str(e)}")
-    
     def _load_additional_data(self, apn: str):
-        def load():
+    def load():
             try:
-                print(f"Loading tax info for {apn}..."); tax_info = self.api.get_full_tax_info(apn) # Call the new method
+        print(f"Loading tax info for {apn}..."); tax_info = self.api.get_full_tax_info(apn) # Call the new method
                 self.current_tax_info = tax_info; self.root.after(0, self._display_tax_info, tax_info); print("Tax info loaded.")
-                print(f"Loading sales history for {apn}..."); sales_info = self.api.get_sales_history(self.current_property)
+        print(f"Loading sales history for {apn}..."); sales_info = self.api.get_sales_history(self.current_property)
                 self.current_sales_info = sales_info; self.root.after(0, self._display_sales_info, sales_info); print("Sales history loaded.")
                 self.root.after(0, self._enable_document_buttons)
             except Exception as e: print(f"Error loading additional data: {e}")
         thread = threading.Thread(target=load, daemon=True); thread.start()
-    
     def _display_property_info(self, property_info: PropertyInfo):
         self.property_text.delete(1.0, tk.END)
         display_data = property_info.to_display_dict()
@@ -757,33 +726,26 @@ class PropertySearchApp:
         self.notebook.select(self.property_frame)
         self._set_status(f"Property found: {property_info.apn}")
         print(f"Successfully displayed property: {property_info.apn}")
-    
     def _display_tax_info(self, tax_list: List[TaxInfo]):
         for item in self.tax_tree.get_children(): self.tax_tree.delete(item)
         for tax in tax_list:
             values = (tax.tax_year, f"${tax.assessed_value:,.0f}", f"${tax.limited_value:,.0f}", f"${tax.total_taxes:,.2f}", tax.tax_status)
             self.tax_tree.insert('', tk.END, values=values)
-    
     def _display_sales_info(self, sales_list: List[SaleInfo]):
         for item in self.sales_tree.get_children(): self.sales_tree.delete(item)
         for sale in sales_list:
             values = (sale.sale_date, f"${sale.sale_price:,.0f}", sale.deed_type, sale.seller[:30], sale.buyer[:30])
             self.sales_tree.insert('', tk.END, values=values)
-    
     def _enable_document_buttons(self):
         self.assessor_link_btn.config(state=tk.NORMAL)
         self.recorder_link_btn.config(state=tk.NORMAL)
         self.tax_bill_btn.config(state=tk.NORMAL)
-    
     def _open_assessor_link(self):
         if self.current_apn: webbrowser.open(APIConfig.PARCEL_URL.format(apn=self.current_apn))
-    
     def _open_recorder_link(self):
         if self.current_apn: webbrowser.open(f"https://recorder.maricopa.gov/recdocdata/GetRecDataDetail.aspx?rec={self.current_apn}")
-    
     def _open_tax_bills(self):
         if self.current_apn: webbrowser.open(f"https://treasurer.maricopa.gov/parcelinfo/?q={self.current_apn}")
-    
     def _export_current(self):
         if not self.current_property: messagebox.showwarning("No Data", "No property data to export."); return
         try:
@@ -795,30 +757,23 @@ class PropertySearchApp:
                 for key, value in self.current_property.to_display_dict().items(): writer.writerow([key, value])
             messagebox.showinfo("Export Complete", f"Data exported to:\n{folder}")
         except Exception as e: messagebox.showerror("Export Error", f"Error exporting data:\n{str(e)}")
-    
     def _clear_cache(self):
         self.api.csv_cache.clear(); self.data_status.config(text="CSV Cache: 0 properties")
         messagebox.showinfo("Cache Cleared", "CSV cache has been cleared.")
-    
     def _open_export_folder(self):
         folder = Path.home() / "MaricopaPropertyExports"; folder.mkdir(exist_ok=True); os.startfile(folder)
-    
     def _show_no_results(self):
         print("Search completed, but no results were found.")
         self.property_text.delete(1.0, tk.END)
         self.property_text.insert(tk.END, "No results found.\n\nCheck the 'Log' tab for detailed error messages.\n")
         self.notebook.select(self.property_frame)
-    
     def _show_error(self, error_msg: str):
         messagebox.showerror("Error", f"An error occurred:\n{error_msg}")
-    
     def _search_complete(self):
         self.search_button.config(state=tk.NORMAL); self.progress.stop(); self.progress.pack_forget()
         self._set_status("Search complete."); print("--- Search finished ---")
-    
     def _set_status(self, message: str):
         self.status_var.set(message)
-    
     def _batch_process(self):
         filename = filedialog.askopenfilename(title="Select file with APNs (one per line)", filetypes=[("Text files", "*.txt"), ("CSV files", "*.csv"), ("All files", "*.* ")])
         if not filename: return
@@ -847,8 +802,7 @@ class PropertySearchApp:
 # ============================================================================
 # Main Entry Point
 # ============================================================================
-
-def main():
+    def main():
     """Main application entry point"""
     root = tk.Tk()
     app = PropertySearchApp(root)

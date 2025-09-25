@@ -4,32 +4,31 @@ Batch Processing Manager
 Central coordinator for all batch/parallel processing operations
 Integrates batch search, parallel scraping, and optimized data collection
 """
-
-import time
+import json
 import logging
+import threading
+import time
+import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Dict, List, Optional, Any, Set, Callable, Union
-from threading import Lock, RLock, Event
-import threading
-import json
-import uuid
+from threading import Event, Lock, RLock
+from typing import Any, Callable, Dict, List, Optional, Set, Union
 
-from PyQt5.QtCore import QThread, pyqtSignal, QObject, QTimer
+from PyQt5.QtCore import QObject, QThread, QTimer, pyqtSignal
 
-from batch_search_engine import BatchSearchEngine, SearchMode, BatchPriority
-
-# MIGRATED: from batch_api_client import BatchAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.api_client_unified import UnifiedMaricopaAPIClient, BatchAPIRequest
+from background_data_collector import BackgroundDataCollectionManager
+from batch_search_engine import BatchPriority, BatchSearchEngine, SearchMode
+from logging_config import get_logger
 from parallel_web_scraper import (
     ParallelWebScraperManager,
-    ScrapingTask,
     ScrapingRequest,
+    ScrapingTask,
 )
-from background_data_collector import BackgroundDataCollectionManager
-from logging_config import get_logger
+
+# MIGRATED: from batch_api_client import BatchAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.api_client_unified import BatchAPIRequest, UnifiedMaricopaAPIClient
 
 logger = get_logger(__name__)
 
@@ -85,7 +84,6 @@ class BatchProcessingJob:
 
 class BatchProcessingManager:
     """Central manager for all batch processing operations"""
-
     def __init__(
         self,
         api_client,
@@ -163,7 +161,6 @@ class BatchProcessingManager:
             f"Max concurrent jobs: {max_concurrent_jobs}, "
             f"Background collection: {enable_background_collection}"
         )
-
     def submit_batch_job(
         self,
         identifiers: List[str],
@@ -217,14 +214,13 @@ class BatchProcessingManager:
         )
 
         return job_id
-
     def _execute_batch_job(self, job: BatchProcessingJob, callback: Callable = None):
         """Execute a complete batch processing job"""
         job.started_at = datetime.now()
         job.status = "running"
         start_time = time.time()
 
-        try:
+    try:
             logger.info(f"Executing batch job {job.job_id}: {job.job_type.value}")
 
             # Execute based on job type
@@ -269,23 +265,22 @@ class BatchProcessingManager:
 
             # Final callback
             if callback:
-                try:
+    try:
                     callback(job)
-                except Exception as e:
+    except Exception as e:
                     logger.error(f"Error in job callback: {e}")
 
-        except Exception as e:
+    except Exception as e:
             job.status = "failed"
             job.errors.append(str(e))
             logger.error(f"Batch job {job.job_id} failed: {e}")
 
-        finally:
+    finally:
             # Move to completed jobs
             with self.jobs_lock:
                 if job.job_id in self.active_jobs:
                     del self.active_jobs[job.job_id]
                 self.completed_jobs[job.job_id] = job
-
     def _execute_property_search_job(
         self, job: BatchProcessingJob, callback: Callable = None
     ):
@@ -371,7 +366,6 @@ class BatchProcessingManager:
             raise ValueError(
                 f"Unsupported processing mode for property search: {job.processing_mode}"
             )
-
     def _execute_data_enhancement_job(
         self, job: BatchProcessingJob, callback: Callable = None
     ):
@@ -417,7 +411,6 @@ class BatchProcessingManager:
                 break
 
             time.sleep(2.0)
-
     def _execute_comprehensive_collection_job(
         self, job: BatchProcessingJob, callback: Callable = None
     ):
@@ -515,7 +508,6 @@ class BatchProcessingManager:
         for request_id, result_data in api_stats["results"].items():
             if result_data["status"]["success"]:
                 job.results[f"api_{request_id}"] = result_data["result"]
-
     def _execute_tax_collection_job(
         self, job: BatchProcessingJob, callback: Callable = None
     ):
@@ -560,7 +552,6 @@ class BatchProcessingManager:
                         callback(job)
 
             time.sleep(2.0)
-
     def _execute_sales_collection_job(
         self, job: BatchProcessingJob, callback: Callable = None
     ):
@@ -605,7 +596,6 @@ class BatchProcessingManager:
                         callback(job)
 
             time.sleep(2.0)
-
     def _execute_bulk_validation_job(
         self, job: BatchProcessingJob, callback: Callable = None
     ):
@@ -656,7 +646,6 @@ class BatchProcessingManager:
 
                 if callback:
                     callback(job)
-
     def _update_job_progress(
         self, job: BatchProcessingJob, batch_job, callback: Callable = None
     ):
@@ -665,7 +654,6 @@ class BatchProcessingManager:
 
         if callback:
             callback(job)
-
     def get_job_status(self, job_id: str) -> Optional[Dict[str, Any]]:
         """Get status of a batch processing job"""
         with self.jobs_lock:
@@ -696,7 +684,6 @@ class BatchProcessingManager:
                 ),
                 "error_count": len(job.errors),
             }
-
     def get_job_results(self, job_id: str) -> Optional[Dict[str, Any]]:
         """Get results from a completed job"""
         with self.jobs_lock:
@@ -722,7 +709,6 @@ class BatchProcessingManager:
                 }
             else:
                 return None
-
     def cancel_job(self, job_id: str) -> bool:
         """Cancel a running batch processing job"""
         with self.jobs_lock:
@@ -736,7 +722,6 @@ class BatchProcessingManager:
                 logger.info(f"Cancelled batch processing job {job_id}")
                 return True
             return False
-
     def get_manager_statistics(self) -> Dict[str, Any]:
         """Get comprehensive manager statistics"""
         with self.stats_lock:
@@ -774,7 +759,6 @@ class BatchProcessingManager:
         }
 
         return stats
-
     def cleanup_completed_jobs(self, max_age_hours: int = 24):
         """Clean up old completed jobs"""
         cutoff_time = datetime.now() - timedelta(hours=max_age_hours)
@@ -801,7 +785,6 @@ class BatchProcessingManager:
             logger.info(f"Cleaned up {removed_count} old batch processing jobs")
 
         return removed_count
-
     def shutdown(self):
         """Gracefully shutdown the batch processing manager"""
         logger.info("Shutting down batch processing manager...")
@@ -831,12 +814,10 @@ class BatchProcessingWorker(QThread):
     job_progress = pyqtSignal(str, float)  # job_id, progress
     job_completed = pyqtSignal(str, dict)  # job_id, results
     job_failed = pyqtSignal(str, str)  # job_id, error
-
     def __init__(self, processing_manager: BatchProcessingManager):
         super().__init__()
         self.processing_manager = processing_manager
         self.current_job_id = None
-
     def start_batch_processing(
         self,
         identifiers: List[str],
@@ -854,10 +835,9 @@ class BatchProcessingWorker(QThread):
         self.priority = priority
         self.parameters = parameters or {}
         self.start()
-
     def run(self):
         """Execute batch processing in background thread"""
-        try:
+    try:
             # Submit job
             self.current_job_id = self.processing_manager.submit_batch_job(
                 identifiers=self.identifiers,
@@ -897,12 +877,11 @@ class BatchProcessingWorker(QThread):
             else:
                 self.job_failed.emit(self.current_job_id, "Job status not found")
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Batch processing worker error: {e}")
             self.job_failed.emit(
                 self.current_job_id or "unknown", f"Worker error: {str(e)}"
             )
-
     def _progress_callback(self, job: BatchProcessingJob):
         """Handle progress updates"""
         if self.current_job_id:

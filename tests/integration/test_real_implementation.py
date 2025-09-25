@@ -3,35 +3,32 @@
 Test script for the real Maricopa County property search implementation.
 This script tests the actual API and web scraping functionality.
 """
-
-import sys
-import os
 import logging
+import os
+import sys
 from pathlib import Path
 
 # Add src directory to path
 project_root = Path(__file__).parent
 src_path = project_root / "src"
 sys.path.insert(0, str(src_path))
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.enhanced_config_manager import EnhancedConfigManager
 
 # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 from web_scraper import WebScraperManager
-from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.enhanced_config_manager import EnhancedConfigManager
 
 # Setup logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-
-
-def test_api_client():
+    def test_api_client():
     """Test the real API client functionality"""
     logger.info("Testing Maricopa API Client...")
 
-    try:
+try:
         config = EnhancedConfigManager()
         client = UnifiedMaricopaAPIClient(config)
 
@@ -76,16 +73,14 @@ def test_api_client():
         logger.info("API client test completed successfully")
         return True
 
-    except Exception as e:
+except Exception as e:
         logger.error(f"API client test failed: {e}")
         return False
-
-
-def test_web_scraper():
+    def test_web_scraper():
     """Test the real web scraper functionality"""
     logger.info("Testing Web Scraper...")
 
-    try:
+try:
         config = EnhancedConfigManager()
         scraper = WebScraperManager(config)
 
@@ -118,16 +113,14 @@ def test_web_scraper():
         logger.info("Web scraper test completed successfully")
         return True
 
-    except Exception as e:
+except Exception as e:
         logger.error(f"Web scraper test failed: {e}")
         return False
-
-
-def test_data_validation():
+    def test_data_validation():
     """Test data validation and cleaning functions"""
     logger.info("Testing data validation...")
 
-    try:
+try:
         config = EnhancedConfigManager()
         client = UnifiedMaricopaAPIClient(config)
 
@@ -168,12 +161,10 @@ def test_data_validation():
         logger.info("Data validation test completed successfully")
         return True
 
-    except Exception as e:
+except Exception as e:
         logger.error(f"Data validation test failed: {e}")
         return False
-
-
-def main():
+    def main():
     """Run all tests"""
     logger.info("Starting comprehensive tests for real implementation...")
 
@@ -190,7 +181,7 @@ def main():
         logger.info(f"Running {test_name} Test")
         logger.info("=" * 50)
 
-        try:
+try:
             success = test_func()
             results[test_name] = success
 
@@ -199,7 +190,7 @@ def main():
             else:
                 logger.error(f"❌ {test_name} test FAILED")
 
-        except Exception as e:
+except Exception as e:
             logger.error(f"❌ {test_name} test CRASHED: {e}")
             results[test_name] = False
 

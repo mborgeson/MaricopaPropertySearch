@@ -3,23 +3,21 @@
 Simple Database Manager Test
 Tests DatabaseManager fixes and ConfigManager integration
 """
-
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add the src directory to the Python path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "src"))
-
-def test_database_manager():
-    print("=" * 60)
-    print("DATABASE MANAGER FIXES TEST")
-    print("=" * 60)
+    def test_database_manager():
+        print("=" * 60)
+        print("DATABASE MANAGER FIXES TEST")
+        print("=" * 60)
 
     results = {}
 
-    try:
+try:
         # Test 1: Import and Configuration
         print("\n1. Testing imports and configuration...")
         # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
@@ -46,11 +44,11 @@ def test_database_manager():
         print("\n4. Testing database connectivity...")
         is_connected = db_manager.test_connection()
         if is_connected:
-            print("[PASS] Database connection successful")
+        print("[PASS] Database connection successful")
             results['connectivity'] = True
 
             # Test 5: Property operations
-            print("\n5. Testing property operations...")
+        print("\n5. Testing property operations...")
 
             # Test get_property_by_apn method (the key fix)
             test_apn = "12345678"
@@ -64,42 +62,42 @@ def test_database_manager():
 
             insert_result = db_manager.insert_property(test_property)
             if insert_result:
-                print("[PASS] Property insertion successful")
+        print("[PASS] Property insertion successful")
                 results['property_insert'] = True
 
                 # Test the fixed get_property_by_apn method
                 property_data = db_manager.get_property_by_apn(test_apn)
                 if property_data and property_data.get('apn') == test_apn:
-                    print("[PASS] get_property_by_apn method working correctly")
+        print("[PASS] get_property_by_apn method working correctly")
                     results['get_by_apn'] = True
                 else:
-                    print("[FAIL] get_property_by_apn method failed")
+        print("[FAIL] get_property_by_apn method failed")
                     results['get_by_apn'] = False
 
                 # Test the alias method get_property_details
                 property_details = db_manager.get_property_details(test_apn)
                 if property_details and property_details.get('apn') == test_apn:
-                    print("[PASS] get_property_details alias method working")
+        print("[PASS] get_property_details alias method working")
                     results['get_details_alias'] = True
                 else:
-                    print("[FAIL] get_property_details alias method failed")
+        print("[FAIL] get_property_details alias method failed")
                     results['get_details_alias'] = False
 
                 # Test search operations
                 search_results = db_manager.search_properties_by_owner('Test Owner')
                 if len(search_results) > 0:
-                    print(f"[PASS] Owner search returned {len(search_results)} results")
+        print(f"[PASS] Owner search returned {len(search_results)} results")
                     results['owner_search'] = True
                 else:
-                    print("[FAIL] Owner search returned no results")
+        print("[FAIL] Owner search returned no results")
                     results['owner_search'] = False
 
             else:
-                print("[FAIL] Property insertion failed")
+        print("[FAIL] Property insertion failed")
                 results['property_insert'] = False
 
             # Test 6: Tax history operations
-            print("\n6. Testing tax history operations...")
+        print("\n6. Testing tax history operations...")
             test_tax = {
                 'apn': test_apn,
                 'tax_year': 2023,
@@ -113,22 +111,22 @@ def test_database_manager():
 
             tax_insert = db_manager.insert_tax_history(test_tax)
             if tax_insert:
-                print("[PASS] Tax history insertion successful")
+        print("[PASS] Tax history insertion successful")
                 results['tax_insert'] = True
 
                 tax_history = db_manager.get_tax_history(test_apn)
                 if len(tax_history) > 0:
-                    print(f"[PASS] Tax history retrieval successful ({len(tax_history)} records)")
+        print(f"[PASS] Tax history retrieval successful ({len(tax_history)} records)")
                     results['tax_retrieve'] = True
                 else:
-                    print("[FAIL] Tax history retrieval failed")
+        print("[FAIL] Tax history retrieval failed")
                     results['tax_retrieve'] = False
             else:
-                print("[FAIL] Tax history insertion failed")
+        print("[FAIL] Tax history insertion failed")
                 results['tax_insert'] = False
 
             # Test 7: Sales history operations
-            print("\n7. Testing sales history operations...")
+        print("\n7. Testing sales history operations...")
             test_sales = {
                 'apn': test_apn,
                 'sale_date': '2023-06-15',
@@ -141,54 +139,57 @@ def test_database_manager():
 
             sales_insert = db_manager.insert_sales_history(test_sales)
             if sales_insert:
-                print("[PASS] Sales history insertion successful")
+        print("[PASS] Sales history insertion successful")
                 results['sales_insert'] = True
 
                 sales_history = db_manager.get_sales_history(test_apn)
                 if len(sales_history) > 0:
-                    print(f"[PASS] Sales history retrieval successful ({len(sales_history)} records)")
+        print(f"[PASS] Sales history retrieval successful ({len(sales_history)} records)")
                     results['sales_retrieve'] = True
                 else:
-                    print("[FAIL] Sales history retrieval failed")
+        print("[FAIL] Sales history retrieval failed")
                     results['sales_retrieve'] = False
             else:
-                print("[FAIL] Sales history insertion failed")
+        print("[FAIL] Sales history insertion failed")
                 results['sales_insert'] = False
 
             # Test 8: Database statistics
-            print("\n8. Testing database statistics...")
+        print("\n8. Testing database statistics...")
             stats = db_manager.get_database_stats()
             if stats:
-                print("[PASS] Database statistics retrieved successfully")
-                print(f"  Properties: {stats.get('properties', 0)}")
-                print(f"  Tax records: {stats.get('tax_records', 0)}")
-                print(f"  Sales records: {stats.get('sales_records', 0)}")
+        print("[PASS] Database statistics retrieved successfully")
+        print(f"  Properties: {stats.get('properties', 0)}")
+        print(f"  Tax records: {stats.get('tax_records', 0)}")
+        print(f"  Sales records: {stats.get('sales_records', 0)}")
                 results['statistics'] = True
             else:
-                print("[FAIL] Database statistics retrieval failed")
+        print("[FAIL] Database statistics retrieval failed")
                 results['statistics'] = False
 
         else:
-            print("[FAIL] Database connection failed")
+        print("[FAIL] Database connection failed")
             results['connectivity'] = False
 
         # Cleanup
         if 'db_manager' in locals():
             db_manager.close()
-            print("\n[INFO] Database connections closed")
+        print("\n[INFO] Database connections closed")
 
-    except Exception as e:
+except Exception as e:
         print(f"[ERROR] Test failed: {str(e)}")
-        import traceback
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+import traceback
+
 from src.enhanced_config_manager import EnhancedConfigManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
         traceback.print_exc()
-        results['error'] = str(e)
+
+    results['error'] = str(e)
 
     # Generate report
-    print("\n" + "=" * 60)
-    print("TEST RESULTS SUMMARY")
-    print("=" * 60)
+        print("\n" + "=" * 60)
+        print("TEST RESULTS SUMMARY")
+        print("=" * 60)
 
     passed_tests = 0
     total_tests = 0
@@ -214,18 +215,17 @@ from src.enhanced_config_manager import EnhancedConfigManager
         total_tests += 1
 
     success_rate = (passed_tests / total_tests) * 100 if total_tests > 0 else 0
-    print(f"\nOVERALL RESULT: {passed_tests}/{total_tests} tests passed ({success_rate:.1f}%)")
+        print(f"\nOVERALL RESULT: {passed_tests}/{total_tests} tests passed ({success_rate:.1f}%)")
 
     # Key fixes verification
-    print(f"\nKEY FIXES VERIFICATION:")
-    print("-" * 25)
+        print(f"\nKEY FIXES VERIFICATION:")
+        print("-" * 25)
     config_fix = results.get('config_manager', False) and results.get('db_manager_init', False)
     apn_method_fix = results.get('get_by_apn', False)
     alias_fix = results.get('get_details_alias', False)
-
-    print(f"[{'PASS' if config_fix else 'FAIL'}] ConfigManager integration working")
-    print(f"[{'PASS' if apn_method_fix else 'FAIL'}] get_property_by_apn method working")
-    print(f"[{'PASS' if alias_fix else 'FAIL'}] get_property_details alias working")
+        print(f"[{'PASS' if config_fix else 'FAIL'}] ConfigManager integration working")
+        print(f"[{'PASS' if apn_method_fix else 'FAIL'}] get_property_by_apn method working")
+        print(f"[{'PASS' if alias_fix else 'FAIL'}] get_property_details alias working")
 
     if config_fix and apn_method_fix and alias_fix:
         print(f"\n[SUCCESS] All critical DatabaseManager fixes are working correctly!")
@@ -234,8 +234,7 @@ from src.enhanced_config_manager import EnhancedConfigManager
 
     if 'error' in results:
         print(f"\nERROR DETAILS: {results['error']}")
-
-    print("=" * 60)
+        print("=" * 60)
 
 if __name__ == "__main__":
     test_database_manager()

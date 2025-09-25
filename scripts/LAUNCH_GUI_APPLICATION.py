@@ -11,9 +11,8 @@ to the unified GUI launcher that consolidates features from:
 - launch_enhanced_app.py (splash screen and requirement checking)
 - launch_improved_app.py (UX improvements and Missouri Ave testing)
 """
-
-import sys
 import subprocess
+import sys
 from pathlib import Path
 
 # Handle both Windows and Linux paths
@@ -29,10 +28,10 @@ src_dir = PROJECT_ROOT / "src"
 sys.path.insert(0, str(src_dir))
 sys.path.insert(0, str(PROJECT_ROOT))
 
+import logging
+
 # Import unified launcher functionality
 from src.gui_launcher_unified import main as unified_main
-
-import logging
 from src.logging_config import get_logger
 
 logger = get_logger(__name__)

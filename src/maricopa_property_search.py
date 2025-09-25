@@ -3,9 +3,8 @@
 Maricopa County Property Search Application
 Main application file
 """
-
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add project root to path
@@ -17,7 +16,7 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 import platform
 
 if platform.system() == "Windows":
-    import multiprocessing
+import multiprocessing
 
     multiprocessing.freeze_support()
 
@@ -28,21 +27,21 @@ if platform.system() == "Windows":
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
+from gui.enhanced_main_window import EnhancedMainWindow
+
 # Import configuration and logging
 # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
-from logging_config import setup_logging, get_logger, log_exception
+from logging_config import get_logger, log_exception, setup_logging
 
 # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 from web_scraper import WebScraperManager
-from gui.enhanced_main_window import EnhancedMainWindow
+
 
 # [Rest of the application code from earlier...]
-
-
 def main():
     """Main entry point"""
-    try:
+try:
         app = QApplication(sys.argv)
         app.setApplicationName("Maricopa Property Search")
 
@@ -73,17 +72,18 @@ def main():
 
         sys.exit(exit_code)
 
-    except Exception as e:
+except Exception as e:
         # Fallback logging if main logging system isn't working
-        try:
+try:
             logger = get_logger(__name__)
             log_exception(logger, e, "main application startup")
-        except:
-            print(f"CRITICAL ERROR in main(): {e}")
-            import traceback
+except:
+                print(f"CRITICAL ERROR in main(): {e}")
+import traceback
 
-            traceback.print_exc()
-        sys.exit(1)
+        traceback.print_exc()
+
+    sys.exit(1)
 
 
 if __name__ == "__main__":

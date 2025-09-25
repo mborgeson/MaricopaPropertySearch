@@ -15,18 +15,18 @@ Key Features:
 - Comprehensive error handling
 - Full backward compatibility
 """
-
-import psycopg2
-from psycopg2.pool import ThreadedConnectionPool
-from psycopg2.extras import RealDictCursor, execute_batch, Json
-from contextlib import contextmanager
-import logging
-from threading import Lock, RLock
-from typing import Dict, List, Optional, Any, Tuple
 import json
-from datetime import datetime, timedelta
+import logging
 import time
 import traceback
+from contextlib import contextmanager
+from datetime import datetime, timedelta
+from threading import Lock, RLock
+from typing import Any, Dict, List, Optional, Tuple
+
+import psycopg2
+from psycopg2.extras import Json, RealDictCursor, execute_batch
+from psycopg2.pool import ThreadedConnectionPool
 
 # Import centralized logging
 from .logging_config import get_logger, get_performance_logger, log_exception
@@ -45,8 +45,7 @@ class UnifiedDatabaseManager:
     - Performance monitoring and bulk operations
     - Backward compatibility with all existing code
     """
-
-    def __init__(self, config_manager, min_connections=5, max_connections=20):
+def __init__(self, config_manager, min_connections=5, max_connections=20):
         """Initialize with configurable connection pooling for concurrent operations"""
         logger.info("Initializing Unified Database Manager")
 
@@ -91,12 +90,11 @@ class UnifiedDatabaseManager:
         logger.info(
             f"Unified database manager initialized with pool size {min_connections}-{max_connections}"
         )
-
     def _initialize_connection_pool(self):
         """Initialize the database connection pool"""
         logger.debug("Setting up database connection pool")
 
-        try:
+    try:
             connection_string = (
                 f"host={self.config['host']} "
                 f"port={self.config['port']} "
@@ -120,10 +118,9 @@ class UnifiedDatabaseManager:
                 f"Connection pool configured with min={self.min_connections}, max={self.max_connections} connections"
             )
 
-        except Exception as e:
+    except Exception as e:
             log_exception(logger, e, "initializing database connection pool")
             raise
-
     def _init_connection_pool(self):
         """Backward compatibility alias for _initialize_connection_pool"""
         return self._initialize_connection_pool()
@@ -134,7 +131,7 @@ class UnifiedDatabaseManager:
         connection = None
         start_time = None
 
-        try:
+    try:
             start_time = time.time()
             logger.debug("Acquiring database connection from pool")
 
@@ -147,26 +144,25 @@ class UnifiedDatabaseManager:
 
             yield connection
 
-        except Exception as e:
+    except Exception as e:
             if connection:
-                try:
+    try:
                     connection.rollback()
                     logger.debug("Database transaction rolled back due to error")
-                except:
-                    pass
+    except:
+            pass
 
             log_exception(logger, e, "database operation")
             raise
 
-        finally:
+    finally:
             if connection:
-                try:
+    try:
                     logger.debug("Returning database connection to pool")
                     with self._pool_lock:
                         self._connection_pool.putconn(connection)
-                except Exception as e:
+    except Exception as e:
                     logger.error(f"Error returning connection to pool: {e}")
-
     def _record_operation_stats(
         self, operation_type: str, duration: float, error: bool = False
     ):
@@ -186,7 +182,7 @@ class UnifiedDatabaseManager:
         """Test database connectivity"""
         logger.debug("Testing database connection")
 
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute("SELECT 1")
@@ -202,7 +198,7 @@ class UnifiedDatabaseManager:
                     logger.error("Database connection test returned unexpected result")
                     return False
 
-        except Exception as e:
+    except Exception as e:
             log_exception(logger, e, "database connection test")
             return False
 
@@ -223,7 +219,7 @@ class UnifiedDatabaseManager:
         logger.info(f"Inserting/updating property data for APN: {apn}")
         start_time = time.time()
 
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
@@ -305,7 +301,7 @@ class UnifiedDatabaseManager:
                 logger.debug(f"Property data committed successfully for APN: {apn}")
                 return True
 
-        except KeyError as e:
+    except KeyError as e:
             duration = time.time() - start_time
             self._record_operation_stats("inserts", duration, error=True)
             logger.error(f"KeyError in insert_property for APN {apn}: Missing key {e}")
@@ -313,12 +309,11 @@ class UnifiedDatabaseManager:
                 f"Available keys in property_data: {list(property_data.keys())}"
             )
             return False
-        except Exception as e:
+    except Exception as e:
             duration = time.time() - start_time
             self._record_operation_stats("inserts", duration, error=True)
             log_exception(logger, e, f"inserting property data for APN: {apn}")
             return False
-
     def insert_property_safe(self, property_data: Dict[str, Any]) -> bool:
         """Thread-safe property insertion - alias for insert_property for backward compatibility"""
         return self.insert_property(property_data)
@@ -329,7 +324,7 @@ class UnifiedDatabaseManager:
         logger.debug(f"Retrieving property data for APN: {apn}")
         start_time = time.time()
 
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
@@ -348,20 +343,19 @@ class UnifiedDatabaseManager:
                     logger.debug(f"No property data found for APN: {apn}")
                     return None
 
-        except Exception as e:
+    except Exception as e:
             duration = time.time() - start_time
             self._record_operation_stats("selects", duration, error=True)
             log_exception(logger, e, f"retrieving property data for APN: {apn}")
             return None
-
     def get_property_details(self, apn: str) -> Optional[Dict]:
         """Get property details by APN - alias for get_property_by_apn for GUI compatibility"""
         logger.debug(f"Retrieving property details for APN: {apn}")
 
-        try:
+    try:
             return self.get_property_by_apn(apn)
 
-        except Exception as e:
+    except Exception as e:
             log_exception(logger, e, f"retrieving property details for APN: {apn}")
             return None
 
@@ -373,7 +367,7 @@ class UnifiedDatabaseManager:
         logger.info(f"Searching properties by owner: {owner_name} (limit: {limit})")
         start_time = time.time()
 
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
@@ -397,7 +391,7 @@ class UnifiedDatabaseManager:
 
                 return results
 
-        except Exception as e:
+    except Exception as e:
             duration = time.time() - start_time
             self._record_operation_stats("selects", duration, error=True)
             log_exception(logger, e, f"searching properties by owner: {owner_name}")
@@ -411,7 +405,7 @@ class UnifiedDatabaseManager:
         logger.info(f"Searching properties by address: {address} (limit: {limit})")
         start_time = time.time()
 
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
@@ -435,7 +429,7 @@ class UnifiedDatabaseManager:
 
                 return results
 
-        except Exception as e:
+    except Exception as e:
             duration = time.time() - start_time
             self._record_operation_stats("selects", duration, error=True)
             log_exception(logger, e, f"searching properties by address: {address}")
@@ -444,12 +438,11 @@ class UnifiedDatabaseManager:
     # =======================
     # TAX HISTORY OPERATIONS
     # =======================
-
     def insert_tax_history(self, tax_data: Dict[str, Any]) -> bool:
         """Insert tax history record with enhanced error handling"""
         start_time = time.time()
 
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
@@ -487,23 +480,21 @@ class UnifiedDatabaseManager:
                 )
                 return True
 
-        except Exception as e:
+    except Exception as e:
             duration = time.time() - start_time
             self._record_operation_stats("inserts", duration, error=True)
             logger.error(
                 f"Error inserting tax history for {tax_data.get('apn', 'unknown')}: {e}"
             )
             return False
-
     def insert_tax_history_safe(self, tax_data: Dict[str, Any]) -> bool:
         """Thread-safe tax history insertion - alias for backward compatibility"""
         return self.insert_tax_history(tax_data)
-
     def get_tax_history(self, apn: str) -> List[Dict]:
         """Get tax history for property with performance tracking"""
         start_time = time.time()
 
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
@@ -521,12 +512,11 @@ class UnifiedDatabaseManager:
 
                 return results
 
-        except Exception as e:
+    except Exception as e:
             duration = time.time() - start_time
             self._record_operation_stats("selects", duration, error=True)
             logger.error(f"Failed to get tax history for {apn}: {e}")
             return []
-
     def bulk_insert_tax_history(self, tax_records: List[Dict[str, Any]]) -> int:
         """Efficient bulk insertion of tax history records"""
         if not tax_records:
@@ -535,7 +525,7 @@ class UnifiedDatabaseManager:
         start_time = time.time()
         inserted_count = 0
 
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
@@ -575,7 +565,7 @@ class UnifiedDatabaseManager:
                     f"Bulk inserted {inserted_count} tax records in {duration:.2f}s"
                 )
 
-        except Exception as e:
+    except Exception as e:
             duration = time.time() - start_time
             self._record_operation_stats("inserts", duration, error=True)
             logger.error(f"Error in bulk tax history insert: {e}")
@@ -586,12 +576,11 @@ class UnifiedDatabaseManager:
     # =======================
     # SALES HISTORY OPERATIONS
     # =======================
-
     def insert_sales_history(self, sales_data: Dict[str, Any]) -> bool:
         """Insert sales history record with enhanced error handling"""
         start_time = time.time()
 
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
@@ -621,23 +610,21 @@ class UnifiedDatabaseManager:
                 )
                 return True
 
-        except Exception as e:
+    except Exception as e:
             duration = time.time() - start_time
             self._record_operation_stats("inserts", duration, error=True)
             logger.error(
                 f"Error inserting sales history for {sales_data.get('apn', 'unknown')}: {e}"
             )
             return False
-
     def insert_sales_history_safe(self, sales_data: Dict[str, Any]) -> bool:
         """Thread-safe sales history insertion - alias for backward compatibility"""
         return self.insert_sales_history(sales_data)
-
     def get_sales_history(self, apn: str) -> List[Dict]:
         """Get sales history for property with performance tracking"""
         start_time = time.time()
 
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
@@ -655,12 +642,11 @@ class UnifiedDatabaseManager:
 
                 return results
 
-        except Exception as e:
+    except Exception as e:
             duration = time.time() - start_time
             self._record_operation_stats("selects", duration, error=True)
             logger.error(f"Failed to get sales history for {apn}: {e}")
             return []
-
     def bulk_insert_sales_history(self, sales_records: List[Dict[str, Any]]) -> int:
         """Efficient bulk insertion of sales history records"""
         if not sales_records:
@@ -669,7 +655,7 @@ class UnifiedDatabaseManager:
         start_time = time.time()
         inserted_count = 0
 
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
@@ -710,7 +696,7 @@ class UnifiedDatabaseManager:
                     f"Bulk inserted {inserted_count} sales records in {duration:.2f}s"
                 )
 
-        except Exception as e:
+    except Exception as e:
             duration = time.time() - start_time
             self._record_operation_stats("inserts", duration, error=True)
             logger.error(f"Error in bulk sales history insert: {e}")
@@ -721,12 +707,11 @@ class UnifiedDatabaseManager:
     # =======================
     # DATA COLLECTION STATUS OPERATIONS
     # =======================
-
     def get_data_collection_status(self, apn: str) -> Dict[str, Any]:
         """Get comprehensive data collection status for an APN"""
         start_time = time.time()
 
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
@@ -796,7 +781,7 @@ class UnifiedDatabaseManager:
                         "needs_sales_collection": True,
                     }
 
-        except Exception as e:
+    except Exception as e:
             duration = time.time() - start_time
             self._record_operation_stats("selects", duration, error=True)
             logger.error(f"Error getting data collection status for {apn}: {e}")
@@ -807,12 +792,11 @@ class UnifiedDatabaseManager:
                 "needs_tax_collection": True,
                 "needs_sales_collection": True,
             }
-
     def get_apns_needing_collection(self, limit: int = 100) -> List[Dict[str, Any]]:
         """Get APNs that need data collection, prioritized by search frequency"""
         start_time = time.time()
 
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
@@ -875,15 +859,14 @@ class UnifiedDatabaseManager:
                 logger.info(f"Found {len(results)} APNs needing data collection")
                 return [dict(row) for row in results]
 
-        except Exception as e:
+    except Exception as e:
             duration = time.time() - start_time
             self._record_operation_stats("selects", duration, error=True)
             logger.error(f"Error getting APNs needing collection: {e}")
             return []
-
     def mark_collection_in_progress(self, apn: str) -> bool:
         """Mark an APN as having collection in progress"""
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
@@ -901,15 +884,14 @@ class UnifiedDatabaseManager:
 
                 return True
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error marking collection in progress for {apn}: {e}")
             return False
-
     def mark_collection_completed(
         self, apn: str, success: bool, error_message: Optional[str] = None
     ) -> bool:
         """Mark an APN collection as completed"""
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
@@ -929,7 +911,7 @@ class UnifiedDatabaseManager:
 
                 return True
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error marking collection completed for {apn}: {e}")
             return False
 
@@ -951,7 +933,7 @@ class UnifiedDatabaseManager:
         )
         start_time = time.time()
 
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
@@ -968,7 +950,7 @@ class UnifiedDatabaseManager:
 
                 logger.debug("Search analytics logged successfully")
 
-        except Exception as e:
+    except Exception as e:
             duration = time.time() - start_time
             self._record_operation_stats("inserts", duration, error=True)
             log_exception(
@@ -981,7 +963,7 @@ class UnifiedDatabaseManager:
         logger.debug("Retrieving database statistics")
         start_time = time.time()
 
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
@@ -1003,14 +985,14 @@ class UnifiedDatabaseManager:
                 stats["sales_records"] = result["count"] if result else 0
 
                 # Recent searches (handle case where table may not exist)
-                try:
+    try:
                     cursor.execute(
                         "SELECT COUNT(*) as count FROM search_history WHERE searched_at > NOW() - INTERVAL '7 days'"
                     )
                     result = cursor.fetchone()
                     stats["recent_searches"] = result["count"] if result else 0
-                except:
-                    stats["recent_searches"] = 0
+    except:
+            stats["recent_searches"] = 0
 
                 duration = time.time() - start_time
                 self._record_operation_stats("selects", duration)
@@ -1023,12 +1005,11 @@ class UnifiedDatabaseManager:
 
                 return stats
 
-        except Exception as e:
+    except Exception as e:
             duration = time.time() - start_time
             self._record_operation_stats("selects", duration, error=True)
             log_exception(logger, e, "retrieving database statistics")
             return {}
-
     def get_database_performance_stats(self) -> Dict[str, Any]:
         """Get database performance statistics"""
         with self._stats_lock:
@@ -1053,7 +1034,7 @@ class UnifiedDatabaseManager:
 
             # Add connection pool stats
             if self._connection_pool:
-                try:
+    try:
                     with self._pool_lock:
                         # Get pool status (these methods may not be available in all versions)
                         stats["connection_pool"] = {
@@ -1061,7 +1042,7 @@ class UnifiedDatabaseManager:
                             "max_connections": self.max_connections,
                             "status": "active",
                         }
-                except Exception as e:
+    except Exception as e:
                     stats["connection_pool"] = {"status": "error", "error": str(e)}
 
             return stats
@@ -1069,7 +1050,6 @@ class UnifiedDatabaseManager:
     # =======================
     # VALIDATION AND UTILITY METHODS
     # =======================
-
     def save_comprehensive_property_data(
         self, comprehensive_info: Dict[str, Any]
     ) -> bool:
@@ -1077,7 +1057,7 @@ class UnifiedDatabaseManager:
         apn = comprehensive_info.get("apn", "unknown")
         logger.info(f"Saving comprehensive property data for APN: {apn}")
 
-        try:
+    try:
             # Save basic property information
             basic_property_saved = self.insert_property(comprehensive_info)
             if not basic_property_saved:
@@ -1121,17 +1101,16 @@ class UnifiedDatabaseManager:
             )
             return True
 
-        except Exception as e:
+    except Exception as e:
             log_exception(
                 logger, e, f"saving comprehensive property data for APN: {apn}"
             )
             return False
-
     def _safe_int(self, value) -> Optional[int]:
         """Safely convert value to integer"""
         if value is None or value == "":
             return None
-        try:
+    try:
             if isinstance(value, str):
                 # Remove any whitespace and convert
                 cleaned = value.strip()
@@ -1139,9 +1118,8 @@ class UnifiedDatabaseManager:
                     return int(cleaned)
                 return None
             return int(value)
-        except (ValueError, TypeError):
+    except (ValueError, TypeError):
             return None
-
     def validate_property_data(
         self, property_data: Dict[str, Any]
     ) -> tuple[bool, List[str]]:
@@ -1164,11 +1142,11 @@ class UnifiedDatabaseManager:
         for field in numeric_fields:
             value = property_data.get(field)
             if value is not None and not isinstance(value, (int, float, type(None))):
-                try:
+    try:
                     # Try to convert to numeric
                     if isinstance(value, str) and value.strip():
                         float(value.strip())
-                except (ValueError, TypeError):
+    except (ValueError, TypeError):
                     errors.append(f"Invalid numeric value for field '{field}': {value}")
 
         # Validate boolean fields
@@ -1181,10 +1159,9 @@ class UnifiedDatabaseManager:
 
         is_valid = len(errors) == 0
         return is_valid, errors
-
     def _ensure_tables_exist(self):
         """Ensure all required tables exist"""
-        try:
+    try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
 
@@ -1221,14 +1198,13 @@ class UnifiedDatabaseManager:
                 conn.commit()
                 logger.debug("Database schema verification completed")
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error ensuring tables exist: {e}")
-
     def close(self):
         """Close the database connection pool"""
         logger.info("Closing database connection pool")
 
-        try:
+    try:
             if self._connection_pool:
                 with self._pool_lock:
                     self._connection_pool.closeall()
@@ -1239,7 +1215,7 @@ class UnifiedDatabaseManager:
             else:
                 logger.debug("Database connection pool was already closed")
 
-        except Exception as e:
+    except Exception as e:
             log_exception(logger, e, "closing database connection pool")
 
 

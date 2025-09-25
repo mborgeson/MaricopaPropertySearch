@@ -2,27 +2,27 @@
 Web Scraper Manager
 Handles web scraping of Maricopa County property information
 """
+import json
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
-import time
-from typing import Dict, List, Optional, Any
-from pathlib import Path
-import json
-from concurrent.futures import ThreadPoolExecutor
-import threading
+from selenium.webdriver.support.ui import WebDriverWait
 
 # Import centralized logging
 from logging_config import (
     get_logger,
     get_performance_logger,
-    log_exception,
     log_debug_variables,
+    log_exception,
 )
 
 logger = get_logger(__name__)
@@ -69,10 +69,9 @@ class WebScraperManager:
 
         logger.debug(f"Chrome driver path: {self.chrome_driver_path}")
         logger.info("Web scraper manager initialized successfully")
-
     def _create_driver(self) -> webdriver.Chrome:
         """Create a new Chrome driver instance"""
-        try:
+    try:
             service = Service(str(self.chrome_driver_path))
             driver = webdriver.Chrome(service=service, options=self.chrome_options)
 
@@ -82,10 +81,9 @@ class WebScraperManager:
             )
 
             return driver
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Failed to create Chrome driver: {e}")
             raise
-
     def _get_driver(self) -> webdriver.Chrome:
         """Get a driver from the pool or create a new one"""
         with self.driver_lock:
@@ -93,7 +91,6 @@ class WebScraperManager:
                 return self.drivers.pop()
             else:
                 return self._create_driver()
-
     def _return_driver(self, driver: webdriver.Chrome):
         """Return a driver to the pool"""
         with self.driver_lock:
@@ -108,7 +105,7 @@ class WebScraperManager:
         logger.info(f"Starting web scraping for APN: {apn}")
 
         driver = None
-        try:
+    try:
             driver = self._get_driver()
             logger.debug(f"Obtained browser driver for APN: {apn}")
 
@@ -123,7 +120,7 @@ class WebScraperManager:
             wait = WebDriverWait(driver, self.config["timeout"])
 
             # Check if we got a valid property page or error
-            try:
+    try:
                 # Wait for either property data or error message
                 wait.until(
                     lambda d: d.find_elements(By.CLASS_NAME, "property-data")
@@ -139,7 +136,7 @@ class WebScraperManager:
                     logger.warning(f"Property not found for APN: {apn}")
                     return None
 
-            except TimeoutException:
+    except TimeoutException:
                 # Try alternative selector patterns
                 pass
 
@@ -153,29 +150,28 @@ class WebScraperManager:
                 logger.warning(f"No property data found for {apn}")
                 return None
 
-        except TimeoutException:
+    except TimeoutException:
             logger.error(f"Timeout while scraping property {apn}")
             if self.config.get("screenshot_on_error", False):
                 self._take_screenshot(driver, f"timeout_error_{apn}")
             return None
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error scraping property {apn}: {e}")
             if self.config.get("screenshot_on_error", False):
                 self._take_screenshot(driver, f"scrape_error_{apn}")
             return None
 
-        finally:
+    finally:
             if driver:
                 self._return_driver(driver)
-
     def _extract_real_property_details(
         self, driver: webdriver.Chrome, apn: str
     ) -> Dict:
         """Extract property details from the page"""
         property_data = {"apn": apn, "scraped_at": time.time()}
 
-        try:
+    try:
             # Extract basic property information
             property_data["owner_name"] = self._safe_get_text(
                 driver, By.CLASS_NAME, "owner-name"
@@ -221,61 +217,57 @@ class WebScraperManager:
             property_data["garage_spaces"] = self._parse_int(garage_text)
 
             # Extract tax information if available
-            try:
+    try:
                 tax_table = driver.find_element(By.CLASS_NAME, "tax-history-table")
                 property_data["tax_history"] = self._extract_tax_table(tax_table)
-            except NoSuchElementException:
+    except NoSuchElementException:
                 property_data["tax_history"] = []
 
             # Extract sales information if available
-            try:
+    try:
                 sales_table = driver.find_element(By.CLASS_NAME, "sales-history-table")
                 property_data["sales_history"] = self._extract_sales_table(sales_table)
-            except NoSuchElementException:
+    except NoSuchElementException:
                 property_data["sales_history"] = []
 
             return property_data
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error extracting property details for {apn}: {e}")
             return property_data
-
     def _safe_get_text(
         self, driver: webdriver.Chrome, by: By, selector: str
     ) -> Optional[str]:
         """Safely get text from an element"""
-        try:
+    try:
             element = driver.find_element(by, selector)
             return element.text.strip()
-        except NoSuchElementException:
+    except NoSuchElementException:
             return None
-
     def _parse_int(self, text: str) -> Optional[int]:
         """Parse integer from text"""
         if not text:
             return None
-        try:
+    try:
             # Remove non-numeric characters except digits
             numeric_text = "".join(c for c in text if c.isdigit())
             return int(numeric_text) if numeric_text else None
-        except ValueError:
+    except ValueError:
             return None
-
     def _parse_float(self, text: str) -> Optional[float]:
         """Parse float from text"""
         if not text:
             return None
-        try:
+    try:
             # Remove non-numeric characters except digits and decimal point
             numeric_text = "".join(c for c in text if c.isdigit() or c == ".")
             return float(numeric_text) if numeric_text else None
-        except ValueError:
+    except ValueError:
             return None
-
     def _extract_tax_table(self, table_element) -> List[Dict]:
         """Extract tax history from table"""
         tax_history = []
-        try:
+    try:
             rows = table_element.find_elements(By.TAG_NAME, "tr")[1:]  # Skip header
 
             for row in rows:
@@ -288,15 +280,14 @@ class WebScraperManager:
                         "payment_status": cells[3].text.strip(),
                     }
                     tax_history.append(tax_record)
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error extracting tax table: {e}")
 
         return tax_history
-
     def _extract_sales_table(self, table_element) -> List[Dict]:
         """Extract sales history from table"""
         sales_history = []
-        try:
+    try:
             rows = table_element.find_elements(By.TAG_NAME, "tr")[1:]  # Skip header
 
             for row in rows:
@@ -309,23 +300,21 @@ class WebScraperManager:
                         "buyer_name": cells[3].text.strip(),
                     }
                     sales_history.append(sales_record)
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error extracting sales table: {e}")
 
         return sales_history
-
     def _take_screenshot(self, driver: webdriver.Chrome, filename: str):
         """Take screenshot for debugging"""
-        try:
+    try:
             screenshot_dir = self.paths_config.get_path("log") / "screenshots"
             screenshot_dir.mkdir(exist_ok=True)
 
             screenshot_path = screenshot_dir / f"{filename}_{int(time.time())}.png"
             driver.save_screenshot(str(screenshot_path))
             logger.info(f"Screenshot saved: {screenshot_path}")
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Failed to take screenshot: {e}")
-
     def bulk_scrape_properties(
         self, apns: List[str], max_workers: int = None
     ) -> Dict[str, Dict]:
@@ -347,22 +336,21 @@ class WebScraperManager:
             # Collect results
             for future in future_to_apn:
                 apn = future_to_apn[future]
-                try:
+    try:
                     result = future.result()
                     if result:
                         results[apn] = result
-                except Exception as e:
+    except Exception as e:
                     logger.error(f"Error in bulk scrape for {apn}: {e}")
 
         logger.info(
             f"Bulk scrape completed: {len(results)}/{len(apns)} properties scraped successfully"
         )
         return results
-
     def search_by_owner_name(self, owner_name: str, limit: int = 50) -> List[Dict]:
         """Search properties by owner name using web scraping on the real website"""
         driver = None
-        try:
+    try:
             driver = self._get_driver()
 
             # Use the actual search endpoint with proper URL encoding
@@ -373,13 +361,13 @@ class WebScraperManager:
             wait = WebDriverWait(driver, self.config["timeout"])
 
             # Wait for results to load
-            try:
+    try:
                 wait.until(
                     lambda d: d.find_elements(By.CLASS_NAME, "search-results")
                     or d.find_elements(By.CLASS_NAME, "property-result")
                     or "No results found" in d.page_source.lower()
                 )
-            except TimeoutException:
+    except TimeoutException:
                 logger.error(
                     f"Timeout waiting for search results for owner: {owner_name}"
                 )
@@ -396,24 +384,23 @@ class WebScraperManager:
             logger.info(f"Found {len(results)} properties for owner: {owner_name}")
             return results
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error searching by owner name '{owner_name}': {e}")
             return []
 
-        finally:
+    finally:
             if driver:
                 self._return_driver(driver)
-
     def _extract_real_search_results(
         self, driver: webdriver.Chrome, search_term: str, limit: int
     ) -> List[Dict]:
         """Extract search results from results page"""
         results = []
-        try:
+    try:
             result_rows = driver.find_elements(By.CLASS_NAME, "result-row")[:limit]
 
             for row in result_rows:
-                try:
+    try:
                     result = {
                         "apn": self._safe_get_text(row, By.CLASS_NAME, "apn"),
                         "owner_name": self._safe_get_text(row, By.CLASS_NAME, "owner"),
@@ -425,28 +412,25 @@ class WebScraperManager:
                         ),
                     }
                     results.append(result)
-                except Exception as e:
+    except Exception as e:
                     logger.warning(f"Error extracting search result row: {e}")
                     continue
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error extracting search results: {e}")
 
         return results
-
     def _format_apn(self, apn: str) -> str:
         """Format APN for URL usage"""
         # Remove spaces, dashes, dots for URL
         return apn.replace(" ", "").replace("-", "").replace(".", "")
-
     def _url_encode(self, text: str) -> str:
         """URL encode search text"""
-        import urllib.parse
+import urllib.parse
 
         return urllib.parse.quote_plus(text)
-
     def _extract_from_tables(self, driver: webdriver.Chrome, property_data: Dict):
         """Extract property data from tables on the page"""
-        try:
+    try:
             # Look for data tables
             tables = driver.find_elements(By.TAG_NAME, "table")
             for table in tables:
@@ -469,36 +453,34 @@ class WebScraperManager:
                             property_data["latest_assessed_value"] = self._parse_float(
                                 value
                             )
-        except Exception as e:
+    except Exception as e:
             logger.debug(f"Error extracting from tables: {e}")
-
     def _extract_structured_data(self, driver: webdriver.Chrome, property_data: Dict):
         """Extract structured data (JSON-LD, microdata, etc.)"""
-        try:
+    try:
             # Look for JSON-LD structured data
             scripts = driver.find_elements(
                 By.CSS_SELECTOR, 'script[type="application/ld+json"]'
             )
             for script in scripts:
-                try:
+    try:
                     data = json.loads(script.get_attribute("innerHTML"))
                     if isinstance(data, dict):
                         if "name" in data:
                             property_data["owner_name"] = data["name"]
                         if "address" in data:
                             property_data["property_address"] = str(data["address"])
-                except json.JSONDecodeError:
+    except json.JSONDecodeError:
                     continue
-        except Exception as e:
+    except Exception as e:
             logger.debug(f"Error extracting structured data: {e}")
-
     def _extract_from_page_text(self, driver: webdriver.Chrome, property_data: Dict):
         """Extract data from page text using patterns"""
-        try:
+    try:
             page_text = driver.page_source
 
             # Use regex patterns to find data
-            import re
+import re
 
             # APN pattern
             apn_match = re.search(r"APN[:\s]*([\d-\.\s]+)", page_text, re.IGNORECASE)
@@ -517,14 +499,13 @@ class WebScraperManager:
             if owner_match:
                 property_data["owner_name"] = owner_match.group(1).strip()
 
-        except Exception as e:
+    except Exception as e:
             logger.debug(f"Error extracting from page text: {e}")
-
     def _extract_result_from_element(self, element, search_term: str) -> Dict:
         """Extract result data from a search result element"""
         result = {}
 
-        try:
+    try:
             # Try to find APN in the element
             apn_selectors = [
                 '[class*="apn"]',
@@ -578,16 +559,15 @@ class WebScraperManager:
                         result["apn"] = href.split("/parcel/")[-1].split("/")[0]
                         break
 
-        except Exception as e:
+    except Exception as e:
             logger.debug(f"Error extracting from result element: {e}")
 
         return result
-
     def _try_pagination(
         self, driver: webdriver.Chrome, current_results: List[Dict], needed: int
     ):
         """Try to get more results from pagination"""
-        try:
+    try:
             # Look for next page buttons
             next_buttons = driver.find_elements(
                 By.CSS_SELECTOR, '.next, .page-next, [class*="next"]'
@@ -601,16 +581,15 @@ class WebScraperManager:
                     new_results = self._extract_real_search_results(driver, "", needed)
                     current_results.extend(new_results[:needed])
                     break
-        except Exception as e:
+    except Exception as e:
             logger.debug(f"Error with pagination: {e}")
-
     def close(self):
         """Close all driver instances"""
         with self.driver_lock:
             for driver in self.drivers:
-                try:
+    try:
                     driver.quit()
-                except Exception as e:
+    except Exception as e:
                     logger.warning(f"Error closing driver: {e}")
             self.drivers.clear()
 
@@ -619,14 +598,12 @@ class WebScraperManager:
 
 class MockWebScraperManager(WebScraperManager):
     """Mock web scraper for testing without Chrome dependencies"""
-
     def __init__(self, config_manager):
         self.config = config_manager.get_scraping_config()
         logger.info("Using Mock Web Scraper - no actual web scraping will be performed")
-
     def scrape_property_by_apn(self, apn: str) -> Optional[Dict]:
         """Mock scraping by APN"""
-        import random
+import random
 
         time.sleep(random.uniform(0.5, 2.0))  # Simulate scraping time
 
@@ -650,10 +627,9 @@ class MockWebScraperManager(WebScraperManager):
             "tax_history": [],
             "sales_history": [],
         }
-
     def search_by_owner_name(self, owner_name: str, limit: int = 50) -> List[Dict]:
         """Mock search by owner name"""
-        import random
+import random
 
         logger.info(f"Mock: Searching properties by owner: {owner_name}")
 
@@ -667,7 +643,6 @@ class MockWebScraperManager(WebScraperManager):
             }
             for i in range(num_results)
         ]
-
     def bulk_scrape_properties(
         self, apns: List[str], max_workers: int = None
     ) -> Dict[str, Dict]:
@@ -679,7 +654,6 @@ class MockWebScraperManager(WebScraperManager):
             results[apn] = self.scrape_property_by_apn(apn)
 
         return results
-
     def close(self):
         """Mock close method"""
         logger.info("Mock web scraper closed")

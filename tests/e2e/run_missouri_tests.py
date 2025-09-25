@@ -3,14 +3,14 @@
 Test runner for Missouri Avenue address and UX improvements
 Comprehensive testing script for the specific address "10000 W Missouri Ave"
 """
-
-import sys
-import os
 import logging
-import pytest
+import os
+import sys
 import time
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
+import pytest
 
 # Add src directory to path
 src_dir = Path(__file__).parent / "src"
@@ -27,9 +27,7 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
-
-
-def run_missouri_avenue_tests():
+    def run_missouri_avenue_tests():
     """Run comprehensive tests for Missouri Avenue property"""
 
     logger.info("=" * 80)
@@ -117,9 +115,7 @@ def run_missouri_avenue_tests():
     logger.info("=" * 80)
 
     return overall_success
-
-
-def run_ux_verification_tests():
+    def run_ux_verification_tests():
     """Run UX verification tests to ensure no 'Not Available' messages"""
 
     logger.info("\n" + "=" * 60)
@@ -160,9 +156,7 @@ def run_ux_verification_tests():
         logger.error("  • Test tooltip functionality")
         logger.error("  • Verify message consistency")
         return False
-
-
-def run_regression_tests():
+    def run_regression_tests():
     """Run regression tests to ensure existing functionality still works"""
 
     logger.info("\n" + "=" * 60)
@@ -202,9 +196,7 @@ def run_regression_tests():
         logger.error("  • Test export functionality")
         logger.error("  • Review database connections")
         return False
-
-
-def check_test_prerequisites():
+    def check_test_prerequisites():
     """Check that test prerequisites are met"""
 
     logger.info("Checking test prerequisites...")
@@ -247,9 +239,7 @@ def check_test_prerequisites():
     else:
         logger.info("✅ Prerequisites check PASSED - All required files found")
         return True
-
-
-def generate_test_report():
+    def generate_test_report():
     """Generate a comprehensive test report"""
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -386,17 +376,15 @@ The application is ready for production deployment with significant UX improveme
 **Coverage:** Comprehensive functional, UX, and regression testing
 """
 
-    try:
+try:
         with open(report_file, "w", encoding="utf-8") as f:
             f.write(report_content)
         logger.info(f"✅ Test report generated successfully: {report_file}")
         return report_file
-    except Exception as e:
+except Exception as e:
         logger.error(f"❌ Failed to generate test report: {e}")
         return None
-
-
-def main():
+    def main():
     """Main test execution function"""
 
     start_time = time.time()

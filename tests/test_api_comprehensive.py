@@ -3,15 +3,14 @@
 Comprehensive API Test Suite for Maricopa Property Search
 Tests all API functionality including search methods, error handling, and data retrieval
 """
-
-import sys
-import os
-import time
 import json
 import logging
-from pathlib import Path
+import os
+import sys
+import time
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
 # Add src directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -19,6 +18,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient, MockMaricopaAPIClient
 # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 import requests
+
 from src.api_client_unified import UnifiedMaricopaAPIClient
 from src.enhanced_config_manager import EnhancedConfigManager
 
@@ -31,7 +31,6 @@ logger = logging.getLogger(__name__)
 
 class APITestRunner:
     """Comprehensive API test runner"""
-
     def __init__(self):
         self.config_manager = EnhancedConfigManager()
         self.real_client = None
@@ -64,27 +63,25 @@ class APITestRunner:
             "1234 MAIN STREET",
             "999999 NONEXISTENT ROAD",
         ]
-
     def setup_clients(self):
         """Initialize API clients"""
         logger.info("Setting up API clients...")
 
-        try:
+    try:
             # Initialize real client
             self.real_client = UnifiedMaricopaAPIClient(self.config_manager)
             logger.info("Real API client initialized")
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Failed to initialize real client: {e}")
             self.real_client = None
 
-        try:
+    try:
             # Initialize mock client
             self.mock_client = MockMaricopaAPIClient(self.config_manager)
             logger.info("Mock API client initialized")
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Failed to initialize mock client: {e}")
             self.mock_client = None
-
     def test_connection(self) -> Dict[str, Any]:
         """Test API connection and basic connectivity"""
         logger.info("Testing API connection...")
@@ -96,40 +93,39 @@ class APITestRunner:
         }
 
         # Test base URL accessibility
-        try:
+    try:
             config = self.config_manager.get_api_config()
             response = requests.get(config["base_url"], timeout=10)
             results["base_url_accessible"] = response.status_code == 200
             results["base_url_status_code"] = response.status_code
-        except Exception as e:
+    except Exception as e:
             results["base_url_error"] = str(e)
 
         # Test real client connection
         if self.real_client:
-            try:
+    try:
                 connection_result = self.real_client.test_connection()
                 results["real_client"]["status"] = (
                     "pass" if connection_result else "fail"
                 )
                 results["real_client"]["connected"] = connection_result
-            except Exception as e:
+    except Exception as e:
                 results["real_client"]["status"] = "error"
                 results["real_client"]["error"] = str(e)
 
         # Test mock client connection
         if self.mock_client:
-            try:
+    try:
                 connection_result = self.mock_client.test_connection()
                 results["mock_client"]["status"] = (
                     "pass" if connection_result else "fail"
                 )
                 results["mock_client"]["connected"] = connection_result
-            except Exception as e:
+    except Exception as e:
                 results["mock_client"]["status"] = "error"
                 results["mock_client"]["error"] = str(e)
 
         return results
-
     def test_search_by_apn(self, client, client_name: str) -> Dict[str, Any]:
         """Test APN search functionality"""
         logger.info(f"Testing APN search with {client_name} client...")
@@ -148,7 +144,7 @@ class APITestRunner:
                 "error": None,
             }
 
-            try:
+    try:
                 start_time = time.time()
                 result = client.search_by_apn(apn)
                 end_time = time.time()
@@ -162,7 +158,7 @@ class APITestRunner:
                     test_case["owner_name"] = result.get("owner_name")
                     test_case["property_address"] = result.get("property_address")
 
-            except Exception as e:
+    except Exception as e:
                 test_case["status"] = "error"
                 test_case["error"] = str(e)
                 logger.warning(f"APN search error for {apn}: {e}")
@@ -182,7 +178,6 @@ class APITestRunner:
         results["successful_tests"] = successful
 
         return results
-
     def test_search_by_owner(self, client, client_name: str) -> Dict[str, Any]:
         """Test owner name search functionality"""
         logger.info(f"Testing owner search with {client_name} client...")
@@ -202,7 +197,7 @@ class APITestRunner:
                 "error": None,
             }
 
-            try:
+    try:
                 start_time = time.time()
                 results_list = client.search_by_owner(owner, limit=5)
                 end_time = time.time()
@@ -215,7 +210,7 @@ class APITestRunner:
                 if results_list:
                     test_case["sample_result"] = results_list[0]
 
-            except Exception as e:
+    except Exception as e:
                 test_case["status"] = "error"
                 test_case["error"] = str(e)
                 logger.warning(f"Owner search error for {owner}: {e}")
@@ -235,7 +230,6 @@ class APITestRunner:
         results["successful_tests"] = successful
 
         return results
-
     def test_search_by_address(self, client, client_name: str) -> Dict[str, Any]:
         """Test address search functionality"""
         logger.info(f"Testing address search with {client_name} client...")
@@ -255,7 +249,7 @@ class APITestRunner:
                 "error": None,
             }
 
-            try:
+    try:
                 start_time = time.time()
                 results_list = client.search_by_address(address, limit=5)
                 end_time = time.time()
@@ -268,7 +262,7 @@ class APITestRunner:
                 if results_list:
                     test_case["sample_result"] = results_list[0]
 
-            except Exception as e:
+    except Exception as e:
                 test_case["status"] = "error"
                 test_case["error"] = str(e)
                 logger.warning(f"Address search error for {address}: {e}")
@@ -288,7 +282,6 @@ class APITestRunner:
         results["successful_tests"] = successful
 
         return results
-
     def test_tax_history(self, client, client_name: str) -> Dict[str, Any]:
         """Test tax history retrieval"""
         logger.info(f"Testing tax history with {client_name} client...")
@@ -311,7 +304,7 @@ class APITestRunner:
                 "error": None,
             }
 
-            try:
+    try:
                 start_time = time.time()
                 tax_records = client.get_tax_history(apn, years=5)
                 end_time = time.time()
@@ -324,7 +317,7 @@ class APITestRunner:
                 if tax_records:
                     test_case["sample_record"] = tax_records[0]
 
-            except Exception as e:
+    except Exception as e:
                 test_case["status"] = "error"
                 test_case["error"] = str(e)
                 logger.warning(f"Tax history error for {apn}: {e}")
@@ -344,7 +337,6 @@ class APITestRunner:
         results["successful_tests"] = successful
 
         return results
-
     def test_sales_history(self, client, client_name: str) -> Dict[str, Any]:
         """Test sales history retrieval"""
         logger.info(f"Testing sales history with {client_name} client...")
@@ -367,7 +359,7 @@ class APITestRunner:
                 "error": None,
             }
 
-            try:
+    try:
                 start_time = time.time()
                 sales_records = client.get_sales_history(apn, years=10)
                 end_time = time.time()
@@ -380,7 +372,7 @@ class APITestRunner:
                 if sales_records:
                     test_case["sample_record"] = sales_records[0]
 
-            except Exception as e:
+    except Exception as e:
                 test_case["status"] = "error"
                 test_case["error"] = str(e)
                 logger.warning(f"Sales history error for {apn}: {e}")
@@ -400,7 +392,6 @@ class APITestRunner:
         results["successful_tests"] = successful
 
         return results
-
     def test_bulk_search(self, client, client_name: str) -> Dict[str, Any]:
         """Test bulk property search"""
         logger.info(f"Testing bulk search with {client_name} client...")
@@ -420,7 +411,7 @@ class APITestRunner:
         test_apns = self.test_apns[:3]
         results["input_count"] = len(test_apns)
 
-        try:
+    try:
             start_time = time.time()
             bulk_results = client.bulk_property_search(test_apns)
             end_time = time.time()
@@ -433,13 +424,12 @@ class APITestRunner:
             ) * 100
             results["status"] = "success" if bulk_results else "no_results"
 
-        except Exception as e:
+    except Exception as e:
             results["status"] = "error"
             results["error"] = str(e)
             logger.warning(f"Bulk search error: {e}")
 
         return results
-
     def test_api_status(self, client, client_name: str) -> Dict[str, Any]:
         """Test API status endpoint"""
         logger.info(f"Testing API status with {client_name} client...")
@@ -452,7 +442,7 @@ class APITestRunner:
             "error": None,
         }
 
-        try:
+    try:
             start_time = time.time()
             status_info = client.get_api_status()
             end_time = time.time()
@@ -461,13 +451,12 @@ class APITestRunner:
             results["api_status"] = status_info
             results["status"] = "success" if status_info else "no_results"
 
-        except Exception as e:
+    except Exception as e:
             results["status"] = "error"
             results["error"] = str(e)
             logger.warning(f"API status error: {e}")
 
         return results
-
     def test_error_handling(self, client, client_name: str) -> Dict[str, Any]:
         """Test error handling and edge cases"""
         logger.info(f"Testing error handling with {client_name} client...")
@@ -503,14 +492,14 @@ class APITestRunner:
                 "error": None,
             }
 
-            try:
+    try:
                 method = getattr(client, test["method"])
                 result = method(test["input"])
                 test_case["result"] = result
                 test_case["status"] = "completed"
                 test_case["error_handled"] = True  # No exception thrown
 
-            except Exception as e:
+    except Exception as e:
                 test_case["status"] = "error"
                 test_case["error"] = str(e)
                 test_case["error_handled"] = True  # Exception properly handled
@@ -528,7 +517,6 @@ class APITestRunner:
         )
 
         return results
-
     def test_rate_limiting(self, client, client_name: str) -> Dict[str, Any]:
         """Test rate limiting behavior"""
         logger.info(f"Testing rate limiting with {client_name} client...")
@@ -543,18 +531,18 @@ class APITestRunner:
             "error": None,
         }
 
-        try:
+    try:
             # Make rapid requests to test rate limiting
             response_times = []
             for i in range(5):
                 start_time = time.time()
-                try:
+    try:
                     result = client.search_by_apn(self.test_apns[0])
                     end_time = time.time()
                     response_time = end_time - start_time
                     response_times.append(response_time)
                     results["requests_made"] += 1
-                except Exception as e:
+    except Exception as e:
                     if "429" in str(e) or "rate limit" in str(e).lower():
                         results["rate_limited"] = True
                         break
@@ -567,13 +555,12 @@ class APITestRunner:
             )
             results["status"] = "completed"
 
-        except Exception as e:
+    except Exception as e:
             results["status"] = "error"
             results["error"] = str(e)
             logger.warning(f"Rate limiting test error: {e}")
 
         return results
-
     def run_all_tests(self):
         """Run all API tests"""
         logger.info("Starting comprehensive API test suite...")
@@ -615,10 +602,10 @@ class APITestRunner:
             ]
 
             for test_name, test_method in test_methods:
-                try:
+    try:
                     logger.info(f"Running {test_name} test...")
                     client_results[test_name] = test_method(client, client_name)
-                except Exception as e:
+    except Exception as e:
                     logger.error(f"Failed to run {test_name} test: {e}")
                     client_results[test_name] = {
                         "test_name": f"{test_name} - {client_name}",
@@ -627,7 +614,6 @@ class APITestRunner:
                     }
 
             self.test_results[client_name.lower()] = client_results
-
     def generate_report(self) -> str:
         """Generate comprehensive test report"""
         test_end_time = datetime.now()
@@ -858,7 +844,6 @@ class APITestRunner:
         report_lines.extend(["=" * 80, "END OF REPORT", "=" * 80])
 
         return "\n".join(report_lines)
-
     def save_detailed_results(self, filename: str = None):
         """Save detailed test results to JSON file"""
         if filename is None:
@@ -880,21 +865,19 @@ class APITestRunner:
             "results": self.test_results,
         }
 
-        try:
+    try:
             with open(output_file, "w", encoding="utf-8") as f:
                 json.dump(json_results, f, indent=2, default=str)
 
             logger.info(f"Detailed test results saved to: {output_file}")
             return str(output_file)
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Failed to save detailed results: {e}")
             return None
-
-
-def main():
+    def main():
     """Main test execution"""
-    print("Starting Maricopa Property Search API Test Suite...")
-    print("=" * 60)
+        print("Starting Maricopa Property Search API Test Suite...")
+        print("=" * 60)
 
     # Create test runner
     test_runner = APITestRunner()
@@ -910,7 +893,7 @@ def main():
         # Save detailed results
         results_file = test_runner.save_detailed_results()
         if results_file:
-            print(f"\nDetailed results saved to: {results_file}")
+        print(f"\nDetailed results saved to: {results_file}")
 
     except Exception as e:
         logger.error(f"Test suite failed: {e}")

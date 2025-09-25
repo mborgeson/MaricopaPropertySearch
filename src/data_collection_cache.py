@@ -3,8 +3,8 @@ Simple Data Collection Cache
 """
 
 import json
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
 
 
 class DataCollectionCache:
@@ -26,25 +26,25 @@ class DataCollectionCache:
             del self.sales_cache[apn]
         return True
 
-    def is_cached(self, apn):
-        """Check if data for given APN exists in cache
 
-        Args:
-            apn (str): The APN to check for in cache
+def is_cached(self, apn):
+    """Check if data for given APN exists in cache
 
-        Returns:
-            bool: True if APN data exists in any cache, False otherwise
-        """
-        if not apn or not isinstance(apn, str):
-            return False
+    Args:
+        apn (str): The APN to check for in cache
 
-        # Check if APN exists in any of the cache dictionaries
-        return (
-            apn in self.property_cache
-            or apn in self.tax_cache
-            or apn in self.sales_cache
-        )
+    Returns:
+        bool: True if APN data exists in any cache, False otherwise
+    """
+    if not apn or not isinstance(apn, str):
+        return False
 
-    def save_cache(self):
-        """Save cache to disk"""
-        pass
+    # Check if APN exists in any of the cache dictionaries
+    return (
+        apn in self.property_cache or apn in self.tax_cache or apn in self.sales_cache
+    )
+
+
+def save_cache(self):
+    """Save cache to disk"""
+    pass

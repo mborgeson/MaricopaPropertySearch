@@ -3,14 +3,13 @@
 Test API functionality with real APNs found through owner search
 This test will first find valid APNs through owner search, then test all API methods with them
 """
-
-import sys
-import os
-import time
 import json
 import logging
-from pathlib import Path
+import os
+import sys
+import time
 from datetime import datetime
+from pathlib import Path
 
 # Add src directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -25,9 +24,7 @@ logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
-
-
-def find_valid_apns(client, max_apns=5):
+    def find_valid_apns(client, max_apns=5):
     """Find valid APNs by searching for common owner names"""
     logger.info("Finding valid APNs through owner search...")
 
@@ -46,7 +43,7 @@ def find_valid_apns(client, max_apns=5):
         if len(valid_apns) >= max_apns:
             break
 
-        try:
+try:
             logger.info(f"Searching for properties owned by: {owner}")
             results = client.search_by_owner(owner, limit=10)
 
@@ -65,15 +62,13 @@ def find_valid_apns(client, max_apns=5):
                         # Add a delay between requests
                         time.sleep(0.2)
 
-        except Exception as e:
+except Exception as e:
             logger.error(f"Error searching for owner {owner}: {e}")
             continue
 
     logger.info(f"Found {len(valid_apns)} valid APNs: {valid_apns}")
     return valid_apns
-
-
-def test_apn_search_detailed(client, apns):
+    def test_apn_search_detailed(client, apns):
     """Test APN search with detailed analysis"""
     logger.info("Testing APN search with real APNs...")
 
@@ -90,7 +85,7 @@ def test_apn_search_detailed(client, apns):
             "errors": [],
         }
 
-        try:
+try:
             # Test basic search
             start_time = time.time()
             search_result = client.search_by_apn(apn)
@@ -103,7 +98,7 @@ def test_apn_search_detailed(client, apns):
                 logger.info(f"✅ APN search successful for {apn}")
 
                 # Test property details
-                try:
+try:
                     start_time = time.time()
                     details = client.get_property_details(apn)
                     details_time = time.time() - start_time
@@ -116,13 +111,13 @@ def test_apn_search_detailed(client, apns):
                     else:
                         logger.warning(f"⚠️  No property details for {apn}")
 
-                except Exception as e:
+except Exception as e:
                     error_msg = f"Property details error for {apn}: {e}"
                     logger.error(f"❌ {error_msg}")
                     test_result["errors"].append(error_msg)
 
                 # Test comprehensive info
-                try:
+try:
                     start_time = time.time()
                     comp_info = client.get_comprehensive_property_info(apn)
                     comp_time = time.time() - start_time
@@ -145,7 +140,7 @@ def test_apn_search_detailed(client, apns):
                     else:
                         logger.warning(f"⚠️  No comprehensive info for {apn}")
 
-                except Exception as e:
+except Exception as e:
                     error_msg = f"Comprehensive info error for {apn}: {e}"
                     logger.error(f"❌ {error_msg}")
                     test_result["errors"].append(error_msg)
@@ -153,7 +148,7 @@ def test_apn_search_detailed(client, apns):
             else:
                 logger.warning(f"⚠️  No search results for {apn}")
 
-        except Exception as e:
+except Exception as e:
             error_msg = f"APN search error for {apn}: {e}"
             logger.error(f"❌ {error_msg}")
             test_result["errors"].append(error_msg)
@@ -164,9 +159,7 @@ def test_apn_search_detailed(client, apns):
         time.sleep(0.3)
 
     return results
-
-
-def test_tax_and_sales_detailed(client, apns):
+    def test_tax_and_sales_detailed(client, apns):
     """Test tax and sales history with real APNs"""
     logger.info("Testing tax and sales history with real APNs...")
 
@@ -185,7 +178,7 @@ def test_tax_and_sales_detailed(client, apns):
         }
 
         # Test tax history
-        try:
+try:
             start_time = time.time()
             tax_history = client.get_tax_history(apn, years=5)
             tax_time = time.time() - start_time
@@ -200,13 +193,13 @@ def test_tax_and_sales_detailed(client, apns):
             else:
                 logger.warning(f"⚠️  No tax history for {apn}")
 
-        except Exception as e:
+except Exception as e:
             error_msg = f"Tax history error for {apn}: {e}"
             logger.error(f"❌ {error_msg}")
             test_result["errors"].append(error_msg)
 
         # Test comprehensive tax information
-        try:
+try:
             start_time = time.time()
             tax_info = client.get_tax_information(apn)
             tax_info_time = time.time() - start_time
@@ -222,13 +215,13 @@ def test_tax_and_sales_detailed(client, apns):
             else:
                 logger.warning(f"⚠️  No tax information for {apn}")
 
-        except Exception as e:
+except Exception as e:
             error_msg = f"Tax information error for {apn}: {e}"
             logger.error(f"❌ {error_msg}")
             test_result["errors"].append(error_msg)
 
         # Test sales history
-        try:
+try:
             start_time = time.time()
             sales_history = client.get_sales_history(apn, years=10)
             sales_time = time.time() - start_time
@@ -243,13 +236,13 @@ def test_tax_and_sales_detailed(client, apns):
             else:
                 logger.warning(f"⚠️  No sales history for {apn}")
 
-        except Exception as e:
+except Exception as e:
             error_msg = f"Sales history error for {apn}: {e}"
             logger.error(f"❌ {error_msg}")
             test_result["errors"].append(error_msg)
 
         # Test property documents
-        try:
+try:
             start_time = time.time()
             documents = client.get_property_documents(apn)
             docs_time = time.time() - start_time
@@ -264,7 +257,7 @@ def test_tax_and_sales_detailed(client, apns):
             else:
                 logger.warning(f"⚠️  No documents for {apn}")
 
-        except Exception as e:
+except Exception as e:
             error_msg = f"Documents error for {apn}: {e}"
             logger.error(f"❌ {error_msg}")
             test_result["errors"].append(error_msg)
@@ -275,9 +268,7 @@ def test_tax_and_sales_detailed(client, apns):
         time.sleep(0.5)
 
     return results
-
-
-def test_endpoint_discovery(client):
+    def test_endpoint_discovery(client):
     """Test various endpoint discovery methods"""
     logger.info("Testing endpoint discovery and detailed data methods...")
 
@@ -289,7 +280,7 @@ def test_endpoint_discovery(client):
     }
 
     # Test search all property types
-    try:
+try:
         logger.info("Testing search all property types...")
         all_types = client.search_all_property_types("PHOENIX", limit=5)
         results["all_property_types"] = all_types
@@ -303,13 +294,13 @@ def test_endpoint_discovery(client):
             if properties:
                 logger.info(f"   {category}: {len(properties)} results")
 
-    except Exception as e:
+except Exception as e:
         error_msg = f"All property types search error: {e}"
         logger.error(f"❌ {error_msg}")
         results["errors"].append(error_msg)
 
     # Test API status
-    try:
+try:
         logger.info("Testing API status...")
         api_status = client.get_api_status()
         results["api_status"] = api_status
@@ -321,15 +312,13 @@ def test_endpoint_discovery(client):
         else:
             logger.warning("⚠️  No API status returned")
 
-    except Exception as e:
+except Exception as e:
         error_msg = f"API status error: {e}"
         logger.error(f"❌ {error_msg}")
         results["errors"].append(error_msg)
 
     return results
-
-
-def generate_detailed_report(
+    def generate_detailed_report(
     apn_results, tax_sales_results, endpoint_results, test_duration
 ):
     """Generate a detailed report of all test results"""
@@ -621,16 +610,14 @@ def generate_detailed_report(
     report_lines.extend(["=" * 80, "END OF DETAILED REPORT", "=" * 80])
 
     return "\n".join(report_lines)
-
-
-def main():
+    def main():
     """Main test execution with real APNs"""
-    print("Starting Maricopa API Detailed Test with Real APNs...")
-    print("=" * 60)
+        print("Starting Maricopa API Detailed Test with Real APNs...")
+        print("=" * 60)
 
     start_time = time.time()
 
-    try:
+try:
         # Initialize client
         config_manager = EnhancedConfigManager()
         client = UnifiedMaricopaAPIClient(config_manager)
@@ -640,9 +627,8 @@ def main():
         valid_apns = find_valid_apns(client, max_apns=3)
 
         if not valid_apns:
-            print("❌ No valid APNs found. Cannot proceed with detailed testing.")
+        print("❌ No valid APNs found. Cannot proceed with detailed testing.")
             return 1
-
         print(f"✅ Found {len(valid_apns)} valid APNs for testing")
 
         # Test APN search methods
@@ -662,7 +648,6 @@ def main():
         report = generate_detailed_report(
             apn_results, tax_sales_results, endpoint_results, test_duration
         )
-
         print("\n" + report)
 
         # Save detailed results
@@ -686,10 +671,9 @@ def main():
 
         with open(output_file, "w", encoding="utf-8") as f:
             json.dump(detailed_results, f, indent=2, default=str)
-
         print(f"\nDetailed results saved to: {output_file}")
 
-    except Exception as e:
+except Exception as e:
         logger.error(f"Test execution failed: {e}")
         print(f"\n❌ TEST EXECUTION ERROR: {e}")
         return 1

@@ -3,25 +3,26 @@
 Comprehensive test suite for "10000 W Missouri Ave" property search and data collection.
 Focuses on testing the specific address requirements and UX improvements.
 """
+import asyncio
+import logging
+import time
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
-import asyncio
-import time
-import logging
-from unittest.mock import Mock, patch, MagicMock
-from PyQt5.QtWidgets import QApplication, QPushButton, QLabel, QTableWidget
-from PyQt5.QtTest import QTest
-from PyQt5.QtCore import Qt, QTimer
 
 # Import test fixtures and setup
 from conftest import app_instance, db_manager, mock_api_client, test_config
+from PyQt5.QtCore import Qt, QTimer
+from PyQt5.QtTest import QTest
+from PyQt5.QtWidgets import QApplication, QLabel, QPushButton, QTableWidget
 
-# Import application modules
-from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+from src.automatic_data_collector import MaricopaDataCollector
 
 # MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.background_data_collector import BackgroundDataCollectionManager, JobPriority
-from src.automatic_data_collector import MaricopaDataCollector
+
+# Import application modules
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
 logger = logging.getLogger(__name__)

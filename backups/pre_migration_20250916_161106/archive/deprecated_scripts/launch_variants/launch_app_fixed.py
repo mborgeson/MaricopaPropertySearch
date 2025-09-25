@@ -4,8 +4,8 @@ Fixed launcher for Maricopa Property Search Application
 Handles all import issues and launches the application correctly
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add src directory to path FIRST
@@ -32,9 +32,9 @@ def main():
     
     try:
         # Import PyQt5 components
-        from PyQt5.QtWidgets import QApplication, QMessageBox
         from PyQt5.QtCore import Qt
-        
+        from PyQt5.QtWidgets import QApplication, QMessageBox
+
         # Create QApplication
         app = QApplication(sys.argv)
         app.setApplicationName("Maricopa Property Search - Enhanced")
@@ -44,11 +44,13 @@ def main():
         
         # Import configuration
         from config_manager import ConfigManager
+
         logger.info("Loading application configuration")
         config_manager = ConfigManager()
         
         # Test database connection
         from threadsafe_database_manager import ThreadSafeDatabaseManager
+
         try:
             db_test = ThreadSafeDatabaseManager(config_manager)
             if not db_test.test_connection():
@@ -65,6 +67,7 @@ def main():
         # Import and create main window
         logger.info("Creating main application window")
         from gui.enhanced_main_window import EnhancedPropertySearchApp
+
         main_window = EnhancedPropertySearchApp(config_manager)
         
         main_window.show()
@@ -103,11 +106,12 @@ def main():
         
         try:
             from PyQt5.QtWidgets import QMessageBox
+
             QMessageBox.critical(None, "Application Error", 
                                f"A critical error occurred during startup:\n\n{str(e)}\n\n"
                                "Please check the log files for more details.")
         except:
-            print(f"\nCRITICAL ERROR: {e}")
+        print(f"\nCRITICAL ERROR: {e}")
             print("Please check the logs for more details.")
         
         return 1

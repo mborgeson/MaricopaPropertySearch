@@ -8,21 +8,20 @@ Consolidates functionality from all data collector implementations:
 - Multi-script orchestration
 - Comprehensive error handling and recovery
 """
-
 import asyncio
-import logging
-import time
 import json
+import logging
+import re
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from queue import Queue, Empty, PriorityQueue
-from threading import Lock, Event
-from typing import Dict, List, Optional, Any, Callable, Tuple
-import re
+from queue import Empty, PriorityQueue, Queue
+from threading import Event, Lock
+from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from PyQt5.QtCore import QThread, pyqtSignal, QObject, QTimer
+from PyQt5.QtCore import QObject, QThread, QTimer, pyqtSignal
 
 # Optional imports for web scraping fallback
 try:
@@ -34,8 +33,8 @@ except ImportError:
     logger = logging.getLogger(__name__)
     logger.warning("Playwright not available - web scraping fallback will be disabled")
 
-from .logging_config import get_logger, get_performance_logger
 from .api_client_unified import UnifiedMaricopaAPIClient
+from .logging_config import get_logger, get_performance_logger
 
 logger = get_logger(__name__)
 perf_logger = get_performance_logger(__name__)
@@ -83,7 +82,6 @@ class DataCollectionJob:
     completed_at: Optional[datetime] = None
     result: Optional[Dict] = None
     force_fresh: bool = False
-
     def __lt__(self, other):
         """Enable priority queue sorting"""
         return self.priority.value < other.priority.value
@@ -91,10 +89,8 @@ class DataCollectionJob:
 
 class DataCollectionStats:
     """Statistics tracking for data collection performance"""
-
     def __init__(self):
         self.reset()
-
     def reset(self):
         """Reset all statistics"""
         self.jobs_submitted = 0
@@ -104,7 +100,6 @@ class DataCollectionStats:
         self.avg_processing_time = 0.0
         self.web_scraping_fallbacks = 0
         self.api_success_rate = 0.0
-
     def record_job_completion(self, processing_time: float):
         """Record successful job completion"""
         self.jobs_completed += 1
@@ -112,15 +107,12 @@ class DataCollectionStats:
         self.avg_processing_time = self.total_processing_time / max(
             1, self.jobs_completed
         )
-
     def record_job_failure(self):
         """Record job failure"""
         self.jobs_failed += 1
-
     def record_web_fallback(self):
         """Record web scraping fallback usage"""
         self.web_scraping_fallbacks += 1
-
     def get_stats(self) -> Dict[str, Any]:
         """Get current statistics"""
         total_jobs = self.jobs_completed + self.jobs_failed
@@ -140,14 +132,12 @@ class DataCollectionStats:
 
 class DataCollectionCache:
     """Enhanced in-memory cache for data collection results with metrics"""
-
     def __init__(self, ttl_hours: int = 24):
         self.cache = {}
         self.ttl_seconds = ttl_hours * 3600
         self.lock = Lock()
         self.hit_count = 0
         self.miss_count = 0
-
     def get_cached_data(self, apn: str) -> Optional[Dict]:
         """Get cached data if available and fresh"""
         with self.lock:
@@ -166,13 +156,11 @@ class DataCollectionCache:
 
             self.miss_count += 1
             return None
-
     def cache_data(self, apn: str, data: Dict):
         """Cache data for future use"""
         with self.lock:
             self.cache[apn] = {"data": data, "timestamp": time.time()}
             logger.debug(f"Cached data for APN {apn}")
-
     def clear_expired(self):
         """Remove expired cache entries"""
         with self.lock:
@@ -188,7 +176,6 @@ class DataCollectionCache:
 
             if expired_apns:
                 logger.info(f"Cleared {len(expired_apns)} expired cache entries")
-
     def get_cache_stats(self) -> Dict[str, Any]:
         """Get cache statistics with hit rate"""
         with self.lock:
@@ -206,7 +193,6 @@ class DataCollectionCache:
 
 class WebScrapingFallback:
     """Web scraping fallback for when API methods fail"""
-
     def __init__(self):
         self.session_timeout = 30000
         self.available = PLAYWRIGHT_AVAILABLE
@@ -223,7 +209,7 @@ class WebScrapingFallback:
             result["tax_errors"].append(error_msg)
             return result
 
-        try:
+    try:
             async with async_playwright() as p:
                 browser = await p.chromium.launch(headless=True)
                 page = await browser.new_page()
@@ -268,7 +254,7 @@ class WebScrapingFallback:
 
                 await browser.close()
 
-        except Exception as e:
+    except Exception as e:
             error_msg = f"Error in web scraping tax data fallback: {str(e)}"
             logger.error(error_msg)
             result["tax_errors"].append(error_msg)
@@ -291,7 +277,7 @@ class WebScrapingFallback:
             result["sales_errors"].append(error_msg)
             return result
 
-        try:
+    try:
             async with async_playwright() as p:
                 browser = await p.chromium.launch(headless=True)
                 page = await browser.new_page()
@@ -329,7 +315,7 @@ class WebScrapingFallback:
 
                 await browser.close()
 
-        except Exception as e:
+    except Exception as e:
             error_msg = f"Error in web scraping sales data fallback: {str(e)}"
             logger.error(error_msg)
             result["sales_errors"].append(error_msg)
@@ -340,7 +326,7 @@ class WebScrapingFallback:
         """Extract tax history from the treasurer's website"""
         tax_records = []
 
-        try:
+    try:
             # Look for tax history table or data rows
             await page.wait_for_selector(
                 "table, .tax-history, .payment-history", timeout=5000
@@ -362,7 +348,7 @@ class WebScrapingFallback:
             for i, year in enumerate(years[-5:]):  # Last 5 years
                 if i < len(amounts):
                     amount_str = amounts[i].replace(",", "")
-                    try:
+    try:
                         tax_amount = float(amount_str)
                         status = statuses[i] if i < len(statuses) else "UNKNOWN"
 
@@ -376,10 +362,10 @@ class WebScrapingFallback:
                         }
                         tax_records.append(tax_record)
 
-                    except ValueError:
+    except ValueError:
                         continue
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error extracting tax data from page: {e}")
 
         return tax_records
@@ -388,7 +374,7 @@ class WebScrapingFallback:
         """Extract sales history from the recorder's website"""
         sales_records = []
 
-        try:
+    try:
             # Wait for any tables or data structures
             await page.wait_for_selector(
                 "table, .sales-history, .deed-records", timeout=5000
@@ -406,7 +392,7 @@ class WebScrapingFallback:
             # Create sales records from extracted data
             for i, date_str in enumerate(dates[:10]):  # Limit to 10 most recent
                 if i < len(amounts):
-                    try:
+    try:
                         # Parse date
                         if "/" in date_str:
                             date_parts = date_str.split("/")
@@ -435,10 +421,10 @@ class WebScrapingFallback:
                             }
                             sales_records.append(sales_record)
 
-                    except (ValueError, IndexError):
+    except (ValueError, IndexError):
                         continue
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error extracting sales data from page: {e}")
 
         return sales_records
@@ -453,7 +439,6 @@ class BackgroundDataWorker(QThread):
     job_failed = pyqtSignal(str, str)  # APN, error
     progress_updated = pyqtSignal(int, int)  # completed, total
     status_updated = pyqtSignal(str)  # status message
-
     def __init__(self, data_collector, max_concurrent_jobs: int = 3):
         super().__init__()
         self.data_collector = data_collector
@@ -474,7 +459,6 @@ class BackgroundDataWorker(QThread):
         logger.info(
             f"Background data worker initialized with {max_concurrent_jobs} concurrent jobs"
         )
-
     def add_job(
         self,
         apn: str,
@@ -482,7 +466,7 @@ class BackgroundDataWorker(QThread):
         force_fresh: bool = False,
     ) -> bool:
         """Add a job to the queue"""
-        try:
+    try:
             # Check if job already exists for this APN (avoid duplicates)
             if apn in self.active_jobs:
                 logger.debug(f"Job already active for APN {apn}")
@@ -507,18 +491,17 @@ class BackgroundDataWorker(QThread):
             )
             return True
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Failed to add job for APN {apn}: {e}")
             return False
-
     def run(self):
         """Main worker thread loop"""
         logger.info("Background data worker started")
         last_maintenance = time.time()
 
-        try:
+    try:
             while not self.should_stop.is_set():
-                try:
+    try:
                     # Get next job with timeout
                     job = self.job_queue.get(timeout=1.0)
 
@@ -530,21 +513,20 @@ class BackgroundDataWorker(QThread):
                         self._perform_maintenance(last_maintenance)
                         last_maintenance = time.time()
 
-                except Empty:
+    except Empty:
                     # Timeout - continue loop (allows checking should_stop)
                     continue
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Worker thread error: {e}")
-        finally:
+    finally:
             logger.info("Background data worker stopped")
             self.executor.shutdown(wait=True)
-
     def _process_job(self, job: DataCollectionJob):
         """Process a single data collection job"""
         apn = job.apn
 
-        try:
+    try:
             self.active_jobs[apn] = job
             job.started_at = datetime.now()
 
@@ -555,17 +537,16 @@ class BackgroundDataWorker(QThread):
             future = self.executor.submit(self._collect_data, job)
             future.add_done_callback(lambda f: self._handle_job_completion(job, f))
 
-        except Exception as e:
+    except Exception as e:
             error_msg = f"Failed to process job for APN {apn}: {str(e)}"
             logger.error(error_msg)
             self._handle_job_failure(job, error_msg)
-
     def _collect_data(self, job: DataCollectionJob) -> Dict[str, Any]:
         """Collect data for a specific APN"""
         apn = job.apn
         start_time = time.time()
 
-        try:
+    try:
             logger.info(f"Starting data collection for APN {apn}")
 
             # Use the unified data collector
@@ -590,16 +571,15 @@ class BackgroundDataWorker(QThread):
             )
             return result_dict
 
-        except Exception as e:
+    except Exception as e:
             processing_time = time.time() - start_time
             error_msg = f"Data collection failed for APN {apn}: {str(e)}"
             logger.error(error_msg)
 
             return {"apn": apn, "error": error_msg, "processing_time": processing_time}
-
     def _handle_job_completion(self, job: DataCollectionJob, future):
         """Handle job completion in main thread"""
-        try:
+    try:
             result = future.result()
             job.result = result
             job.completed_at = datetime.now()
@@ -611,11 +591,10 @@ class BackgroundDataWorker(QThread):
                 # Job succeeded
                 self._handle_job_success(job, result)
 
-        except Exception as e:
+    except Exception as e:
             error_msg = f"Exception in job completion handler: {str(e)}"
             logger.error(error_msg)
             self._handle_job_failure(job, error_msg)
-
     def _handle_job_success(self, job: DataCollectionJob, result: Dict):
         """Handle successful job completion"""
         apn = job.apn
@@ -633,7 +612,6 @@ class BackgroundDataWorker(QThread):
         logger.info(f"Data collection successful for APN {apn}")
         self.job_completed.emit(apn, result)
         self._emit_progress_update()
-
     def _handle_job_failure(self, job: DataCollectionJob, error_msg: str):
         """Handle failed job completion"""
         apn = job.apn
@@ -648,11 +626,9 @@ class BackgroundDataWorker(QThread):
         logger.error(f"Data collection failed for APN {apn}: {error_msg}")
         self.job_failed.emit(apn, error_msg)
         self._emit_progress_update()
-
     def _emit_progress_update(self):
         """Emit progress update signal"""
         self.progress_updated.emit(self.jobs_completed_count, self.total_jobs_count)
-
     def _perform_maintenance(self, last_cleanup_time: float):
         """Perform periodic maintenance tasks"""
         current_time = time.time()
@@ -673,7 +649,6 @@ class BackgroundDataWorker(QThread):
                 f"cache: {cache_stats['total_entries']} entries, "
                 f"hit rate: {cache_stats['hit_rate_percent']:.1f}%"
             )
-
     def stop_worker(self):
         """Stop the worker thread gracefully"""
         logger.info("Stopping background data worker...")
@@ -683,7 +658,6 @@ class BackgroundDataWorker(QThread):
         if self.isRunning():
             logger.warning("Worker thread did not stop gracefully, terminating...")
             self.terminate()
-
     def get_queue_status(self) -> Dict[str, Any]:
         """Get current queue status"""
         return {
@@ -704,8 +678,7 @@ class UnifiedDataCollector:
     - Multi-script orchestration
     - Comprehensive error handling and recovery
     """
-
-    def __init__(self, db_manager, config_manager):
+def __init__(self, db_manager, config_manager):
         self.db_manager = db_manager
         self.config_manager = config_manager
 
@@ -750,7 +723,7 @@ class UnifiedDataCollector:
             errors=[],
         )
 
-        try:
+try:
             # STAGE 1: Basic property info (Target: <1 second)
             stage_start = time.time()
             basic_data = await self._collect_basic_data_fast(apn)
@@ -821,7 +794,7 @@ class UnifiedDataCollector:
 
             return results
 
-        except Exception as e:
+except Exception as e:
             logger.error(
                 f"Error in unified progressive data collection for APN {apn}: {e}"
             )
@@ -853,7 +826,7 @@ class UnifiedDataCollector:
 
         result = {"detailed_data_available": False, "data_collection_stage": "detailed"}
 
-        try:
+try:
             # Try API first
             detailed_data = await self.api_client._get_detailed_property_data_parallel(
                 apn
@@ -883,7 +856,7 @@ class UnifiedDataCollector:
                     f"API failed for detailed data, continuing without fallback for APN: {apn}"
                 )
 
-        except Exception as e:
+except Exception as e:
             logger.error(f"Error collecting detailed data for APN {apn}: {e}")
             result["errors"] = result.get("errors", [])
             result["errors"].append(f"Detailed data error: {str(e)}")
@@ -927,7 +900,7 @@ class UnifiedDataCollector:
 
         # Try API methods first
         if api_tasks:
-            try:
+try:
                 # Wait for API tasks with timeout
                 completed_tasks = await asyncio.wait_for(
                     asyncio.gather(*api_tasks, return_exceptions=True), timeout=2.0
@@ -958,7 +931,7 @@ class UnifiedDataCollector:
 
                     # Web scraping fallback for tax data
                     if "tax_info" not in extended_data:
-                        try:
+try:
                             tax_fallback = await asyncio.wait_for(
                                 self.web_fallback.collect_tax_data_fallback(apn),
                                 timeout=5.0,
@@ -975,18 +948,18 @@ class UnifiedDataCollector:
                                 logger.info(
                                     f"Tax data collected via web scraping fallback for APN: {apn}"
                                 )
-                        except asyncio.TimeoutError:
+except asyncio.TimeoutError:
                             logger.warning(
                                 f"Tax web scraping fallback timed out for APN: {apn}"
                             )
-                        except Exception as e:
+except Exception as e:
                             logger.error(
                                 f"Tax web scraping fallback error for APN {apn}: {e}"
                             )
 
                     # Web scraping fallback for sales data
                     if "sales_history" not in extended_data:
-                        try:
+try:
                             sales_fallback = await asyncio.wait_for(
                                 self.web_fallback.collect_sales_data_fallback(apn),
                                 timeout=5.0,
@@ -1005,16 +978,16 @@ class UnifiedDataCollector:
                                 logger.info(
                                     f"Sales data collected via web scraping fallback for APN: {apn}"
                                 )
-                        except asyncio.TimeoutError:
+except asyncio.TimeoutError:
                             logger.warning(
                                 f"Sales web scraping fallback timed out for APN: {apn}"
                             )
-                        except Exception as e:
+except Exception as e:
                             logger.error(
                                 f"Sales web scraping fallback error for APN {apn}: {e}"
                             )
 
-            except asyncio.TimeoutError:
+except asyncio.TimeoutError:
                 logger.warning(
                     f"Extended data collection (API) timed out for APN: {apn}"
                 )
@@ -1026,49 +999,48 @@ class UnifiedDataCollector:
 
     async def _get_sales_history_fast(self, apn: str) -> Optional[List[Dict]]:
         """Fast sales history collection with timeout"""
-        try:
+try:
             sales_data = await asyncio.wait_for(
                 self.api_client._make_async_request(f"/parcel/{apn}/sales/"),
                 timeout=1.5,
             )
             return sales_data if sales_data else []
-        except asyncio.TimeoutError:
+except asyncio.TimeoutError:
             logger.warning(f"Sales history timeout for APN: {apn}")
             return []
-        except Exception as e:
+except Exception as e:
             logger.error(f"Sales history error for APN {apn}: {e}")
             return []
 
     async def _get_documents_fast(self, apn: str) -> Optional[List[Dict]]:
         """Fast document collection with timeout"""
-        try:
+try:
             docs_data = await asyncio.wait_for(
                 self.api_client._make_async_request(f"/parcel/{apn}/documents/"),
                 timeout=1.5,
             )
             return docs_data if docs_data else []
-        except asyncio.TimeoutError:
+except asyncio.TimeoutError:
             logger.warning(f"Documents timeout for APN: {apn}")
             return []
-        except Exception as e:
+except Exception as e:
             logger.error(f"Documents error for APN {apn}: {e}")
             return []
 
     async def _get_tax_info_fast(self, apn: str) -> Optional[List[Dict]]:
         """Fast tax information collection"""
-        try:
+try:
             tax_data = await asyncio.wait_for(
                 self.api_client._make_async_request(f"/parcel/{apn}/tax-info/"),
                 timeout=1.0,
             )
             return tax_data if tax_data else []
-        except asyncio.TimeoutError:
+except asyncio.TimeoutError:
             logger.warning(f"Tax info timeout for APN: {apn}")
             return []
-        except Exception as e:
+except Exception as e:
             logger.error(f"Tax info error for APN {apn}: {e}")
             return []
-
     def _process_valuations_fast(self, valuations: List[Dict]) -> Dict[str, Any]:
         """Fast processing of valuation data for immediate display"""
         if not valuations:
@@ -1083,7 +1055,6 @@ class UnifiedDataCollector:
             "tax_area": latest.get("TaxAreaCode"),
             "valuation_count": len(valuations),
         }
-
     def _process_residential_fast(self, res_details: Dict) -> Dict[str, Any]:
         """Fast processing of residential details"""
         return {
@@ -1097,16 +1068,15 @@ class UnifiedDataCollector:
 
     async def _save_data_async(self, property_data: Dict):
         """Asynchronous database save (non-blocking)"""
-        try:
+    try:
             # Run database save in thread pool to avoid blocking
             loop = asyncio.get_event_loop()
             await loop.run_in_executor(
                 None, self.db_manager.save_comprehensive_property_data, property_data
             )
             logger.debug("Property data saved to database")
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error saving property data: {e}")
-
     def _update_performance_stats(self, collection_time: float):
         """Update performance statistics"""
         self.collection_stats["total_collections"] += 1
@@ -1121,25 +1091,22 @@ class UnifiedDataCollector:
         # Update cache hit rate from API client
         api_stats = self.api_client.get_performance_stats()
         self.collection_stats["cache_hit_rate"] = api_stats["cache_hit_rate"]
-
     def _safe_int(self, value) -> Optional[int]:
         """Safely convert value to int"""
         if not value or value == "":
             return None
-        try:
+    try:
             return int(str(value).replace(",", "").strip())
-        except (ValueError, AttributeError):
+    except (ValueError, AttributeError):
             return None
-
     def _safe_float(self, value) -> Optional[float]:
         """Safely convert value to float"""
         if not value or value == "":
             return None
-        try:
+    try:
             return float(str(value).replace(",", "").strip())
-        except (ValueError, AttributeError):
+    except (ValueError, AttributeError):
             return None
-
     def collect_data_for_apn_sync(self, apn: str) -> Dict[str, Any]:
         """
         Synchronous wrapper for comprehensive data collection
@@ -1193,7 +1160,6 @@ class UnifiedDataCollector:
             )
 
         return comprehensive_results
-
     def start_background_worker(
         self, max_concurrent_jobs: int = 3
     ) -> BackgroundDataWorker:
@@ -1206,14 +1172,12 @@ class UnifiedDataCollector:
         self.background_worker.start()
         logger.info("Background data collection worker started")
         return self.background_worker
-
     def stop_background_worker(self):
         """Stop background worker gracefully"""
         if self.background_worker:
             self.background_worker.stop_worker()
             self.background_worker = None
             logger.info("Background data collection worker stopped")
-
     def get_performance_report(self) -> Dict[str, Any]:
         """Get comprehensive performance report including fallback usage"""
         api_stats = self.api_client.get_performance_stats()
@@ -1235,7 +1199,6 @@ class UnifiedDataCollector:
                 "complete_target": 3.0,
             },
         }
-
     def collect_property_data_sync(self, apn: str, callback=None) -> ProgressiveResults:
         """Synchronous wrapper for progressive data collection"""
         return asyncio.run(self.collect_property_data_progressive(apn, callback))
@@ -1245,7 +1208,6 @@ class UnifiedDataCollector:
         if self.background_worker:
             self.background_worker.stop_worker()
         await self.api_client.close()
-
     def __del__(self):
         """Cleanup when object is destroyed"""
         if hasattr(self, "api_client"):
@@ -1260,7 +1222,6 @@ class BackgroundDataCollectionManager(QObject):
     collection_stopped = pyqtSignal()
     progress_updated = pyqtSignal(dict)  # status dict
     job_completed = pyqtSignal(str, dict)  # APN, result
-
     def __init__(self, db_manager, config_manager, max_concurrent_jobs: int = 3):
         super().__init__()
         self.db_manager = db_manager
@@ -1277,7 +1238,6 @@ class BackgroundDataCollectionManager(QObject):
         logger.info(
             "Background data collection manager initialized with unified collector"
         )
-
     def start_collection(self):
         """Start background data collection"""
         if self.worker and self.worker.isRunning():
@@ -1297,7 +1257,6 @@ class BackgroundDataCollectionManager(QObject):
         self.worker.start()
         self.status_timer.start()
         self.collection_started.emit()
-
     def stop_collection(self):
         """Stop background data collection"""
         if not self.worker or not self.worker.isRunning():
@@ -1310,11 +1269,9 @@ class BackgroundDataCollectionManager(QObject):
         self.worker.stop_worker()
         self.worker = None
         self.collection_stopped.emit()
-
     def is_running(self) -> bool:
         """Check if collection is currently running"""
         return self.worker and self.worker.isRunning()
-
     def collect_data_for_apn(
         self,
         apn: str,
@@ -1327,7 +1284,6 @@ class BackgroundDataCollectionManager(QObject):
             return False
 
         return self.worker.add_job(apn, priority, force_fresh)
-
     def collect_batch_data(
         self,
         apns: List[str],
@@ -1376,7 +1332,6 @@ class BackgroundDataCollectionManager(QObject):
             f"Batch collection: {jobs_added}/{len(apns)} jobs added successfully"
         )
         return result
-
     def get_collection_status(self) -> Dict[str, Any]:
         """Get current collection status"""
         if not self.worker:
@@ -1401,33 +1356,27 @@ class BackgroundDataCollectionManager(QObject):
             "avg_processing_time": f"{stats['avg_processing_time']:.2f}s",
             "web_scraping_fallbacks": stats["web_scraping_fallbacks"],
         }
-
     def _emit_progress_update(self):
         """Emit progress update signal"""
         status = self.get_collection_status()
         self.progress_updated.emit(status)
-
     def _on_progress_updated(self, completed: int, total: int):
         """Handle progress update from worker"""
         self._emit_progress_update()
 
 
 # Convenience functions for backward compatibility and easy usage
-def create_unified_collector(db_manager, config_manager) -> UnifiedDataCollector:
+    def create_unified_collector(db_manager, config_manager) -> UnifiedDataCollector:
     """Create a unified data collector with all features"""
     return UnifiedDataCollector(db_manager, config_manager)
-
-
-def create_background_manager(
+    def create_background_manager(
     db_manager, config_manager, max_concurrent_jobs: int = 3
 ) -> BackgroundDataCollectionManager:
     """Create a background data collection manager with unified collector"""
     return BackgroundDataCollectionManager(
         db_manager, config_manager, max_concurrent_jobs
     )
-
-
-def start_background_collection(
+    def start_background_collection(
     db_manager, config_manager, max_concurrent_jobs: int = 3
 ) -> BackgroundDataCollectionManager:
     """Start background collection and return the manager"""

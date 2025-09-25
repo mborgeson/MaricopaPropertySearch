@@ -3,11 +3,10 @@
 Automated Checkpoint Generation System
 Generates timestamped project status checkpoints automatically
 """
-
-import os
-import sys
 import json
+import os
 import subprocess
+import sys
 from datetime import datetime
 from pathlib import Path
 
@@ -240,7 +239,6 @@ Complete all goals in the "Issue Resolution Goals" Checklist with priority on co
 
         with open(filepath, "w") as f:
             f.write(checkpoint_content)
-
         print(f"✅ Checkpoint created: {filepath}")
         return filepath
 

@@ -3,10 +3,9 @@
 Comprehensive Fix Script for All GUI Issues
 Addresses all 10 issues reported by the user
 """
-
+import re
 import sys
 from pathlib import Path
-import re
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -18,13 +17,12 @@ class ComprehensiveFixer:
     def __init__(self):
         self.issues_fixed = []
         self.issues_failed = []
-
     def fix_clear_apn_cache(self):
         """Fix Issue #5: clear_apn_cache AttributeError"""
         print("\n[FIX 1] Fixing clear_apn_cache AttributeError")
         print("-" * 50)
 
-        try:
+    try:
             # Check DataCollectionCache class and add missing method
             cache_file = project_root / "src" / "data_collection_cache.py"
 
@@ -37,7 +35,7 @@ class ComprehensiveFixer:
                     method_code = '''
     def clear_apn_cache(self, apn):
         """Clear cache for specific APN"""
-        try:
+    try:
             # Remove from property cache
             if apn in self.property_cache:
                 del self.property_cache[apn]
@@ -57,7 +55,7 @@ class ComprehensiveFixer:
             self.save_cache()
             return True
 
-        except Exception as e:
+    except Exception as e:
             self.logger.error(f"Error clearing cache for APN {apn}: {e}")
             return False
 '''
@@ -87,28 +85,27 @@ class ComprehensiveFixer:
 
                     # Write back
                     cache_file.write_text("\n".join(lines))
-                    print("[OK] Added clear_apn_cache method to DataCollectionCache")
+        print("[OK] Added clear_apn_cache method to DataCollectionCache")
                     self.issues_fixed.append("clear_apn_cache method added")
                 else:
-                    print("[INFO] clear_apn_cache method already exists")
+        print("[INFO] clear_apn_cache method already exists")
                     self.issues_fixed.append("clear_apn_cache already exists")
             else:
                 # Create a simple version if file doesn't exist
-                print(
+        print(
                     "[WARNING] DataCollectionCache file not found, creating workaround"
                 )
                 self.create_cache_workaround()
 
-        except Exception as e:
-            print(f"[ERROR] {e}")
+    except Exception as e:
+        print(f"[ERROR] {e}")
             self.issues_failed.append(f"clear_apn_cache: {e}")
-
     def fix_show_message_error(self):
         """Fix Issue #10: BackgroundCollectionStatusWidget show_message error"""
         print("\n[FIX 2] Fixing BackgroundCollectionStatusWidget show_message")
         print("-" * 50)
 
-        try:
+    try:
             window_file = project_root / "src" / "gui" / "enhanced_main_window.py"
 
             if window_file.exists():
@@ -129,21 +126,20 @@ class ComprehensiveFixer:
                     )
 
                     window_file.write_text(content)
-                    print("[OK] Fixed show_message calls to use update_status")
+        print("[OK] Fixed show_message calls to use update_status")
                     self.issues_fixed.append("show_message error fixed")
                 else:
-                    print("[INFO] show_message calls already fixed or not found")
+        print("[INFO] show_message calls already fixed or not found")
 
-        except Exception as e:
-            print(f"[ERROR] {e}")
+    except Exception as e:
+        print(f"[ERROR] {e}")
             self.issues_failed.append(f"show_message: {e}")
-
     def fix_data_collection(self):
         """Fix Issue #4 & #6: Data collection for tax and sales history"""
         print("\n[FIX 3] Fixing data collection for tax/sales history")
         print("-" * 50)
 
-        try:
+    try:
             # Check if API endpoints are configured correctly
             api_file = project_root / "src" / "api_client.py"
 
@@ -152,18 +148,18 @@ class ComprehensiveFixer:
 
                 # Ensure proper endpoints
                 if "def get_tax_info" not in content:
-                    print("[WARNING] get_tax_info method missing in API client")
+        print("[WARNING] get_tax_info method missing in API client")
                     # Add stub method
                     method_code = '''
     def get_tax_info(self, apn):
         """Get tax information for APN"""
-        try:
+    try:
             # Try to fetch from API
             endpoint = f"/api/tax/{apn}"
             response = self._make_request(endpoint)
             if response:
                 return response
-        except:
+    except:
             pass
 
         # Return mock data if API fails
@@ -186,21 +182,19 @@ class ComprehensiveFixer:
                             break
 
                     api_file.write_text("\n".join(lines))
-                    print("[OK] Added get_tax_info method")
-
-                print("[OK] Data collection methods checked")
+        print("[OK] Added get_tax_info method")
+        print("[OK] Data collection methods checked")
                 self.issues_fixed.append("Data collection methods verified")
 
-        except Exception as e:
-            print(f"[ERROR] {e}")
+    except Exception as e:
+        print(f"[ERROR] {e}")
             self.issues_failed.append(f"Data collection: {e}")
-
     def fix_settings_persistence(self):
         """Fix Issue #7: Settings not saving"""
         print("\n[FIX 4] Fixing settings persistence")
         print("-" * 50)
 
-        try:
+    try:
             window_file = project_root / "src" / "gui" / "enhanced_main_window.py"
 
             if window_file.exists():
@@ -228,24 +222,23 @@ class ComprehensiveFixer:
                                 break
 
                         window_file.write_text("\n".join(lines))
-                        print("[OK] Added settings save on dialog accept")
+        print("[OK] Added settings save on dialog accept")
                 else:
                     # Add save_settings method
-                    print("[INFO] Adding save_settings method")
+        print("[INFO] Adding save_settings method")
                     self.add_save_settings_method(window_file)
 
                 self.issues_fixed.append("Settings persistence fixed")
 
-        except Exception as e:
-            print(f"[ERROR] {e}")
+    except Exception as e:
+        print(f"[ERROR] {e}")
             self.issues_failed.append(f"Settings persistence: {e}")
-
     def fix_source_priority(self):
         """Fix Issue #8: Source priority configuration"""
         print("\n[FIX 5] Fixing source priority (DB cache last)")
         print("-" * 50)
 
-        try:
+    try:
             config_file = project_root / "src" / "config_manager.py"
 
             if config_file.exists():
@@ -270,20 +263,19 @@ class ComprehensiveFixer:
                             break
 
                     config_file.write_text("\n".join(lines))
-                    print("[OK] Added source priority configuration")
+        print("[OK] Added source priority configuration")
 
                 self.issues_fixed.append("Source priority configured")
 
-        except Exception as e:
-            print(f"[ERROR] {e}")
+    except Exception as e:
+        print(f"[ERROR] {e}")
             self.issues_failed.append(f"Source priority: {e}")
-
     def fix_test_sources(self):
         """Fix Issue #9: Test All Sources functionality"""
         print("\n[FIX 6] Fixing Test All Sources")
         print("-" * 50)
 
-        try:
+    try:
             # This needs to be fixed in the test sources method
             window_file = project_root / "src" / "gui" / "enhanced_main_window.py"
 
@@ -309,46 +301,45 @@ class ComprehensiveFixer:
                         # Check if it has proper implementation
                         method_lines = lines[method_start:i]
                         if any("return" in line for line in method_lines):
-                            print("[INFO] test_all_sources already has implementation")
+        print("[INFO] test_all_sources already has implementation")
                         else:
                             # Add basic implementation
                             implementation = '''        """Test all data sources"""
         results = {}
 
         # Test API
-        try:
+    try:
             self.api_client.test_connection()
             results['API'] = 'OK'
-        except:
-            results['API'] = 'Failed'
+    except:
+                results['API'] = 'Failed'
 
         # Test Scraping
-        try:
+    try:
             results['Scraping'] = 'OK' if self.scraper else 'N/A'
-        except:
-            results['Scraping'] = 'Failed'
+    except:
+                results['Scraping'] = 'Failed'
 
         # Test DB
-        try:
+    try:
             if self.db_manager.test_connection():
                 results['DB'] = 'OK'
             else:
                 results['DB'] = 'Failed'
-        except:
-            results['DB'] = 'Failed'
+    except:
+                results['DB'] = 'Failed'
 
         return results
 '''
                             lines[method_start + 1 : i] = implementation.split("\n")
                             window_file.write_text("\n".join(lines))
-                            print("[OK] Fixed test_all_sources implementation")
+        print("[OK] Fixed test_all_sources implementation")
 
                 self.issues_fixed.append("Test sources fixed")
 
-        except Exception as e:
-            print(f"[ERROR] {e}")
+    except Exception as e:
+        print(f"[ERROR] {e}")
             self.issues_failed.append(f"Test sources: {e}")
-
     def create_cache_workaround(self):
         """Create a simple cache workaround if needed"""
         cache_file = project_root / "src" / "data_collection_cache.py"
@@ -357,7 +348,6 @@ class ComprehensiveFixer:
             cache_code = '''"""
 Simple Data Collection Cache
 """
-
 import json
 from pathlib import Path
 from datetime import datetime
@@ -370,7 +360,6 @@ class DataCollectionCache:
         self.tax_cache = {}
         self.sales_cache = {}
         self.logger = None
-
     def clear_apn_cache(self, apn):
         """Clear cache for specific APN"""
         if apn in self.property_cache:
@@ -380,14 +369,12 @@ class DataCollectionCache:
         if apn in self.sales_cache:
             del self.sales_cache[apn]
         return True
-
     def save_cache(self):
         """Save cache to disk"""
         pass
 '''
             cache_file.write_text(cache_code)
-            print("[OK] Created DataCollectionCache with clear_apn_cache method")
-
+        print("[OK] Created DataCollectionCache with clear_apn_cache method")
     def add_save_settings_method(self, window_file):
         """Add save_settings method if missing"""
         content = window_file.read_text()
@@ -398,7 +385,7 @@ class DataCollectionCache:
         if settings is None:
             settings = self.current_settings
 
-        try:
+    try:
             settings_file = Path("config/app_settings.json")
             settings_file.parent.mkdir(exist_ok=True)
 
@@ -409,7 +396,7 @@ class DataCollectionCache:
             logger.info("Settings saved successfully")
             return True
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Failed to save settings: {e}")
             return False
 '''
@@ -433,7 +420,6 @@ class DataCollectionCache:
 
         window_file.write_text("\n".join(lines))
         print("[OK] Added save_settings method")
-
     def run_all_fixes(self):
         """Run all fixes"""
         print("=" * 60)
@@ -446,36 +432,31 @@ class DataCollectionCache:
         self.fix_settings_persistence()
         self.fix_source_priority()
         self.fix_test_sources()
-
         print("\n" + "=" * 60)
         print(" FIX SUMMARY")
         print("=" * 60)
 
         if self.issues_fixed:
-            print(f"\n[OK] Fixed {len(self.issues_fixed)} issues:")
+        print(f"\n[OK] Fixed {len(self.issues_fixed)} issues:")
             for fix in self.issues_fixed:
-                print(f"  ✓ {fix}")
+        print(f"  ✓ {fix}")
 
         if self.issues_failed:
-            print(f"\n[WARNING] Failed to fix {len(self.issues_failed)} issues:")
+        print(f"\n[WARNING] Failed to fix {len(self.issues_failed)} issues:")
             for fail in self.issues_failed:
-                print(f"  ✗ {fail}")
-
+        print(f"  ✗ {fail}")
         print("\n" + "=" * 60)
         if not self.issues_failed:
-            print(" ✓ ALL ISSUES FIXED SUCCESSFULLY")
+        print(" ✓ ALL ISSUES FIXED SUCCESSFULLY")
         else:
-            print(f" ⚠ {len(self.issues_failed)} issues need manual attention")
+        print(f" ⚠ {len(self.issues_failed)} issues need manual attention")
         print("=" * 60)
 
         return len(self.issues_failed) == 0
-
-
-def main():
+    def main():
     fixer = ComprehensiveFixer()
     success = fixer.run_all_fixes()
-
-    print("\n[NEXT STEPS]")
+        print("\n[NEXT STEPS]")
     if success:
         print("1. Restart the application: python RUN_APPLICATION.py")
         print("2. Test the following:")

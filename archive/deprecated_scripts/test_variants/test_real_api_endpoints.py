@@ -3,11 +3,12 @@
 Test real Maricopa County API endpoints to find working data sources
 """
 
-import sys
-from pathlib import Path
-import requests
 import json
+import sys
 import time
+from pathlib import Path
+
+import requests
 
 PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch")
 sys.path.insert(0, str(PROJECT_ROOT))
@@ -120,7 +121,7 @@ def test_network_requests_inspection():
                             data = response.json()
                             print(f"  JSON Keys: {list(data.keys()) if isinstance(data, dict) else 'Array'}")
                         except:
-                            print("  Invalid JSON response")
+        print("  Invalid JSON response")
                     else:
                         print(f"  Content-Type: {content_type}")
                 elif response.status_code in [401, 403]:
@@ -205,6 +206,7 @@ def analyze_javascript_network_calls():
             
             # Look for script tags with API references
             import re
+
             script_urls = re.findall(r'<script[^>]*src=["\']([^"\']*)["\']', content)
             
             print(f"Found {len(script_urls)} script references")

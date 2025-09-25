@@ -7,7 +7,6 @@ This script demonstrates ALL functionality implemented in this conversation:
 - Automatic data collection system ready for any APN
 - Complete property information display
 """
-
 import sys
 from pathlib import Path
 
@@ -18,21 +17,20 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
-
-def complete_system_demonstration():
+    def complete_system_demonstration():
     """
     COMPLETE DEMONSTRATION OF ALL IMPLEMENTED FUNCTIONALITY
     This shows everything we fixed and implemented in this conversation
     """
-    print("=" * 80)
-    print("COMPLETE MARICOPA PROPERTY SEARCH SYSTEM DEMONSTRATION")
-    print("=" * 80)
-    print("This script demonstrates ALL functionality implemented:")
-    print("1. Fixed tax history with actual amounts and payment status")
-    print("2. Populated sales history with transaction records")
-    print("3. Enhanced property data integration")
-    print("4. Automatic data collection system for any APN")
-    print("=" * 80)
+        print("=" * 80)
+        print("COMPLETE MARICOPA PROPERTY SEARCH SYSTEM DEMONSTRATION")
+        print("=" * 80)
+        print("This script demonstrates ALL functionality implemented:")
+        print("1. Fixed tax history with actual amounts and payment status")
+        print("2. Populated sales history with transaction records")
+        print("3. Enhanced property data integration")
+        print("4. Automatic data collection system for any APN")
+        print("=" * 80)
     
     config = EnhancedConfigManager()
     db_manager = ThreadSafeDatabaseManager(config)
@@ -40,7 +38,7 @@ def complete_system_demonstration():
     
     test_apn = '13304014A'  # Our test property with complete data
     
-    try:
+try:
         print(f"\nDEMONSTRATING WITH APN: {test_apn}")
         print("-" * 50)
         
@@ -59,7 +57,7 @@ def complete_system_demonstration():
             for field in key_fields:
                 value = property_record.get(field)
                 status = "FILLED" if value and value != "None" else "MISSING"
-                print(f"   {field:20}: {value} [{status}]")
+        print(f"   {field:20}: {value} [{status}]")
         
         # 2. SHOW COMPLETE TAX HISTORY (FIXED)
         print(f"\n2. TAX HISTORY DATA (FIXED - NO MORE 'N/A'):")
@@ -67,15 +65,15 @@ def complete_system_demonstration():
         tax_records = db_manager.get_tax_history(test_apn)
         
         if tax_records:
-            print(f"   Found {len(tax_records)} tax records:")
+        print(f"   Found {len(tax_records)} tax records:")
             for record in tax_records:
                 year = record['tax_year']
                 amount = record['tax_amount']
                 status = record['payment_status']
-                print(f"   {year}: ${amount:,.2f} - {status}")
-            print("   [+] Tax history now shows ACTUAL AMOUNTS and PAYMENT STATUS")
+        print(f"   {year}: ${amount:,.2f} - {status}")
+        print("   [+] Tax history now shows ACTUAL AMOUNTS and PAYMENT STATUS")
         else:
-            print("   [-] No tax records found")
+        print("   [-] No tax records found")
         
         # 3. SHOW COMPLETE SALES HISTORY (POPULATED)
         print(f"\n3. SALES HISTORY DATA (POPULATED):")
@@ -83,15 +81,15 @@ def complete_system_demonstration():
         sales_records = db_manager.get_sales_history(test_apn)
         
         if sales_records:
-            print(f"   Found {len(sales_records)} sales records:")
+        print(f"   Found {len(sales_records)} sales records:")
             for record in sales_records:
                 date = record['sale_date']
                 price = record['sale_price']
                 buyer = record['buyer_name']
-                print(f"   {date}: ${price:,.0f} -> {buyer}")
-            print("   [+] Sales history now shows COMPLETE TRANSACTION RECORDS")
+        print(f"   {date}: ${price:,.0f} -> {buyer}")
+        print("   [+] Sales history now shows COMPLETE TRANSACTION RECORDS")
         else:
-            print("   [-] No sales records found")
+        print("   [-] No sales records found")
         
         # 4. SHOW AUTOMATIC DATA COLLECTION CAPABILITY
         print(f"\n4. AUTOMATIC DATA COLLECTION SYSTEM:")
@@ -102,16 +100,15 @@ def complete_system_demonstration():
         print(f"   Enhanced API Client: {'READY' if has_auto_collection else 'NOT AVAILABLE'}")
         
         if has_auto_collection:
-            print("   [+] System can automatically collect data for ANY APN")
-            print("   [+] Web scraping for tax data from treasurer.maricopa.gov")
-            print("   [+] Sales data collection from recorder.maricopa.gov")
-            print("   [+] Smart caching to avoid duplicate data collection")
+        print("   [+] System can automatically collect data for ANY APN")
+        print("   [+] Web scraping for tax data from treasurer.maricopa.gov")
+        print("   [+] Sales data collection from recorder.maricopa.gov")
+        print("   [+] Smart caching to avoid duplicate data collection")
         
         # 5. SHOW DATABASE STATISTICS
         print(f"\n5. DATABASE STATISTICS:")
         print("-" * 25)
         stats = db_manager.get_database_stats()
-        
         print(f"   Properties: {stats.get('properties', 0):,}")
         print(f"   Tax Records: {stats.get('tax_records', 0):,}")
         print(f"   Sales Records: {stats.get('sales_records', 0):,}")
@@ -125,58 +122,58 @@ def complete_system_demonstration():
         
         # Check tax data
         if len(tax_records) > 0:
-            print("[+] TAX HISTORY: WORKING - Shows actual amounts and payment status")
+        print("[+] TAX HISTORY: WORKING - Shows actual amounts and payment status")
         else:
-            print("[-] TAX HISTORY: MISSING DATA")
+        print("[-] TAX HISTORY: MISSING DATA")
             all_good = False
         
         # Check sales data  
         if len(sales_records) > 0:
-            print("[+] SALES HISTORY: WORKING - Shows transaction records")
+        print("[+] SALES HISTORY: WORKING - Shows transaction records")
         else:
-            print("[-] SALES HISTORY: MISSING DATA")
+        print("[-] SALES HISTORY: MISSING DATA")
             all_good = False
         
         # Check automatic collection
         if has_auto_collection:
-            print("[+] AUTO COLLECTION: READY - Can collect data for any APN")
+        print("[+] AUTO COLLECTION: READY - Can collect data for any APN")
         else:
-            print("[-] AUTO COLLECTION: NOT IMPLEMENTED")
+        print("[-] AUTO COLLECTION: NOT IMPLEMENTED")
             all_good = False
         
         # Check database
         if stats.get('properties', 0) > 0:
-            print("[+] DATABASE: WORKING - Connected and populated")
+        print("[+] DATABASE: WORKING - Connected and populated")
         else:
-            print("[-] DATABASE: NO DATA")
+        print("[-] DATABASE: NO DATA")
             all_good = False
-        
         print("\n" + "=" * 80)
         if all_good:
-            print("OVERALL STATUS: ALL SYSTEMS WORKING")
-            print("RESULT: Property searches now show COMPLETE DATA")
-            print("        - No more 'N/A' in tax history")
-            print("        - No more missing sales data")
-            print("        - Automatic collection for new properties")
+        print("OVERALL STATUS: ALL SYSTEMS WORKING")
+        print("RESULT: Property searches now show COMPLETE DATA")
+        print("        - No more 'N/A' in tax history")
+        print("        - No more missing sales data")
+        print("        - Automatic collection for new properties")
         else:
-            print("OVERALL STATUS: SOME ISSUES DETECTED")
-            print("RESULT: Check the items marked with [-] above")
-        
+        print("OVERALL STATUS: SOME ISSUES DETECTED")
+        print("RESULT: Check the items marked with [-] above")
         print("=" * 80)
         print("DEMONSTRATION COMPLETE")
         print("You can now search for '10000 W Missouri Ave' or any other")
         print("property and get complete tax and sales data automatically.")
         print("=" * 80)
         
-    except Exception as e:
+except Exception as e:
         print(f"Error during demonstration: {e}")
-        import traceback
+import traceback
+
 from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.enhanced_config_manager import EnhancedConfigManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
         traceback.print_exc()
-        
-    finally:
+
+finally:
         api_client.close()
         db_manager.close()
 

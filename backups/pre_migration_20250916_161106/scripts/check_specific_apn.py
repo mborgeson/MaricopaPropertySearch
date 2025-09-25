@@ -3,8 +3,8 @@
 Check specific APN data flow
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch")
@@ -13,6 +13,7 @@ sys.path.insert(0, str(PROJECT_ROOT))
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
+
 def check_apn_comprehensive(test_apn):
     """Check comprehensive data for specific APN"""
 
@@ -20,11 +21,11 @@ def check_apn_comprehensive(test_apn):
     print("=" * 50)
 
     db_config = {
-        'host': 'localhost',
-        'port': 5433,
-        'database': 'maricopa_properties',
-        'user': 'property_user',
-        'password': 'Wildcats777!!'
+        "host": "localhost",
+        "port": 5433,
+        "database": "maricopa_properties",
+        "user": "property_user",
+        "password": "Wildcats777!!",
     }
 
     try:
@@ -46,28 +47,38 @@ def check_apn_comprehensive(test_apn):
             return
 
         # Check tax history
-        cursor.execute("SELECT * FROM tax_history WHERE apn = %s ORDER BY tax_year DESC", (test_apn,))
+        cursor.execute(
+            "SELECT * FROM tax_history WHERE apn = %s ORDER BY tax_year DESC",
+            (test_apn,),
+        )
         tax_records = cursor.fetchall()
         print(f"\n📊 Tax History: {len(tax_records)} records")
 
         for record in tax_records[:3]:
-            print(f"   - {record['tax_year']}: ${record.get('assessed_value', 'N/A')} assessed, ${record.get('tax_amount', 'N/A')} tax")
+            print(
+                f"   - {record['tax_year']}: ${record.get('assessed_value', 'N/A')} assessed, ${record.get('tax_amount', 'N/A')} tax"
+            )
 
         # Check sales history
-        cursor.execute("SELECT * FROM sales_history WHERE apn = %s ORDER BY sale_date DESC", (test_apn,))
+        cursor.execute(
+            "SELECT * FROM sales_history WHERE apn = %s ORDER BY sale_date DESC",
+            (test_apn,),
+        )
         sales_records = cursor.fetchall()
         print(f"\n🏠 Sales History: {len(sales_records)} records")
 
         for record in sales_records[:3]:
-            print(f"   - {record['sale_date']}: ${record.get('sale_price', 'N/A')} ({record.get('deed_type', 'Unknown')})")
+            print(
+                f"   - {record['sale_date']}: ${record.get('sale_price', 'N/A')} ({record.get('deed_type', 'Unknown')})"
+            )
 
         conn.close()
 
         # Now test API data collection
         print(f"\n🔍 Testing API data collection for APN: {test_apn}")
 
-        from src.config_manager import ConfigManager
         from src.api_client import MaricopaAPIClient
+        from src.config_manager import ConfigManager
 
         config_manager = ConfigManager()
         api_client = MaricopaAPIClient(config_manager)
@@ -75,11 +86,15 @@ def check_apn_comprehensive(test_apn):
         print("Getting tax history from API...")
         try:
             api_tax_history = api_client.get_tax_history(test_apn, years=3)
-            print(f"   API returned {len(api_tax_history) if api_tax_history else 0} tax records")
+            print(
+                f"   API returned {len(api_tax_history) if api_tax_history else 0} tax records"
+            )
 
             if api_tax_history:
                 for record in api_tax_history[:2]:
-                    print(f"   - Year {record.get('TaxYear', 'Unknown')}: ${record.get('FullCashValue', 'N/A')}")
+                    print(
+                        f"   - Year {record.get('TaxYear', 'Unknown')}: ${record.get('FullCashValue', 'N/A')}"
+                    )
         except Exception as e:
             print(f"   ❌ API tax collection failed: {e}")
 
@@ -94,6 +109,7 @@ def check_apn_comprehensive(test_apn):
 
     except Exception as e:
         print(f"❌ Error: {e}")
+
 
 if __name__ == "__main__":
     test_apn = sys.argv[1] if len(sys.argv) > 1 else "13304019"

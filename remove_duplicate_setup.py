@@ -3,9 +3,8 @@
 Remove Duplicate Setup Calls
 Remove the setup calls that were added in the wrong location
 """
-
 def main():
-    print("Removing duplicate setup calls...")
+        print("Removing duplicate setup calls...")
     
     main_window_path = "src/gui/enhanced_main_window.py"
     
@@ -20,7 +19,7 @@ def main():
     for i, line in enumerate(lines):
         # Skip the wrong setup calls (around line 740)
         if i > 730 and i < 750 and "# Setup enhanced features" in line:
-            print(f"Removing setup calls starting at line {i+1}")
+        print(f"Removing setup calls starting at line {i+1}")
             skip_lines = 4  # Skip this line and the next 4 setup calls
             continue
         
@@ -36,8 +35,7 @@ def main():
     # Write back the cleaned content
     with open(main_window_path, 'w', encoding='utf-8') as f:
         f.writelines(new_lines)
-    
-    print(f"Removed duplicate setup calls. File now has {len(new_lines)} lines (was {len(lines)})")
+        print(f"Removed duplicate setup calls. File now has {len(new_lines)} lines (was {len(lines)})")
 
 if __name__ == "__main__":
     main()

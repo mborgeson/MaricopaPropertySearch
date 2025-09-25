@@ -2,22 +2,19 @@
 """
 Test script to identify runtime issues with RUN_APPLICATION.py
 """
-
-import sys
 import os
-from pathlib import Path
 import subprocess
+import sys
+from pathlib import Path
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
-
-
 def test_gui_startup():
     """Test if GUI can start without user interaction"""
-    print("\n[TEST] GUI Startup Test")
-    print("-" * 40)
+        print("\n[TEST] GUI Startup Test")
+        print("-" * 40)
 
     test_code = """
 import sys
@@ -35,7 +32,7 @@ os.environ['QT_QPA_PLATFORM'] = 'offscreen'
 try:
     from PyQt5.QtWidgets import QApplication
     # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
-    from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
     # Create app
     app = QApplication(sys.argv)
@@ -61,7 +58,7 @@ try:
     if issues:
         print("ISSUES FOUND:")
         for issue in issues:
-            print(f"  - {{issue}}")
+        print(f"  - {{issue}}")
     else:
         print("GUI initialized successfully")
 
@@ -70,9 +67,9 @@ try:
     app.quit()
 
 except Exception as e:
-    print(f"ERROR: {{e}}")
-    import traceback
-    traceback.print_exc()
+        print(f"ERROR: {{e}}")
+import traceback
+        traceback.print_exc()
 """.format(
         root=project_root
     )
@@ -80,18 +77,15 @@ except Exception as e:
     result = subprocess.run(
         [sys.executable, "-c", test_code], capture_output=True, text=True, timeout=10
     )
-
-    print("Output:", result.stdout)
+        print("Output:", result.stdout)
     if result.stderr:
         print("Errors:", result.stderr)
 
     return result.returncode == 0
-
-
 def test_search_functionality():
     """Test if search function works"""
-    print("\n[TEST] Search Functionality")
-    print("-" * 40)
+        print("\n[TEST] Search Functionality")
+        print("-" * 40)
 
     test_code = """
 import sys
@@ -120,10 +114,10 @@ from src.enhanced_config_manager import EnhancedConfigManager
 
     # Test API client
     api = UnifiedMaricopaAPIClient(config)
-    print("API Client: OK")
+        print("API Client: OK")
 
 except Exception as e:
-    print(f"ERROR: {{e}}")
+        print(f"ERROR: {{e}}")
 """.format(
         root=project_root
     )
@@ -131,19 +125,16 @@ except Exception as e:
     result = subprocess.run(
         [sys.executable, "-c", test_code], capture_output=True, text=True, timeout=5
     )
-
-    print("Output:", result.stdout)
+        print("Output:", result.stdout)
     if result.stderr:
         print("Errors:", result.stderr)
 
     return result.returncode == 0
-
-
 def identify_specific_issues():
     """Identify specific runtime issues"""
-    print("\n" + "=" * 60)
-    print(" RUNTIME ISSUE IDENTIFICATION")
-    print("=" * 60)
+        print("\n" + "=" * 60)
+        print(" RUNTIME ISSUE IDENTIFICATION")
+        print("=" * 60)
 
     issues_found = []
 
@@ -156,15 +147,14 @@ def identify_specific_issues():
         issues_found.append("Search components have issues")
 
     # Report
-    print("\n" + "=" * 60)
-    print(" SUMMARY")
-    print("=" * 60)
+        print("\n" + "=" * 60)
+        print(" SUMMARY")
+        print("=" * 60)
 
     if issues_found:
         print("\n[ISSUES] Found problems:")
         for issue in issues_found:
-            print(f"  - {issue}")
-
+        print(f"  - {issue}")
         print("\n[RECOMMENDATION] Use hive-mind wizard:")
         print("  npx claude-flow hive-mind wizard")
         print("\nWizard steps:")

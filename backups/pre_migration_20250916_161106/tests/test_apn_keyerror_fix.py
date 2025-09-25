@@ -3,11 +3,13 @@
 Test script to verify the APN KeyError fix in database_manager.py
 """
 
-import sys
 import os
+import sys
+
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
+
 from src.database_manager import DatabaseManager
 
 
@@ -18,15 +20,15 @@ def test_apn_keyerror_fix():
     # Mock the config manager
     mock_config_manager = Mock()
     mock_config_manager.get_db_config.return_value = {
-        'host': 'localhost',
-        'port': 5432,
-        'database': 'test_db',
-        'user': 'test_user',
-        'password': 'test_pass'
+        "host": "localhost",
+        "port": 5432,
+        "database": "test_db",
+        "user": "test_user",
+        "password": "test_pass",
     }
 
     # Mock the connection pool
-    with patch('src.database_manager.ThreadedConnectionPool'):
+    with patch("src.database_manager.ThreadedConnectionPool"):
         db_manager = DatabaseManager(mock_config_manager)
 
         # Mock the database connection and cursor
@@ -34,15 +36,15 @@ def test_apn_keyerror_fix():
         mock_cursor = MagicMock()
         mock_conn.cursor.return_value = mock_cursor
 
-        with patch.object(db_manager, 'get_connection') as mock_get_conn:
+        with patch.object(db_manager, "get_connection") as mock_get_conn:
             mock_get_conn.return_value.__enter__.return_value = mock_conn
             mock_get_conn.return_value.__exit__.return_value = None
 
             # Test Case 1: Property data missing 'apn' key
             print("\n1. Testing property data missing 'apn' key...")
             property_data_no_apn = {
-                'owner_name': 'John Doe',
-                'property_address': '123 Main St'
+                "owner_name": "John Doe",
+                "property_address": "123 Main St",
             }
 
             result = db_manager.insert_property(property_data_no_apn)
@@ -52,8 +54,8 @@ def test_apn_keyerror_fix():
             # Test Case 2: Property data with 'apn' but missing other fields
             print("\n2. Testing property data with 'apn' but missing other fields...")
             property_data_partial = {
-                'apn': '123-45-678',
-                'owner_name': 'Jane Smith'
+                "apn": "123-45-678",
+                "owner_name": "Jane Smith",
                 # Missing other fields that are expected by SQL
             }
 
@@ -68,36 +70,53 @@ def test_apn_keyerror_fix():
 
                 # Verify all required fields are present
                 required_fields = [
-                    'apn', 'owner_name', 'property_address', 'mailing_address',
-                    'legal_description', 'land_use_code', 'year_built', 'living_area_sqft',
-                    'lot_size_sqft', 'bedrooms', 'bathrooms', 'pool', 'garage_spaces', 'raw_data'
+                    "apn",
+                    "owner_name",
+                    "property_address",
+                    "mailing_address",
+                    "legal_description",
+                    "land_use_code",
+                    "year_built",
+                    "living_area_sqft",
+                    "lot_size_sqft",
+                    "bedrooms",
+                    "bathrooms",
+                    "pool",
+                    "garage_spaces",
+                    "raw_data",
                 ]
 
-                missing_fields = [field for field in required_fields if field not in executed_data]
+                missing_fields = [
+                    field for field in required_fields if field not in executed_data
+                ]
                 print(f"   Missing fields: {missing_fields}")
-                assert len(missing_fields) == 0, f"Missing required fields: {missing_fields}"
+                assert (
+                    len(missing_fields) == 0
+                ), f"Missing required fields: {missing_fields}"
 
                 # Verify APN value is correct
-                assert executed_data['apn'] == '123-45-678', "APN value should be preserved"
+                assert (
+                    executed_data["apn"] == "123-45-678"
+                ), "APN value should be preserved"
                 print("   [OK] All required fields present in executed data")
 
             # Test Case 3: Complete property data
             print("\n3. Testing complete property data...")
             property_data_complete = {
-                'apn': '987-65-432',
-                'owner_name': 'Complete Owner',
-                'property_address': '456 Complete Ave',
-                'mailing_address': '456 Complete Ave',
-                'legal_description': 'LOT 1 BLOCK 1',
-                'land_use_code': 'RES',
-                'year_built': 2000,
-                'living_area_sqft': 1500,
-                'lot_size_sqft': 7200,
-                'bedrooms': 3,
-                'bathrooms': 2,
-                'pool': False,
-                'garage_spaces': 2,
-                'raw_data': {'source': 'test'}
+                "apn": "987-65-432",
+                "owner_name": "Complete Owner",
+                "property_address": "456 Complete Ave",
+                "mailing_address": "456 Complete Ave",
+                "legal_description": "LOT 1 BLOCK 1",
+                "land_use_code": "RES",
+                "year_built": 2000,
+                "living_area_sqft": 1500,
+                "lot_size_sqft": 7200,
+                "bedrooms": 3,
+                "bathrooms": 2,
+                "pool": False,
+                "garage_spaces": 2,
+                "raw_data": {"source": "test"},
             }
 
             result = db_manager.insert_property(property_data_complete)
@@ -113,20 +132,20 @@ def test_validation_method():
     # Mock the config manager
     mock_config_manager = Mock()
     mock_config_manager.get_db_config.return_value = {
-        'host': 'localhost',
-        'port': 5432,
-        'database': 'test_db',
-        'user': 'test_user',
-        'password': 'test_pass'
+        "host": "localhost",
+        "port": 5432,
+        "database": "test_db",
+        "user": "test_user",
+        "password": "test_pass",
     }
 
-    with patch('src.database_manager.ThreadedConnectionPool'):
+    with patch("src.database_manager.ThreadedConnectionPool"):
         db_manager = DatabaseManager(mock_config_manager)
 
         # Test invalid data
         invalid_data = {
-            'owner_name': 'Test Owner',
-            'year_built': 'not_a_number'  # Invalid numeric value
+            "owner_name": "Test Owner",
+            "year_built": "not_a_number",  # Invalid numeric value
         }
 
         is_valid, errors = db_manager.validate_property_data(invalid_data)
@@ -136,10 +155,10 @@ def test_validation_method():
 
         # Test valid data
         valid_data = {
-            'apn': '123-45-678',
-            'owner_name': 'Test Owner',
-            'year_built': 2000,
-            'pool': False
+            "apn": "123-45-678",
+            "owner_name": "Test Owner",
+            "year_built": 2000,
+            "pool": False,
         }
 
         is_valid, errors = db_manager.validate_property_data(valid_data)
@@ -159,5 +178,7 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"\n[ERROR] Test failed with error: {e}")
         import traceback
+
         traceback.print_exc()
-        sys.exit(1)
+
+    sys.exit(1)

@@ -4,40 +4,74 @@ Enhanced Main Window with Batch Processing Integration
 Consolidated main window with full GUI enhancements and batch processing capabilities
 """
 
-import sys
-import os
+import asyncio
 import json
 import logging
-import asyncio
+import os
+import sys
 import traceback
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
+from PyQt5.QtCore import QObject, QSettings, Qt, QThread, QTimer, pyqtSignal
+from PyQt5.QtGui import QColor, QFont, QIcon, QPalette, QPixmap
 from PyQt5.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QLineEdit, QPushButton, QTableWidget, QTableWidgetItem,
-    QComboBox, QTextEdit, QGroupBox, QCheckBox, QSpinBox,
-    QProgressBar, QStatusBar, QMenuBar, QAction, QMessageBox,
-    QFrame, QTabWidget, QSplitter, QHeaderView, QDialog,
-    QFormLayout, QListWidget, QListWidgetItem, QTreeWidget,
-    QTreeWidgetItem, QSlider, QDoubleSpinBox, QButtonGroup, QRadioButton
+    QAction,
+    QButtonGroup,
+    QCheckBox,
+    QComboBox,
+    QDialog,
+    QDoubleSpinBox,
+    QFormLayout,
+    QFrame,
+    QGridLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QLineEdit,
+    QListWidget,
+    QListWidgetItem,
+    QMainWindow,
+    QMenuBar,
+    QMessageBox,
+    QProgressBar,
+    QPushButton,
+    QRadioButton,
+    QSlider,
+    QSpinBox,
+    QSplitter,
+    QStatusBar,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QTextEdit,
+    QTreeWidget,
+    QTreeWidgetItem,
+    QVBoxLayout,
+    QWidget,
 )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QObject, QSettings
-from PyQt5.QtGui import QFont, QPixmap, QIcon, QPalette, QColor
 
 # Import all the necessary classes
-sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
+sys.path.append(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+)
 
-from database_manager import DatabaseManager
 from api_client import APIClient
-from web_scraper import WebScraper
+from database_manager import DatabaseManager
+
 from background_data_collector import BackgroundDataCollectionManager
 from batch_search_integration import BatchSearchIntegration
 from gui.gui_enhancements_dialogs import (
-    ApplicationSettingsDialog, DataCollectionSettingsDialog, CacheManagementDialog,
-    PropertyDetailsDialog, SearchResultsExportDialog, DataVisualizationDialog
+    ApplicationSettingsDialog,
+    CacheManagementDialog,
+    DataCollectionSettingsDialog,
+    DataVisualizationDialog,
+    PropertyDetailsDialog,
+    SearchResultsExportDialog,
 )
+from web_scraper import WebScraper
 
 logger = logging.getLogger(__name__)
 

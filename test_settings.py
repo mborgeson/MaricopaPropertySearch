@@ -3,15 +3,16 @@
 Test Settings Loading and Application
 This script tests the QSettings functionality to verify default values are working.
 """
-
-import sys
 import os
+import sys
+
 from PyQt5.QtCore import QSettings
 from PyQt5.QtWidgets import QApplication
 
+
 def test_qsettings_defaults():
     """Test QSettings default value handling"""
-    print("Testing QSettings default value handling...")
+        print("Testing QSettings default value handling...")
     
     # Create a unique settings instance for testing
     settings = QSettings("MaricopaPropertySearchTest", "PropertySearchTest")
@@ -28,8 +29,7 @@ def test_qsettings_defaults():
         'show_progress_details': (True, bool),
         'always_fresh_data': (True, bool)
     }
-    
-    print("\nTesting default value retrieval:")
+        print("\nTesting default value retrieval:")
     loaded_settings = {}
     
     # Test loading defaults (same logic as in the app)
@@ -47,11 +47,10 @@ def test_qsettings_defaults():
             loaded_settings[key] = int(stored_value) if stored_value else default_value
         else:
             loaded_settings[key] = stored_value
-        
         print(f"  {key}: {loaded_settings[key]} (type: {type(loaded_settings[key])})")
     
     # Test saving and reloading
-    print("\nTesting save and reload:")
+        print("\nTesting save and reload:")
     
     # Save the settings
     for key, value in loaded_settings.items():
@@ -72,7 +71,6 @@ def test_qsettings_defaults():
             reloaded_settings[key] = int(stored_value) if stored_value else default_value
         else:
             reloaded_settings[key] = stored_value
-        
         print(f"  {key}: {reloaded_settings[key]} (type: {type(reloaded_settings[key])})")
     
     # Verify all values match expectations
@@ -83,8 +81,7 @@ def test_qsettings_defaults():
         'show_progress_details': True,
         'always_fresh_data': True
     }
-    
-    print("\nValidation results:")
+        print("\nValidation results:")
     all_correct = True
     for key, expected_value in expected.items():
         actual_value = reloaded_settings[key]
@@ -99,30 +96,29 @@ def test_qsettings_defaults():
     settings.sync()
     
     return all_correct
-
 def main():
     """Run settings tests"""
     # Create minimal QApplication for QSettings to work
     if not QApplication.instance():
         app = QApplication(sys.argv)
-    
-    print("Maricopa Property Search - Settings Test")
-    print("=" * 50)
+        print("Maricopa Property Search - Settings Test")
+        print("=" * 50)
     
     try:
         success = test_qsettings_defaults()
         
         if success:
-            print("\n[SUCCESS] All settings tests passed!")
-            print("Default settings should work correctly in the application.")
+        print("\n[SUCCESS] All settings tests passed!")
+        print("Default settings should work correctly in the application.")
         else:
-            print("\n[ERROR] Some settings tests failed!")
-            print("There may be issues with the settings implementation.")
+        print("\n[ERROR] Some settings tests failed!")
+        print("There may be issues with the settings implementation.")
     
     except Exception as e:
         print(f"\n[ERROR] Test failed with exception: {e}")
-        import traceback
+import traceback
+
         traceback.print_exc()
 
-if __name__ == "__main__":
+    if __name__ == "__main__":
     main()

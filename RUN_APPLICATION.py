@@ -11,7 +11,6 @@ to the unified GUI launcher that consolidates features from:
 - launch_enhanced_app.py (splash screen and requirement checking)
 - launch_improved_app.py (UX improvements and Missouri Ave testing)
 """
-
 import sys
 from pathlib import Path
 
@@ -20,17 +19,16 @@ src_dir = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_dir))
 sys.path.insert(0, str(Path(__file__).parent))
 
+import logging
+
 # Import unified launcher functionality
 from src.gui_launcher_unified import main as unified_main
-
-import logging
 from src.logging_config import get_logger
 
 logger = get_logger(__name__)
 
 # Backward compatibility message
 logger.info("RUN_APPLICATION: Using unified GUI launcher with consolidated features")
-
 def main():
     """Main entry point - delegates to unified launcher"""
     logger.info("Starting application via RUN_APPLICATION (unified launcher)")
@@ -44,6 +42,7 @@ if __name__ == "__main__":
         sys.exit(0)
     except Exception as e:
         print(f"\n[ERROR] Fatal error: {e}")
-        import traceback
+import traceback
+
         print(traceback.format_exc())
         sys.exit(1)

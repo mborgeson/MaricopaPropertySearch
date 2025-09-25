@@ -4,8 +4,8 @@ Launcher for Improved Maricopa Property Search Application
 Launches the application with UX improvements and Missouri Ave testing support
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add src directory to path
@@ -13,9 +13,10 @@ src_dir = Path(__file__).parent / "src"
 sys.path.insert(0, str(src_dir))
 
 import logging
-from PyQt5.QtWidgets import QApplication, QSplashScreen, QMessageBox
+
 from PyQt5.QtCore import Qt, QTimer
-from PyQt5.QtGui import QPixmap, QFont
+from PyQt5.QtGui import QFont, QPixmap
+from PyQt5.QtWidgets import QApplication, QMessageBox, QSplashScreen
 
 # Import application modules
 from config_manager import ConfigManager
@@ -33,10 +34,10 @@ def show_improvement_splash():
         # Create splash screen
         splash_pix = QPixmap(500, 300)
         splash_pix.fill(Qt.white)
-        
+
         splash = QSplashScreen(splash_pix, Qt.WindowStaysOnTopHint)
         splash.setMask(splash_pix.mask())
-        
+
         # Add text about improvements
         splash.showMessage(
             "🏠 Maricopa Property Search - Enhanced UX\n"
@@ -46,12 +47,12 @@ def show_improvement_splash():
             "⚡ IMPROVED: Professional appearance\n\n"
             "🚀 Loading improved application...",
             Qt.AlignCenter | Qt.AlignBottom,
-            Qt.black
+            Qt.black,
         )
-        
+
         splash.show()
         return splash
-        
+
     except Exception as e:
         logger.warning(f"Could not create improvement splash screen: {e}")
         return None
@@ -61,24 +62,24 @@ def check_ux_improvements():
     """Check that UX improvement files are available"""
     improvements_available = True
     missing_components = []
-    
+
     # Check for improved components
     improved_files = [
         "src/gui/improved_main_window.py",
-        "tests/test_missouri_avenue_address.py", 
+        "tests/test_missouri_avenue_address.py",
         "UX_IMPROVEMENTS_SUMMARY.md",
-        "run_missouri_tests.py"
+        "run_missouri_tests.py",
     ]
-    
+
     for file_path in improved_files:
         if not Path(file_path).exists():
             missing_components.append(file_path)
             improvements_available = False
-    
+
     if not improvements_available:
         logger.warning(f"Some UX improvement components missing: {missing_components}")
         return False, missing_components
-    
+
     logger.info("✅ All UX improvement components available")
     return True, []
 
@@ -116,44 +117,47 @@ This enhanced version includes comprehensive testing for:
 
 Would you like to continue to the application?
     """
-    
-    return QMessageBox.question(
-        None, 
-        "Missouri Avenue Testing & UX Improvements Ready",
-        info_text,
-        QMessageBox.Yes | QMessageBox.No,
-        QMessageBox.Yes
-    ) == QMessageBox.Yes
+
+    return (
+        QMessageBox.question(
+            None,
+            "Missouri Avenue Testing & UX Improvements Ready",
+            info_text,
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Yes,
+        )
+        == QMessageBox.Yes
+    )
 
 
 def main():
     """Main application entry point with UX improvements"""
     logger.info("Starting Improved Maricopa Property Search Application")
-    
+
     # Create QApplication
     app = QApplication(sys.argv)
     app.setApplicationName("Maricopa Property Search - Enhanced UX")
     app.setApplicationVersion("2.1")
     app.setOrganizationName("Property Search Solutions")
-    
+
     # Set application style
-    app.setStyle('Fusion')
-    
+    app.setStyle("Fusion")
+
     # Check UX improvements availability
     improvements_ready, missing = check_ux_improvements()
     if not improvements_ready:
         QMessageBox.critical(
-            None, 
+            None,
             "UX Improvements Missing",
-            f"Some UX improvement components are missing:\n\n" +
-            "\n".join(f"• {file}" for file in missing) +
-            "\n\nPlease ensure all improvement files are in place."
+            f"Some UX improvement components are missing:\n\n"
+            + "\n".join(f"• {file}" for file in missing)
+            + "\n\nPlease ensure all improvement files are in place.",
         )
         return 1
-    
+
     # Show improvement splash
     splash = show_improvement_splash()
-    
+
     try:
         # Show demo information
         if splash:
@@ -162,18 +166,18 @@ def main():
                 "✨ Preparing Missouri Avenue testing demo...\n\n"
                 "🚀 Loading improved application...",
                 Qt.AlignCenter | Qt.AlignBottom,
-                Qt.black
+                Qt.black,
             )
-        
+
         app.processEvents()
-        
+
         # Give user information about testing capabilities
         if not show_missouri_ave_demo_info():
             logger.info("User chose not to continue to application")
             if splash:
                 splash.close()
             return 0
-        
+
         # Update splash
         if splash:
             splash.showMessage(
@@ -181,13 +185,13 @@ def main():
                 "📋 Loading configuration...\n\n"
                 "🚀 Starting improved application...",
                 Qt.AlignCenter | Qt.AlignBottom,
-                Qt.black
+                Qt.black,
             )
-        
+
         # Load configuration
         logger.info("Loading application configuration")
         config_manager = ConfigManager()
-        
+
         # Update splash
         if splash:
             splash.showMessage(
@@ -195,11 +199,12 @@ def main():
                 "🗄️ Testing database connection...\n\n"
                 "🚀 Almost ready...",
                 Qt.AlignCenter | Qt.AlignBottom,
-                Qt.black
+                Qt.black,
             )
-        
+
         # Test database connection early
         from threadsafe_database_manager import ThreadSafeDatabaseManager
+
         try:
             db_test = ThreadSafeDatabaseManager(config_manager)
             if not db_test.test_connection():
@@ -211,14 +216,14 @@ def main():
             if splash:
                 splash.close()
             QMessageBox.critical(
-                None, 
-                "Database Connection Issue", 
+                None,
+                "Database Connection Issue",
                 f"Could not connect to database:\n{str(e)}\n\n"
                 "The application can still run with limited functionality.\n"
-                "Some features may not be available."
+                "Some features may not be available.",
             )
             # Continue anyway for testing purposes
-        
+
         # Update splash
         if splash:
             splash.showMessage(
@@ -226,19 +231,19 @@ def main():
                 "🎨 Creating improved interface...\n\n"
                 "✨ Ready to launch!",
                 Qt.AlignCenter | Qt.AlignBottom,
-                Qt.black
+                Qt.black,
             )
-        
+
         # Create main window with improvements
         logger.info("Creating improved main application window")
         main_window = ImprovedPropertySearchApp(config_manager)
-        
+
         # Close splash and show main window
         if splash:
             splash.finish(main_window)
-        
+
         main_window.show()
-        
+
         # Show welcome message about improvements
         QMessageBox.information(
             main_window,
@@ -251,36 +256,36 @@ def main():
             "• Enhanced Missouri Avenue property testing\n"
             "• Improved error handling and recovery\n\n"
             "💡 Try searching for '10000 W Missouri Ave' to test\n"
-            "the enhanced functionality!"
+            "the enhanced functionality!",
         )
-        
+
         logger.info("Improved application startup complete")
-        
+
         # Start the application event loop
         exit_code = app.exec_()
-        
+
         logger.info(f"Improved application exiting with code: {exit_code}")
         return exit_code
-        
+
     except Exception as e:
         logger.error(f"Critical error during improved application startup: {e}")
         logger.error(f"Traceback: {traceback.format_exc()}")
-        
+
         if splash:
             splash.close()
-        
+
         QMessageBox.critical(
-            None, 
-            "Application Startup Error", 
+            None,
+            "Application Startup Error",
             f"A critical error occurred during startup:\n\n{str(e)}\n\n"
             "This may be due to:\n"
             "• Missing required files\n"
-            "• Configuration issues\n" 
+            "• Configuration issues\n"
             "• Database connectivity problems\n\n"
-            "Please check the log files for more details."
+            "Please check the log files for more details.",
         )
         return 1
-    
+
     except KeyboardInterrupt:
         logger.info("Improved application interrupted by user")
         return 0
@@ -289,17 +294,17 @@ def main():
 def run_quick_test():
     """Run a quick test of the Missouri Avenue functionality"""
     logger.info("Running quick Missouri Avenue functionality test...")
-    
+
     try:
         # Import test modules
         from tests.test_missouri_avenue_address import TestMissouriAvenueProperty
-        
+
         logger.info("✅ Test modules imported successfully")
         logger.info("✅ Missouri Avenue tests are ready to run")
         logger.info("✅ Use 'python run_missouri_tests.py' for comprehensive testing")
-        
+
         return True
-        
+
     except ImportError as e:
         logger.error(f"❌ Test import failed: {e}")
         return False
@@ -307,21 +312,21 @@ def run_quick_test():
 
 if __name__ == "__main__":
     import traceback
-    
+
     try:
         # Quick test first
         logger.info("Performing pre-launch checks...")
         test_ready = run_quick_test()
-        
+
         if test_ready:
             logger.info("✅ Pre-launch checks passed")
         else:
             logger.warning("⚠️ Some test components may not be available")
-        
+
         # Launch improved application
         exit_code = main()
         sys.exit(exit_code)
-        
+
     except Exception as e:
         print(f"Fatal error in improved application launcher: {e}")
         print(traceback.format_exc())

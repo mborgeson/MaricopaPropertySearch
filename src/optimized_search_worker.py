@@ -2,22 +2,22 @@
 Optimized Search Worker
 Enhanced background search worker with better thread management, caching, and error handling
 """
-
-import time
 import logging
-from typing import Dict, List, Optional, Any
-from PyQt5.QtCore import QThread, pyqtSignal, QMutex, QMutexLocker
-from dataclasses import asdict
+import time
 import traceback
+from dataclasses import asdict
+from typing import Any, Dict, List, Optional
+
+from optimized_database_manager import OptimizedDatabaseManager
+from PyQt5.QtCore import QMutex, QMutexLocker, QThread, pyqtSignal
 
 from search_cache import SearchCache, SearchHistory
 from search_validator import (
-    SearchValidator,
-    SearchType,
-    ValidationResult,
     SearchFilters,
+    SearchType,
+    SearchValidator,
+    ValidationResult,
 )
-from optimized_database_manager import OptimizedDatabaseManager
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +32,6 @@ class OptimizedSearchWorker(QThread):
     error_occurred = pyqtSignal(str)
     validation_failed = pyqtSignal(str, list)  # error_message, suggestions
     search_completed = pyqtSignal(str, str, int, float)  # type, term, count, duration
-
     def __init__(
         self,
         search_term: str,
@@ -74,8 +73,7 @@ class OptimizedSearchWorker(QThread):
         logger.debug(
             f"Search worker initialized: {search_type.value} = '{search_term}'"
         )
-
-    def run(self):
+def run(self):
         """Execute optimized search in background thread"""
         search_start_time = time.time()
 
@@ -210,18 +208,15 @@ class OptimizedSearchWorker(QThread):
 
         finally:
             self.progress_updated.emit(0)  # Reset progress
-
-    def cancel_search(self):
+def cancel_search(self):
         """Cancel the current search operation"""
         with QMutexLocker(self._mutex):
             self._is_cancelled = True
             logger.info("Search cancellation requested")
-
     def _validate_input(self) -> ValidationResult:
         """Validate and sanitize search input"""
         return self.validator.validate_search_input(self.search_term, self.search_type)
-
-    def _handle_validation_failure(self, validation: ValidationResult):
+def _handle_validation_failure(self, validation: ValidationResult):
         """Handle validation failures with helpful suggestions"""
         error_message = "; ".join(validation.errors)
 
@@ -237,7 +232,6 @@ class OptimizedSearchWorker(QThread):
             error_message, suggestions.get(self.search_type.value, [])
         )
         logger.warning(f"Validation failed: {error_message}")
-
     def _check_cache(
         self, search_term: str, search_type: SearchType
     ) -> Optional[List[Dict]]:
@@ -248,7 +242,6 @@ class OptimizedSearchWorker(QThread):
         except Exception as e:
             logger.warning(f"Cache check failed: {e}")
             return None
-
     def _search_database(
         self, search_term: str, search_type: SearchType
     ) -> tuple[List[Dict], int]:
@@ -271,7 +264,6 @@ class OptimizedSearchWorker(QThread):
         except Exception as e:
             logger.error(f"Database search failed: {e}")
             return [], 0
-
     def _search_external_sources(
         self, search_term: str, search_type: SearchType
     ) -> List[Dict]:
@@ -321,7 +313,6 @@ class OptimizedSearchWorker(QThread):
 
         logger.debug(f"External sources returned {len(external_results)} results")
         return external_results
-
     def _search_external_sources_fresh(
         self, search_term: str, search_type: SearchType
     ) -> List[Dict]:
@@ -390,7 +381,6 @@ class OptimizedSearchWorker(QThread):
             f"Fresh data collection returned {len(fresh_results)} total results"
         )
         return fresh_results
-
     def _apply_client_filters(self, results: List[Dict]) -> List[Dict]:
         """Apply additional client-side filtering to cached results"""
         if not self.filters or not results:
@@ -430,7 +420,6 @@ class OptimizedSearchWorker(QThread):
             filtered.append(result)
 
         return filtered
-
     def _cache_results(
         self, search_term: str, search_type: SearchType, results: List[Dict]
     ):
@@ -449,7 +438,6 @@ class OptimizedSearchWorker(QThread):
             )
         except Exception as e:
             logger.warning(f"Failed to cache results: {e}")
-
     def _log_search(
         self, search_type: SearchType, search_term: str, results_count: int
     ):
@@ -463,7 +451,6 @@ class OptimizedSearchWorker(QThread):
 
         except Exception as e:
             logger.warning(f"Failed to log search: {e}")
-
     def get_search_suggestions(self, partial_term: str, limit: int = 10) -> List[str]:
         """Get search suggestions based on history and database"""
         suggestions = []
@@ -494,12 +481,10 @@ class OptimizedSearchWorker(QThread):
         except Exception as e:
             logger.warning(f"Failed to get suggestions: {e}")
             return []
-
     def get_cache_stats(self) -> Dict[str, Any]:
         """Get cache statistics"""
         return self.cache.get_stats()
-
-    def clear_cache(self):
+def clear_cache(self):
         """Clear search cache"""
         try:
             self.cache.invalidate()
@@ -510,12 +495,10 @@ class OptimizedSearchWorker(QThread):
 
 class SearchWorkerPool:
     """Pool manager for search workers to handle concurrent searches"""
-
     def __init__(self, max_workers: int = 3):
         self.max_workers = max_workers
         self.active_workers = []
         self._mutex = QMutex()
-
     def submit_search(
         self,
         search_term: str,
@@ -558,18 +541,15 @@ class SearchWorkerPool:
 
             self.active_workers.append(worker)
             return worker
-
-    def _cleanup_workers(self):
+def _cleanup_workers(self):
         """Remove finished workers from active list"""
         self.active_workers = [w for w in self.active_workers if w.isRunning()]
-
-    def _worker_finished(self, worker: OptimizedSearchWorker):
+def _worker_finished(self, worker: OptimizedSearchWorker):
         """Handle worker completion"""
         with QMutexLocker(self._mutex):
             if worker in self.active_workers:
                 self.active_workers.remove(worker)
-
-    def cancel_all(self):
+def cancel_all(self):
         """Cancel all active searches"""
         with QMutexLocker(self._mutex):
             for worker in self.active_workers:
@@ -580,7 +560,6 @@ class SearchWorkerPool:
                 worker.wait(2000)  # 2 second timeout
 
             self.active_workers.clear()
-
     def get_active_count(self) -> int:
         """Get number of active workers"""
         with QMutexLocker(self._mutex):

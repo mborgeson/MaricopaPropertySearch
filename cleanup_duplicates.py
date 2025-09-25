@@ -3,11 +3,11 @@
 Cleanup Duplicate Methods Script
 Removes duplicate methods that were accidentally added during integration
 """
-
 import os
 
+
 def main():
-    print("Cleaning up duplicate methods...")
+        print("Cleaning up duplicate methods...")
     
     main_window_path = "src/gui/enhanced_main_window.py"
     
@@ -38,7 +38,7 @@ def main():
                 break
         
         if closeEvent_line != -1:
-            print(f"Removing duplicate methods from line {duplicate_start + 1} to {closeEvent_line}")
+        print(f"Removing duplicate methods from line {duplicate_start + 1} to {closeEvent_line}")
             # Keep everything before duplicates and from closeEvent onwards
             cleaned_lines = lines[:duplicate_start] + lines[closeEvent_line:]
             cleaned_content = '\n'.join(cleaned_lines)
@@ -46,11 +46,10 @@ def main():
             # Write back the cleaned content
             with open(main_window_path, 'w', encoding='utf-8') as f:
                 f.write(cleaned_content)
-            
-            print("Duplicate methods removed successfully!")
-            print(f"File size reduced by {len(lines) - len(cleaned_lines)} lines")
+        print("Duplicate methods removed successfully!")
+        print(f"File size reduced by {len(lines) - len(cleaned_lines)} lines")
         else:
-            print("Could not find closeEvent method to determine end of duplicates")
+        print("Could not find closeEvent method to determine end of duplicates")
     else:
         print("No duplicate methods found")
     
@@ -65,14 +64,13 @@ def main():
         "refresh_selected_property",
         "copy_apn_to_clipboard"
     ]
-    
-    print("\nVerification:")
+        print("\nVerification:")
     for method in methods_to_check:
         count = content.count(f"def {method}")
         if count == 1:
-            print(f"✓ {method}: {count} occurrence (correct)")
+        print(f"✓ {method}: {count} occurrence (correct)")
         else:
-            print(f"✗ {method}: {count} occurrences (should be 1)")
+        print(f"✗ {method}: {count} occurrences (should be 1)")
 
 if __name__ == "__main__":
     main()

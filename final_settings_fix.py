@@ -3,19 +3,18 @@
 Final Settings Fix for Enhanced Main Window
 This script cleans up the initialization and ensures settings are applied correctly.
 """
-
 import os
 import re
 import shutil
 from datetime import datetime
 
+
 def backup_file(filepath):
     """Create a backup of the file"""
     backup_path = f"{filepath}.backup_final_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     shutil.copy2(filepath, backup_path)
-    print(f"Created backup: {backup_path}")
+        print(f"Created backup: {backup_path}")
     return backup_path
-
 def fix_initialization_section(content):
     """Fix the initialization section to properly load settings"""
     
@@ -51,7 +50,6 @@ def fix_initialization_section(content):
     content = re.sub(old_init_pattern, new_init_section, content, flags=re.MULTILINE)
     
     return content
-
 def add_unified_settings_method(content):
     """Add a unified method for applying settings and starting background collection"""
     
@@ -82,7 +80,6 @@ def add_unified_settings_method(content):
     content = re.sub(close_event_pattern, new_method + r'\1', content)
     
     return content
-
 def remove_duplicate_delayed_settings(content):
     """Remove duplicate _apply_delayed_settings methods"""
     
@@ -107,7 +104,6 @@ def remove_duplicate_delayed_settings(content):
     content = re.sub(delayed_pattern, '', content, flags=re.MULTILINE)
     
     return content
-
 def main():
     """Apply final settings fixes"""
     
@@ -119,8 +115,7 @@ def main():
     if not os.path.exists(main_window_path):
         print(f"Error: File not found: {main_window_path}")
         return False
-    
-    print(f"Applying final settings fixes to: {main_window_path}")
+        print(f"Applying final settings fixes to: {main_window_path}")
     
     # Create backup
     backup_path = backup_file(main_window_path)
@@ -129,7 +124,6 @@ def main():
         # Read the current file
         with open(main_window_path, 'r', encoding='utf-8') as f:
             content = f.read()
-        
         print("Applying final fixes...")
         
         # Apply fixes in order
@@ -140,7 +134,6 @@ def main():
         # Write the fixed content
         with open(main_window_path, 'w', encoding='utf-8') as f:
             f.write(content)
-        
         print("[SUCCESS] Applied final settings fixes!")
         print()
         print("Final fixes applied:")

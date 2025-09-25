@@ -9,22 +9,22 @@ Consolidated from 8 variants with best features from each:
 - Adaptive rate limiting
 - Connection pool management
 """
-
 import asyncio
-import aiohttp
-import requests
-import time
-import logging
 import json
+import logging
+import queue
 import threading
-from typing import Dict, List, Optional, Any, Tuple
-from urllib.parse import urljoin
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from functools import lru_cache
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
+from functools import lru_cache
 from threading import Lock, RLock, Semaphore
-import queue
+from typing import Any, Dict, List, Optional, Tuple
+from urllib.parse import urljoin
+
+import aiohttp
+import requests
 
 from .logging_config import get_api_logger
 
@@ -42,7 +42,6 @@ class PropertyDataCache:
     data: Dict[str, Any]
     timestamp: float
     ttl: float = 300.0  # 5 minutes default TTL
-
     def is_expired(self) -> bool:
         return time.time() - self.timestamp > self.ttl
 
@@ -63,10 +62,8 @@ class BatchAPIRequest:
     error: Optional[str] = None
     retry_count: int = 0
     max_retries: int = 3
-
     def __hash__(self):
         return hash((self.request_type, self.identifier))
-
     def __eq__(self, other):
         if not isinstance(other, BatchAPIRequest):
             return False
@@ -78,7 +75,6 @@ class BatchAPIRequest:
 
 class AdaptiveRateLimiter:
     """Intelligent rate limiter that adapts based on server responses"""
-
     def __init__(
         self,
         initial_rate: float = 2.0,
@@ -107,7 +103,6 @@ class AdaptiveRateLimiter:
             f"Initial rate: {initial_rate} req/s, "
             f"Burst capacity: {burst_capacity}"
         )
-
     def acquire(self, timeout: float = 10.0) -> bool:
         """Acquire token with adaptive rate limiting"""
         start_time = time.time()
@@ -129,25 +124,21 @@ class AdaptiveRateLimiter:
             time.sleep(0.1)  # Short pause before retry
 
         return False
-
     def record_success(self):
         """Record successful request for rate adaptation"""
         with self.lock:
             self.success_count += 1
             self._maybe_adjust_rate()
-
     def record_error(self):
         """Record failed request for rate adaptation"""
         with self.lock:
             self.error_count += 1
             self._maybe_adjust_rate()
-
     def record_rate_limit(self):
         """Record rate limit hit - decrease rate immediately"""
         with self.lock:
             self.rate_limit_count += 1
             self._decrease_rate()
-
     def _maybe_adjust_rate(self):
         """Adjust rate based on success/error ratio"""
         now = time.time()
@@ -175,12 +166,10 @@ class AdaptiveRateLimiter:
         self.error_count = 0
         self.rate_limit_count = 0
         self.last_rate_adjustment = now
-
     def _decrease_rate(self):
         """Decrease the current rate"""
         self.current_rate = max(self.min_rate, self.current_rate * 0.8)
         logger.debug(f"Decreased rate to {self.current_rate:.2f} req/s")
-
     def get_stats(self) -> Dict[str, Any]:
         """Get current rate limiter statistics"""
         with self.lock:
@@ -198,7 +187,6 @@ class AdaptiveRateLimiter:
 
 class ConnectionPoolManager:
     """Manages HTTP connection pools for optimized API requests"""
-
     def __init__(
         self,
         max_connections: int = 20,
@@ -220,7 +208,6 @@ class ConnectionPoolManager:
             f"Max connections: {max_connections}, "
             f"Max per host: {max_connections_per_host}"
         )
-
     def _ensure_connector(self):
         """Ensure connector is initialized (called in async context)"""
         if self.connector is None:
@@ -273,8 +260,7 @@ class UnifiedMaricopaAPIClient:
     - Thread safety
     - Performance optimizations
     """
-
-    def __init__(self, config_manager=None):
+def __init__(self, config_manager=None):
         logger.info("Initializing Unified Maricopa API Client")
 
         # Configuration
@@ -344,7 +330,6 @@ class UnifiedMaricopaAPIClient:
         self.min_request_interval = 0.02  # 20ms between requests (optimized)
 
         logger.info("Unified Maricopa API Client initialized successfully")
-
     def _rate_limit(self):
         """Enforce rate limiting between API calls"""
         current_time = time.time()
@@ -356,12 +341,10 @@ class UnifiedMaricopaAPIClient:
             time.sleep(sleep_time)
 
         self.last_request_time = time.time()
-
     def _get_cache_key(self, endpoint: str, params: Dict = None) -> str:
         """Generate cache key for request"""
         params_str = json.dumps(params or {}, sort_keys=True)
         return f"{endpoint}:{hash(params_str)}"
-
     def _get_cached_data(self, cache_key: str) -> Optional[Dict]:
         """Get data from cache if not expired"""
         with self._cache_lock:
@@ -377,23 +360,20 @@ class UnifiedMaricopaAPIClient:
 
         self.cache_misses += 1
         return None
-
     def _cache_data(self, cache_key: str, data: Dict, ttl: float = 300.0):
         """Cache response data"""
         with self._cache_lock:
             self._cache[cache_key] = PropertyDataCache(
                 data=data, timestamp=time.time(), ttl=ttl
             )
-
     def test_connection(self) -> bool:
         """Test if API connection is working"""
-        try:
+    try:
             response = self.session.get(self.base_url, timeout=5)
             return response.status_code == 200
-        except Exception as e:
+    except Exception as e:
             logger.debug(f"API connection test failed: {e}")
             return False
-
     def _make_request(
         self, endpoint: str, params: Dict = None, retry_count: int = 0
     ) -> Optional[Dict]:
@@ -412,7 +392,7 @@ class UnifiedMaricopaAPIClient:
 
         start_time = time.time()
 
-        try:
+    try:
             response = self.session.get(url, params=params, timeout=self.timeout)
 
             response_time = time.time() - start_time
@@ -461,7 +441,7 @@ class UnifiedMaricopaAPIClient:
                     self.rate_limiter.record_error()
                 return None
 
-        except requests.exceptions.Timeout:
+    except requests.exceptions.Timeout:
             logger.error(f"Request timeout for {url}")
             if retry_count < self.max_retries:
                 logger.info(f"Retrying after timeout (attempt {retry_count + 1})")
@@ -472,7 +452,7 @@ class UnifiedMaricopaAPIClient:
                 self.total_failed += 1
             return None
 
-        except requests.exceptions.RequestException as e:
+    except requests.exceptions.RequestException as e:
             logger.error(f"Request exception for {url}: {e}")
             if retry_count < self.max_retries:
                 logger.info(f"Retrying after exception (attempt {retry_count + 1})")
@@ -486,7 +466,6 @@ class UnifiedMaricopaAPIClient:
     # ========================================================================
     # CORE API METHODS (Backward Compatible)
     # ========================================================================
-
     def search_by_owner(self, owner_name: str, limit: int = 50) -> List[Dict]:
         """Search properties by owner name using real Maricopa API with web scraping fallback"""
         logger.info(f"Searching properties by owner: {owner_name} (limit: {limit})")
@@ -494,7 +473,7 @@ class UnifiedMaricopaAPIClient:
         # Try API first
         params = {"q": owner_name}
 
-        try:
+    try:
             response = self._make_request("/search/property/", params)
 
             if response and "Results" in response:
@@ -516,7 +495,7 @@ class UnifiedMaricopaAPIClient:
             else:
                 logger.warning(f"No properties found via API for owner: {owner_name}")
 
-        except Exception as e:
+    except Exception as e:
             logger.warning(
                 f"API search failed for owner {owner_name}: {e}, returning empty results"
             )
@@ -527,7 +506,6 @@ class UnifiedMaricopaAPIClient:
             f"SEARCH_ANALYTICS: owner_search, results=0, limit={limit}, source=api_only"
         )
         return []
-
     def search_by_address(self, address: str, limit: int = 50) -> List[Dict]:
         """Search properties by address using real Maricopa API with web scraping fallback"""
         logger.info(f"Searching properties by address: {address} (limit: {limit})")
@@ -535,7 +513,7 @@ class UnifiedMaricopaAPIClient:
         # Try API first
         params = {"q": address}
 
-        try:
+    try:
             response = self._make_request("/search/property/", params)
 
             if response and "Results" in response:
@@ -557,7 +535,7 @@ class UnifiedMaricopaAPIClient:
             else:
                 logger.warning(f"No properties found via API for address: {address}")
 
-        except Exception as e:
+    except Exception as e:
             logger.warning(
                 f"API search failed for address {address}: {e}, returning empty results"
             )
@@ -568,13 +546,12 @@ class UnifiedMaricopaAPIClient:
             f"SEARCH_ANALYTICS: address_search, results=0, limit={limit}, source=api_only"
         )
         return []
-
     def search_by_apn(self, apn: str) -> Optional[Dict]:
         """Search property by APN using real Maricopa API with web scraping fallback"""
         logger.info(f"Searching property by APN: {apn}")
 
         # Try API first
-        try:
+    try:
             params = {"q": apn}
             response = self._make_request("/search/property/", params)
 
@@ -604,13 +581,13 @@ class UnifiedMaricopaAPIClient:
                 f"No property found via API for APN: {apn}, trying web scraping fallback"
             )
 
-        except Exception as e:
+    except Exception as e:
             logger.warning(
                 f"API search failed for APN {apn}: {e}, trying web scraping fallback"
             )
 
         # Web scraping fallback - attempt to get basic property data
-        try:
+    try:
             # Try to get tax data which often contains property info
             tax_data = self._scrape_tax_data_sync(apn)
             if tax_data and tax_data.get("owner_info"):
@@ -634,18 +611,17 @@ class UnifiedMaricopaAPIClient:
                 )
                 return property_data
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Web scraping fallback failed for APN {apn}: {e}")
 
         logger.warning(f"No property found for APN: {apn} (tried API and web scraping)")
         logger.info(f"SEARCH_ANALYTICS: apn_search, results=0, apn={apn}, source=none")
         return None
-
     def get_property_details(self, apn: str) -> Optional[Dict]:
         """Get detailed property information using comprehensive API endpoints"""
         logger.info(f"Getting property details for APN: {apn}")
 
-        try:
+    try:
             # Use the comprehensive property data method
             detailed_info = self.get_comprehensive_property_info(apn)
 
@@ -656,10 +632,9 @@ class UnifiedMaricopaAPIClient:
                 logger.warning(f"No property details found for APN: {apn}")
                 return None
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error getting property details for APN {apn}: {e}")
             raise
-
     def get_tax_history(self, apn: str, years: int = 5) -> List[Dict]:
         """
         Get tax history with automatic fallback to web scraping
@@ -678,7 +653,7 @@ class UnifiedMaricopaAPIClient:
         """
         logger.info(f"Getting tax history for APN: {apn} (years: {years})")
 
-        try:
+    try:
             # Primary method: API valuation endpoint
             response = self._make_request(f"/parcel/{apn}/valuations/")
 
@@ -706,14 +681,14 @@ class UnifiedMaricopaAPIClient:
             logger.info(
                 f"API returned limited tax data, attempting web scraping fallback for APN: {apn}"
             )
-            try:
+    try:
                 tax_scrape_data = self.get_tax_information_web(apn)
                 if tax_scrape_data and tax_scrape_data.get("tax_history"):
                     logger.info(
                         f"Retrieved tax history via web scraping fallback for APN: {apn}"
                     )
                     return tax_scrape_data["tax_history"]
-            except Exception as scrape_error:
+    except Exception as scrape_error:
                 logger.warning(
                     f"Web scraping fallback failed for tax history - APN {apn}: {scrape_error}"
                 )
@@ -721,11 +696,11 @@ class UnifiedMaricopaAPIClient:
             logger.warning(f"No tax history found from any source for APN: {apn}")
             return []
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error getting tax history for APN {apn}: {e}")
 
             # Try web scraping as last resort
-            try:
+    try:
                 logger.info(
                     f"API failed, attempting web scraping as last resort for APN: {apn}"
                 )
@@ -735,14 +710,13 @@ class UnifiedMaricopaAPIClient:
                         f"Retrieved tax history via web scraping last resort for APN: {apn}"
                     )
                     return tax_scrape_data["tax_history"]
-            except Exception as scrape_error:
+    except Exception as scrape_error:
                 logger.warning(
                     f"Web scraping last resort failed for tax history - APN {apn}: {scrape_error}"
                 )
 
             # Return empty list rather than raising exception to maintain compatibility
             return []
-
     def get_sales_history(self, apn: str, years: int = 10) -> List[Dict]:
         """
         Get sales history with automatic fallback to web scraping
@@ -761,7 +735,7 @@ class UnifiedMaricopaAPIClient:
         """
         logger.info(f"Getting sales history for APN: {apn} (years: {years})")
 
-        try:
+    try:
             # Primary method: API-based sales history (not available yet in Maricopa API)
             # This placeholder allows for future API integration
             api_sales_data = None
@@ -787,29 +761,28 @@ class UnifiedMaricopaAPIClient:
                 )
                 return []
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error getting sales history for APN {apn}: {e}")
             # Return empty list rather than raising exception to maintain compatibility
             return []
-
     def bulk_property_search(self, apns: List[str]) -> Dict[str, Dict]:
         """Bulk search for multiple properties using individual API calls"""
         logger.info(f"Starting bulk search for {len(apns)} properties")
 
         results = {}
 
-        try:
+    try:
             for i, apn in enumerate(apns):
                 logger.debug(f"Processing APN {i+1}/{len(apns)}: {apn}")
 
-                try:
+    try:
                     property_data = self.search_by_apn(apn)
                     if property_data:
                         results[apn] = property_data
                         logger.debug(f"Found property for APN: {apn}")
                     else:
                         logger.debug(f"No property found for APN: {apn}")
-                except Exception as e:
+    except Exception as e:
                     logger.warning(f"Error searching APN {apn}: {e}")
                     continue
 
@@ -827,24 +800,22 @@ class UnifiedMaricopaAPIClient:
 
             return results
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error in bulk property search for {len(apns)} APNs: {e}")
             raise
-
     def validate_apn(self, apn: str) -> bool:
         """Validate if APN exists by searching for it"""
         logger.debug(f"Validating APN: {apn}")
 
-        try:
+    try:
             property_data = self.search_by_apn(apn)
             is_valid = property_data is not None
             logger.debug(f"APN {apn} validation result: {is_valid}")
             return is_valid
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error validating APN {apn}: {e}")
             return False
-
     def get_api_status(self) -> Dict[str, Any]:
         """Get API service status and limits"""
         logger.debug("Getting API status - real Maricopa County API active")
@@ -879,7 +850,7 @@ class UnifiedMaricopaAPIClient:
         start_time = time.time()
         url = urljoin(self.base_url, endpoint.lstrip("/"))
 
-        try:
+    try:
             session = await self.connection_pool.get_session(self.token)
             async with session.get(url, params=params) as response:
                 response_time = time.time() - start_time
@@ -910,12 +881,12 @@ class UnifiedMaricopaAPIClient:
                         self.rate_limiter.record_error()
                     return None
 
-        except asyncio.TimeoutError:
+    except asyncio.TimeoutError:
             logger.warning(f"Request timeout for endpoint: {endpoint}")
             if self.rate_limiter:
                 self.rate_limiter.record_error()
             return None
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Request error for endpoint {endpoint}: {e}")
             if self.rate_limiter:
                 self.rate_limiter.record_error()
@@ -935,7 +906,7 @@ class UnifiedMaricopaAPIClient:
         }
 
         # Try to get owner name for rental details (if needed)
-        try:
+    try:
             basic_search = await self._make_async_request(
                 f"/search/property/", {"q": apn}
             )
@@ -947,7 +918,7 @@ class UnifiedMaricopaAPIClient:
                             f"/parcel/{apn}/rental-details/{owner_name}/"
                         )
                         break
-        except Exception as e:
+    except Exception as e:
             logger.debug(f"Could not determine owner name for rental details: {e}")
 
         # Execute all requests in parallel
@@ -963,14 +934,14 @@ class UnifiedMaricopaAPIClient:
         # Wait for all requests to complete
         detailed_data = {}
         for endpoint_name, task in tasks:
-            try:
+    try:
                 response = await task
                 if response:
                     detailed_data[endpoint_name] = response
                     logger.debug(f"Retrieved {endpoint_name} data")
                 else:
                     logger.debug(f"No data from {endpoint_name}")
-            except Exception as e:
+    except Exception as e:
                 logger.error(f"Error retrieving {endpoint_name}: {e}")
 
         total_time = time.time() - start_time
@@ -979,7 +950,6 @@ class UnifiedMaricopaAPIClient:
         )
 
         return detailed_data
-
     def get_detailed_property_data_fast(self, apn: str) -> Dict[str, Any]:
         """Synchronous wrapper for parallel detailed property data retrieval"""
         return asyncio.run(self._get_detailed_property_data_parallel(apn))
@@ -1002,7 +972,7 @@ class UnifiedMaricopaAPIClient:
         )
 
         # Wait for both to complete
-        try:
+    try:
             basic_search, detailed_data = await asyncio.gather(
                 basic_search_task, detailed_data_task, return_exceptions=True
             )
@@ -1074,12 +1044,11 @@ class UnifiedMaricopaAPIClient:
 
             return comprehensive_info
 
-        except Exception as e:
+    except Exception as e:
             logger.error(
                 f"Error in comprehensive property info collection for APN {apn}: {e}"
             )
             return None
-
     def get_comprehensive_property_info_fast(self, apn: str) -> Optional[Dict]:
         """Synchronous wrapper for parallel comprehensive property info retrieval"""
         return asyncio.run(self._get_comprehensive_property_info_parallel(apn))
@@ -1087,7 +1056,6 @@ class UnifiedMaricopaAPIClient:
     # ========================================================================
     # BATCH OPERATIONS
     # ========================================================================
-
     def submit_batch_requests(self, requests: List[BatchAPIRequest]) -> List[str]:
         """Submit multiple API requests for batch processing"""
         request_ids = []
@@ -1110,7 +1078,6 @@ class UnifiedMaricopaAPIClient:
 
         logger.info(f"Submitted {len(requests)} batch API requests")
         return request_ids
-
     def batch_search_by_apns(
         self, apns: List[str], priority: int = 5, comprehensive: bool = True
     ) -> List[str]:
@@ -1135,19 +1102,17 @@ class UnifiedMaricopaAPIClient:
             requests.append(request)
 
         return self.submit_batch_requests(requests)
-
     def _process_request_queue(self):
         """Process queued requests in thread pool"""
         self.executor.submit(self._queue_processor_worker)
-
     def _queue_processor_worker(self):
         """Background worker to process API request queue"""
         while True:
-            try:
+    try:
                 # Get next request with timeout
-                try:
+    try:
                     priority_tuple, request = self.request_queue.get(timeout=5.0)
-                except queue.Empty:
+    except queue.Empty:
                     break  # No more requests to process
 
                 # Submit request for execution
@@ -1159,10 +1124,9 @@ class UnifiedMaricopaAPIClient:
                 # Brief pause to prevent overwhelming
                 time.sleep(0.05)
 
-            except Exception as e:
+    except Exception as e:
                 logger.error(f"Error in queue processor: {e}")
                 time.sleep(1.0)
-
     def _execute_api_request(self, request: BatchAPIRequest):
         """Execute a single API request with error handling and retries"""
         start_time = time.time()
@@ -1171,7 +1135,7 @@ class UnifiedMaricopaAPIClient:
         logger.debug(f"Executing API request: {request.request_id}")
 
         for attempt in range(request.max_retries + 1):
-            try:
+    try:
                 # Rate limiting
                 if self.rate_limiter and not self.rate_limiter.acquire(timeout=10.0):
                     raise TimeoutError("Rate limit timeout")
@@ -1212,7 +1176,7 @@ class UnifiedMaricopaAPIClient:
                 )
                 break
 
-            except Exception as e:
+    except Exception as e:
                 request.retry_count = attempt
                 error_msg = f"Attempt {attempt + 1} failed: {str(e)}"
 
@@ -1239,7 +1203,6 @@ class UnifiedMaricopaAPIClient:
             if request.request_id in self.active_requests:
                 del self.active_requests[request.request_id]
             self.completed_requests[request.request_id] = request
-
     def wait_for_batch_completion(
         self, request_ids: List[str], timeout: float = 300.0
     ) -> Dict[str, Any]:
@@ -1282,7 +1245,6 @@ class UnifiedMaricopaAPIClient:
         )
 
         return completion_stats
-
     def get_request_status(self, request_id: str) -> Optional[Dict[str, Any]]:
         """Get status of an API request"""
         with self.requests_lock:
@@ -1323,7 +1285,6 @@ class UnifiedMaricopaAPIClient:
                 }
 
             return None
-
     def get_request_result(self, request_id: str) -> Optional[Any]:
         """Get result from completed API request"""
         with self.requests_lock:
@@ -1335,7 +1296,6 @@ class UnifiedMaricopaAPIClient:
     # ========================================================================
     # HELPER METHODS
     # ========================================================================
-
     def get_comprehensive_property_info(self, apn: str) -> Optional[Dict]:
         """
         Get complete property information combining basic search + detailed data.
@@ -1344,33 +1304,32 @@ class UnifiedMaricopaAPIClient:
         """
         logger.info(f"Getting comprehensive property info for APN: {apn}")
 
-        try:
+    try:
             # Try fast parallel version first if event loop is available
-            try:
+    try:
                 loop = asyncio.get_event_loop()
                 if loop.is_running():
                     # Already in async context, use the fast version
                     return self.get_comprehensive_property_info_fast(apn)
-            except RuntimeError:
+    except RuntimeError:
                 pass  # No event loop, use sync version
 
             # Fallback to synchronous version
             return self._get_comprehensive_property_info_sync(apn)
 
-        except Exception as e:
+    except Exception as e:
             logger.error(
                 f"Error getting comprehensive property info for APN {apn}: {e}"
             )
             return None
-
     def _get_comprehensive_property_info_sync(self, apn: str) -> Optional[Dict]:
         """Synchronous version of comprehensive property info retrieval with web scraping fallback"""
-        try:
+    try:
             # Try to get basic property info first (optional)
             basic_info = None
-            try:
+    try:
                 basic_info = self.search_by_apn(apn)
-            except Exception as e:
+    except Exception as e:
                 logger.warning(
                     f"Basic search failed for APN {apn}, continuing with detailed data only: {e}"
                 )
@@ -1387,7 +1346,7 @@ class UnifiedMaricopaAPIClient:
                     f"Insufficient API data for APN: {apn}, trying web scraping fallback"
                 )
 
-                try:
+    try:
                     # Use the new comprehensive web scraping method
                     web_scraped_data = (
                         self.get_complete_property_with_automatic_data_collection(apn)
@@ -1399,7 +1358,7 @@ class UnifiedMaricopaAPIClient:
                         )
                         return web_scraped_data
 
-                except Exception as e:
+    except Exception as e:
                     logger.error(f"Web scraping fallback failed for APN {apn}: {e}")
 
                 logger.warning(
@@ -1448,7 +1407,7 @@ class UnifiedMaricopaAPIClient:
                 logger.info(
                     f"Enhancing limited API data with web scraping for APN: {apn}"
                 )
-                try:
+    try:
                     # Get additional data via web scraping
                     tax_data = self._scrape_tax_data_sync(apn)
                     sales_data = self._scrape_sales_data_sync(apn)
@@ -1469,7 +1428,7 @@ class UnifiedMaricopaAPIClient:
 
                     comprehensive_info["data_enhancement"] = "api_plus_webscraping"
 
-                except Exception as e:
+    except Exception as e:
                     logger.warning(
                         f"Could not enhance API data with web scraping for APN {apn}: {e}"
                     )
@@ -1477,12 +1436,11 @@ class UnifiedMaricopaAPIClient:
             logger.info(f"Successfully compiled comprehensive info for APN: {apn}")
             return comprehensive_info
 
-        except Exception as e:
+    except Exception as e:
             logger.error(
                 f"Error getting comprehensive property info for APN {apn}: {e}"
             )
             return None
-
     def _get_detailed_property_data_threaded(self, apn: str) -> Dict[str, Any]:
         """Get detailed property data using threaded parallel execution"""
         logger.info(f"Getting detailed property data (threaded) for APN: {apn}")
@@ -1497,14 +1455,14 @@ class UnifiedMaricopaAPIClient:
         }
 
         # Try to get owner name for rental details
-        try:
+    try:
             basic_search = self.search_by_apn(apn)
             if basic_search and basic_search.get("owner_name"):
                 owner_name = basic_search["owner_name"]
                 endpoints["rental_details"] = (
                     f"/parcel/{apn}/rental-details/{owner_name}/"
                 )
-        except Exception as e:
+    except Exception as e:
             logger.debug(f"Could not determine owner name for rental details: {e}")
 
         # Execute requests in parallel using thread pool
@@ -1520,14 +1478,14 @@ class UnifiedMaricopaAPIClient:
         # Collect results as they complete
         for future in as_completed(future_to_endpoint, timeout=30):
             endpoint_name = future_to_endpoint[future]
-            try:
+    try:
                 response = future.result()
                 if response:
                     detailed_data[endpoint_name] = response
                     logger.debug(f"Retrieved {endpoint_name} data")
                 else:
                     logger.debug(f"No data from {endpoint_name}")
-            except Exception as e:
+    except Exception as e:
                 logger.error(f"Error retrieving {endpoint_name}: {e}")
 
         total_time = time.time() - start_time
@@ -1536,7 +1494,6 @@ class UnifiedMaricopaAPIClient:
         )
 
         return detailed_data
-
     def _is_api_data_limited(self, property_data: Dict[str, Any]) -> bool:
         """Determine if API data is limited and would benefit from web scraping enhancement"""
         if not property_data:
@@ -1562,7 +1519,6 @@ class UnifiedMaricopaAPIClient:
             return True
 
         return False
-
     def _add_valuation_data(self, comprehensive_info: Dict, valuations: List[Dict]):
         """Add valuation data to comprehensive info"""
         if valuations and len(valuations) > 0:
@@ -1584,7 +1540,6 @@ class UnifiedMaricopaAPIClient:
                     "valuation_history": valuations,
                 }
             )
-
     def _add_residential_data(self, comprehensive_info: Dict, res_details: Dict):
         """Add residential details to comprehensive info"""
         comprehensive_info.update(
@@ -1612,7 +1567,6 @@ class UnifiedMaricopaAPIClient:
                 comprehensive_info["land_use_code"] = "SFR"  # Single Family Residential
             elif "Commercial" in use_desc:
                 comprehensive_info["land_use_code"] = "COM"  # Commercial
-
     def _add_improvements_data(
         self, comprehensive_info: Dict, improvements: List[Dict]
     ):
@@ -1648,7 +1602,6 @@ class UnifiedMaricopaAPIClient:
                 # Estimate 1-2 bedrooms per unit for multi-family properties
                 estimated_bedrooms = apartment_units * 2  # Conservative estimate
                 comprehensive_info["bedrooms"] = estimated_bedrooms
-
     def _ensure_required_fields(self, comprehensive_info: Dict):
         """Ensure all required database fields are present"""
         required_fields = {
@@ -1672,7 +1625,6 @@ class UnifiedMaricopaAPIClient:
             comprehensive_info["raw_data"] = json.dumps(
                 comprehensive_info.get("detailed_data", {})
             )
-
     def _normalize_api_data(self, api_data: Dict) -> Dict:
         """Convert API field names to database field names"""
         field_mapping = {
@@ -1736,30 +1688,28 @@ class UnifiedMaricopaAPIClient:
         logger.debug(f"Normalized API data: {list(normalized.keys())}")
 
         return normalized
-
     def _safe_int(self, value) -> Optional[int]:
         """Safely convert value to int"""
         if not value or value == "":
             return None
-        try:
+    try:
             return int(str(value).replace(",", "").strip())
-        except (ValueError, AttributeError):
+    except (ValueError, AttributeError):
             return None
-
     def _safe_float(self, value) -> Optional[float]:
         """Safely convert value to float"""
         if not value or value == "":
             return None
-        try:
+    try:
             return float(str(value).replace(",", "").strip())
-        except (ValueError, AttributeError):
+    except (ValueError, AttributeError):
             return None
-
     def _scrape_tax_data_sync(self, apn: str) -> Optional[Dict]:
         """Synchronous wrapper for tax data scraping"""
-        try:
-            from tax_scraper import MaricopaTaxScraper
+    try:
             from playwright.sync_api import sync_playwright
+
+            from tax_scraper import MaricopaTaxScraper
 
             with sync_playwright() as p:
                 browser = p.chromium.launch(
@@ -1782,18 +1732,18 @@ class UnifiedMaricopaAPIClient:
                 browser.close()
                 return tax_data
 
-        except ImportError as e:
+    except ImportError as e:
             logger.warning(f"Playwright not available for tax scraping: {e}")
             return None
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error in tax data scraping for {apn}: {e}")
             return None
-
     def _scrape_sales_data_sync(self, apn: str, years: int = 10) -> Optional[Dict]:
         """Synchronous wrapper for sales data scraping"""
-        try:
-            from recorder_scraper import MaricopaRecorderScraper
+    try:
             from playwright.sync_api import sync_playwright
+
+            from recorder_scraper import MaricopaRecorderScraper
 
             with sync_playwright() as p:
                 browser = p.chromium.launch(
@@ -1816,17 +1766,16 @@ class UnifiedMaricopaAPIClient:
                 browser.close()
                 return recorder_data
 
-        except ImportError as e:
+    except ImportError as e:
             logger.warning(f"Playwright not available for sales scraping: {e}")
             return None
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error in sales data scraping for {apn}: {e}")
             return None
 
     # ========================================================================
     # WEB SCRAPING METHODS (Phase 1 Integration)
     # ========================================================================
-
     def get_tax_information_web(self, apn: str) -> Optional[Dict]:
         """
         Get tax information via web scraping from Maricopa County Treasurer's office
@@ -1839,7 +1788,7 @@ class UnifiedMaricopaAPIClient:
         """
         logger.info(f"Getting tax information via web scraping for APN: {apn}")
 
-        try:
+    try:
             # Use the existing tax scraping method
             tax_data = self._scrape_tax_data_sync(apn)
 
@@ -1854,12 +1803,11 @@ class UnifiedMaricopaAPIClient:
                 )
                 return None
 
-        except Exception as e:
+    except Exception as e:
             logger.error(
                 f"Error getting tax information via web scraping for APN {apn}: {e}"
             )
             return None
-
     def get_sales_history_web(self, apn: str, years: int = 10) -> Optional[Dict]:
         """
         Get sales history via web scraping from Maricopa County Recorder's office
@@ -1875,7 +1823,7 @@ class UnifiedMaricopaAPIClient:
             f"Getting sales history via web scraping for APN: {apn} (years: {years})"
         )
 
-        try:
+    try:
             # Use the existing recorder scraping method
             sales_data = self._scrape_sales_data_sync(apn, years)
 
@@ -1890,12 +1838,11 @@ class UnifiedMaricopaAPIClient:
                 )
                 return None
 
-        except Exception as e:
+    except Exception as e:
             logger.error(
                 f"Error getting sales history via web scraping for APN {apn}: {e}"
             )
             return None
-
     def get_complete_property_with_automatic_data_collection(
         self, apn: str
     ) -> Optional[Dict]:
@@ -1918,7 +1865,7 @@ class UnifiedMaricopaAPIClient:
             f"Getting complete property with automatic data collection for APN: {apn}"
         )
 
-        try:
+    try:
             # Start with comprehensive API data
             property_info = self.get_comprehensive_property_info(apn)
 
@@ -1939,7 +1886,7 @@ class UnifiedMaricopaAPIClient:
 
             # Collect tax data via web scraping if needed
             if needs_tax_data:
-                try:
+    try:
                     logger.info(
                         f"Attempting to collect tax data via web scraping for APN: {apn}"
                     )
@@ -1986,14 +1933,14 @@ class UnifiedMaricopaAPIClient:
                             f"Could not collect tax data via web scraping for APN: {apn}"
                         )
 
-                except Exception as e:
+    except Exception as e:
                     logger.error(
                         f"Error collecting tax data via web scraping for APN {apn}: {e}"
                     )
 
             # Collect sales data via web scraping if needed
             if needs_sales_data:
-                try:
+    try:
                     logger.info(
                         f"Attempting to collect sales data via web scraping for APN: {apn}"
                     )
@@ -2010,7 +1957,7 @@ class UnifiedMaricopaAPIClient:
                             f"Could not collect sales data via web scraping for APN: {apn}"
                         )
 
-                except Exception as e:
+    except Exception as e:
                     logger.error(
                         f"Error collecting sales data via web scraping for APN {apn}: {e}"
                     )
@@ -2027,12 +1974,11 @@ class UnifiedMaricopaAPIClient:
             logger.info(f"Complete property data collection finished for APN {apn}")
             return property_info
 
-        except Exception as e:
+    except Exception as e:
             logger.error(
                 f"Error in complete property data collection for APN {apn}: {e}"
             )
             return None
-
     def get_performance_stats(self) -> Dict[str, Any]:
         """Get comprehensive performance statistics"""
         with self.stats_lock:
@@ -2069,7 +2015,6 @@ class UnifiedMaricopaAPIClient:
             stats["rate_limiter"] = self.rate_limiter.get_stats()
 
         return stats
-
     def cleanup_completed_requests(self, max_age_hours: int = 6):
         """Clean up old completed requests"""
         cutoff_time = datetime.now() - timedelta(hours=max_age_hours)
@@ -2090,10 +2035,9 @@ class UnifiedMaricopaAPIClient:
             logger.info(f"Cleaned up {removed_count} old API requests")
 
         return removed_count
-
     def close(self):
         """Close the HTTP sessions and cleanup resources"""
-        try:
+    try:
             if self.session:
                 self.session.close()
                 logger.info("Synchronous API client session closed successfully")
@@ -2105,12 +2049,12 @@ class UnifiedMaricopaAPIClient:
             self.executor.shutdown(wait=True)
 
             logger.info("Unified API client closed successfully")
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error closing unified API client: {e}")
 
     async def async_close(self):
         """Async version of close for use in async contexts"""
-        try:
+    try:
             if self.session:
                 self.session.close()
 
@@ -2118,7 +2062,7 @@ class UnifiedMaricopaAPIClient:
             self.executor.shutdown(wait=True)
 
             logger.info("Unified API client closed successfully (async)")
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error closing unified API client (async): {e}")
 
 
@@ -2131,7 +2075,6 @@ BatchAPIClient = UnifiedMaricopaAPIClient  # Unified client includes batch capab
 
 class MockMaricopaAPIClient(UnifiedMaricopaAPIClient):
     """Mock API client for testing and development"""
-
     def __init__(self, config_manager=None):
         # Initialize parent but don't actually make HTTP requests
         if config_manager:
@@ -2145,15 +2088,13 @@ class MockMaricopaAPIClient(UnifiedMaricopaAPIClient):
         logger.info("Initializing Mock API Client")
         logger.warning("Using Mock API Client - no actual API calls will be made")
         logger.debug(f"Mock API Configuration - Base URL: {self.base_url}")
-
     def test_connection(self) -> bool:
         """Mock test connection - always returns True"""
         logger.debug("Mock: Testing API connection (always returns True)")
         return True
-
     def _generate_mock_property(self, apn: str) -> Dict:
         """Generate mock property data"""
-        import random
+import random
 
         logger.debug(f"Generating mock property data for APN: {apn}")
 
@@ -2172,7 +2113,6 @@ class MockMaricopaAPIClient(UnifiedMaricopaAPIClient):
             "pool": random.choice([True, False]),
             "garage_spaces": random.randint(0, 3),
         }
-
     def search_by_apn(self, apn: str) -> Optional[Dict]:
         """Mock search by APN"""
         logger.info(f"Mock: Searching property by APN: {apn}")
@@ -2181,7 +2121,6 @@ class MockMaricopaAPIClient(UnifiedMaricopaAPIClient):
         logger.info(f"SEARCH_ANALYTICS: mock_apn_search, results=1, apn={apn}")
 
         return result
-
     def search_by_owner(self, owner_name: str, limit: int = 50) -> List[Dict]:
         """Mock search by owner"""
         logger.info(
@@ -2201,7 +2140,6 @@ class MockMaricopaAPIClient(UnifiedMaricopaAPIClient):
         )
 
         return results
-
     def search_by_address(self, address: str, limit: int = 50) -> List[Dict]:
         """Mock search by address"""
         logger.info(
@@ -2219,7 +2157,6 @@ class MockMaricopaAPIClient(UnifiedMaricopaAPIClient):
         )
 
         return results
-
     def get_api_status(self) -> Dict[str, Any]:
         """Mock API status"""
         logger.debug("Mock: Getting API status")

@@ -2,11 +2,11 @@
 """
 Setup database tables using SQL scripts
 """
+import sys
+from pathlib import Path
 
 import psycopg2
 from psycopg2 import OperationalError
-import sys
-from pathlib import Path
 
 PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch")
 
@@ -22,8 +22,7 @@ try:
 
     connection.autocommit = True
     cursor = connection.cursor()
-
-    print("Connected to maricopa_properties as property_user")
+        print("Connected to maricopa_properties as property_user")
 
     # Read and execute create_tables.sql
     sql_file = PROJECT_ROOT / "database" / "create_tables.sql"
@@ -48,14 +47,13 @@ try:
         """
         )
         tables = cursor.fetchall()
-
         print("Database tables:")
         for table in tables:
-            print(f"  - {table[0]}")
+        print(f"  - {table[0]}")
     else:
         print("ERROR: create_tables.sql not found")
 
     connection.close()
 
 except Exception as e:
-    print(f"ERROR: {e}")
+        print(f"ERROR: {e}")

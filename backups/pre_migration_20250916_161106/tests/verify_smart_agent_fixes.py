@@ -12,6 +12,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
 
+
 def test_apn_keyerror_fix():
     """Test that insert_property handles missing 'apn' gracefully"""
     print("\n[TEST 1] Testing APN KeyError fix in DatabaseManager...")
@@ -25,8 +26,8 @@ def test_apn_keyerror_fix():
 
         # Test with missing 'apn' key
         property_data = {
-            'owner_name': 'Test Owner',
-            'property_address': '123 Test St',
+            "owner_name": "Test Owner",
+            "property_address": "123 Test St",
             # 'apn' is missing intentionally
         }
 
@@ -39,9 +40,9 @@ def test_apn_keyerror_fix():
             print("  [WARNING] insert_property returned unexpected result")
 
         # Test validation method exists
-        if hasattr(db, 'validate_property_data'):
+        if hasattr(db, "validate_property_data"):
             errors = db.validate_property_data(property_data)
-            if errors and 'apn' in str(errors):
+            if errors and "apn" in str(errors):
                 print("  [OK] validate_property_data detects missing 'apn'")
             else:
                 print("  [WARNING] validate_property_data didn't detect missing 'apn'")
@@ -53,6 +54,7 @@ def test_apn_keyerror_fix():
         print(f"  [ERROR] APN KeyError fix test failed: {e}")
         return False
 
+
 def test_int_not_iterable_fix():
     """Test that data status checking handles int return values"""
     print("\n[TEST 2] Testing 'int' object not iterable fix...")
@@ -60,17 +62,20 @@ def test_int_not_iterable_fix():
     try:
         # Mock test since we need GUI context
         # Check if the fix is in place by examining the method
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
         import inspect
 
+        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+
         # Get the source of _get_data_collection_status method
-        source_lines = inspect.getsource(EnhancedPropertySearchApp._get_data_collection_status)
+        source_lines = inspect.getsource(
+            EnhancedPropertySearchApp._get_data_collection_status
+        )
 
         # Check if type checking is implemented
-        if 'isinstance' in source_lines and 'active_jobs' in source_lines:
+        if "isinstance" in source_lines and "active_jobs" in source_lines:
             print("  [OK] Type checking for active_jobs is implemented")
 
-            if 'isinstance(active_jobs, (list, tuple))' in source_lines:
+            if "isinstance(active_jobs, (list, tuple))" in source_lines:
                 print("  [OK] Handles both list and int types for active_jobs")
             else:
                 print("  [WARNING] Type checking may be incomplete")
@@ -84,6 +89,7 @@ def test_int_not_iterable_fix():
         print(f"  [ERROR] Int not iterable fix test failed: {e}")
         return False
 
+
 def test_is_cached_method():
     """Test that DataCollectionCache has is_cached method"""
     print("\n[TEST 3] Testing is_cached method in DataCollectionCache...")
@@ -94,7 +100,7 @@ def test_is_cached_method():
         cache = DataCollectionCache()
 
         # Test method exists
-        if not hasattr(cache, 'is_cached'):
+        if not hasattr(cache, "is_cached"):
             print("  [ERROR] is_cached method missing")
             return False
 
@@ -108,22 +114,22 @@ def test_is_cached_method():
             print("  [WARNING] is_cached(None) should return False")
 
         # Test with empty string
-        result = cache.is_cached('')
+        result = cache.is_cached("")
         if result is False:
             print("  [OK] is_cached('') returns False")
         else:
             print("  [WARNING] is_cached('') should return False")
 
         # Test with valid APN (not cached)
-        result = cache.is_cached('12345678')
+        result = cache.is_cached("12345678")
         if result is False:
             print("  [OK] is_cached returns False for uncached APN")
         else:
             print("  [WARNING] is_cached should return False for new APN")
 
         # Add test data and verify
-        cache.property_cache['12345678'] = {'test': 'data'}
-        result = cache.is_cached('12345678')
+        cache.property_cache["12345678"] = {"test": "data"}
+        result = cache.is_cached("12345678")
         if result is True:
             print("  [OK] is_cached returns True for cached APN")
         else:
@@ -135,6 +141,7 @@ def test_is_cached_method():
     except Exception as e:
         print(f"  [ERROR] is_cached method test failed: {e}")
         return False
+
 
 def main():
     print("=" * 60)
@@ -178,6 +185,7 @@ def main():
         print("Check the error messages above for details")
 
     return 0 if all_passed else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

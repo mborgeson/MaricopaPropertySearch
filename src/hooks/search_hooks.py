@@ -2,20 +2,19 @@
 Search Operation Hooks
 Handles search operation lifecycle, validation, and optimization for property searches
 """
-
 import asyncio
 import hashlib
 import re
 import time
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from hook_manager import (
     Hook,
     HookContext,
+    HookPriority,
     HookResult,
     HookStatus,
-    HookPriority,
     get_hook_manager,
 )
 from logging_config import get_logger, log_exception
@@ -25,7 +24,6 @@ logger = get_logger(__name__)
 
 class SearchValidationHook(Hook):
     """Hook for validating search inputs before execution"""
-
     def __init__(self):
         super().__init__("search_validation", HookPriority.HIGHEST)
         self.validation_rules = {
@@ -127,7 +125,6 @@ class SearchValidationHook(Hook):
             logger.error(f"Search validation error: {e}")
             log_exception(logger, e, "search validation")
             return HookResult(status=HookStatus.FAILED, error=e)
-
     def _validate_apn(self, apn: str) -> List[str]:
         """Validate APN format"""
         errors = []
@@ -137,7 +134,6 @@ class SearchValidationHook(Hook):
             errors.append(f"Invalid APN format. {apn_rule['description']}")
 
         return errors
-
     def _validate_address(self, address: str) -> List[str]:
         """Validate address format"""
         errors = []
@@ -154,7 +150,6 @@ class SearchValidationHook(Hook):
             )
 
         return errors
-
     def _validate_owner(self, owner: str) -> List[str]:
         """Validate owner name format"""
         errors = []
@@ -171,7 +166,6 @@ class SearchValidationHook(Hook):
             )
 
         return errors
-
     def _detect_search_type(self, search_term: str) -> Tuple[str, float]:
         """Auto-detect search type from term"""
         term = search_term.strip()
@@ -200,7 +194,6 @@ class SearchValidationHook(Hook):
             return "owner", 0.8
 
         return "unknown", 0.0
-
     def _sanitize_search_term(self, term: str) -> str:
         """Sanitize search term"""
         # Remove dangerous characters
@@ -214,7 +207,6 @@ class SearchValidationHook(Hook):
 
 class SearchPerformanceHook(Hook):
     """Hook for monitoring search performance"""
-
     def __init__(self):
         super().__init__("search_performance", HookPriority.LOW)
         self.search_metrics = {}
@@ -314,14 +306,12 @@ class SearchPerformanceHook(Hook):
             },
             metadata={"is_slow": execution_time > self.slow_search_threshold},
         )
-
     def _generate_search_id(self, search_data: Dict) -> str:
         """Generate unique search ID"""
         search_string = (
             f"{search_data.get('search_type', '')}:{search_data.get('search_term', '')}"
         )
         return hashlib.md5(search_string.encode()).hexdigest()[:8]
-
     def _analyze_performance(self, execution_time: float) -> str:
         """Analyze search performance level"""
         if execution_time < 1.0:
@@ -338,7 +328,6 @@ class SearchPerformanceHook(Hook):
 
 class SearchCacheHook(Hook):
     """Hook for search result caching"""
-
     def __init__(self):
         super().__init__("search_cache", HookPriority.HIGH)
         self.cache = {}
@@ -427,7 +416,6 @@ class SearchCacheHook(Hook):
             },
             metadata={"cached": True},
         )
-
     def _generate_cache_key(self, search_data: Dict) -> str:
         """Generate cache key from search parameters"""
         key_parts = [
@@ -438,8 +426,7 @@ class SearchCacheHook(Hook):
         ]
         key_string = "|".join(key_parts)
         return hashlib.md5(key_string.encode()).hexdigest()
-
-    def _manage_cache_size(self):
+def _manage_cache_size(self):
         """Manage cache size by removing oldest entries"""
         if len(self.cache) >= self.max_cache_size:
             # Remove oldest 10% of cache
@@ -457,7 +444,6 @@ class SearchCacheHook(Hook):
 
 class SearchAuditHook(Hook):
     """Hook for auditing search operations"""
-
     def __init__(self):
         super().__init__("search_audit", HookPriority.LOW)
         self.audit_log = []
@@ -502,13 +488,11 @@ class SearchAuditHook(Hook):
         except Exception as e:
             logger.error(f"Search audit error: {e}")
             return HookResult(status=HookStatus.FAILED, error=e)
-
     def _mask_sensitive_data(self, search_term: str) -> str:
         """Mask potentially sensitive search data"""
         if len(search_term) > 20:
             return search_term[:10] + "***" + search_term[-5:]
         return search_term
-
     def get_audit_summary(self, hours: int = 24) -> Dict[str, Any]:
         """Get audit summary for specified time period"""
         cutoff_time = datetime.now() - timedelta(hours=hours)
@@ -577,9 +561,7 @@ def trigger_search_start(search_type: str, search_term: str, **kwargs):
         search_term=search_term,
         **kwargs,
     )
-
-
-def trigger_search_complete(
+    def trigger_search_complete(
     search_type: str,
     search_term: str,
     results: List,

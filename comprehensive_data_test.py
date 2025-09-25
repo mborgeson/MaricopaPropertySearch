@@ -3,27 +3,27 @@
 Comprehensive Test Script for Maricopa Property Search Data Collection Methods
 Tests all major data collection functionality to verify fixes are working properly.
 """
-
-import sys
-import os
 import json
 import logging
+import os
+import sys
 import traceback
 from datetime import datetime
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 # Add src to path for imports
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
+
+from recorder_scraper import MaricopaRecorderScraper
+from src.api_client_unified import UnifiedMaricopaAPIClient
+from src.enhanced_config_manager import EnhancedConfigManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
 # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from tax_scraper import MaricopaTaxScraper
-from recorder_scraper import MaricopaRecorderScraper
 from web_scraper import WebScraperManager
-from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
-from src.enhanced_config_manager import EnhancedConfigManager
 
 # Configure logging for test output
 logging.basicConfig(
@@ -39,7 +39,6 @@ logger = logging.getLogger(__name__)
 
 class ComprehensiveDataTest:
     """Test suite for all data collection methods"""
-    
     def __init__(self):
         self.test_apn = "501-38-034A"
         self.backup_apns = ["501-38-034", "501-38-001", "500-01-001"]
@@ -52,8 +51,7 @@ class ComprehensiveDataTest:
         self.passed_tests = []
         self.failed_tests = []
         self.warnings = []
-        
-    def setup(self):
+def setup(self):
         """Initialize all components needed for testing"""
         logger.info("Setting up test environment...")
         
@@ -83,8 +81,7 @@ class ComprehensiveDataTest:
             logger.error(f"Setup failed: {e}")
             logger.error(traceback.format_exc())
             return False
-    
-    def test_api_status(self):
+def test_api_status(self):
         """Test API connectivity and status"""
         logger.info("\n" + "="*50)
         logger.info("TESTING: API Status and Connectivity")
@@ -106,8 +103,7 @@ class ComprehensiveDataTest:
             logger.error(f"❌ API Status Check Failed: {e}")
             self.failed_tests.append(f"API Status Check: {str(e)}")
             return False
-    
-    def test_property_details(self):
+def test_property_details(self):
         """Test get_property_details method"""
         logger.info("\n" + "="*50)
         logger.info(f"TESTING: Property Details for APN {self.test_apn}")
@@ -136,8 +132,7 @@ class ComprehensiveDataTest:
             logger.error(traceback.format_exc())
             self.failed_tests.append(f"Property Details: {str(e)}")
             return False
-    
-    def test_tax_information(self):
+def test_tax_information(self):
         """Test get_tax_information method"""
         logger.info("\n" + "="*50)
         logger.info(f"TESTING: Tax Information for APN {self.test_apn}")
@@ -166,8 +161,7 @@ class ComprehensiveDataTest:
             logger.error(traceback.format_exc())
             self.failed_tests.append(f"Tax Information: {str(e)}")
             return False
-    
-    def test_sales_history(self):
+def test_sales_history(self):
         """Test get_sales_history method"""
         logger.info("\n" + "="*50)
         logger.info(f"TESTING: Sales History for APN {self.test_apn}")
@@ -202,8 +196,7 @@ class ComprehensiveDataTest:
             logger.error(traceback.format_exc())
             self.failed_tests.append(f"Sales History: {str(e)}")
             return False
-    
-    def test_property_documents(self):
+def test_property_documents(self):
         """Test get_property_documents method"""
         logger.info("\n" + "="*50)
         logger.info(f"TESTING: Property Documents for APN {self.test_apn}")
@@ -238,8 +231,7 @@ class ComprehensiveDataTest:
             logger.error(traceback.format_exc())
             self.failed_tests.append(f"Property Documents: {str(e)}")
             return False
-    
-    def test_comprehensive_property_info(self):
+def test_comprehensive_property_info(self):
         """Test get_comprehensive_property_info method (integration test)"""
         logger.info("\n" + "="*50)
         logger.info(f"TESTING: Comprehensive Property Info for APN {self.test_apn}")
@@ -278,8 +270,7 @@ class ComprehensiveDataTest:
             logger.error(traceback.format_exc())
             self.failed_tests.append(f"Comprehensive Property Info: {str(e)}")
             return False
-    
-    def test_error_handling(self):
+def test_error_handling(self):
         """Test error handling with invalid APNs"""
         logger.info("\n" + "="*50)
         logger.info("TESTING: Error Handling with Invalid APNs")
@@ -310,8 +301,7 @@ class ComprehensiveDataTest:
             logger.warning("⚠ Error Handling: Some issues detected")
         
         return error_handling_passed
-    
-    def test_with_backup_apns(self):
+def test_with_backup_apns(self):
         """Test with backup APNs if primary fails"""
         if self.results.get('property_details'):
             return True  # Primary APN worked
@@ -338,8 +328,7 @@ class ComprehensiveDataTest:
         logger.error("❌ All APNs failed")
         self.failed_tests.append("All test APNs failed")
         return False
-    
-    def generate_summary_report(self):
+def generate_summary_report(self):
         """Generate comprehensive test summary"""
         logger.info("\n" + "="*70)
         logger.info("COMPREHENSIVE TEST RESULTS SUMMARY")
@@ -386,8 +375,7 @@ class ComprehensiveDataTest:
         
         # Save detailed results to file
         self.save_results_to_file()
-    
-    def save_results_to_file(self):
+def save_results_to_file(self):
         """Save detailed test results to JSON file"""
         results_file = f"test_results_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         
@@ -406,8 +394,7 @@ class ComprehensiveDataTest:
             logger.info(f"📄 Detailed results saved to: {results_file}")
         except Exception as e:
             logger.error(f"Failed to save results file: {e}")
-    
-    def run_all_tests(self):
+def run_all_tests(self):
         """Run complete test suite"""
         logger.info("🚀 Starting Comprehensive Data Collection Test Suite")
         logger.info(f"Target APN: {self.test_apn}")
@@ -440,12 +427,11 @@ class ComprehensiveDataTest:
         self.generate_summary_report()
         
         return len(self.failed_tests) == 0
-
 def main():
     """Main test execution"""
-    print("=" * 70)
-    print("MARICOPA PROPERTY SEARCH - COMPREHENSIVE DATA TEST")
-    print("=" * 70)
+        print("=" * 70)
+        print("MARICOPA PROPERTY SEARCH - COMPREHENSIVE DATA TEST")
+        print("=" * 70)
     
     test_suite = ComprehensiveDataTest()
     success = test_suite.run_all_tests()

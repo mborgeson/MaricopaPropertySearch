@@ -3,8 +3,8 @@
 Test the complete Maricopa Property Search application
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add project paths
@@ -26,10 +26,12 @@ def test_imports():
         # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient, MockMaricopaAPIClient
         print("✓ API clients imported")
         
-        from web_scraper import WebScraperManager, MockWebScraperManager
+        from web_scraper import MockWebScraperManager, WebScraperManager
+
         print("✓ Web scraper imported")
         
         from gui.main_window import PropertySearchApp
+
         print("✓ Main GUI imported")
         
         return True
@@ -131,9 +133,9 @@ def test_gui_creation():
     
     try:
         # Import Qt modules
-        from PyQt5.QtWidgets import QApplication
         from PyQt5.QtCore import Qt
-        
+        from PyQt5.QtWidgets import QApplication
+
         # Check if QApplication exists
         app = QApplication.instance()
         if app is None:
@@ -144,10 +146,11 @@ def test_gui_creation():
         
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         from gui.main_window import PropertySearchApp
+
 from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.enhanced_config_manager import EnhancedConfigManager
-        
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
         config = EnhancedConfigManager()
         
         # Create main window (but don't show it)

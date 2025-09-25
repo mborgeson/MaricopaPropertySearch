@@ -3,7 +3,6 @@
 Apply Critical Fixes for GUI Runtime Issues
 Targeted fixes for the specific errors reported
 """
-
 import sys
 from pathlib import Path
 
@@ -11,12 +10,10 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
-
-
-def fix_1_clear_apn_cache():
+    def fix_1_clear_apn_cache():
     """Fix the clear_apn_cache AttributeError"""
-    print("\n[FIX 1] Adding clear_apn_cache method")
-    print("-" * 50)
+        print("\n[FIX 1] Adding clear_apn_cache method")
+        print("-" * 50)
 
     # First check if DataCollectionCache exists
     cache_file = project_root / "src" / "data_collection_cache.py"
@@ -29,7 +26,6 @@ def fix_1_clear_apn_cache():
 Data Collection Cache Module
 Handles caching of collected property data
 """
-
 import json
 from pathlib import Path
 from datetime import datetime, timedelta
@@ -39,7 +35,6 @@ logger = logging.getLogger(__name__)
 
 class DataCollectionCache:
     """Cache for collected property data"""
-
     def __init__(self, cache_dir=None):
         self.cache_dir = cache_dir or Path("cache")
         self.cache_dir.mkdir(parents=True, exist_ok=True)
@@ -51,23 +46,21 @@ class DataCollectionCache:
         self.logger = logger
         self.cache_file = self.cache_dir / "data_cache.json"
         self.load_cache()
-
     def load_cache(self):
         """Load cache from disk"""
         if self.cache_file.exists():
-            try:
+    try:
                 with open(self.cache_file, 'r') as f:
                     data = json.load(f)
                     self.property_cache = data.get('property', {})
                     self.tax_cache = data.get('tax', {})
                     self.sales_cache = data.get('sales', {})
                     logger.info("Cache loaded from disk")
-            except Exception as e:
+    except Exception as e:
                 logger.error(f"Failed to load cache: {e}")
-
     def save_cache(self):
         """Save cache to disk"""
-        try:
+    try:
             data = {
                 'property': self.property_cache,
                 'tax': self.tax_cache,
@@ -77,9 +70,8 @@ class DataCollectionCache:
             with open(self.cache_file, 'w') as f:
                 json.dump(data, f, indent=2, default=str)
             logger.info("Cache saved to disk")
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Failed to save cache: {e}")
-
     def clear_apn_cache(self, apn):
         """Clear all cached data for a specific APN"""
         cleared = False
@@ -103,7 +95,6 @@ class DataCollectionCache:
             self.save_cache()
 
         return cleared
-
     def get_cached_data(self, apn, data_type='property'):
         """Get cached data for an APN"""
         cache_map = {
@@ -114,7 +105,6 @@ class DataCollectionCache:
 
         cache = cache_map.get(data_type, {})
         return cache.get(apn)
-
     def set_cached_data(self, apn, data, data_type='property'):
         """Set cached data for an APN"""
         cache_map = {
@@ -142,7 +132,7 @@ class DataCollectionCache:
         content = cache_file.read_text()
 
         if "def clear_apn_cache" not in content:
-            print("Adding clear_apn_cache method to existing file...")
+        print("Adding clear_apn_cache method to existing file...")
 
             # Find the class and add the method
             lines = content.split("\n")
@@ -185,18 +175,16 @@ class DataCollectionCache:
 
             lines.insert(insert_index, method)
             cache_file.write_text("\n".join(lines))
-            print("[OK] Added clear_apn_cache method to DataCollectionCache")
+        print("[OK] Added clear_apn_cache method to DataCollectionCache")
             return True
 
         else:
-            print("[INFO] clear_apn_cache method already exists")
+        print("[INFO] clear_apn_cache method already exists")
             return True
-
-
-def fix_2_show_message():
+    def fix_2_show_message():
     """Fix the show_message AttributeError"""
-    print("\n[FIX 2] Fixing show_message calls")
-    print("-" * 50)
+        print("\n[FIX 2] Fixing show_message calls")
+        print("-" * 50)
 
     window_file = project_root / "src" / "gui" / "enhanced_main_window.py"
 
@@ -219,19 +207,17 @@ def fix_2_show_message():
         if content != original:
             with open(window_file, "w", encoding="utf-8") as f:
                 f.write(content)
-            print("[OK] Fixed show_message calls to use update_status")
+        print("[OK] Fixed show_message calls to use update_status")
             return True
         else:
-            print("[INFO] No show_message calls found or already fixed")
+        print("[INFO] No show_message calls found or already fixed")
             return True
 
     return False
-
-
-def fix_3_test_sources():
+    def fix_3_test_sources():
     """Fix the Test All Sources functionality"""
-    print("\n[FIX 3] Fixing Test All Sources")
-    print("-" * 50)
+        print("\n[FIX 3] Fixing Test All Sources")
+        print("-" * 50)
 
     window_file = project_root / "src" / "gui" / "enhanced_main_window.py"
 
@@ -261,28 +247,28 @@ def fix_3_test_sources():
         results = {}
 
         # Test API
-        try:
+    try:
             if hasattr(self, 'api_client') and self.api_client:
                 # Simple test - just check if client exists
                 results['API'] = 'OK'
             else:
                 results['API'] = 'N/A'
-        except Exception as e:
+    except Exception as e:
             results['API'] = 'Error'
             logger.error(f"API test error: {e}")
 
         # Test Scraping
-        try:
+    try:
             if hasattr(self, 'scraper') and self.scraper:
                 results['Scraping'] = 'OK'
             else:
                 results['Scraping'] = 'N/A'
-        except Exception as e:
+    except Exception as e:
             results['Scraping'] = 'Error'
             logger.error(f"Scraping test error: {e}")
 
         # Test Database
-        try:
+    try:
             if hasattr(self, 'db_manager') and self.db_manager:
                 if self.db_manager.test_connection():
                     results['DB'] = 'OK'
@@ -290,7 +276,7 @@ def fix_3_test_sources():
                     results['DB'] = 'Failed'
             else:
                 results['DB'] = 'N/A'
-        except Exception as e:
+    except Exception as e:
             results['DB'] = 'Error'
             logger.error(f"DB test error: {e}")
 
@@ -315,17 +301,14 @@ def fix_3_test_sources():
 
             with open(window_file, "w", encoding="utf-8") as f:
                 f.writelines(lines)
-
-            print("[OK] Fixed test_all_sources method")
+        print("[OK] Fixed test_all_sources method")
             return True
 
     return False
-
-
-def fix_4_settings_persistence():
+    def fix_4_settings_persistence():
     """Add settings save functionality"""
-    print("\n[FIX 4] Adding settings persistence")
-    print("-" * 50)
+        print("\n[FIX 4] Adding settings persistence")
+        print("-" * 50)
 
     # Create settings file if it doesn't exist
     settings_dir = project_root / "config"
@@ -342,22 +325,17 @@ def fix_4_settings_persistence():
             "source_priority": ["api", "scraping", "cache"],
             "ui_theme": "default",
         }
-
-        import json
+import json
 
         with open(settings_file, "w") as f:
             json.dump(default_settings, f, indent=2)
-
         print(f"[OK] Created default settings file: {settings_file}")
-
-    print("[INFO] Settings will be persisted to config/app_settings.json")
+        print("[INFO] Settings will be persisted to config/app_settings.json")
     return True
-
-
-def main():
-    print("=" * 60)
-    print(" APPLYING CRITICAL GUI FIXES")
-    print("=" * 60)
+    def main():
+        print("=" * 60)
+        print(" APPLYING CRITICAL GUI FIXES")
+        print("=" * 60)
 
     fixes_applied = []
 
@@ -375,25 +353,24 @@ def main():
         fixes_applied.append("Settings persistence")
 
     # Summary
-    print("\n" + "=" * 60)
-    print(" FIX SUMMARY")
-    print("=" * 60)
+        print("\n" + "=" * 60)
+        print(" FIX SUMMARY")
+        print("=" * 60)
 
     if fixes_applied:
         print(f"\n[OK] Successfully applied {len(fixes_applied)} fixes:")
         for fix in fixes_applied:
-            print(f"  - {fix}")
+        print(f"  - {fix}")
     else:
         print("\n[WARNING] No fixes were applied")
-
-    print("\n[NEXT STEPS]")
-    print("1. Close the application if it's running")
-    print("2. Restart with: python RUN_APPLICATION.py")
-    print("3. Test the fixed features:")
-    print("   - Manual Collect should work")
-    print("   - Refresh Property Data should not crash")
-    print("   - Test All Sources should show results")
-    print("   - Settings should persist")
+        print("\n[NEXT STEPS]")
+        print("1. Close the application if it's running")
+        print("2. Restart with: python RUN_APPLICATION.py")
+        print("3. Test the fixed features:")
+        print("   - Manual Collect should work")
+        print("   - Refresh Property Data should not crash")
+        print("   - Test All Sources should show results")
+        print("   - Settings should persist")
 
     return 0
 

@@ -2,7 +2,6 @@
 Hook Integration Module
 Provides integration points for the Maricopa Property Search application
 """
-
 import asyncio
 import functools
 import logging
@@ -11,7 +10,7 @@ import time
 from contextlib import contextmanager
 from typing import Any, Callable, Dict, Optional
 
-from hook_manager import get_hook_manager, emit_hook, emit_hook_async
+from hook_manager import emit_hook, emit_hook_async, get_hook_manager
 from logging_config import get_logger
 
 logger = get_logger(__name__)
@@ -19,23 +18,19 @@ logger = get_logger(__name__)
 
 class HookIntegration:
     """Main integration class for hooks in the application"""
-
     def __init__(self):
         self.hook_manager = get_hook_manager()
         self.integration_enabled = True
         self._session_id = None
-
     def enable_integration(self):
         """Enable hook integration"""
         self.integration_enabled = True
         logger.info("Hook integration enabled")
-
     def disable_integration(self):
         """Disable hook integration"""
         self.integration_enabled = False
         logger.info("Hook integration disabled")
-
-    def set_session_id(self, session_id: str):
+def set_session_id(self, session_id: str):
         """Set current session ID for tracking"""
         self._session_id = session_id
 
@@ -68,7 +63,7 @@ class HookIntegration:
             )
 
     @contextmanager
-    def search_operation(self, search_type: str, search_term: str, **kwargs):
+def search_operation(self, search_type: str, search_term: str, **kwargs):
         """Context manager for search operation hooks"""
         if not self.integration_enabled:
             yield
@@ -165,7 +160,7 @@ class HookIntegration:
             )
 
     @contextmanager
-    def database_transaction(self, transaction_id: str):
+def database_transaction(self, transaction_id: str):
         """Context manager for database transaction hooks"""
         if not self.integration_enabled:
             yield
@@ -245,14 +240,13 @@ class HookIntegration:
                     response_time=response_time,
                     response_size=len(str(response_data)) if response_data else 0,
                 )
-
-    def set_api_response(self, response_data: Any, status_code: int = 200):
+def set_api_response(self, response_data: Any, status_code: int = 200):
         """Set API response data for hook tracking"""
         self._api_response_data = response_data
         self._api_status_code = status_code
 
     @contextmanager
-    def performance_monitoring(self, operation_name: str, metadata: Dict = None):
+def performance_monitoring(self, operation_name: str, metadata: Dict = None):
         """Context manager for performance monitoring"""
         if not self.integration_enabled:
             yield
@@ -287,8 +281,7 @@ class HookIntegration:
                 operation_id=operation_id,
                 success=success,
             )
-
-    def track_user_action(self, action: str, user_id: str = None, **details):
+def track_user_action(self, action: str, user_id: str = None, **details):
         """Track user action"""
         if not self.integration_enabled:
             return
@@ -301,7 +294,6 @@ class HookIntegration:
             action=action,
             details=details,
         )
-
     def handle_error(
         self,
         error: Exception,
@@ -322,8 +314,7 @@ class HookIntegration:
             failed_operation=operation,
             fallback_operation=fallback,
         )
-
-    def trigger_health_check(self, database_manager=None, api_client=None):
+def trigger_health_check(self, database_manager=None, api_client=None):
         """Trigger health check"""
         if not self.integration_enabled:
             return
@@ -338,9 +329,7 @@ class HookIntegration:
 
 # Global integration instance
 _hook_integration = None
-
-
-def get_hook_integration() -> HookIntegration:
+    def get_hook_integration() -> HookIntegration:
     """Get global hook integration instance"""
     global _hook_integration
     if _hook_integration is None:
@@ -351,10 +340,9 @@ def get_hook_integration() -> HookIntegration:
 # Decorator functions for easy integration
 def with_hooks(hook_type: str, **hook_kwargs):
     """Decorator to add hooks to functions"""
-
-    def decorator(func):
+def decorator(func):
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+def wrapper(*args, **kwargs):
             integration = get_hook_integration()
 
             if hook_type == "performance":
@@ -374,14 +362,11 @@ def with_hooks(hook_type: str, **hook_kwargs):
         return wrapper
 
     return decorator
-
-
 def with_performance_monitoring(operation_name: str = None, **metadata):
     """Decorator for performance monitoring"""
-
-    def decorator(func):
+def decorator(func):
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+def wrapper(*args, **kwargs):
             integration = get_hook_integration()
             op_name = operation_name or func.__name__
 
@@ -391,14 +376,11 @@ def with_performance_monitoring(operation_name: str = None, **metadata):
         return wrapper
 
     return decorator
-
-
 def with_error_handling(fallback: Callable = None):
     """Decorator for error handling"""
-
-    def decorator(func):
+def decorator(func):
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+def wrapper(*args, **kwargs):
             integration = get_hook_integration()
 
             try:
@@ -412,14 +394,11 @@ def with_error_handling(fallback: Callable = None):
         return wrapper
 
     return decorator
-
-
 def track_user_action(action: str, **details):
     """Decorator to track user actions"""
-
-    def decorator(func):
+def decorator(func):
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+def wrapper(*args, **kwargs):
             integration = get_hook_integration()
 
             # Execute function
@@ -440,12 +419,12 @@ def initialize_hooks():
     """Initialize and register all hook modules"""
     try:
         # Import and register all hook modules
-        from hooks.lifecycle_hooks import register_lifecycle_hooks
-        from hooks.search_hooks import register_search_hooks
-        from hooks.database_hooks import register_database_hooks
         from hooks.api_hooks import register_api_hooks
+        from hooks.database_hooks import register_database_hooks
         from hooks.error_hooks import register_error_hooks
+        from hooks.lifecycle_hooks import register_lifecycle_hooks
         from hooks.performance_hooks import register_performance_hooks
+        from hooks.search_hooks import register_search_hooks
         from hooks.user_action_hooks import register_user_action_hooks
 
         # Register all hooks
@@ -468,11 +447,9 @@ def initialize_hooks():
 # Enhanced database manager integration
 class HookedDatabaseManager:
     """Database manager wrapper with hook integration"""
-
     def __init__(self, original_db_manager):
         self.db_manager = original_db_manager
         self.integration = get_hook_integration()
-
     def get_connection(self):
         """Get database connection with hooks"""
         connection_id = f"conn_{int(time.time())}"
@@ -485,8 +462,7 @@ class HookedDatabaseManager:
             port=config["port"],
         ):
             return self.db_manager.get_connection()
-
-    def __getattr__(self, name):
+def __getattr__(self, name):
         """Delegate other methods to original manager"""
         return getattr(self.db_manager, name)
 
@@ -494,11 +470,9 @@ class HookedDatabaseManager:
 # Enhanced API client integration
 class HookedAPIClient:
     """API client wrapper with hook integration"""
-
     def __init__(self, original_api_client):
         self.api_client = original_api_client
         self.integration = get_hook_integration()
-
     def _make_request(self, endpoint: str, params: Dict = None, **kwargs):
         """Make API request with hooks"""
         request_id = f"req_{int(time.time())}"
@@ -519,8 +493,7 @@ class HookedAPIClient:
                 self.integration.set_api_response(None, 500)
 
             return result
-
-    def __getattr__(self, name):
+def __getattr__(self, name):
         """Delegate other methods to original client"""
         return getattr(self.api_client, name)
 
@@ -529,16 +502,12 @@ class HookedAPIClient:
 def enable_hooks_for_database(database_manager):
     """Enable hooks for database manager"""
     return HookedDatabaseManager(database_manager)
-
-
 def enable_hooks_for_api_client(api_client):
     """Enable hooks for API client"""
     return HookedAPIClient(api_client)
-
-
-def start_user_session(user_id: str = None, **metadata) -> str:
+    def start_user_session(user_id: str = None, **metadata) -> str:
     """Start a user session with hooks"""
-    import uuid
+import uuid
 
     session_id = str(uuid.uuid4())
 
@@ -554,8 +523,6 @@ def start_user_session(user_id: str = None, **metadata) -> str:
     )
 
     return session_id
-
-
 def end_user_session(session_id: str = None, reason: str = "explicit"):
     """End a user session with hooks"""
     integration = get_hook_integration()
@@ -574,9 +541,7 @@ def end_user_session(session_id: str = None, reason: str = "explicit"):
         # Clear session from integration
         if integration._session_id == session_id:
             integration.set_session_id(None)
-
-
-def get_hook_stats() -> Dict[str, Any]:
+    def get_hook_stats() -> Dict[str, Any]:
     """Get comprehensive hook statistics"""
     hook_manager = get_hook_manager()
 

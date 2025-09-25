@@ -3,46 +3,85 @@
 Enhanced Main Window with Background Data Collection
 Integrates automatic background data collection for seamless user experience
 """
-
-import sys
-from PyQt5.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QLineEdit, QPushButton, QTabWidget, QTableWidget, 
-    QTableWidgetItem, QTextEdit, QProgressBar, QMessageBox,
-    QComboBox, QSpinBox, QCheckBox, QGroupBox, QSplitter,
-    QHeaderView, QApplication, QMenuBar, QMenu,
-    QAction, QFileDialog, QDialog, QFrame, QSizePolicy,
-    QSlider, QFormLayout, QListWidget, QListWidgetItem,
-    QPushButton, QButtonGroup, QRadioButton, QScrollArea, QShortcut, QToolBar, QMenu
-)
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QObject, QSettings
-from PyQt5.QtGui import QFont, QIcon, QPixmap, QColor, QPalette, QKeySequence
-from typing import Dict, List, Optional, Any
-import json
 import csv
-from pathlib import Path
-from datetime import datetime
+import json
+import sys
 import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
-# Import application modules
-# MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
-# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient, MockMaricopaAPIClient
-from web_scraper import WebScraperManager, MockWebScraperManager
-from background_data_collector import BackgroundDataCollectionManager, JobPriority
-from user_action_logger import UserActionLogger, get_user_action_logger
-
-# Import centralized logging
-from logging_config import get_logger, get_search_logger, get_performance_logger, log_exception
-
-# Import GUI enhancement dialogs
-from gui.gui_enhancements_dialogs import (
-    ApplicationSettingsDialog, DataCollectionSettingsDialog, CacheManagementDialog,
-    BatchSearchDialog, ParallelProcessingDialog, DataSourceConfigurationDialog
+from PyQt5.QtCore import QObject, QSettings, Qt, QThread, QTimer, pyqtSignal
+from PyQt5.QtGui import QColor, QFont, QIcon, QKeySequence, QPalette, QPixmap
+from PyQt5.QtWidgets import (
+    QAction,
+    QApplication,
+    QButtonGroup,
+    QCheckBox,
+    QComboBox,
+    QDialog,
+    QFileDialog,
+    QFormLayout,
+    QFrame,
+    QGridLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QLineEdit,
+    QListWidget,
+    QListWidgetItem,
+    QMainWindow,
+    QMenu,
+    QMenuBar,
+    QMessageBox,
+    QProgressBar,
+    QPushButton,
+    QRadioButton,
+    QScrollArea,
+    QShortcut,
+    QSizePolicy,
+    QSlider,
+    QSpinBox,
+    QSplitter,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QTextEdit,
+    QToolBar,
+    QVBoxLayout,
+    QWidget,
 )
+
+from background_data_collector import BackgroundDataCollectionManager, JobPriority
 
 # Import enhanced batch search integration
 from batch_search_integration import BatchSearchIntegrationManager
 from enhanced_batch_search_dialog import EnhancedBatchSearchDialog
+
+# Import GUI enhancement dialogs
+from gui.gui_enhancements_dialogs import (
+    ApplicationSettingsDialog,
+    BatchSearchDialog,
+    CacheManagementDialog,
+    DataCollectionSettingsDialog,
+    DataSourceConfigurationDialog,
+    ParallelProcessingDialog,
+)
+
+# Import centralized logging
+from logging_config import (
+    get_logger,
+    get_performance_logger,
+    get_search_logger,
+    log_exception,
+)
+from user_action_logger import UserActionLogger, get_user_action_logger
+
+# Import application modules
+# MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+# MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient, MockMaricopaAPIClient
+from web_scraper import MockWebScraperManager, WebScraperManager
 
 logger = get_logger(__name__)
 search_logger = get_search_logger(__name__)
@@ -57,7 +96,6 @@ class EnhancedSearchWorker(QThread):
     results_ready = pyqtSignal(list)
     error_occurred = pyqtSignal(str)
     background_collection_started = pyqtSignal(int)  # number of jobs queued
-    
     def __init__(self, search_type, search_term, db_manager, api_client, scraper, background_manager, fresh_data_only=False):
         super().__init__()
         self.search_type = search_type
@@ -67,10 +105,9 @@ class EnhancedSearchWorker(QThread):
         self.scraper = scraper
         self.background_manager = background_manager
         self.fresh_data_only = fresh_data_only
-    
     def run(self):
         """Execute search and trigger background enhancement"""
-        try:
+    try:
             self.status_updated.emit(f"Searching {self.search_type}: {self.search_term}...")
             
             results = []
@@ -103,10 +140,9 @@ class EnhancedSearchWorker(QThread):
             self.progress_updated.emit(100)
             self.results_ready.emit(results)
             
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Search worker error: {e}")
             self.error_occurred.emit(str(e))
-    
     def _search_by_owner(self) -> List[Dict]:
         """Search by owner name"""
         results = []
@@ -158,7 +194,6 @@ class EnhancedSearchWorker(QThread):
                 results.extend(scrape_results)
         
         return results
-    
     def _search_by_address(self) -> List[Dict]:
         """Search by address"""
         results = []
@@ -205,7 +240,6 @@ class EnhancedSearchWorker(QThread):
             results.append(demo_property)
         
         return results
-    
     def _search_by_apn(self) -> List[Dict]:
         """Search by APN"""
         results = []
@@ -257,7 +291,6 @@ class BatchCollectionTracker(QObject):
     batch_started = pyqtSignal(int)  # total_properties
     batch_progress = pyqtSignal(int, int)  # completed, total
     batch_completed = pyqtSignal(dict)  # results summary
-    
     def __init__(self, parent=None):
         super().__init__(parent)
         self.batch_active = False
@@ -265,7 +298,6 @@ class BatchCollectionTracker(QObject):
         self.batch_completed_count = 0
         self.batch_start_time = None
         self.batch_results = {}
-        
     def start_batch(self, apns):
         """Start tracking a new batch collection"""
         self.batch_active = True
@@ -275,7 +307,6 @@ class BatchCollectionTracker(QObject):
         self.batch_results = {}
         self.batch_started.emit(len(apns))
         logger.info(f"Batch collection started for {len(apns)} properties")
-        
     def update_batch_progress(self, apn, result):
         """Update progress for a completed APN in the batch"""
         if not self.batch_active or apn not in self.batch_apns:
@@ -288,7 +319,6 @@ class BatchCollectionTracker(QObject):
         # Check if batch is complete
         if self.batch_completed_count >= len(self.batch_apns):
             self._complete_batch()
-    
     def _complete_batch(self):
         """Complete the batch operation"""
         if not self.batch_active:
@@ -317,13 +347,11 @@ class BatchCollectionTracker(QObject):
         self.batch_completed.emit(summary)
         logger.info(f"Batch collection completed: {successful} successful, "
                    f"{failed} failed, {skipped} skipped in {batch_time:.1f}s")
-    
     def cancel_batch(self):
         """Cancel the current batch"""
         if self.batch_active:
             self.batch_active = False
             logger.info("Batch collection cancelled")
-    
     def is_batch_active(self):
         """Check if a batch is currently active"""
         return self.batch_active
@@ -331,7 +359,6 @@ class BatchCollectionTracker(QObject):
 
 class BackgroundCollectionStatusWidget(QWidget):
     """Enhanced widget for displaying background collection status with detailed progress"""
-    
     def __init__(self, parent=None):
         super().__init__(parent)
         
@@ -346,7 +373,6 @@ class BackgroundCollectionStatusWidget(QWidget):
         
         # Now setup UI with batch_tracker available
         self.setup_ui()
-    
     def setup_ui(self):
         """Setup the enhanced status widget UI"""
         layout = QVBoxLayout(self)
@@ -465,7 +491,6 @@ class BackgroundCollectionStatusWidget(QWidget):
         # Set compact but expandable size
         self.setMinimumHeight(120)
         self.setMaximumHeight(400)  # Increased for batch progress
-    
     def update_status(self, status_dict: Dict[str, Any]):
         """Update the enhanced status display with detailed progress"""
         is_running = status_dict.get('status') == 'running'
@@ -512,7 +537,6 @@ class BackgroundCollectionStatusWidget(QWidget):
         
         # Update active jobs display
         self.update_active_jobs_display(status_dict)
-    
     def update_active_jobs_display(self, status_dict: Dict[str, Any]):
         """Update the display of active data collection jobs"""
         active_jobs = status_dict.get('active_jobs', 0)
@@ -522,7 +546,6 @@ class BackgroundCollectionStatusWidget(QWidget):
             self.active_jobs_group.setTitle(f"Active Data Collections ({active_jobs})")
         else:
             self.active_jobs_group.setVisible(False)
-    
     def add_active_job_progress(self, apn: str):
         """Add a progress indicator for a specific job"""
         if apn in self.active_job_widgets:
@@ -559,7 +582,6 @@ class BackgroundCollectionStatusWidget(QWidget):
         }
         
         self.active_jobs_group.setVisible(True)
-    
     def update_job_progress(self, apn: str, status: str, progress: int = -1):
         """Update progress for a specific job"""
         if apn in self.active_job_widgets:
@@ -569,7 +591,6 @@ class BackgroundCollectionStatusWidget(QWidget):
             if progress >= 0:
                 widgets['progress_bar'].setRange(0, 100)
                 widgets['progress_bar'].setValue(progress)
-    
     def remove_active_job_progress(self, apn: str, final_status: str = "Completed"):
         """Remove progress indicator for a completed job"""
         if apn not in self.active_job_widgets:
@@ -585,7 +606,6 @@ class BackgroundCollectionStatusWidget(QWidget):
         
         # Remove after a short delay
         QTimer.singleShot(2000, lambda: self._remove_job_widget(apn))
-    
     def _remove_job_widget(self, apn: str):
         """Actually remove the job widget from display"""
         if apn in self.active_job_widgets:
@@ -597,15 +617,12 @@ class BackgroundCollectionStatusWidget(QWidget):
             # Hide group if no active jobs
             if not self.active_job_widgets:
                 self.active_jobs_group.setVisible(False)
-    
     def start_batch_tracking(self, apns):
         """Start tracking a batch collection operation"""
         self.batch_tracker.start_batch(apns)
-    
     def update_batch_progress(self, apn, result):
         """Update batch progress for a completed APN"""
         self.batch_tracker.update_batch_progress(apn, result)
-    
     def _on_batch_started(self, total_properties):
         """Handle batch started signal"""
         self.batch_progress_group.setVisible(True)
@@ -613,13 +630,11 @@ class BackgroundCollectionStatusWidget(QWidget):
         self.batch_progress_bar.setRange(0, total_properties)
         self.batch_progress_bar.setValue(0)
         logger.info(f"Batch progress display started for {total_properties} properties")
-    
     def _on_batch_progress(self, completed, total):
         """Handle batch progress update"""
         self.batch_progress_bar.setValue(completed)
         percentage = (completed / total * 100) if total > 0 else 0
         self.batch_status_label.setText(f"Collecting... {completed}/{total} complete ({percentage:.0f}%)")
-    
     def _on_batch_completed(self, summary):
         """Handle batch completion"""
         total = summary['total_properties']
@@ -639,7 +654,6 @@ class BackgroundCollectionStatusWidget(QWidget):
         QTimer.singleShot(5000, self._hide_batch_progress)
         
         logger.info(f"Batch collection display completed with summary: {summary}")
-    
     def _hide_batch_progress(self):
         """Hide batch progress display"""
         self.batch_progress_group.setVisible(False)
@@ -648,7 +662,6 @@ class BackgroundCollectionStatusWidget(QWidget):
 
 class PropertyDetailsDialog(QDialog):
     """Enhanced property details dialog with background data collection"""
-    
     def __init__(self, property_data: Dict, db_managerThreadSafeDatabaseManager, 
                  background_manager: BackgroundDataCollectionManager, parent=None):
         super().__init__(parent)
@@ -670,7 +683,6 @@ class PropertyDetailsDialog(QDialog):
         # AUTOMATIC DATA COLLECTION: Start comprehensive data collection automatically
         # This eliminates the need for manual button clicks
         self._start_automatic_data_collection()
-    
     def setup_ui(self):
         """Setup dialog UI"""
         self.setWindowTitle(f"Property Details - {self.property_data.get('apn', 'Unknown')}")
@@ -737,7 +749,6 @@ class PropertyDetailsDialog(QDialog):
             self.status_timer = QTimer()
             self.status_timer.timeout.connect(self._update_dialog_status)
             self.status_timer.start(2000)  # Update every 2 seconds
-    
     def setup_basic_info_tab(self, tab):
         """Setup basic information tab"""
         layout = QVBoxLayout(tab)
@@ -777,7 +788,6 @@ class PropertyDetailsDialog(QDialog):
         
         layout.addLayout(form_layout)
         layout.addStretch()
-    
     def setup_tax_history_tab(self, tab):
         """Setup tax history tab"""
         layout = QVBoxLayout(tab)
@@ -794,7 +804,6 @@ class PropertyDetailsDialog(QDialog):
         ])
         
         layout.addWidget(self.tax_table)
-    
     def setup_sales_history_tab(self, tab):
         """Setup sales history tab"""
         layout = QVBoxLayout(tab)
@@ -811,7 +820,6 @@ class PropertyDetailsDialog(QDialog):
         ])
         
         layout.addWidget(self.sales_table)
-    
     def load_property_details(self):
         """Load detailed property information"""
         apn = self.property_data.get('apn')
@@ -841,7 +849,6 @@ class PropertyDetailsDialog(QDialog):
             self.sales_status_label.setStyleSheet("color: orange;")
             
         self.populate_sales_table(sales_history)
-    
     def auto_collect_data(self):
         """Request background data collection for this property with enhanced feedback"""
         apn = self.property_data.get('apn')
@@ -873,7 +880,6 @@ class PropertyDetailsDialog(QDialog):
         else:
             QMessageBox.information(self, "Data Collection", 
                                    f"APN {apn} is already being processed or has very recent data.")
-    
     def manual_collect_data(self):
         """Immediate data collection (blocking)"""
         apn = self.property_data.get('apn')
@@ -881,15 +887,15 @@ class PropertyDetailsDialog(QDialog):
             return
         
         # Show progress dialog
-        from PyQt5.QtWidgets import QProgressDialog
         from PyQt5.QtCore import Qt
+        from PyQt5.QtWidgets import QProgressDialog
         
         progress = QProgressDialog("Collecting property data...", "Cancel", 0, 100, self)
         progress.setWindowModality(Qt.WindowModal)
         progress.show()
         progress.setValue(10)
         
-        try:
+    try:
             # Import the automatic data collector
             from automatic_data_collector import MaricopaDataCollector
             
@@ -920,12 +926,11 @@ class PropertyDetailsDialog(QDialog):
                 QMessageBox.warning(self, "Warning", 
                                   f"Could not collect complete data for APN {apn}")
         
-        except Exception as e:
+    except Exception as e:
             QMessageBox.critical(self, "Error", f"Error collecting data: {str(e)}")
         
-        finally:
+    finally:
             progress.close()
-    
     def _start_automatic_data_collection(self):
         """
         Automatically start comprehensive data collection for this property
@@ -962,13 +967,12 @@ class PropertyDetailsDialog(QDialog):
                 logger.info(f"APN {apn} already has recent data or collection in progress")
         else:
             logger.info(f"APN {apn} has fresh data, skipping automatic collection")
-    
     def _check_existing_data_freshness(self, apn: str) -> Dict[str, Any]:
         """
         Check if existing data is fresh enough to skip collection
         Returns dict with 'needs_collection' boolean and details
         """
-        try:
+    try:
             # Check tax history freshness
             tax_records = self.db_manager.get_tax_history(apn)
             has_recent_tax = len(tax_records) > 0
@@ -992,15 +996,13 @@ class PropertyDetailsDialog(QDialog):
                 'has_property_details': has_property_details
             }
             
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error checking data freshness for APN {apn}: {e}")
             # If we can't check, assume we need collection
             return {'needs_collection': True}
-
-    
     def _apply_delayed_settings(self, settings_dict):
         """Apply settings after UI is fully initialized"""
-        try:
+    try:
             self.apply_settings_to_ui(settings_dict)
             logger.info("Applied delayed settings to UI successfully")
             
@@ -1009,9 +1011,8 @@ class PropertyDetailsDialog(QDialog):
                 if hasattr(self, 'background_manager') and not self.background_manager.is_running():
                     QTimer.singleShot(2000, self._delayed_background_start)
                     logger.info("Background data collection scheduled to start automatically")
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Failed to apply delayed settings: {e}")
-
     def closeEvent(self, event):
         """Handle dialog close event"""
         # Stop the status timer
@@ -1019,7 +1020,6 @@ class PropertyDetailsDialog(QDialog):
             self.status_timer.stop()
         
         event.accept()
-    
     def _on_background_job_completed(self, apn: str, result: Dict):
         """Handle background job completion with enhanced feedback"""
         if apn == self.property_data.get('apn'):
@@ -1046,7 +1046,6 @@ class PropertyDetailsDialog(QDialog):
             
             # Reset title after 3 seconds
             QTimer.singleShot(3000, lambda: self.setWindowTitle(f"Property Details - {apn}"))
-    
     def _check_collection_status(self):
         """Check if collection is currently in progress for this property"""
         if not self.background_manager or not self.background_manager.worker:
@@ -1065,7 +1064,6 @@ class PropertyDetailsDialog(QDialog):
             if apn in self.background_manager.worker.active_jobs:
                 self.collection_in_progress = True
                 self._update_collection_progress_display()
-    
     def _update_collection_progress_display(self):
         """Update the display to show collection in progress"""
         if self.collection_in_progress:
@@ -1078,7 +1076,6 @@ class PropertyDetailsDialog(QDialog):
             if hasattr(self, 'sales_status_label'):
                 self.sales_status_label.setText("Sales data: Collection in progress... 🔄")
                 self.sales_status_label.setStyleSheet("color: blue; font-style: italic;")
-    
     def refresh_property_data(self):
         """Force refresh property data by clearing cache and reloading details"""
         apn = self.property_data.get('apn')
@@ -1091,15 +1088,15 @@ class PropertyDetailsDialog(QDialog):
             logger.info(f"Cleared cache for APN {apn}")
         
         # Show progress dialog
-        from PyQt5.QtWidgets import QProgressDialog
         from PyQt5.QtCore import Qt
+        from PyQt5.QtWidgets import QProgressDialog
         
         progress = QProgressDialog("Refreshing property data...", "Cancel", 0, 100, self)
         progress.setWindowModality(Qt.WindowModal)
         progress.show()
         progress.setValue(30)
         
-        try:
+    try:
             # Force collection of fresh data
             if self.background_manager and self.background_manager.is_running():
                 progress.setValue(60)
@@ -1125,13 +1122,12 @@ class PropertyDetailsDialog(QDialog):
                 self.load_property_details()
                 QMessageBox.information(self, "Data Refreshed", "Property data has been refreshed with current database contents.")
         
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error refreshing property data for APN {apn}: {e}")
             QMessageBox.critical(self, "Refresh Error", f"Error refreshing property data: {str(e)}")
         
-        finally:
+    finally:
             progress.close()
-    
     def _update_dialog_status(self):
         """Periodically update dialog status"""
         if self.background_manager:
@@ -1146,7 +1142,6 @@ class PropertyDetailsDialog(QDialog):
                         # Collection completed, refresh
                         self.collection_in_progress = False
                         self.load_property_details()
-    
     def populate_tax_table(self, tax_history: List[Dict]):
         """Populate tax history table"""
         if not tax_history:
@@ -1182,7 +1177,6 @@ class PropertyDetailsDialog(QDialog):
             self.tax_table.setItem(i, 4, QTableWidgetItem(record.get('payment_status', '') or 'N/A'))
         
         self.tax_table.resizeColumnsToContents()
-    
     def populate_sales_table(self, sales_history: List[Dict]):
         """Populate sales history table"""
         if not sales_history:
@@ -1216,32 +1210,31 @@ class PropertyDetailsDialog(QDialog):
 
 class EnhancedPropertySearchApp(QMainWindow):
     """Enhanced main application window with background data collection"""
-    
     def __init__(self, config_manager):
         super().__init__()
         logger.info("Initializing Enhanced Property Search Application GUI")
         
         self.config = config_manager
         
-        try:
+    try:
             # Initialize components
             logger.debug("Initializing database manager")
             self.db_manager = ThreadSafeDatabaseManager(config_manager)
             
             # Initialize API client
-            try:
+    try:
                 logger.debug("Attempting to initialize real API client")
                 self.api_client = UnifiedMaricopaAPIClient(config_manager)
                 logger.info("Using real Maricopa API client")
-            except Exception as e:
+    except Exception as e:
                 logger.warning(f"Failed to initialize real API client: {e}. Using mock client.")
                 self.api_client = MockMaricopaAPIClient(config_manager)
             
             # Initialize web scraper
-            try:
+    try:
                 self.scraper = WebScraperManager(config_manager)
                 logger.info("Using real web scraper")
-            except Exception as e:
+    except Exception as e:
                 logger.warning(f"Failed to initialize real web scraper: {e}. Using mock scraper.")
                 self.scraper = MockWebScraperManager(config_manager)
             
@@ -1263,7 +1256,7 @@ class EnhancedPropertySearchApp(QMainWindow):
             )
             logger.info("Batch search integration manager initialized")
             
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Failed to initialize core components: {e}")
             raise
         
@@ -1292,19 +1285,17 @@ class EnhancedPropertySearchApp(QMainWindow):
             logger.info("Background data collection scheduled to start automatically")
         else:
             logger.info("Auto-start background collection is disabled in settings")
-    
     def _delayed_background_start(self):
         """Start background collection after UI is fully initialized"""
-        try:
+    try:
             self.background_manager.start_collection()
             logger.info("Background data collection started successfully")
             
             # Update UI to reflect the started collection
             QTimer.singleShot(500, self.update_background_status)
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Failed to start background collection: {e}")
             self.statusBar().showMessage("Background collection failed to start - check logs")
-    
     def setup_ui(self):
         """Setup the main user interface"""
         self.setWindowTitle("Maricopa County Property Search - Enhanced")
@@ -1484,7 +1475,6 @@ class EnhancedPropertySearchApp(QMainWindow):
         self.setup_enhanced_toolbar() 
         self.setup_results_table_context_menu()
         self.setup_enhanced_status_bar()
-    
     def setup_results_table(self):
         """Setup the results table"""
         headers = ["APN", "Owner Name", "Property Address", "Year Built", 
@@ -1501,7 +1491,6 @@ class EnhancedPropertySearchApp(QMainWindow):
         header.setSectionResizeMode(4, QHeaderView.ResizeToContents)  # Lot Size
         header.setSectionResizeMode(5, QHeaderView.ResizeToContents)  # Data Status
         header.setSectionResizeMode(6, QHeaderView.ResizeToContents)  # Last Updated
-    
     def setup_connections(self):
         """Setup signal-slot connections"""
         self.search_btn.clicked.connect(self.perform_search)
@@ -1525,14 +1514,12 @@ class EnhancedPropertySearchApp(QMainWindow):
         # Connect batch completion to button reset
         self.bg_status_widget.batch_tracker.batch_completed.connect(self._on_batch_collection_completed)
         self.results_table.selectionModel().selectionChanged.connect(self.update_toolbar_buttons_state)
-    
     def _setup_worker_connections(self):
         """Setup connections to worker signals when collection starts"""
         if self.background_manager.worker:
             self.background_manager.worker.job_started.connect(self.on_background_job_started)
             self.background_manager.worker.job_failed.connect(self.on_background_job_failed)
             logger.info("Connected to background worker progress signals")
-    
     def setup_menu_bar(self):
         """Setup application menu bar"""
         menubar = self.menuBar()
@@ -1639,11 +1626,9 @@ class EnhancedPropertySearchApp(QMainWindow):
         about_action = QAction("About", self)
         about_action.triggered.connect(self.show_about)
         help_menu.addAction(about_action)
-    
     def setup_status_bar(self):
         """Setup status bar"""
         self.statusBar().showMessage("Ready")
-    
     def check_system_status(self):
         """Check system component status"""
         status_messages = []
@@ -1655,18 +1640,17 @@ class EnhancedPropertySearchApp(QMainWindow):
             status_messages.append("DB: Disconnected")
         
         # Check API status
-        try:
+    try:
             api_status = self.api_client.get_api_status()
             status_messages.append(f"API: {api_status.get('status', 'Unknown')}")
-        except:
-            status_messages.append("API: Error")
+    except:
+                status_messages.append("API: Error")
         
         # Check background collection status
         bg_status = "Running" if self.background_manager.is_running() else "Stopped"
         status_messages.append(f"BG Collection: {bg_status}")
         
         self.statusBar().showMessage(" | ".join(status_messages))
-    
     def toggle_background_collection(self):
         """Toggle background data collection"""
         if self.background_manager.is_running():
@@ -1677,7 +1661,6 @@ class EnhancedPropertySearchApp(QMainWindow):
             logger.info("Background collection started by user")
         
         self.check_system_status()
-    
     def update_background_status(self, status_dict=None):
         """Update background collection status display"""
         if status_dict is None:
@@ -1685,7 +1668,6 @@ class EnhancedPropertySearchApp(QMainWindow):
         
         self.bg_status_widget.update_status(status_dict)
         self.check_system_status()
-    
     def perform_search(self):
         """Perform property search with background enhancement"""
         search_term = self.search_input.text().strip()
@@ -1735,7 +1717,6 @@ class EnhancedPropertySearchApp(QMainWindow):
         self.search_worker.background_collection_started.connect(self.on_background_collection_started)
         
         self.search_worker.start()
-    
     def display_results(self, results: List[Dict]):
         """Display search results with data collection status"""
         self.current_results = results
@@ -1760,10 +1741,11 @@ class EnhancedPropertySearchApp(QMainWindow):
             # Handle raw_data - it might be a JSON string that needs parsing
             raw_data = result.get('raw_data', {})
             if isinstance(raw_data, str):
-                try:
-                    import json
+    try:
+import json
+
                     raw_data = json.loads(raw_data)
-                except (json.JSONDecodeError, TypeError):
+    except (json.JSONDecodeError, TypeError):
                     raw_data = {}
             elif not isinstance(raw_data, dict):
                 raw_data = {}
@@ -1794,10 +1776,10 @@ class EnhancedPropertySearchApp(QMainWindow):
                        raw_data.get('LotSize'))
             
             if lot_size is not None:
-                try:
+    try:
                     clean_size = str(lot_size).replace(',', '')
                     lot_size_text = f"{int(float(clean_size)):,}"
-                except (ValueError, TypeError):
+    except (ValueError, TypeError):
                     lot_size_text = 'Available'
             else:
                 lot_size_text = 'Available'
@@ -1834,10 +1816,9 @@ class EnhancedPropertySearchApp(QMainWindow):
         
         # Auto-resize columns
         self.results_table.resizeColumnsToContents()
-    
     def _get_data_collection_status(self, apn: str) -> Dict[str, Any]:
         """Get data collection status for an APN"""
-        try:
+    try:
             tax_records = self.db_manager.get_tax_history(apn)
             sales_records = self.db_manager.get_sales_history(apn)
             
@@ -1863,27 +1844,25 @@ class EnhancedPropertySearchApp(QMainWindow):
             else:
                 return {'text': 'Queued', 'complete': False, 'collecting': False}
                 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error checking data status for {apn}: {e}")
             # Log the actual type of data causing the issue for debugging
-            try:
+    try:
                 tax_type = type(self.db_manager.get_tax_history(apn)).__name__
                 sales_type = type(self.db_manager.get_sales_history(apn)).__name__
                 logger.debug(f"Data types for {apn}: tax_records={tax_type}, sales_records={sales_type}")
-            except:
-                pass  # Don't let debug logging cause more errors
+    except:
+            pass  # Don't let debug logging cause more errors
             
             return {'text': 'Unknown', 'complete': False, 'collecting': False}
-    
     def _get_last_update_time(self, apn: str) -> str:
         """Get last update time for an APN"""
-        try:
+    try:
             # This would need to be implemented in the database manager
             # For now, return a placeholder
             return "Recent"
-        except:
-            return "Unknown"
-    
+    except:
+                return "Unknown"
     def handle_search_error(self, error_message: str):
         """Handle search errors"""
         QMessageBox.critical(self, "Search Error", f"Search failed: {error_message}")
@@ -1891,12 +1870,10 @@ class EnhancedPropertySearchApp(QMainWindow):
         self.search_btn.setEnabled(True)
         self.progress_bar.setVisible(False)
         self.statusBar().showMessage("Search failed")
-    
     def on_selection_changed(self):
         """Handle table selection changes"""
         selected_rows = self.results_table.selectionModel().selectedRows()
         self.view_details_btn.setEnabled(len(selected_rows) > 0)
-    
     def on_background_collection_started(self, jobs_queued: int):
         """Handle notification that background collection started with enhanced feedback"""
         self.statusBar().showMessage(f"Auto-collection: {jobs_queued} properties queued for data enhancement", 3000)
@@ -1908,7 +1885,6 @@ class EnhancedPropertySearchApp(QMainWindow):
                                    f"Watch the status panel for individual progress.")
         
         logger.info(f"Auto-collection started for {jobs_queued} properties from search results")
-    
     def on_background_job_started(self, apn: str):
         """Handle background job start"""
         # Add progress indicator for this specific job
@@ -1918,7 +1894,6 @@ class EnhancedPropertySearchApp(QMainWindow):
         self._update_table_status_for_apn(apn, "Collecting...", QColor(255, 255, 200))
         
         logger.info(f"Background data collection started for APN {apn}")
-    
     def on_background_job_failed(self, apn: str, error: str):
         """Handle background job failure"""
         # Remove progress indicator with failure status
@@ -1933,7 +1908,6 @@ class EnhancedPropertySearchApp(QMainWindow):
         self._update_table_status_for_apn(apn, "Failed", QColor(255, 200, 200))
         
         logger.warning(f"Background data collection failed for APN {apn}: {error}")
-    
     def on_background_job_completed(self, apn: str, result: Dict):
         """Handle background job completion with enhanced feedback"""
         # Remove progress indicator with success status
@@ -1966,7 +1940,6 @@ class EnhancedPropertySearchApp(QMainWindow):
         )
         
         logger.info(f"Updated table display for completed collection: APN {apn}")
-    
     def _update_table_status_for_apn(self, apn: str, status_text: str, background_color: QColor):
         """Update the results table status for a specific APN"""
         for i in range(self.results_table.rowCount()):
@@ -1980,7 +1953,6 @@ class EnhancedPropertySearchApp(QMainWindow):
                 last_updated_item = QTableWidgetItem(datetime.now().strftime("%H:%M:%S"))
                 self.results_table.setItem(i, 6, last_updated_item)
                 break
-    
     def collect_all_data(self):
         """Queue all current search results for batch data collection with enhanced progress tracking"""
         if not self.current_results:
@@ -2011,7 +1983,6 @@ class EnhancedPropertySearchApp(QMainWindow):
                 return
         else:
             self._do_collect_all_data()
-    
     def _do_collect_all_data(self):
         """Actually perform the batch data collection with smart filtering"""
         if not self.background_manager.worker:
@@ -2041,7 +2012,7 @@ class EnhancedPropertySearchApp(QMainWindow):
                 continue
                 
             # Check completeness of existing data
-            try:
+    try:
                 tax_records = self.db_manager.get_tax_history(apn)
                 sales_records = self.db_manager.get_sales_history(apn)
                 
@@ -2050,7 +2021,7 @@ class EnhancedPropertySearchApp(QMainWindow):
                     skipped_reasons['already_complete'] += 1
                     continue
                     
-            except Exception as e:
+    except Exception as e:
                 logger.warning(f"Error checking data completeness for {apn}: {e}")
             
             apns_to_collect.append(apn)
@@ -2113,12 +2084,10 @@ class EnhancedPropertySearchApp(QMainWindow):
         else:
             QMessageBox.warning(self, "Warning", "No properties were queued for collection.")
             self._reset_collect_all_button()
-    
     def _reset_collect_all_button(self):
         """Reset the collect all button to its default state"""
         self.collect_all_btn.setEnabled(True)
         self.collect_all_btn.setText("Collect All Data")
-    
     def _on_batch_collection_completed(self, summary: Dict):
         """Handle batch collection completion"""
         # Reset the button
@@ -2154,7 +2123,6 @@ class EnhancedPropertySearchApp(QMainWindow):
         )
         
         logger.info(f"Batch collection completed with summary: {summary}")
-    
     def view_property_details(self):
         """View detailed property information with background collection support"""
         selected_rows = self.results_table.selectionModel().selectedRows()
@@ -2169,7 +2137,6 @@ class EnhancedPropertySearchApp(QMainWindow):
             dialog = PropertyDetailsDialog(property_data, self.db_manager, 
                                          self.background_manager, self)
             dialog.exec_()
-    
     def show_collection_stats(self):
         """Show collection statistics"""
         status = self.background_manager.get_collection_status()
@@ -2193,7 +2160,6 @@ class EnhancedPropertySearchApp(QMainWindow):
         stats_text += f"Uptime: {uptime_hours:.1f} hours"
         
         QMessageBox.information(self, "Collection Statistics", stats_text)
-    
     def export_results(self):
         """Export search results to CSV"""
         if not self.current_results:
@@ -2207,7 +2173,7 @@ class EnhancedPropertySearchApp(QMainWindow):
         )
         
         if filename:
-            try:
+    try:
                 with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
                     if self.current_results:
                         writer = csv.DictWriter(csvfile, fieldnames=self.current_results[0].keys())
@@ -2216,9 +2182,8 @@ class EnhancedPropertySearchApp(QMainWindow):
                 
                 QMessageBox.information(self, "Success", f"Results exported to {filename}")
                 
-            except Exception as e:
+    except Exception as e:
                 QMessageBox.critical(self, "Export Error", f"Failed to export results: {e}")
-    
     def show_database_stats(self):
         """Show database statistics"""
         stats = self.db_manager.get_database_stats()
@@ -2230,7 +2195,6 @@ class EnhancedPropertySearchApp(QMainWindow):
         stats_text += f"Recent Searches (7 days): {stats.get('recent_searches', 0):,}"
         
         QMessageBox.information(self, "Database Statistics", stats_text)
-    
     def show_settings_dialog(self):
         """Show application settings dialog with persistence"""
         dialog = ApplicationSettingsDialog(self.config, self)
@@ -2246,20 +2210,17 @@ class EnhancedPropertySearchApp(QMainWindow):
             
             # Show confirmation
             self.statusBar().showMessage("Settings saved successfully", 3000)
-    
     def show_collection_settings_dialog(self):
         """Show data collection settings dialog"""
         dialog = DataCollectionSettingsDialog(self.background_manager, self)
         dialog.exec_()
-    
     def show_cache_management_dialog(self):
         """Show cache management dialog"""
         dialog = CacheManagementDialog(self.background_manager, self)
         dialog.exec_()
-
     def refresh_current_data(self):
         """Refresh data for currently displayed results - CRASH-SAFE VERSION"""
-        try:
+    try:
             # Check if we have results to refresh
             if not hasattr(self, 'current_results') or not self.current_results:
                 QMessageBox.warning(self, "Warning", "No search results to refresh.")
@@ -2279,7 +2240,7 @@ class EnhancedPropertySearchApp(QMainWindow):
                                        QMessageBox.Yes | QMessageBox.No)
 
             if reply == QMessageBox.Yes:
-                try:
+    try:
                     # Extract APNs and validate them
                     apns = []
                     for result in self.current_results:
@@ -2316,30 +2277,33 @@ class EnhancedPropertySearchApp(QMainWindow):
                         QMessageBox.warning(self, "Refresh Failed", 
                                            "Failed to queue refresh jobs. Please check the background collection service.")
                         
-                except AttributeError as e:
+    except AttributeError as e:
                     QMessageBox.critical(self, "Attribute Error", 
                                        f"Missing required attribute or method: {str(e)}\n"
                                        "Please restart the application.")
                     logger.error(f"AttributeError in refresh_current_data: {e}")
                     
-                except Exception as e:
+    except Exception as e:
                     QMessageBox.critical(self, "Refresh Error", 
                                        f"Failed to refresh data: {str(e)}\n"
                                        "Check the application logs for more details.")
                     logger.error(f"Error in refresh_current_data: {e}")
-                    import traceback
-                    traceback.print_exc()
+import traceback
 
-        except Exception as e:
+        traceback.print_exc()
+
+    except Exception as e:
             # Ultimate catch-all to prevent crash
             QMessageBox.critical(self, "Critical Error", 
                                f"Unexpected error during refresh: {str(e)}\n"
                                "The application will continue running.")
             logger.error(f"Critical error in refresh_current_data: {e}")
-            import traceback
-            traceback.print_exc()    def force_data_collection(self):
+import traceback
+
+        traceback.print_exc()
+    def force_data_collection(self):
         """Force data collection ignoring cache - CRASH-SAFE VERSION"""
-        try:
+    try:
             # Check if we have results to collect data for
             if not hasattr(self, 'current_results') or not self.current_results:
                 QMessageBox.warning(self, "Warning", "No search results to collect data for.")
@@ -2359,7 +2323,7 @@ class EnhancedPropertySearchApp(QMainWindow):
                                        QMessageBox.Yes | QMessageBox.No)
 
             if reply == QMessageBox.Yes:
-                try:
+    try:
                     # Extract APNs and validate them
                     apns = []
                     for result in self.current_results:
@@ -2385,12 +2349,12 @@ class EnhancedPropertySearchApp(QMainWindow):
                     # Start background collection if not running
                     if hasattr(self.background_manager, 'is_running') and not self.background_manager.is_running():
                         if hasattr(self.background_manager, 'start_collection'):
-                            try:
+    try:
                                 self.background_manager.start_collection()
                                 # Give it a moment to initialize
                                 QTimer.singleShot(1000, lambda: self._continue_force_collection(apns))
                                 return
-                            except Exception as e:
+    except Exception as e:
                                 QMessageBox.critical(self, "Startup Error", 
                                                    f"Failed to start background collection: {str(e)}")
                                 return
@@ -2400,11 +2364,11 @@ class EnhancedPropertySearchApp(QMainWindow):
                         QMessageBox.warning(self, "Worker Not Ready", 
                                           "Background worker is not ready. Attempting to start collection...")
                         if hasattr(self.background_manager, 'start_collection'):
-                            try:
+    try:
                                 self.background_manager.start_collection()
                                 QTimer.singleShot(1000, lambda: self._continue_force_collection(apns))
                                 return
-                            except Exception as e:
+    except Exception as e:
                                 QMessageBox.critical(self, "Worker Error", 
                                                    f"Failed to start background worker: {str(e)}")
                                 return
@@ -2429,34 +2393,36 @@ class EnhancedPropertySearchApp(QMainWindow):
                         QMessageBox.warning(self, "Collection Failed", 
                                            "Failed to queue collection jobs. Please check the background collection service.")
                         
-                except AttributeError as e:
+    except AttributeError as e:
                     QMessageBox.critical(self, "Attribute Error", 
                                        f"Missing required attribute or method: {str(e)}\n"
                                        "Please restart the application.")
                     logger.error(f"AttributeError in force_data_collection: {e}")
                     
-                except Exception as e:
+    except Exception as e:
                     QMessageBox.critical(self, "Collection Error", 
                                        f"Failed to force data collection: {str(e)}\n"
                                        "Check the application logs for more details.")
                     logger.error(f"Error in force_data_collection: {e}")
-                    import traceback
-                    traceback.print_exc()
+import traceback
 
-        except Exception as e:
+        traceback.print_exc()
+
+    except Exception as e:
             # Ultimate catch-all to prevent crash
             QMessageBox.critical(self, "Critical Error", 
                                f"Unexpected error during force collection: {str(e)}\n"
                                "The application will continue running.")
             logger.error(f"Critical error in force_data_collection: {e}")
-            import traceback
+import traceback
+
 from src.api_client_unified import UnifiedMaricopaAPIClient
 from src.threadsafe_database_manager import ThreadSafeDatabaseManager
-            traceback.print_exc()
 
+        traceback.print_exc()
     def _continue_force_collection(self, apns):
         """Continue force collection after background service starts"""
-        try:
+    try:
             if not self.background_manager or not hasattr(self.background_manager, 'collect_batch_data'):
                 QMessageBox.critical(self, "Error", "Background manager is still not ready.")
                 return
@@ -2478,13 +2444,10 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             else:
                 QMessageBox.warning(self, "Collection Failed", "Failed to start force collection.")
             
-        except Exception as e:
+    except Exception as e:
             QMessageBox.critical(self, "Collection Error", 
                                f"Failed to continue force collection: {str(e)}")
             logger.error(f"Error in _continue_force_collection: {e}")
-
-
-    
     def clear_cache(self):
         """Clear all cached data"""
         reply = QMessageBox.question(self, "Clear Cache", 
@@ -2493,7 +2456,7 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
                                    QMessageBox.Yes | QMessageBox.No)
         
         if reply == QMessageBox.Yes:
-            try:
+    try:
                 if self.background_manager and self.background_manager.worker:
                     cache_cleared = self.background_manager.worker.cache.clear_all_cache()
                     QMessageBox.information(self, "Cache Cleared", 
@@ -2501,10 +2464,9 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
                     logger.info(f"User cleared {cache_cleared} cache entries")
                 else:
                     QMessageBox.warning(self, "Cache Clear", "Background worker not available to clear cache.")
-            except Exception as e:
+    except Exception as e:
                 logger.error(f"Error clearing cache: {e}")
                 QMessageBox.critical(self, "Cache Clear Error", f"Error clearing cache: {str(e)}")
-    
     def show_batch_search_dialog(self):
         """Show enhanced batch search dialog"""
         dialog = EnhancedBatchSearchDialog(self.batch_search_manager, self)
@@ -2520,11 +2482,9 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             batch_results = dialog.get_batch_results()
             if batch_results and batch_results.results:
                 self._display_batch_search_results(batch_results)
-    
     def open_batch_search_dialog(self):
         """Open batch search dialog (called from button)"""
         self.show_batch_search_dialog()
-    
     def _on_batch_search_started(self, job_id: str):
         """Handle batch search started"""
         logger.info(f"Batch search started: {job_id}")
@@ -2532,11 +2492,9 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
         
         # Disable batch search button during operation
         self.batch_search_btn.setEnabled(False)
-    
     def _on_batch_search_progress(self, job_id: str, progress: float, status: str):
         """Handle batch search progress updates"""
         self.statusBar().showMessage(f"Batch search progress: {progress:.1f}% - {status}")
-    
     def _on_batch_search_completed(self, job_id: str, batch_summary):
         """Handle batch search completion"""
         logger.info(f"Batch search completed: {job_id}")
@@ -2557,7 +2515,6 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
         # Auto-display results if we got any
         if hasattr(batch_summary, 'results') and batch_summary.results:
             self._display_batch_search_results(batch_summary)
-    
     def _on_batch_search_failed(self, job_id: str, error_message: str):
         """Handle batch search failure"""
         logger.error(f"Batch search failed: {job_id} - {error_message}")
@@ -2573,10 +2530,9 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             self, "Batch Search Failed",
             f"Batch search operation failed:\\n\\n{error_message}"
         )
-    
     def _display_batch_search_results(self, batch_summary):
         """Display batch search results in the main results table"""
-        try:
+    try:
             # Convert batch search results to the main table format
             display_results = []
             
@@ -2614,23 +2570,20 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             else:
                 self.results_label.setText("Batch search completed but no valid properties found")
                 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error displaying batch search results: {e}")
             QMessageBox.warning(
                 self, "Display Error",
                 f"Successfully completed batch search but encountered error displaying results:\\n\\n{str(e)}"
             )
-    
     def show_parallel_processing_dialog(self):
         """Show parallel processing configuration dialog"""
         dialog = ParallelProcessingDialog(self.background_manager, self)
         dialog.exec_()
-    
     def show_data_source_dialog(self):
         """Show data source configuration dialog"""
         dialog = DataSourceConfigurationDialog(self.config, self.api_client, self.scraper, self)
         dialog.exec_()
-    
     def show_about(self):
         """Show about dialog"""
         about_text = """
@@ -2659,7 +2612,6 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
         """
         
         QMessageBox.about(self, "About Enhanced Property Search", about_text)
-    
     def setup_keyboard_shortcuts(self):
         """Setup additional keyboard shortcuts for power users"""
         self.shortcuts = {}
@@ -2680,7 +2632,6 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             self.shortcuts[shortcut_key] = shortcut
         
         logger.info(f"Setup {len(shortcuts_config)} keyboard shortcuts")
-    
     def setup_enhanced_toolbar(self):
         """Create enhanced toolbar with quick access buttons"""
         toolbar = self.addToolBar("Quick Actions")
@@ -2748,12 +2699,10 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
         toolbar.addWidget(self.toolbar_settings_btn)
         
         logger.info("Enhanced toolbar setup complete")
-    
     def setup_results_table_context_menu(self):
         """Setup context menu for results table"""
         self.results_table.setContextMenuPolicy(Qt.CustomContextMenu)
         self.results_table.customContextMenuRequested.connect(self.show_results_context_menu)
-    
     def show_results_context_menu(self, position):
         """Show context menu for results table"""
         if not self.results_table.itemAt(position):
@@ -2781,7 +2730,6 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
         copy_action.triggered.connect(self.copy_apn_to_clipboard)
         
         menu.exec_(self.results_table.mapToGlobal(position))
-    
     def setup_enhanced_status_bar(self):
         """Setup enhanced status bar with detailed information"""
         # Collection status label
@@ -2800,19 +2748,17 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
         self.enhanced_status_timer = QTimer()
         self.enhanced_status_timer.timeout.connect(self.update_enhanced_status_bar)
         self.enhanced_status_timer.start(3000)
-    
     def update_enhanced_status_bar(self):
         """Update enhanced status bar information"""
-        try:
+    try:
             if hasattr(self, 'background_manager') and self.background_manager.is_running():
                 self.collection_status_label.setText("Collection: Running")
                 self.collection_status_label.setStyleSheet("color: green; font-weight: bold;")
             else:
                 self.collection_status_label.setText("Collection: Stopped")
                 self.collection_status_label.setStyleSheet("color: red;")
-        except:
+    except:
             pass
-    
     def refresh_selected_property(self):
         """Refresh data for currently selected property"""
         current_row = self.results_table.currentRow()
@@ -2822,7 +2768,6 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             if apn and self.background_manager.is_running():
                 self.background_manager.add_job(apn, JobPriority.HIGH)
                 self.statusBar().showMessage(f"Refreshing data for APN: {apn}", 3000)
-    
     def force_collect_selected_property(self):
         """Force data collection for currently selected property"""
         current_row = self.results_table.currentRow()
@@ -2833,7 +2778,6 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
                 # Force collection with fresh data (ignores cache automatically)
                 self.background_manager.collect_data_for_apn(apn, JobPriority.CRITICAL, force_fresh=True)
                 self.statusBar().showMessage(f"Force collecting fresh data for APN: {apn}", 3000)
-    
     def export_selected_results(self):
         """Export only selected table rows"""
         selected_rows = set()
@@ -2855,14 +2799,13 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             )
             
             if filename:
-                try:
+    try:
                     # Use existing export logic
                     self.export_results(filename, selected_results)
                     QMessageBox.information(self, "Export Complete", 
                                            f"Exported {len(selected_results)} selected properties.")
-                except Exception as e:
+    except Exception as e:
                     QMessageBox.critical(self, "Export Error", f"Failed to export: {str(e)}")
-    
     def copy_apn_to_clipboard(self):
         """Copy selected property APN to clipboard"""
         current_row = self.results_table.currentRow()
@@ -2872,7 +2815,6 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             if apn:
                 QApplication.clipboard().setText(apn)
                 self.statusBar().showMessage(f"Copied APN: {apn}", 2000)
-    
     def cancel_current_operation(self):
         """Cancel current search or background operation"""
         if self.search_worker and self.search_worker.isRunning():
@@ -2881,7 +2823,6 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             self.statusBar().showMessage("Search cancelled", 2000)
             self.search_btn.setText("Search")
             self.search_btn.setEnabled(True)
-    
     def update_toolbar_buttons_state(self):
         """Update toolbar button states based on current context"""
         has_results = len(self.current_results) > 0
@@ -2889,17 +2830,15 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             self.toolbar_refresh_btn.setEnabled(has_results)
         if hasattr(self, 'toolbar_force_btn'):
             self.toolbar_force_btn.setEnabled(has_results)
-    
     def keyPressEvent(self, event):
         """Handle additional keyboard events"""
         if event.key() == Qt.Key_Escape:
             self.cancel_current_operation()
         else:
             super().keyPressEvent(event)
-
     def save_application_settings(self, settings_dict):
         """Save application settings using QSettings for persistence"""
-        try:
+    try:
             settings = QSettings("MaricopaPropertySearch", "PropertySearch")
             
             # Save each setting with type preservation
@@ -2915,13 +2854,12 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             logger.info(f"Saved {len(settings_dict)} application settings")
             return True
             
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Failed to save settings: {e}")
             return False
-    
     def load_application_settings(self):
         """Load application settings from QSettings"""
-        try:
+    try:
             settings = QSettings("MaricopaPropertySearch", "PropertySearch")
             loaded_settings = {}
             
@@ -2953,7 +2891,7 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             logger.info(f"Loaded {len(loaded_settings)} application settings")
             return loaded_settings
             
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Failed to load settings: {e}")
             # Return defaults on error
             return {
@@ -2963,10 +2901,9 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
                 'show_progress_details': True,
                 'always_fresh_data': True
             }
-    
     def apply_settings_to_ui(self, settings_dict):
         """Apply loaded settings to the UI components"""
-        try:
+    try:
             # Apply max results setting
             if 'max_results' in settings_dict:
                 # This would be used when performing searches
@@ -3009,13 +2946,11 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             
             logger.info("Applied settings to UI successfully")
             
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Failed to apply settings to UI: {e}")
-
-    
     def _apply_delayed_settings(self, settings_dict):
         """Apply settings after UI is fully initialized"""
-        try:
+    try:
             self.apply_settings_to_ui(settings_dict)
             logger.info("Applied delayed settings to UI successfully")
             
@@ -3024,12 +2959,11 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
                 if hasattr(self, 'background_manager') and not self.background_manager.is_running():
                     QTimer.singleShot(2000, self._delayed_background_start)
                     logger.info("Background data collection scheduled to start automatically")
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Failed to apply delayed settings: {e}")
-
     def closeEvent(self, event):
         """Handle application close event"""
-        try:
+    try:
             # Stop background collection gracefully
             if self.background_manager.is_running():
                 logger.info("Stopping background collection for application shutdown...")
@@ -3045,7 +2979,7 @@ from src.threadsafe_database_manager import ThreadSafeDatabaseManager
             
             logger.info("Application shutdown complete")
             
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error during application shutdown: {e}")
         
         event.accept()

@@ -12,6 +12,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
 
+
 def test_complete_system():
     """Test the complete tax/sales data collection and display system"""
     print("\n[TEST] Complete Tax/Sales System Integration")
@@ -21,23 +22,25 @@ def test_complete_system():
         # Test ConfigManager get method
         print("\n1. Testing ConfigManager 'get' method...")
         from src.config_manager import ConfigManager
+
         config = ConfigManager()
 
         # Test the get method that was causing errors
-        test_value = config.get('auto_start_collection', True, 'application')
+        test_value = config.get("auto_start_collection", True, "application")
         print(f"   ✓ config.get() works: auto_start_collection = {test_value}")
 
         # Test DatabaseManager get_property_details method
         print("\n2. Testing DatabaseManager get_property_details method...")
         from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
         db = ThreadSafeDatabaseManager()
 
-        if hasattr(db, 'get_property_details'):
+        if hasattr(db, "get_property_details"):
             print("   ✓ get_property_details method exists")
 
             # Test with a real APN if available
             try:
-                result = db.get_property_details('13304019')  # Test APN
+                result = db.get_property_details("13304019")  # Test APN
                 if result:
                     print(f"   ✓ Retrieved property data for test APN")
                 else:
@@ -58,11 +61,16 @@ def test_complete_system():
         db_manager = ThreadSafeDatabaseManager()
         worker = BackgroundDataWorker(db_manager, "test_worker")
 
-        if hasattr(worker, 'data_collector') and worker.data_collector:
-            if hasattr(worker.data_collector, 'api_client') and worker.data_collector.api_client:
+        if hasattr(worker, "data_collector") and worker.data_collector:
+            if (
+                hasattr(worker.data_collector, "api_client")
+                and worker.data_collector.api_client
+            ):
                 print("   ✓ BackgroundDataWorker has working API client")
             else:
-                print("   ⚠ BackgroundDataWorker API client is None (may be expected in test env)")
+                print(
+                    "   ⚠ BackgroundDataWorker API client is None (may be expected in test env)"
+                )
         else:
             print("   ✗ BackgroundDataWorker data_collector missing")
             return False
@@ -74,7 +82,7 @@ def test_complete_system():
         from src.api_client import MaricopaAPIClient
 
         api_client = MaricopaAPIClient(config)
-        required_methods = ['get_tax_history', 'get_sales_history', 'test_connection']
+        required_methods = ["get_tax_history", "get_sales_history", "test_connection"]
 
         for method in required_methods:
             if hasattr(api_client, method):
@@ -107,8 +115,11 @@ def test_complete_system():
     except Exception as e:
         print(f"\n❌ System test failed: {e}")
         import traceback
+
         traceback.print_exc()
-        return False
+
+    return False
+
 
 def main():
     print("=" * 60)
@@ -129,6 +140,7 @@ def main():
         print("\n❌ FAILURE: Some issues remain")
 
     return 0 if success else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

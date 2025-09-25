@@ -4,27 +4,27 @@ Unit tests for UnifiedDataCollector
 Tests the consolidated data collector that combines 4 previous implementations
 with features including background processing, priority queues, and real-time progress.
 """
-
-import pytest
 import asyncio
-import time
-import threading
-from unittest.mock import Mock, patch, MagicMock, AsyncMock
-from queue import Queue, Empty, PriorityQueue
 
 # Import the component under test
 import sys
+import threading
+import time
 from pathlib import Path
+from queue import Empty, PriorityQueue, Queue
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 from unified_data_collector import (
-    UnifiedDataCollector,
-    JobPriority,
-    DataCollectionJob,
-    CollectionStrategy,
-    ProgressTracker,
     BackgroundProcessor,
+    CollectionStrategy,
+    DataCollectionJob,
+    JobPriority,
+    ProgressTracker,
+    UnifiedDataCollector,
 )
 
 
@@ -164,7 +164,7 @@ class TestUnifiedDataCollector:
         apn_list = ["10215009", "10215010", "10215011"]
 
         # Setup mock return data for batch
-        def mock_search_property(apn):
+    def mock_search_property(apn):
             return {"success": True, "data": {**mock_property_data, "apn": apn}}
 
         data_collector.api_client.search_property.side_effect = mock_search_property
@@ -183,7 +183,7 @@ class TestUnifiedDataCollector:
         apn_list = ["10215009", "invalid_apn", "10215011"]
 
         # Setup mock with mixed results
-        def mock_search_property(apn):
+    def mock_search_property(apn):
             if apn == "invalid_apn":
                 return {"success": False, "error": "Property not found"}
             return {"success": True, "data": {**mock_property_data, "apn": apn}}
@@ -275,8 +275,7 @@ class TestUnifiedDataCollector:
     def test_progress_callback_functionality(self, data_collector):
         """Test progress callback mechanism."""
         progress_updates = []
-
-        def mock_progress_callback(progress_data):
+    def mock_progress_callback(progress_data):
             progress_updates.append(progress_data)
 
         data_collector.set_progress_callback(mock_progress_callback)
@@ -368,8 +367,7 @@ class TestUnifiedDataCollector:
         """Test error recovery and resilience."""
         # Setup API client to fail initially, then succeed
         call_count = 0
-
-        def mock_search_with_recovery(apn):
+    def mock_search_with_recovery(apn):
             nonlocal call_count
             call_count += 1
             if call_count <= 2:
@@ -416,9 +414,8 @@ class TestUnifiedDataCollector:
         """Test thread safety of the data collector."""
         results = []
         errors = []
-
-        def worker_thread(thread_id):
-            try:
+    def worker_thread(thread_id):
+    try:
                 for i in range(10):
                     job = DataCollectionJob(
                         job_id=f"thread_{thread_id}_job_{i}",
@@ -427,7 +424,7 @@ class TestUnifiedDataCollector:
                     )
                     data_collector.add_job(job)
                     results.append(f"thread_{thread_id}_completed")
-            except Exception as e:
+    except Exception as e:
                 errors.append(str(e))
 
         # Start multiple threads

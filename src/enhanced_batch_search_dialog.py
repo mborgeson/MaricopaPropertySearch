@@ -4,48 +4,47 @@ Enhanced Batch Search Dialog
 Advanced GUI dialog that integrates with the batch search integration manager
 Provides comprehensive batch/parallel search functionality with real-time progress tracking
 """
-
-import os
 import csv
 import json
+import os
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
+from PyQt5.QtCore import Qt, QThread, QTimer, pyqtSignal
+from PyQt5.QtGui import QColor, QFont, QIcon
 from PyQt5.QtWidgets import (
-    QDialog,
-    QVBoxLayout,
-    QHBoxLayout,
-    QFormLayout,
-    QGridLayout,
-    QWidget,
-    QPushButton,
-    QLabel,
+    QButtonGroup,
     QCheckBox,
     QComboBox,
-    QSpinBox,
-    QGroupBox,
-    QTextEdit,
-    QProgressBar,
+    QDialog,
     QFileDialog,
-    QMessageBox,
-    QTabWidget,
-    QTableWidget,
-    QTableWidgetItem,
-    QHeaderView,
-    QSplitter,
+    QFormLayout,
     QFrame,
-    QScrollArea,
+    QGridLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QLineEdit,
     QListWidget,
     QListWidgetItem,
-    QButtonGroup,
+    QMessageBox,
+    QProgressBar,
+    QPushButton,
     QRadioButton,
+    QScrollArea,
     QSlider,
-    QLineEdit,
+    QSpinBox,
+    QSplitter,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
 )
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer
-from PyQt5.QtGui import QFont, QIcon, QColor
 
 from batch_search_integration import (
     BatchSearchIntegrationManager,
@@ -66,7 +65,6 @@ class EnhancedBatchSearchDialog(QDialog):
     batch_progress = pyqtSignal(str, float, str)  # job_id, progress, status
     batch_completed = pyqtSignal(str, object)  # job_id, BatchSearchSummary
     batch_failed = pyqtSignal(str, str)  # job_id, error_message
-
     def __init__(self, integration_manager: BatchSearchIntegrationManager, parent=None):
         super().__init__(parent)
         self.integration_manager = integration_manager
@@ -77,7 +75,6 @@ class EnhancedBatchSearchDialog(QDialog):
 
         self.setup_ui()
         self.load_settings()
-
     def setup_ui(self):
         """Setup the enhanced batch search dialog UI"""
         self.setWindowTitle("Enhanced Batch Property Search")
@@ -109,7 +106,6 @@ class EnhancedBatchSearchDialog(QDialog):
 
         # Bottom button panel
         self.setup_button_panel(layout)
-
     def setup_input_tab(self, tab):
         """Setup the input and basic configuration tab"""
         layout = QVBoxLayout(tab)
@@ -193,7 +189,6 @@ class EnhancedBatchSearchDialog(QDialog):
         validation_layout.addStretch()
 
         layout.addWidget(validation_group)
-
     def setup_options_tab(self, tab):
         """Setup processing options tab"""
         layout = QVBoxLayout(tab)
@@ -293,7 +288,6 @@ class EnhancedBatchSearchDialog(QDialog):
         layout.addWidget(advanced_group)
 
         layout.addStretch()
-
     def setup_progress_tab(self, tab):
         """Setup progress tracking and results display tab"""
         layout = QVBoxLayout(tab)
@@ -364,7 +358,6 @@ class EnhancedBatchSearchDialog(QDialog):
         results_layout.addWidget(self.results_table)
 
         layout.addWidget(results_group)
-
     def setup_button_panel(self, layout):
         """Setup bottom button panel"""
         button_layout = QHBoxLayout()
@@ -429,7 +422,6 @@ class EnhancedBatchSearchDialog(QDialog):
         button_layout.addWidget(close_btn)
 
         layout.addLayout(button_layout)
-
     def _update_search_count(self):
         """Update search count display"""
         text = self.input_text.toPlainText().strip()
@@ -443,7 +435,6 @@ class EnhancedBatchSearchDialog(QDialog):
 
         # Enable/disable start button based on input
         self.start_btn.setEnabled(count > 0 and self.current_job_id is None)
-
     def _validate_input(self):
         """Validate search input format"""
         text = self.input_text.toPlainText().strip()
@@ -488,7 +479,6 @@ class EnhancedBatchSearchDialog(QDialog):
                 f"{valid_count} valid, {invalid_count} invalid"
             )
             self.validation_status.setStyleSheet("color: orange; font-weight: bold;")
-
     def _browse_export_location(self):
         """Browse for export location"""
         directory = QFileDialog.getExistingDirectory(
@@ -498,7 +488,6 @@ class EnhancedBatchSearchDialog(QDialog):
         )
         if directory:
             self.export_location.setText(directory)
-
     def import_from_file(self, file_type):
         """Import search terms from file"""
         if file_type == "txt":
@@ -513,7 +502,7 @@ class EnhancedBatchSearchDialog(QDialog):
         if not filename:
             return
 
-        try:
+    try:
             if file_type == "txt":
                 with open(filename, "r", encoding="utf-8") as f:
                     content = f.read()
@@ -534,9 +523,8 @@ class EnhancedBatchSearchDialog(QDialog):
                 f"Imported {len(content_lines if file_type == 'csv' else content.split())} items",
             )
 
-        except Exception as e:
+    except Exception as e:
             QMessageBox.critical(self, "Import Error", f"Error reading file: {str(e)}")
-
     def start_batch_search(self):
         """Start the batch search operation"""
         # Get search terms
@@ -584,7 +572,7 @@ class EnhancedBatchSearchDialog(QDialog):
         self.batch_results = None
 
         # Start the batch search
-        try:
+    try:
             self.current_job_id = self.integration_manager.execute_batch_search(
                 identifiers=search_terms,
                 search_type=search_type,
@@ -609,9 +597,8 @@ class EnhancedBatchSearchDialog(QDialog):
                 f"Started batch search job {self.current_job_id} with {len(search_terms)} items"
             )
 
-        except Exception as e:
+    except Exception as e:
             self._handle_batch_error(f"Failed to start batch search: {str(e)}")
-
     def cancel_batch_search(self):
         """Cancel the current batch search"""
         if not self.current_job_id:
@@ -625,7 +612,7 @@ class EnhancedBatchSearchDialog(QDialog):
         )
 
         if reply == QMessageBox.Yes:
-            try:
+    try:
                 success = self.integration_manager.cancel_job(self.current_job_id)
                 if success:
                     self._reset_ui_state()
@@ -635,11 +622,10 @@ class EnhancedBatchSearchDialog(QDialog):
                     QMessageBox.warning(
                         self, "Cancel Failed", "Could not cancel the batch operation."
                     )
-            except Exception as e:
+    except Exception as e:
                 QMessageBox.critical(
                     self, "Cancel Error", f"Error cancelling batch: {str(e)}"
                 )
-
     def _progress_callback(self, job_id: str, progress: float, status_message: str):
         """Handle progress updates from integration manager"""
         if job_id != self.current_job_id:
@@ -657,7 +643,6 @@ class EnhancedBatchSearchDialog(QDialog):
         # Check if completed
         if progress >= 100.0:
             self._handle_batch_completion()
-
     def _update_progress_display(self):
         """Update time and statistics display"""
         if not self.current_job_id or not hasattr(self, "batch_start_time"):
@@ -670,7 +655,7 @@ class EnhancedBatchSearchDialog(QDialog):
         self.time_label.setText(f"Elapsed: {minutes:02d}:{seconds:02d}")
 
         # Update statistics if we have job status
-        try:
+    try:
             status = self.integration_manager.get_job_status(self.current_job_id)
             if status:
                 # Update statistics labels
@@ -688,15 +673,14 @@ class EnhancedBatchSearchDialog(QDialog):
                 if elapsed > 0:
                     rate = processed / elapsed
                     self.stats_labels["rate"].setText(f"Rate: {rate:.1f} items/sec")
-        except Exception as e:
+    except Exception as e:
             logger.debug(f"Error updating progress display: {e}")
-
     def _handle_batch_completion(self):
         """Handle batch search completion"""
         if not self.current_job_id:
             return
 
-        try:
+    try:
             # Get final results
             self.batch_results = self.integration_manager.get_job_results(
                 self.current_job_id
@@ -730,9 +714,8 @@ class EnhancedBatchSearchDialog(QDialog):
             else:
                 self._handle_batch_error("No results received from batch operation")
 
-        except Exception as e:
+    except Exception as e:
             self._handle_batch_error(f"Error handling batch completion: {str(e)}")
-
     def _handle_batch_error(self, error_message: str):
         """Handle batch search errors"""
         self._reset_ui_state()
@@ -745,7 +728,6 @@ class EnhancedBatchSearchDialog(QDialog):
             logger.error(f"Batch search {self.current_job_id} failed: {error_message}")
 
         self.current_job_id = None
-
     def _reset_ui_state(self):
         """Reset UI to initial state"""
         self.start_btn.setEnabled(True)
@@ -754,7 +736,6 @@ class EnhancedBatchSearchDialog(QDialog):
         self.overall_progress.setVisible(False)
         self.progress_timer.stop()
         self.current_job_id = None
-
     def _display_results(self, summary: BatchSearchSummary):
         """Display batch results in the results table"""
         self.results_table.setRowCount(len(summary.results))
@@ -785,13 +766,12 @@ class EnhancedBatchSearchDialog(QDialog):
 
         # Enable export button
         self.export_btn.setEnabled(True)
-
     def _auto_export_results(self):
         """Auto-export results if enabled"""
         if not self.batch_results or not self.export_location.text():
             return
 
-        try:
+    try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             filename = f"batch_search_results_{timestamp}.csv"
             filepath = os.path.join(self.export_location.text(), filename)
@@ -804,9 +784,8 @@ class EnhancedBatchSearchDialog(QDialog):
                 self.status_label.setText(f"Results auto-exported to: {filename}")
             else:
                 logger.warning("Auto-export failed")
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Auto-export error: {e}")
-
     def export_results(self):
         """Export batch results to file"""
         if not self.batch_results:
@@ -824,7 +803,7 @@ class EnhancedBatchSearchDialog(QDialog):
         )
 
         if filename:
-            try:
+    try:
                 success = self.integration_manager.export_results_to_csv(
                     self.current_job_id, filename
                 )
@@ -840,26 +819,22 @@ class EnhancedBatchSearchDialog(QDialog):
                         self, "Export Failed", "Failed to export results."
                     )
 
-            except Exception as e:
+    except Exception as e:
                 QMessageBox.critical(
                     self, "Export Error", f"Error exporting results: {str(e)}"
                 )
-
     def get_batch_results(self) -> Optional[BatchSearchSummary]:
         """Get the batch search results"""
         return self.batch_results
-
     def load_settings(self):
         """Load saved settings"""
         # This could load from QSettings or config file
         # For now, use reasonable defaults
         pass
-
     def save_settings(self):
         """Save current settings"""
         # This could save to QSettings or config file
         pass
-
     def closeEvent(self, event):
         """Handle dialog close event"""
         if self.current_job_id:

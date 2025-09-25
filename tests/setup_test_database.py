@@ -3,11 +3,11 @@
 Test Database Setup Script
 Creates and configures the test database for the Maricopa Property Search application
 """
+import sys
+from pathlib import Path
 
 import psycopg2
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
-import sys
-from pathlib import Path
 
 # Add project paths
 PROJECT_ROOT = Path(__file__).parent.parent
@@ -22,13 +22,11 @@ DB_CONFIG = {
     "production_db": "maricopa_properties",
     "test_db": "maricopa_test",
 }
-
-
-def create_test_database():
+    def create_test_database():
     """Create the test database if it doesn't exist"""
-    print("Creating test database...")
+        print("Creating test database...")
 
-    try:
+try:
         # Connect to PostgreSQL server (not specific database)
         conn = psycopg2.connect(
             host=DB_CONFIG["host"],
@@ -48,10 +46,10 @@ def create_test_database():
         exists = cursor.fetchone()
 
         if exists:
-            print(f"Test database '{DB_CONFIG['test_db']}' already exists")
+        print(f"Test database '{DB_CONFIG['test_db']}' already exists")
             # Drop and recreate for clean state
             cursor.execute(f"DROP DATABASE {DB_CONFIG['test_db']}")
-            print(f"Dropped existing test database")
+        print(f"Dropped existing test database")
 
         # Create test database
         cursor.execute(f"CREATE DATABASE {DB_CONFIG['test_db']}")
@@ -61,16 +59,14 @@ def create_test_database():
         conn.close()
         return True
 
-    except psycopg2.Error as e:
+except psycopg2.Error as e:
         print(f"Error creating test database: {e}")
         return False
-
-
-def setup_test_schema():
+    def setup_test_schema():
     """Create tables and schema in test database"""
-    print("Setting up test database schema...")
+        print("Setting up test database schema...")
 
-    try:
+try:
         # Connect to test database
         conn = psycopg2.connect(
             host=DB_CONFIG["host"],
@@ -192,14 +188,12 @@ def setup_test_schema():
         conn.close()
         return True
 
-    except psycopg2.Error as e:
+except psycopg2.Error as e:
         print(f"Error setting up test schema: {e}")
         return False
-
-
-def load_test_data():
+    def load_test_data():
     """Load test data including 10000 W Missouri Ave"""
-    print("Loading test data...")
+        print("Loading test data...")
 
     test_properties = [
         {
@@ -285,7 +279,7 @@ def load_test_data():
         },
     ]
 
-    try:
+try:
         conn = psycopg2.connect(
             host=DB_CONFIG["host"],
             port=DB_CONFIG["port"],
@@ -338,16 +332,14 @@ def load_test_data():
         conn.close()
         return True
 
-    except psycopg2.Error as e:
+except psycopg2.Error as e:
         print(f"Error loading test data: {e}")
         return False
-
-
-def validate_test_setup():
+    def validate_test_setup():
     """Validate the test database setup"""
-    print("Validating test database setup...")
+        print("Validating test database setup...")
 
-    try:
+try:
         conn = psycopg2.connect(
             host=DB_CONFIG["host"],
             port=DB_CONFIG["port"],
@@ -368,9 +360,9 @@ def validate_test_setup():
         )
         missouri_property = cursor.fetchone()
         if missouri_property:
-            print(f"✓ Test property 10000 W Missouri Ave found: {missouri_property}")
+        print(f"✓ Test property 10000 W Missouri Ave found: {missouri_property}")
         else:
-            print("✗ Test property 10000 W Missouri Ave NOT found")
+        print("✗ Test property 10000 W Missouri Ave NOT found")
 
         # Check tax history
         cursor.execute("SELECT COUNT(*) FROM tax_history")
@@ -384,19 +376,16 @@ def validate_test_setup():
 
         cursor.close()
         conn.close()
-
         print("✓ Test database validation complete")
         return True
 
-    except psycopg2.Error as e:
+except psycopg2.Error as e:
         print(f"✗ Error validating test setup: {e}")
         return False
-
-
-def main():
+    def main():
     """Main setup function"""
-    print("Maricopa Property Search - Test Database Setup")
-    print("=" * 50)
+        print("Maricopa Property Search - Test Database Setup")
+        print("=" * 50)
 
     # Step 1: Create test database
     if not create_test_database():
@@ -417,12 +406,11 @@ def main():
     if not validate_test_setup():
         print("Failed to validate test setup")
         return False
-
-    print("\n✓ Test database setup completed successfully!")
-    print(f"✓ Test database: {DB_CONFIG['test_db']}")
-    print("✓ Schema created with all required tables")
-    print("✓ Test data loaded including 10000 W Missouri Ave")
-    print("✓ Ready for automated testing")
+        print("\n✓ Test database setup completed successfully!")
+        print(f"✓ Test database: {DB_CONFIG['test_db']}")
+        print("✓ Schema created with all required tables")
+        print("✓ Test data loaded including 10000 W Missouri Ave")
+        print("✓ Ready for automated testing")
 
     return True
 

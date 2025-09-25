@@ -2,21 +2,21 @@
 Database Lifecycle Hooks
 Handles database connection lifecycle, transaction management, and optimization
 """
-
 import asyncio
-import psycopg2
 import threading
 import time
 from contextlib import contextmanager
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
+
+import psycopg2
 
 from hook_manager import (
     Hook,
     HookContext,
+    HookPriority,
     HookResult,
     HookStatus,
-    HookPriority,
     get_hook_manager,
 )
 from logging_config import get_logger, log_exception
@@ -26,7 +26,6 @@ logger = get_logger(__name__)
 
 class DatabaseConnectionHook(Hook):
     """Hook for database connection lifecycle management"""
-
     def __init__(self):
         super().__init__("database_connection", HookPriority.HIGH)
         self.connection_stats = {
@@ -206,8 +205,7 @@ class DatabaseConnectionHook(Hook):
             },
             metadata={"connection_failed": True},
         )
-
-    def _cleanup_old_connections(self):
+def _cleanup_old_connections(self):
         """Clean up old connection entries"""
         cutoff_time = time.time() - 3600  # Keep connections from last hour
 
@@ -221,7 +219,6 @@ class DatabaseConnectionHook(Hook):
 
         for conn_id in to_remove:
             del self.connection_registry[conn_id]
-
     def get_connection_stats(self) -> Dict[str, Any]:
         """Get connection statistics"""
         avg_connection_time = 0
@@ -249,7 +246,6 @@ class DatabaseConnectionHook(Hook):
 
 class DatabaseTransactionHook(Hook):
     """Hook for database transaction management"""
-
     def __init__(self):
         super().__init__("database_transaction", HookPriority.HIGH)
         self.transaction_stats = {
@@ -402,7 +398,6 @@ class DatabaseTransactionHook(Hook):
             result={"transaction_id": transaction_id, "error": str(error)},
             metadata={"transaction_error": True},
         )
-
     def get_transaction_stats(self) -> Dict[str, Any]:
         """Get transaction statistics"""
         avg_transaction_time = 0
@@ -433,7 +428,6 @@ class DatabaseTransactionHook(Hook):
 
 class DatabaseQueryOptimizationHook(Hook):
     """Hook for database query optimization and monitoring"""
-
     def __init__(self):
         super().__init__("database_query_optimization", HookPriority.NORMAL)
         self.query_stats = {}
@@ -548,16 +542,14 @@ class DatabaseQueryOptimizationHook(Hook):
             },
             metadata={"is_slow": is_slow},
         )
-
     def _get_query_hash(self, query: str) -> str:
         """Generate hash for query identification"""
-        import hashlib
+import hashlib
 
         return hashlib.md5(query.encode()).hexdigest()[:8]
-
     def _get_query_pattern(self, query: str) -> str:
         """Extract query pattern by removing specific values"""
-        import re
+import re
 
         # Convert to lowercase and normalize whitespace
         pattern = re.sub(r"\s+", " ", query.lower().strip())
@@ -567,7 +559,6 @@ class DatabaseQueryOptimizationHook(Hook):
         pattern = re.sub(r"\b\d+\b", "?", pattern)  # Numbers
 
         return pattern
-
     def _analyze_query(self, query: str) -> List[str]:
         """Analyze query for optimization opportunities"""
         suggestions = []
@@ -602,8 +593,7 @@ class DatabaseQueryOptimizationHook(Hook):
             )
 
         return suggestions
-
-    def _cache_query_plan(self, query_hash: str, query_data: Dict):
+def _cache_query_plan(self, query_hash: str, query_data: Dict):
         """Cache query execution plan"""
         if len(self.query_cache) >= self.max_cache_size:
             # Remove oldest entry
@@ -615,7 +605,6 @@ class DatabaseQueryOptimizationHook(Hook):
             "row_count": query_data.get("row_count"),
             "cached_at": datetime.now().isoformat(),
         }
-
     def get_query_stats(self) -> Dict[str, Any]:
         """Get query performance statistics"""
         if not self.query_stats:
@@ -681,8 +670,6 @@ def trigger_connection_start(connection_id: str, database: str, host: str, port:
         host=host,
         port=port,
     )
-
-
 def trigger_connection_success(connection_id: str):
     """Trigger database connection success hook"""
     from hook_manager import emit_hook
@@ -690,8 +677,6 @@ def trigger_connection_success(connection_id: str):
     return emit_hook(
         "database.connected", "database_manager", connection_id=connection_id
     )
-
-
 def trigger_connection_error(connection_id: str, error: Exception):
     """Trigger database connection error hook"""
     from hook_manager import emit_hook
@@ -699,8 +684,6 @@ def trigger_connection_error(connection_id: str, error: Exception):
     return emit_hook(
         "database.error", "database_manager", connection_id=connection_id, error=error
     )
-
-
 def trigger_transaction_begin(transaction_id: str):
     """Trigger database transaction begin hook"""
     from hook_manager import emit_hook
@@ -708,8 +691,6 @@ def trigger_transaction_begin(transaction_id: str):
     return emit_hook(
         "database.transaction.begin", "database_manager", transaction_id=transaction_id
     )
-
-
 def trigger_transaction_commit(transaction_id: str):
     """Trigger database transaction commit hook"""
     from hook_manager import emit_hook
@@ -717,8 +698,6 @@ def trigger_transaction_commit(transaction_id: str):
     return emit_hook(
         "database.transaction.commit", "database_manager", transaction_id=transaction_id
     )
-
-
 def trigger_query_start(query: str, params: Dict = None):
     """Trigger database query start hook"""
     from hook_manager import emit_hook
@@ -726,9 +705,7 @@ def trigger_query_start(query: str, params: Dict = None):
     return emit_hook(
         "database.query.before", "database_manager", query=query, params=params
     )
-
-
-def trigger_query_complete(
+    def trigger_query_complete(
     query: str, execution_time: float, row_count: int, success: bool = True
 ):
     """Trigger database query completion hook"""

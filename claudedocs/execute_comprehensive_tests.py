@@ -3,17 +3,16 @@
 Comprehensive Test Execution Script
 Orchestrates complete testing workflow with reporting and analysis
 """
-
+import argparse
+import json
+import logging
+import os
 import subprocess
 import sys
-import json
 import time
-import os
-from pathlib import Path
 from datetime import datetime
-import argparse
-import logging
-from typing import Dict, List, Any
+from pathlib import Path
+from typing import Any, Dict, List
 
 # Configure logging
 logging.basicConfig(
@@ -28,14 +27,12 @@ logger = logging.getLogger(__name__)
 
 class ComprehensiveTestRunner:
     """Orchestrates comprehensive testing with reporting and analysis"""
-    
     def __init__(self, project_root: Path):
         self.project_root = project_root
         self.test_results = {}
         self.start_time = time.time()
         self.reports_dir = project_root / "tests" / "reports"
         self.reports_dir.mkdir(parents=True, exist_ok=True)
-        
     def run_test_suite(self, suite_name: str, command: List[str], timeout: int = 300) -> Dict[str, Any]:
         """Execute a test suite and capture results"""
         logger.info(f"🧪 Running {suite_name} tests...")
@@ -97,7 +94,6 @@ class ComprehensiveTestRunner:
                 'passed': False,
                 'timestamp': datetime.now().isoformat()
             }
-
     def run_unit_tests(self) -> Dict[str, Any]:
         """Execute unit tests with coverage reporting"""
         command = [
@@ -113,7 +109,6 @@ class ComprehensiveTestRunner:
             '--durations=10'
         ]
         return self.run_test_suite('Unit Tests', command, timeout=300)
-    
     def run_integration_tests(self) -> Dict[str, Any]:
         """Execute integration tests"""
         command = [
@@ -125,7 +120,6 @@ class ComprehensiveTestRunner:
             '-m', 'integration'
         ]
         return self.run_test_suite('Integration Tests', command, timeout=600)
-    
     def run_performance_tests(self) -> Dict[str, Any]:
         """Execute performance benchmarks"""
         command = [
@@ -139,7 +133,6 @@ class ComprehensiveTestRunner:
             '-m', 'performance'
         ]
         return self.run_test_suite('Performance Tests', command, timeout=900)
-    
     def run_e2e_tests(self) -> Dict[str, Any]:
         """Execute end-to-end tests"""
         command = [
@@ -151,7 +144,6 @@ class ComprehensiveTestRunner:
             '-m', 'e2e'
         ]
         return self.run_test_suite('E2E Tests', command, timeout=1200)
-    
     def run_gui_tests(self) -> Dict[str, Any]:
         """Execute GUI tests"""
         # Set up virtual display for headless GUI testing
@@ -167,7 +159,6 @@ class ComprehensiveTestRunner:
             '-m', 'gui'
         ]
         return self.run_test_suite('GUI Tests', command, timeout=600)
-    
     def run_security_tests(self) -> Dict[str, Any]:
         """Execute security vulnerability scanning"""
         command = [
@@ -177,7 +168,6 @@ class ComprehensiveTestRunner:
             '-o', 'tests/reports/security_report.json'
         ]
         return self.run_test_suite('Security Scan', command, timeout=300)
-    
     def run_code_quality_checks(self) -> Dict[str, Any]:
         """Execute code quality checks"""
         commands = [
@@ -206,7 +196,6 @@ class ComprehensiveTestRunner:
             'timestamp': datetime.now().isoformat(),
             'detailed_results': results
         }
-    
     def analyze_coverage_report(self) -> Dict[str, Any]:
         """Analyze code coverage and identify gaps"""
         coverage_file = self.reports_dir / "coverage.json"
@@ -240,7 +229,6 @@ class ComprehensiveTestRunner:
             
         except Exception as e:
             return {'error': f'Failed to analyze coverage: {e}'}
-    
     def generate_comprehensive_report(self) -> str:
         """Generate a comprehensive test execution report"""
         total_duration = time.time() - self.start_time
@@ -305,7 +293,7 @@ Total Execution Time: {total_duration:.2f} seconds
                     for benchmark in benchmark_data['benchmarks'][:5]:  # Top 5
                         report += f"- {benchmark['name']}: {benchmark['stats']['mean']:.4f}s (mean)\n"
                 except:
-                    report += "\n## Performance Benchmarks\nError parsing benchmark data\n"
+                        report += "\n## Performance Benchmarks\nError parsing benchmark data\n"
         
         # Quality Gates Assessment
         report += "\n## Quality Gates Assessment\n"
@@ -327,7 +315,6 @@ Total Execution Time: {total_duration:.2f} seconds
         report += f"\n**Overall Quality Assessment: {'✅ READY FOR RELEASE' if all_gates_passed else '❌ NOT READY - ISSUES NEED RESOLUTION'}**\n"
         
         return report
-    
     def save_report(self, report: str) -> Path:
         """Save the comprehensive report to file"""
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -338,9 +325,7 @@ Total Execution Time: {total_duration:.2f} seconds
         
         logger.info(f"📊 Comprehensive report saved to: {report_file}")
         return report_file
-
-
-def main():
+    def main():
     """Main test execution workflow"""
     parser = argparse.ArgumentParser(description='Comprehensive Test Runner')
     parser.add_argument('--suite', choices=['unit', 'integration', 'performance', 'e2e', 'gui', 'security', 'quality', 'all'],
@@ -396,10 +381,10 @@ def main():
     report_file = runner.save_report(report)
     
     # Display summary
-    print("\n" + "="*80)
-    print("📊 TEST EXECUTION SUMMARY")
-    print("="*80)
-    print(report)
+        print("\n" + "="*80)
+        print("📊 TEST EXECUTION SUMMARY")
+        print("="*80)
+        print(report)
     
     # Exit with appropriate code
     failed_suites = [name for name, result in runner.test_results.items() if not result['passed']]

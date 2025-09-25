@@ -5,20 +5,20 @@ Integrates with existing UnifiedMaricopaAPIClient for enhanced data collection
 """
 
 import asyncio
-import logging
-import time
 import json
-from typing import Dict, List, Optional, Any, Tuple, Union
+import logging
+import os
+import tempfile
+import time
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from threading import Lock, Event
 from pathlib import Path
-import tempfile
-import os
+from threading import Event, Lock
+from typing import Any, Dict, List, Optional, Tuple, Union
 from urllib.parse import urljoin, urlparse
 
 try:
-    from playwright.async_api import async_playwright, Browser, BrowserContext, Page
+    from playwright.async_api import Browser, BrowserContext, Page, async_playwright
     from playwright.sync_api import sync_playwright
 
     PLAYWRIGHT_AVAILABLE = True
@@ -680,7 +680,8 @@ class SyncPlaywrightService:
         """Get performance statistics"""
         return self.async_service.get_performance_stats()
 
-    def cleanup(self):
-        """Clean up resources"""
-        loop = self._get_event_loop()
-        loop.run_until_complete(self.async_service.cleanup())
+
+def cleanup(self):
+    """Clean up resources"""
+    loop = self._get_event_loop()
+    loop.run_until_complete(self.async_service.cleanup())

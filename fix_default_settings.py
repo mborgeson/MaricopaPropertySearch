@@ -3,19 +3,18 @@
 Fix Default Settings Application in Enhanced Main Window
 This script fixes the issue where default settings are not being properly applied to UI components.
 """
-
 import os
 import re
 import shutil
 from datetime import datetime
 
+
 def backup_file(filepath):
     """Create a backup of the file"""
     backup_path = f"{filepath}.backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     shutil.copy2(filepath, backup_path)
-    print(f"Created backup: {backup_path}")
+        print(f"Created backup: {backup_path}")
     return backup_path
-
 def fix_apply_settings_method(content):
     """Fix the apply_settings_to_ui method"""
     
@@ -71,12 +70,10 @@ def fix_apply_settings_method(content):
             logger.error(f"Failed to apply settings to UI: {e}")
 
     '''
-    
-    def replace_method(match):
+def replace_method(match):
         return new_method + match.group(2)
     
     return re.sub(pattern, replace_method, content, flags=re.DOTALL)
-
 def add_table_auto_resize_support(content):
     """Add support for auto-resizing tables after data is loaded"""
     
@@ -89,12 +86,10 @@ def add_table_auto_resize_support(content):
             if hasattr(self, 'auto_resize_columns_enabled') and self.auto_resize_columns_enabled:
                 self.results_table.resizeColumnsToContents()
 '''
-    
-    def add_auto_resize(match):
+def add_auto_resize(match):
         return match.group(1) + auto_resize_code + match.group(2)
     
     return re.sub(search_pattern, add_auto_resize, content, flags=re.DOTALL)
-
 def fix_initialization_order(content):
     """Fix the initialization order to ensure settings are applied after UI is fully set up"""
     
@@ -112,7 +107,7 @@ def fix_initialization_order(content):
     
     # Add the delayed settings application method
     delayed_method = '''
-    def _apply_delayed_settings(self, settings_dict):
+def _apply_delayed_settings(self, settings_dict):
         """Apply settings after UI is fully initialized"""
         try:
             self.apply_settings_to_ui(settings_dict)
@@ -132,7 +127,6 @@ def fix_initialization_order(content):
     content = re.sub(close_event_pattern, delayed_method + r'\n    \1', content)
     
     return content
-
 def main():
     """Apply fixes to the enhanced main window"""
     
@@ -144,8 +138,7 @@ def main():
     if not os.path.exists(main_window_path):
         print(f"Error: File not found: {main_window_path}")
         return False
-    
-    print(f"Fixing default settings in: {main_window_path}")
+        print(f"Fixing default settings in: {main_window_path}")
     
     # Create backup
     backup_path = backup_file(main_window_path)
@@ -154,7 +147,6 @@ def main():
         # Read the current file
         with open(main_window_path, 'r', encoding='utf-8') as f:
             content = f.read()
-        
         print("Applying fixes...")
         
         # Apply fixes
@@ -165,7 +157,6 @@ def main():
         # Write the fixed content
         with open(main_window_path, 'w', encoding='utf-8') as f:
             f.write(content)
-        
         print("✅ Successfully applied default settings fixes!")
         print()
         print("Fixed issues:")

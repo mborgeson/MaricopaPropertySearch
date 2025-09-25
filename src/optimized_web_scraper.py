@@ -3,25 +3,25 @@ Optimized Web Scraper with Performance Enhancements
 Parallel scraping, connection reuse, and smart timeouts
 Target: <2 seconds for tax/sales data scraping
 """
-
 import asyncio
-import aiohttp
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException, NoSuchElementException
-import time
-import logging
-from typing import Dict, List, Optional, Any, Tuple
-from pathlib import Path
 import json
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+import logging
 import threading
+import time
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from dataclasses import dataclass
 from functools import lru_cache
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
+
+import aiohttp
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException, TimeoutException
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 from logging_config import get_logger, get_performance_logger
 
@@ -42,7 +42,6 @@ class ScrapingTask:
 
 class OptimizedWebScraperManager:
     """High-performance web scraper with parallel processing and smart resource management"""
-
     def __init__(self, config_manager):
         logger.info("Initializing Optimized Web Scraper Manager")
 
@@ -79,7 +78,6 @@ class OptimizedWebScraperManager:
         logger.info(
             f"Optimized Web Scraper initialized with {self.max_workers} workers"
         )
-
     def _setup_optimized_chrome_options(self) -> Options:
         """Setup Chrome options optimized for speed and performance"""
         options = Options()
@@ -133,7 +131,6 @@ class OptimizedWebScraperManager:
 
         logger.debug("Chrome options configured for maximum performance")
         return options
-
     def _get_optimized_driver(self) -> webdriver.Chrome:
         """Get an optimized Chrome driver instance"""
         with self.driver_lock:
@@ -157,10 +154,9 @@ class OptimizedWebScraperManager:
 
         logger.debug("Created new optimized Chrome driver")
         return driver
-
     def _return_driver_to_pool(self, driver: webdriver.Chrome):
         """Return driver to pool for reuse"""
-        try:
+    try:
             # Clear cookies and reset state
             driver.delete_all_cookies()
             driver.get("about:blank")
@@ -173,15 +169,14 @@ class OptimizedWebScraperManager:
                     driver.quit()
                     self.active_drivers -= 1
                     logger.debug("Driver closed (pool full)")
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error returning driver to pool: {e}")
-            try:
+    try:
                 driver.quit()
                 with self.driver_lock:
                     self.active_drivers -= 1
-            except:
-                pass
-
+    except:
+            pass
     def scrape_property_data_parallel(
         self, apn: str, data_types: List[str] = None
     ) -> Dict[str, Any]:
@@ -247,14 +242,14 @@ class OptimizedWebScraperManager:
 
         # Collect results with timeout
         for task_name, future in futures:
-            try:
+    try:
                 result = future.result(timeout=6.0)  # 6 second timeout per task
                 if result:
                     results[task_name] = result
                     logger.debug(f"Scraped {task_name} successfully")
                 else:
                     logger.warning(f"No data from {task_name}")
-            except Exception as e:
+    except Exception as e:
                 logger.error(f"Error scraping {task_name}: {e}")
                 results[task_name] = {"error": str(e)}
 
@@ -271,7 +266,6 @@ class OptimizedWebScraperManager:
             "data_collected": list(results.keys()),
             "results": results,
         }
-
     def _scrape_single_task(self, task: ScrapingTask, apn: str) -> Optional[Dict]:
         """Execute a single scraping task with caching and optimization"""
         cache_key = f"{task.name}:{apn}"
@@ -282,7 +276,7 @@ class OptimizedWebScraperManager:
             return cached_result
 
         driver = None
-        try:
+    try:
             driver = self._get_optimized_driver()
 
             # Navigate with timeout
@@ -313,21 +307,20 @@ class OptimizedWebScraperManager:
 
             return result
 
-        except TimeoutException:
+    except TimeoutException:
             logger.warning(f"Timeout scraping {task.name} for APN: {apn}")
             return None
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error scraping {task.name} for APN {apn}: {e}")
             return None
-        finally:
+    finally:
             if driver:
                 self._return_driver_to_pool(driver)
-
     def _scrape_tax_info_fast(
         self, driver: webdriver.Chrome, wait: WebDriverWait
     ) -> Optional[Dict]:
         """Fast tax information scraping with minimal waits"""
-        try:
+    try:
             # Look for tax table or key tax elements
             tax_elements = driver.find_elements(
                 By.CSS_SELECTOR, ".tax-info, .property-tax, table"
@@ -356,15 +349,14 @@ class OptimizedWebScraperManager:
 
             return None
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error in fast tax scraping: {e}")
             return None
-
     def _scrape_sales_history_fast(
         self, driver: webdriver.Chrome, wait: WebDriverWait
     ) -> Optional[List[Dict]]:
         """Fast sales history scraping"""
-        try:
+    try:
             # Look for sales table or sales data elements
             sales_elements = driver.find_elements(
                 By.CSS_SELECTOR, ".sales-history, .sales-table, table"
@@ -390,15 +382,14 @@ class OptimizedWebScraperManager:
 
             return None
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error in fast sales scraping: {e}")
             return None
-
     def _scrape_documents_fast(
         self, driver: webdriver.Chrome, wait: WebDriverWait
     ) -> Optional[List[Dict]]:
         """Fast document scraping"""
-        try:
+    try:
             # Look for document links or document table
             doc_elements = driver.find_elements(
                 By.CSS_SELECTOR, '.documents, .document-list, a[href*="document"]'
@@ -424,15 +415,14 @@ class OptimizedWebScraperManager:
 
             return None
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error in fast document scraping: {e}")
             return None
-
     def _scrape_recorder_info_fast(
         self, driver: webdriver.Chrome, wait: WebDriverWait
     ) -> Optional[Dict]:
         """Fast recorder information scraping"""
-        try:
+    try:
             # Get basic page information quickly
             page_title = driver.title
             page_url = driver.current_url
@@ -453,10 +443,9 @@ class OptimizedWebScraperManager:
 
             return recorder_data
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error in fast recorder scraping: {e}")
             return None
-
     def _get_cached_result(self, cache_key: str) -> Optional[Dict]:
         """Get cached scraping result if not expired"""
         with self._cache_lock:
@@ -471,12 +460,10 @@ class OptimizedWebScraperManager:
 
         self.scraping_stats["cache_misses"] += 1
         return None
-
     def _cache_result(self, cache_key: str, result: Dict):
         """Cache scraping result"""
         with self._cache_lock:
             self._scrape_cache[cache_key] = {"data": result, "timestamp": time.time()}
-
     def _update_scraping_stats(self, scraping_time: float, success: bool):
         """Update scraping performance statistics"""
         self.scraping_stats["total_scrapes"] += 1
@@ -489,7 +476,6 @@ class OptimizedWebScraperManager:
         self.scraping_stats["avg_scrape_time"] = (
             prev_avg * (count - 1) + scraping_time
         ) / count
-
     def get_performance_report(self) -> Dict[str, Any]:
         """Get scraping performance report"""
         cache_total = (
@@ -504,30 +490,27 @@ class OptimizedWebScraperManager:
             "driver_pool_size": len(self.driver_pool),
             "cached_entries": len(self._scrape_cache),
         }
-
     def clear_cache(self):
         """Clear scraping cache"""
         with self._cache_lock:
             self._scrape_cache.clear()
         logger.info("Scraping cache cleared")
-
     def close_all_drivers(self):
         """Close all drivers and clean up resources"""
         with self.driver_lock:
             for driver in self.driver_pool:
-                try:
+    try:
                     driver.quit()
-                except:
-                    pass
+    except:
+            pass
             self.driver_pool.clear()
             self.active_drivers = 0
 
         self.thread_pool.shutdown(wait=True)
         logger.info("All web drivers closed and thread pool shut down")
-
     def __del__(self):
         """Cleanup when object is destroyed"""
-        try:
+    try:
             self.close_all_drivers()
-        except:
+    except:
             pass

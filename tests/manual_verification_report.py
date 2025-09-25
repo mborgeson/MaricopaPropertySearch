@@ -6,27 +6,24 @@ Manual Verification Report for Hive Mind Fixes
 This script manually examines the code to verify all hive mind fixes
 without needing to execute the actual modules.
 """
-
-import sys
-import os
 import ast
 import inspect
+import os
+import sys
 from pathlib import Path
 
 # Add project root to path
 project_root = Path(__file__).parent.parent.resolve()
 sys.path.insert(0, str(project_root))
-
-
-def check_config_manager_get_method():
+    def check_config_manager_get_method():
     """Verify EnhancedConfigManager.get() method exists and has correct signature"""
-    print("=== CHECKING CONFIGMANAGER.GET() METHOD ===")
+        print("=== CHECKING CONFIGMANAGER.GET() METHOD ===")
 
     config_file = project_root / "src" / "config_manager.py"
     if not config_file.exists():
         return {"status": "FAILED", "reason": "config_manager.py not found"}
 
-    try:
+try:
         with open(config_file, "r") as f:
             content = f.read()
 
@@ -65,19 +62,17 @@ def check_config_manager_get_method():
                 "reason": "Method implementation looks incomplete",
             }
 
-    except Exception as e:
+except Exception as e:
         return {"status": "FAILED", "reason": f"Error parsing file: {e}"}
-
-
-def check_database_manager_methods():
+    def check_database_manager_methods():
     """Verify DatabaseManager has required methods"""
-    print("=== CHECKING DATABASE MANAGER METHODS ===")
+        print("=== CHECKING DATABASE MANAGER METHODS ===")
 
     db_file = project_root / "src" / "database_manager.py"
     if not db_file.exists():
         return {"status": "FAILED", "reason": "database_manager.py not found"}
 
-    try:
+try:
         with open(db_file, "r") as f:
             content = f.read()
 
@@ -116,19 +111,17 @@ def check_database_manager_methods():
             "methods": found_methods,
         }
 
-    except Exception as e:
+except Exception as e:
         return {"status": "FAILED", "reason": f"Error parsing file: {e}"}
-
-
-def check_gui_imports():
+    def check_gui_imports():
     """Verify GUI can be imported without AttributeError issues"""
-    print("=== CHECKING GUI IMPORTS ===")
+        print("=== CHECKING GUI IMPORTS ===")
 
     gui_file = project_root / "src" / "gui" / "enhanced_main_window.py"
     if not gui_file.exists():
         return {"status": "FAILED", "reason": "enhanced_main_window.py not found"}
 
-    try:
+try:
         with open(gui_file, "r") as f:
             content = f.read()
 
@@ -179,19 +172,17 @@ def check_gui_imports():
             "missing_imports": missing_imports,
         }
 
-    except Exception as e:
+except Exception as e:
         return {"status": "FAILED", "reason": f"Error parsing file: {e}"}
-
-
-def check_display_functions():
+    def check_display_functions():
     """Check for tax and sales display functions"""
-    print("=== CHECKING TAX/SALES DISPLAY FUNCTIONS ===")
+        print("=== CHECKING TAX/SALES DISPLAY FUNCTIONS ===")
 
     gui_file = project_root / "src" / "gui" / "enhanced_main_window.py"
     if not gui_file.exists():
         return {"status": "FAILED", "reason": "enhanced_main_window.py not found"}
 
-    try:
+try:
         with open(gui_file, "r") as f:
             content = f.read()
 
@@ -225,17 +216,15 @@ def check_display_functions():
             "all_display_methods": display_methods,
         }
 
-    except Exception as e:
+except Exception as e:
         return {"status": "FAILED", "reason": f"Error parsing file: {e}"}
-
-
-def main():
+    def main():
     """Run all verification checks"""
-    print("🔍 HIVE MIND FIXES MANUAL VERIFICATION REPORT")
-    print("=" * 60)
-    print(f"Project: {project_root}")
-    print(f"Date: {os.system('date') or 'Unknown'}")
-    print()
+        print("🔍 HIVE MIND FIXES MANUAL VERIFICATION REPORT")
+        print("=" * 60)
+        print(f"Project: {project_root}")
+        print(f"Date: {os.system('date') or 'Unknown'}")
+        print()
 
     tests = [
         ("EnhancedConfigManager.get() Method", check_config_manager_get_method),
@@ -253,35 +242,34 @@ def main():
         results.append(result)
 
         if result["status"] == "PASSED":
-            print(f"✅ {test_name}: PASSED")
+        print(f"✅ {test_name}: PASSED")
         elif result["status"] == "WARNING":
-            print(f"⚠️ {test_name}: PASSED WITH WARNINGS")
+        print(f"⚠️ {test_name}: PASSED WITH WARNINGS")
         else:
-            print(f"❌ {test_name}: FAILED")
+        print(f"❌ {test_name}: FAILED")
 
         if "details" in result:
-            print(f"   Details: {result['details']}")
+        print(f"   Details: {result['details']}")
         if "reason" in result:
-            print(f"   Reason: {result['reason']}")
+        print(f"   Reason: {result['reason']}")
         if "issues" in result and result["issues"]:
             for issue in result["issues"]:
-                print(f"   Issue: {issue}")
+        print(f"   Issue: {issue}")
         print()
 
     # Summary
     passed = len([r for r in results if r["status"] == "PASSED"])
     warnings = len([r for r in results if r["status"] == "WARNING"])
     failed = len([r for r in results if r["status"] == "FAILED"])
-
-    print("=" * 60)
-    print("SUMMARY")
-    print("=" * 60)
-    print(f"Total Tests: {len(results)}")
-    print(f"Passed: {passed}")
-    print(f"Warnings: {warnings}")
-    print(f"Failed: {failed}")
-    print(f"Success Rate: {(passed + warnings) / len(results) * 100:.1f}%")
-    print()
+        print("=" * 60)
+        print("SUMMARY")
+        print("=" * 60)
+        print(f"Total Tests: {len(results)}")
+        print(f"Passed: {passed}")
+        print(f"Warnings: {warnings}")
+        print(f"Failed: {failed}")
+        print(f"Success Rate: {(passed + warnings) / len(results) * 100:.1f}%")
+        print()
 
     if failed == 0:
         print("🎉 ALL HIVE MIND FIXES VERIFIED SUCCESSFULLY!")
@@ -290,11 +278,10 @@ def main():
         print("⚠️ SOME ISSUES FOUND:")
         for result in results:
             if result["status"] == "FAILED":
-                print(
+        print(
                     f"   - {result['test_name']}: {result.get('reason', 'Unknown error')}"
                 )
-
-    print("\n" + "=" * 60)
+        print("\n" + "=" * 60)
     return 0 if failed == 0 else 1
 
 

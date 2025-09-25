@@ -1,16 +1,14 @@
 """
 Mock responses and test data fixtures for comprehensive testing
 """
-
 import json
 import random
 from datetime import datetime, timedelta
-from typing import Dict, List, Any, Optional
+from typing import Any, Dict, List, Optional
 
 
 class MockDataGenerator:
     """Generate realistic mock data for testing"""
-
     def __init__(self):
         self.owner_names = [
             "SMITH, JOHN & MARY",
@@ -68,7 +66,6 @@ class MockDataGenerator:
             "MOBILE HOME",
             "INDUSTRIAL",
         ]
-
     def generate_property_data(self, count: int = 10) -> List[Dict[str, Any]]:
         """Generate realistic property data"""
         properties = []
@@ -99,7 +96,6 @@ class MockDataGenerator:
             properties.append(property_data)
 
         return properties
-
     def generate_tax_history(self, apn: str, years: int = 5) -> List[Dict[str, Any]]:
         """Generate tax history data"""
         current_year = datetime.now().year
@@ -123,7 +119,6 @@ class MockDataGenerator:
             tax_history.append(tax_record)
 
         return tax_history
-
     def generate_sales_history(
         self, apn: str, sales_count: int = None
     ) -> List[Dict[str, Any]]:
@@ -163,7 +158,6 @@ class MockDataGenerator:
             sales_history.append(sale_record)
 
         return sales_history
-
     def generate_api_responses(self) -> Dict[str, Any]:
         """Generate complete API response scenarios"""
         return {
@@ -210,7 +204,6 @@ class MockDataGenerator:
                 "query_time": random.uniform(0.2, 0.8),
             },
         }
-
     def generate_scraper_responses(self) -> Dict[str, Any]:
         """Generate web scraper response scenarios"""
         return {
@@ -259,7 +252,6 @@ class MockDataGenerator:
                 "warnings": ["Data format inconsistent"],
             },
         }
-
     def _generate_apn(self, index: int) -> str:
         """Generate realistic APN (Assessor Parcel Number)"""
         book = random.randint(100, 999)
@@ -267,7 +259,6 @@ class MockDataGenerator:
         parcel = f"{index:03d}"
         suffix = random.choice(["A", "B", "C", "D", ""])
         return f"{book}-{map_num}-{parcel}{suffix}"
-
     def _generate_address(self, index: int) -> str:
         """Generate realistic property address"""
         house_number = random.randint(100, 9999)
@@ -276,7 +267,6 @@ class MockDataGenerator:
             ["", f" #{random.randint(1, 50)}", f' APT {random.choice("ABCD")}']
         )
         return f"{house_number} {street_name}{unit}"
-
     def _generate_zip_code(self) -> str:
         """Generate realistic Arizona zip code"""
         return random.choice(
@@ -297,7 +287,6 @@ class MockDataGenerator:
                 "85283",
             ]
         )
-
     def _generate_assessed_value(self) -> int:
         """Generate realistic assessed value"""
         property_type = random.choice(self.property_types)
@@ -308,25 +297,21 @@ class MockDataGenerator:
             return random.randint(25000, 150000)
         else:  # Residential types
             return random.randint(150000, 800000)
-
     def _generate_square_feet(self) -> Optional[int]:
         """Generate realistic square footage"""
         if random.random() < 0.05:  # 5% chance of missing data
             return None
         return random.randint(800, 4500)
-
     def _generate_year_built(self) -> Optional[int]:
         """Generate realistic year built"""
         if random.random() < 0.03:  # 3% chance of missing data
             return None
         return random.randint(1950, 2023)
-
     def _generate_bedrooms(self) -> Optional[int]:
         """Generate realistic bedroom count"""
         if random.random() < 0.1:  # 10% chance of missing data
             return None
         return random.choices([1, 2, 3, 4, 5, 6], weights=[5, 15, 35, 30, 10, 5])[0]
-
     def _generate_bathrooms(self) -> Optional[float]:
         """Generate realistic bathroom count"""
         if random.random() < 0.1:  # 10% chance of missing data
@@ -334,13 +319,11 @@ class MockDataGenerator:
         return random.choices(
             [1, 1.5, 2, 2.5, 3, 3.5, 4], weights=[10, 15, 30, 20, 15, 7, 3]
         )[0]
-
     def _generate_lot_size(self) -> Optional[float]:
         """Generate realistic lot size in acres"""
         if random.random() < 0.15:  # 15% chance of missing data
             return None
         return round(random.uniform(0.15, 2.5), 2)
-
     def _generate_date_in_year(self, year: int) -> str:
         """Generate random date within a year"""
         start_date = datetime(year, 1, 1)
@@ -349,11 +332,9 @@ class MockDataGenerator:
             days=random.randint(0, (end_date - start_date).days)
         )
         return random_date.strftime("%Y-%m-%d")
-
     def _generate_buyer_name(self) -> str:
         """Generate buyer name for sales history"""
         return random.choice(self.owner_names)
-
     def _generate_seller_name(self) -> str:
         """Generate seller name for sales history"""
         return random.choice(self.owner_names)
@@ -361,11 +342,9 @@ class MockDataGenerator:
 
 class MockResponseProvider:
     """Provides mock responses for different testing scenarios"""
-
     def __init__(self):
         self.generator = MockDataGenerator()
         self.response_cache = {}
-
     def get_search_response(self, scenario: str, **kwargs) -> Dict[str, Any]:
         """Get mock response for search scenarios"""
 
@@ -375,7 +354,6 @@ class MockResponseProvider:
             )
 
         return self.response_cache[scenario]
-
     def get_property_details_response(
         self, apn: str, scenario: str = "normal"
     ) -> Dict[str, Any]:
@@ -417,7 +395,6 @@ class MockResponseProvider:
             self.response_cache[cache_key] = response
 
         return self.response_cache[cache_key]
-
     def _generate_scenario_response(self, scenario: str, **kwargs) -> Dict[str, Any]:
         """Generate response for specific test scenario"""
 
@@ -512,20 +489,16 @@ mock_provider = MockResponseProvider()
 
 
 # Convenience functions
-def get_mock_properties(count: int = 5) -> List[Dict[str, Any]]:
+    def get_mock_properties(count: int = 5) -> List[Dict[str, Any]]:
     """Get mock property data"""
     generator = MockDataGenerator()
     return generator.generate_property_data(count)
-
-
-def get_mock_search_response(
+    def get_mock_search_response(
     scenario: str = "successful_search", **kwargs
 ) -> Dict[str, Any]:
     """Get mock search response"""
     return mock_provider.get_search_response(scenario, **kwargs)
-
-
-def get_mock_property_details(apn: str, scenario: str = "normal") -> Dict[str, Any]:
+    def get_mock_property_details(apn: str, scenario: str = "normal") -> Dict[str, Any]:
     """Get mock property details"""
     return mock_provider.get_property_details_response(apn, scenario)
 

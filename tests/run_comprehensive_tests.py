@@ -1,15 +1,15 @@
 """
 Comprehensive test runner with reporting and analysis
 """
+import argparse
+import json
+import subprocess
+import sys
+import time
+from datetime import datetime
+from pathlib import Path
 
 import pytest
-import sys
-import json
-import time
-from pathlib import Path
-from datetime import datetime
-import argparse
-import subprocess
 
 # Test suite configuration
 TEST_SUITES = {
@@ -54,14 +54,12 @@ TEST_SUITES = {
 
 class TestRunner:
     """Comprehensive test runner with reporting"""
-
     def __init__(self, project_root: Path):
         self.project_root = project_root
         self.test_results = {}
         self.start_time = None
         self.reports_dir = project_root / "tests" / "reports"
         self.reports_dir.mkdir(exist_ok=True)
-
     def run_test_suite(self, suite_name: str, **pytest_args) -> dict:
         """Run a specific test suite and return results"""
 
@@ -69,7 +67,6 @@ class TestRunner:
             raise ValueError(f"Unknown test suite: {suite_name}")
 
         suite_config = TEST_SUITES[suite_name]
-
         print(f"\n{'='*60}")
         print(f"Running {suite_name.upper()} tests")
         print(f"Description: {suite_config['description']}")
@@ -104,7 +101,7 @@ class TestRunner:
 
         start_time = time.time()
 
-        try:
+    try:
             # Run pytest
             result = pytest.main(args)
 
@@ -125,14 +122,13 @@ class TestRunner:
                 suite_results.update(self._parse_junit_xml(xml_report))
 
             self.test_results[suite_name] = suite_results
-
-            print(f"\n{suite_name.upper()} Tests Complete:")
-            print(f"  Result: {'PASSED' if result == 0 else 'FAILED'}")
-            print(f"  Time: {execution_time:.1f}s")
+        print(f"\n{suite_name.upper()} Tests Complete:")
+        print(f"  Result: {'PASSED' if result == 0 else 'FAILED'}")
+        print(f"  Time: {execution_time:.1f}s")
 
             return suite_results
 
-        except Exception as e:
+    except Exception as e:
             execution_time = time.time() - start_time
             error_results = {
                 "suite_name": suite_name,
@@ -144,9 +140,8 @@ class TestRunner:
             }
 
             self.test_results[suite_name] = error_results
-            print(f"\n{suite_name.upper()} Tests FAILED with error: {e}")
+        print(f"\n{suite_name.upper()} Tests FAILED with error: {e}")
             return error_results
-
     def run_comprehensive_tests(self, suites: list = None, **pytest_args) -> dict:
         """Run comprehensive test suite"""
 
@@ -154,7 +149,6 @@ class TestRunner:
             suites = ["unit", "integration", "performance", "e2e"]
 
         self.start_time = time.time()
-
         print("Maricopa Property Search - Comprehensive Test Suite")
         print(f"{'='*80}")
         print(f"Test suites: {', '.join(suites)}")
@@ -163,21 +157,19 @@ class TestRunner:
 
         # Run each test suite
         for suite_name in suites:
-            try:
+    try:
                 self.run_test_suite(suite_name, **pytest_args)
-            except KeyboardInterrupt:
-                print(f"\nTest execution interrupted during {suite_name} suite")
+    except KeyboardInterrupt:
+        print(f"\nTest execution interrupted during {suite_name} suite")
                 break
-            except Exception as e:
-                print(f"\nUnexpected error in {suite_name} suite: {e}")
+    except Exception as e:
+        print(f"\nUnexpected error in {suite_name} suite: {e}")
                 continue
 
         # Generate comprehensive report
         return self._generate_final_report()
-
     def run_smoke_tests(self) -> dict:
         """Run quick smoke tests for basic functionality"""
-
         print("Running Smoke Tests (Quick Validation)")
         print("=" * 50)
 
@@ -203,16 +195,13 @@ class TestRunner:
             "success": result == 0,
             "timestamp": datetime.now().isoformat(),
         }
-
         print(
             f"\nSmoke Tests: {'PASSED' if result == 0 else 'FAILED'} ({execution_time:.1f}s)"
         )
 
         return smoke_results
-
     def run_performance_baseline(self) -> dict:
         """Run performance tests to establish baseline metrics"""
-
         print("Establishing Performance Baseline")
         print("=" * 40)
 
@@ -238,17 +227,15 @@ class TestRunner:
             "success": result == 0,
             "timestamp": datetime.now().isoformat(),
         }
-
         print(
             f"\nBaseline Tests: {'COMPLETED' if result == 0 else 'FAILED'} ({execution_time:.1f}s)"
         )
 
         return baseline_results
-
     def _parse_junit_xml(self, xml_file: Path) -> dict:
         """Parse JUnit XML results for detailed metrics"""
-        try:
-            import xml.etree.ElementTree as ET
+    try:
+import xml.etree.ElementTree as ET
 
             tree = ET.parse(xml_file)
             root = tree.getroot()
@@ -263,10 +250,9 @@ class TestRunner:
                 "tests_skipped": int(root.get("skipped", 0)),
                 "test_time": float(root.get("time", 0.0)),
             }
-        except Exception as e:
-            print(f"Warning: Could not parse XML results: {e}")
+    except Exception as e:
+        print(f"Warning: Could not parse XML results: {e}")
             return {}
-
     def _generate_final_report(self) -> dict:
         """Generate comprehensive test report"""
 
@@ -318,7 +304,6 @@ class TestRunner:
         self._print_final_summary(final_report)
 
         return final_report
-
     def _generate_recommendations(self) -> list:
         """Generate recommendations based on test results"""
         recommendations = []
@@ -356,10 +341,8 @@ class TestRunner:
             )
 
         return recommendations
-
     def _print_final_summary(self, report: dict):
         """Print comprehensive test summary"""
-
         print(f"\n{'='*80}")
         print("COMPREHENSIVE TEST REPORT")
         print(f"{'='*80}")
@@ -368,12 +351,10 @@ class TestRunner:
         )
         print(f"Total Time: {report['total_execution_time']:.1f}s")
         print(f"Report saved: {self.reports_dir}")
-
         print(f"\nSuite Summary:")
         print(f"  Total Suites: {report['suites']['total']}")
         print(f"  Passed: {report['suites']['passed']}")
         print(f"  Failed: {report['suites']['failed']}")
-
         print(f"\nTest Summary:")
         print(f"  Total Tests: {report['tests']['total']}")
         print(f"  Passed: {report['tests']['passed']}")
@@ -386,33 +367,29 @@ class TestRunner:
             status = "✅" if results.get("success", False) else "❌"
             time_str = f"{results.get('execution_time', 0):.1f}s"
             test_count = results.get("tests_total", "?")
-            print(f"  {status} {suite_name.upper()}: {test_count} tests in {time_str}")
+        print(f"  {status} {suite_name.upper()}: {test_count} tests in {time_str}")
 
         # Recommendations
         if report["recommendations"]:
-            print(f"\nRecommendations:")
+        print(f"\nRecommendations:")
             for i, rec in enumerate(report["recommendations"], 1):
-                print(f"  {i}. {rec}")
-
+        print(f"  {i}. {rec}")
         print(f"\n{'='*80}")
 
         if report["overall_success"]:
-            print("🎉 ALL TESTS PASSED - Application ready for production!")
-            print("\nNext Steps:")
-            print("- Review performance metrics in detailed reports")
-            print("- Deploy to staging environment")
-            print("- Schedule regular test execution")
+        print("🎉 ALL TESTS PASSED - Application ready for production!")
+        print("\nNext Steps:")
+        print("- Review performance metrics in detailed reports")
+        print("- Deploy to staging environment")
+        print("- Schedule regular test execution")
         else:
-            print("⚠️  TESTS FAILED - Review failures before proceeding")
-            print("\nNext Steps:")
-            print("- Review detailed test reports in tests/reports/")
-            print("- Fix failing tests")
-            print("- Re-run test suite")
-
+        print("⚠️  TESTS FAILED - Review failures before proceeding")
+        print("\nNext Steps:")
+        print("- Review detailed test reports in tests/reports/")
+        print("- Fix failing tests")
+        print("- Re-run test suite")
         print(f"{'='*80}")
-
-
-def main():
+    def main():
     """Main entry point for test runner"""
 
     parser = argparse.ArgumentParser(description="Comprehensive Test Runner")

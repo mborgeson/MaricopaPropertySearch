@@ -3,9 +3,8 @@
 Add Setup Calls Script
 Adds the missing setup calls to the setup_ui method
 """
-
 def main():
-    print("Adding setup calls to setup_ui method...")
+        print("Adding setup calls to setup_ui method...")
     
     main_window_path = "src/gui/enhanced_main_window.py"
     
@@ -37,7 +36,6 @@ def main():
         # Write back the content
         with open(main_window_path, 'w', encoding='utf-8') as f:
             f.write(content)
-        
         print("Setup calls added successfully!")
     else:
         print("Could not find status timer initialization to add setup calls")
@@ -56,10 +54,9 @@ def main():
             # Write back the content
             with open(main_window_path, 'w', encoding='utf-8') as f:
                 f.write(content)
-            
-            print("Added toolbar button state connection")
+        print("Added toolbar button state connection")
         else:
-            print("Could not find batch_completed connection to add toolbar state connection")
+        print("Could not find batch_completed connection to add toolbar state connection")
 
 if __name__ == "__main__":
     main()

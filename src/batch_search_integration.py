@@ -4,31 +4,30 @@ Batch Search Integration
 Connects the BatchSearchDialog GUI with the parallel batch processing backend
 Implements complete batch/parallel search processing system
 """
-
 import asyncio
-import time
+import csv
+import json
 import logging
+import queue
+import time
+import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Dict, List, Optional, Any, Callable, Set, Union
-from threading import Lock, RLock, Event, Thread
-import queue
-import json
-import uuid
-import csv
 from pathlib import Path
+from threading import Event, Lock, RLock, Thread
+from typing import Any, Callable, Dict, List, Optional, Set, Union
 
-from PyQt5.QtCore import QThread, pyqtSignal, QObject, QTimer
-from PyQt5.QtWidgets import QMessageBox, QFileDialog
+from PyQt5.QtCore import QObject, QThread, QTimer, pyqtSignal
+from PyQt5.QtWidgets import QFileDialog, QMessageBox
 
-from batch_search_engine import BatchSearchEngine, SearchMode, BatchPriority
 from batch_processing_manager import (
+    BatchProcessingJobType,
     BatchProcessingManager,
     ProcessingMode,
-    BatchProcessingJobType,
 )
+from batch_search_engine import BatchPriority, BatchSearchEngine, SearchMode
 from logging_config import get_logger, get_performance_logger
 
 logger = get_logger(__name__)
@@ -76,7 +75,6 @@ class BatchSearchSummary:
 
 class BatchSearchIntegrationManager:
     """Central integration manager for batch search operations"""
-
     def __init__(
         self,
         api_client,
@@ -124,7 +122,6 @@ class BatchSearchIntegrationManager:
         self.stats_lock = Lock()
 
         logger.info("Batch Search Integration Manager initialized")
-
     def execute_batch_search(
         self,
         identifiers: List[str],
@@ -188,7 +185,6 @@ class BatchSearchIntegrationManager:
             raise ValueError(f"Unsupported job type: {job_type}")
 
         return job_id
-
     def _execute_basic_search(
         self, job_id: str, job_info: Dict, progress_callback: Callable = None
     ):
@@ -223,7 +219,6 @@ class BatchSearchIntegrationManager:
             args=(job_id, engine_job_id, job_info, progress_callback),
             daemon=True,
         ).start()
-
     def _execute_comprehensive_search(
         self, job_id: str, job_info: Dict, progress_callback: Callable = None
     ):
@@ -256,7 +251,6 @@ class BatchSearchIntegrationManager:
             args=(job_id, processing_job_id, job_info, progress_callback),
             daemon=True,
         ).start()
-
     def _execute_validation_search(
         self, job_id: str, job_info: Dict, progress_callback: Callable = None
     ):
@@ -281,7 +275,6 @@ class BatchSearchIntegrationManager:
             args=(job_id, processing_job_id, job_info, progress_callback),
             daemon=True,
         ).start()
-
     def _execute_bulk_enhancement(
         self, job_id: str, job_info: Dict, progress_callback: Callable = None
     ):
@@ -309,7 +302,6 @@ class BatchSearchIntegrationManager:
             args=(job_id, processing_job_id, job_info, progress_callback),
             daemon=True,
         ).start()
-
     def _monitor_basic_search_completion(
         self,
         job_id: str,
@@ -318,7 +310,7 @@ class BatchSearchIntegrationManager:
         progress_callback: Callable,
     ):
         """Monitor basic search completion"""
-        try:
+    try:
             while True:
                 status = self.batch_search_engine.get_job_status(engine_job_id)
                 if not status or status["status"] in [
@@ -345,12 +337,11 @@ class BatchSearchIntegrationManager:
                 error_msg = f"Search job failed with status: {status.get('status', 'unknown') if status else 'not found'}"
                 self._fail_job(job_id, error_msg, progress_callback)
 
-        except Exception as e:
+    except Exception as e:
             logger.error(
                 f"Error monitoring basic search completion for job {job_id}: {e}"
             )
             self._fail_job(job_id, str(e), progress_callback)
-
     def _monitor_comprehensive_search_completion(
         self,
         job_id: str,
@@ -359,7 +350,7 @@ class BatchSearchIntegrationManager:
         progress_callback: Callable,
     ):
         """Monitor comprehensive search completion"""
-        try:
+    try:
             while True:
                 status = self.batch_processing_manager.get_job_status(processing_job_id)
                 if not status or status["status"] in [
@@ -384,10 +375,9 @@ class BatchSearchIntegrationManager:
                 error_msg = f"Comprehensive search failed with status: {status.get('status', 'unknown') if status else 'not found'}"
                 self._fail_job(job_id, error_msg, progress_callback)
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error monitoring comprehensive search for job {job_id}: {e}")
             self._fail_job(job_id, str(e), progress_callback)
-
     def _monitor_validation_completion(
         self,
         job_id: str,
@@ -396,7 +386,7 @@ class BatchSearchIntegrationManager:
         progress_callback: Callable,
     ):
         """Monitor validation completion"""
-        try:
+    try:
             while True:
                 status = self.batch_processing_manager.get_job_status(processing_job_id)
                 if not status or status["status"] in [
@@ -420,10 +410,9 @@ class BatchSearchIntegrationManager:
                 error_msg = f"Validation failed with status: {status.get('status', 'unknown') if status else 'not found'}"
                 self._fail_job(job_id, error_msg, progress_callback)
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error monitoring validation for job {job_id}: {e}")
             self._fail_job(job_id, str(e), progress_callback)
-
     def _monitor_enhancement_completion(
         self,
         job_id: str,
@@ -432,7 +421,7 @@ class BatchSearchIntegrationManager:
         progress_callback: Callable,
     ):
         """Monitor enhancement completion"""
-        try:
+    try:
             while True:
                 status = self.batch_processing_manager.get_job_status(processing_job_id)
                 if not status or status["status"] in [
@@ -456,10 +445,9 @@ class BatchSearchIntegrationManager:
                 error_msg = f"Enhancement failed with status: {status.get('status', 'unknown') if status else 'not found'}"
                 self._fail_job(job_id, error_msg, progress_callback)
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Error monitoring enhancement for job {job_id}: {e}")
             self._fail_job(job_id, str(e), progress_callback)
-
     def _process_engine_results(
         self, raw_results: List[Dict], search_type: str
     ) -> List[BatchSearchResult]:
@@ -483,7 +471,6 @@ class BatchSearchIntegrationManager:
             results.append(result)
 
         return results
-
     def _process_comprehensive_results(
         self, raw_results: Dict, search_type: str
     ) -> List[BatchSearchResult]:
@@ -509,7 +496,6 @@ class BatchSearchIntegrationManager:
                 results.append(result)
 
         return results
-
     def _process_validation_results(
         self, raw_results: Dict, search_type: str
     ) -> List[BatchSearchResult]:
@@ -545,7 +531,6 @@ class BatchSearchIntegrationManager:
             results.append(result)
 
         return results
-
     def _process_enhancement_results(
         self, raw_results: Dict, search_type: str
     ) -> List[BatchSearchResult]:
@@ -570,7 +555,6 @@ class BatchSearchIntegrationManager:
             results.append(result)
 
         return results
-
     def _trigger_background_collection(self, results: List[BatchSearchResult]):
         """Trigger background data collection for search results"""
         if not self.background_manager:
@@ -593,13 +577,12 @@ class BatchSearchIntegrationManager:
 
         if apns:
             logger.info(f"Triggering background collection for {len(apns)} properties")
-            try:
+    try:
                 self.background_manager.enhance_search_results(
                     [{"apn": apn} for apn in apns], max_properties=50
                 )
-            except Exception as e:
+    except Exception as e:
                 logger.warning(f"Failed to trigger background collection: {e}")
-
     def _update_job_progress(
         self, job_id: str, batch_job, progress_callback: Callable = None
     ):
@@ -610,15 +593,14 @@ class BatchSearchIntegrationManager:
                 job_info["progress"] = getattr(batch_job, "progress", 0.0)
 
                 if progress_callback:
-                    try:
+    try:
                         progress_callback(
                             job_id,
                             job_info["progress"],
                             f"Processing... {job_info['progress']:.1f}% complete",
                         )
-                    except Exception as e:
+    except Exception as e:
                         logger.warning(f"Progress callback error for job {job_id}: {e}")
-
     def _complete_job(
         self,
         job_id: str,
@@ -667,13 +649,13 @@ class BatchSearchIntegrationManager:
 
             # Final progress callback
             if progress_callback:
-                try:
+    try:
                     progress_callback(
                         job_id,
                         100.0,
                         f"Completed: {successful_count}/{len(results)} successful",
                     )
-                except Exception as e:
+    except Exception as e:
                     logger.warning(
                         f"Final progress callback error for job {job_id}: {e}"
                     )
@@ -683,7 +665,6 @@ class BatchSearchIntegrationManager:
                 f"{successful_count}/{len(results)} successful, "
                 f"total time: {total_time:.2f}s"
             )
-
     def _fail_job(
         self, job_id: str, error_message: str, progress_callback: Callable = None
     ):
@@ -695,13 +676,12 @@ class BatchSearchIntegrationManager:
                 job_info["error"] = error_message
 
                 if progress_callback:
-                    try:
+    try:
                         progress_callback(job_id, 0.0, f"Failed: {error_message}")
-                    except Exception as e:
+    except Exception as e:
                         logger.warning(f"Failure callback error for job {job_id}: {e}")
 
                 logger.error(f"Batch search job {job_id} failed: {error_message}")
-
     def get_job_status(self, job_id: str) -> Optional[Dict[str, Any]]:
         """Get current status of a batch search job"""
         with self.jobs_lock:
@@ -730,12 +710,10 @@ class BatchSearchIntegrationManager:
                 }
             else:
                 return None
-
     def get_job_results(self, job_id: str) -> Optional[BatchSearchSummary]:
         """Get results from completed job"""
         with self.jobs_lock:
             return self.completed_jobs.get(job_id)
-
     def cancel_job(self, job_id: str) -> bool:
         """Cancel a running batch search job"""
         with self.jobs_lock:
@@ -754,10 +732,9 @@ class BatchSearchIntegrationManager:
                 logger.info(f"Cancelled batch search job {job_id}")
                 return True
             return False
-
     def export_results_to_csv(self, job_id: str, file_path: str) -> bool:
         """Export batch search results to CSV file"""
-        try:
+    try:
             summary = self.get_job_results(job_id)
             if not summary:
                 return False
@@ -814,10 +791,9 @@ class BatchSearchIntegrationManager:
             )
             return True
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Failed to export results for job {job_id}: {e}")
             return False
-
     def get_integration_statistics(self) -> Dict[str, Any]:
         """Get comprehensive integration statistics"""
         with self.stats_lock:
@@ -836,7 +812,6 @@ class BatchSearchIntegrationManager:
         )
 
         return stats
-
     def shutdown(self):
         """Gracefully shutdown the integration manager"""
         logger.info("Shutting down Batch Search Integration Manager...")

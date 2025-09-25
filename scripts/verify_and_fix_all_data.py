@@ -5,7 +5,6 @@ Verify and Fix All Data Issues
 2. Fix Basic Information tab None values  
 3. Check database save triggers
 """
-
 import sys
 from pathlib import Path
 
@@ -19,16 +18,16 @@ from psycopg2.extras import Json
 
 def verify_and_fix_all_data():
     """Comprehensive data verification and fixes"""
-    print("=" * 60)
-    print("COMPREHENSIVE DATA VERIFICATION AND FIXES")
-    print("=" * 60)
+        print("=" * 60)
+        print("COMPREHENSIVE DATA VERIFICATION AND FIXES")
+        print("=" * 60)
     
     config = EnhancedConfigManager()
     db_manager = ThreadSafeDatabaseManager(config)
     
     test_apn = '13304014A'
     
-    try:
+try:
         # ISSUE 3: Verify Sales History Data
         print("3. SALES HISTORY DATA VERIFICATION:")
         print("-" * 35)
@@ -42,11 +41,10 @@ def verify_and_fix_all_data():
             seller = record['seller_name']
             buyer = record['buyer_name']
             deed = record.get('deed_type', 'N/A')
-            
-            print(f"  {i}. {date}: ${price:,.0f}")
-            print(f"     {seller} -> {buyer}")
-            print(f"     Deed: {deed}")
-            print()
+        print(f"  {i}. {date}: ${price:,.0f}")
+        print(f"     {seller} -> {buyer}")
+        print(f"     Deed: {deed}")
+        print()
         
         # The sales data looks correct - it represents a large commercial/residential complex
         # These are realistic prices for a 300K+ sq ft property
@@ -60,7 +58,7 @@ def verify_and_fix_all_data():
         property_record = db_manager.get_property_by_apn(test_apn)
         
         if property_record:
-            print("Current property data:")
+        print("Current property data:")
             key_fields = ['owner_name', 'property_address', 'mailing_address', 
                          'legal_description', 'year_built', 'living_area_sqft', 
                          'lot_size_sqft', 'bedrooms', 'bathrooms', 'land_use_code']
@@ -69,13 +67,13 @@ def verify_and_fix_all_data():
             for field in key_fields:
                 value = property_record.get(field)
                 status = "FILLED" if value and str(value) != "None" else "MISSING"
-                print(f"  {field}: {value} [{status}]")
+        print(f"  {field}: {value} [{status}]")
                 if status == "MISSING":
                     missing_fields.append(field)
             
             # Update missing fields with realistic data
             if missing_fields:
-                print(f"\nUpdating {len(missing_fields)} missing fields...")
+        print(f"\nUpdating {len(missing_fields)} missing fields...")
                 
                 enhanced_property_data = {
                     'apn': test_apn,
@@ -97,14 +95,13 @@ def verify_and_fix_all_data():
                 success = db_manager.insert_property(enhanced_property_data)
                 
                 if success:
-                    print("  [+] Successfully updated property record with complete data")
+        print("  [+] Successfully updated property record with complete data")
                 else:
-                    print("  [-] Failed to update property record")
+        print("  [-] Failed to update property record")
         
         # ISSUE 5: Database Save Trigger Mechanism
         print("\n5. DATABASE SAVE TRIGGER MECHANISM:")
         print("-" * 40)
-        
         print("Database save triggers:")
         print("  1. Search Results -> Automatic DB insertion via API client")
         print("  2. Property Details -> Data loaded from existing DB records")
@@ -126,25 +123,25 @@ def verify_and_fix_all_data():
         updated_property = db_manager.get_property_by_apn(test_apn)
         updated_tax = db_manager.get_tax_history(test_apn)
         updated_sales = db_manager.get_sales_history(test_apn)
-        
         print(f"[+] Property Record: {'Complete' if updated_property.get('owner_name') else 'Missing Data'}")
         print(f"[+] Tax History: {len(updated_tax)} records with proper assessed values")
         print(f"[+] Sales History: {len(updated_sales)} transaction records")
-        
         print("\nGUI TABS SHOULD NOW SHOW:")
         print("  [+] Basic Information: Complete property details")
         print("  [+] Tax History: Proper assessed values vs tax amounts") 
         print("  [+] Sales History: Accurate transaction records")
         print("  [+] Search Results: Complete columns with data")
         
-    except Exception as e:
+except Exception as e:
         print(f"Error: {e}")
-        import traceback
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+import traceback
+
 from src.enhanced_config_manager import EnhancedConfigManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
         traceback.print_exc()
-        
-    finally:
+
+finally:
         db_manager.close()
 
 if __name__ == "__main__":

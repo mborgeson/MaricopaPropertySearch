@@ -3,30 +3,29 @@ Enhanced Maricopa County API Client with Playwright Integration
 Phase 6 Advanced Features - Extends UnifiedMaricopaAPIClient with browser automation
 Provides intelligent fallback from API → Playwright → Web Scraping
 """
-
 import asyncio
+import json
 import logging
 import time
-import json
-from typing import Dict, List, Optional, Any, Tuple, Union
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-from threading import Lock
 from pathlib import Path
+from threading import Lock
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 # Import base unified client
 from .api_client_unified import (
-    UnifiedMaricopaAPIClient,
-    PropertyDataCache,
-    BatchAPIRequest,
     AdaptiveRateLimiter,
+    BatchAPIRequest,
+    PropertyDataCache,
+    UnifiedMaricopaAPIClient,
 )
-
-# Import Playwright service
-from .playwright_service import PlaywrightService, SyncPlaywrightService, ScrapingResult
 
 # Import logging
 from .logging_config import get_api_logger
+
+# Import Playwright service
+from .playwright_service import PlaywrightService, ScrapingResult, SyncPlaywrightService
 
 logger = get_api_logger(__name__)
 
@@ -69,8 +68,7 @@ class EnhancedMaricopaAPIClient(UnifiedMaricopaAPIClient):
     Enhanced API client with Playwright integration
     Extends UnifiedMaricopaAPIClient with advanced browser automation capabilities
     """
-
-    def __init__(
+def __init__(
         self,
         api_token: str = None,
         enable_playwright: bool = True,
@@ -88,7 +86,7 @@ class EnhancedMaricopaAPIClient(UnifiedMaricopaAPIClient):
         self.sync_playwright = None
 
         if enable_playwright:
-            try:
+try:
                 # Initialize Playwright service
                 playwright_config = playwright_config or {}
                 self.playwright_service = PlaywrightService(
@@ -100,7 +98,7 @@ class EnhancedMaricopaAPIClient(UnifiedMaricopaAPIClient):
 
                 logger.info("Enhanced API client initialized with Playwright support")
 
-            except Exception as e:
+except Exception as e:
                 logger.warning(f"Playwright initialization failed: {str(e)}")
                 self.enable_playwright = False
 
@@ -113,7 +111,6 @@ class EnhancedMaricopaAPIClient(UnifiedMaricopaAPIClient):
             "hybrid_data_sources": 0,
             "screenshot_captures": 0,
         }
-
     def search_property_enhanced(
         self,
         identifier: str,
@@ -158,7 +155,7 @@ class EnhancedMaricopaAPIClient(UnifiedMaricopaAPIClient):
 
         # Strategy 1: Try Playwright for enhanced data collection
         if use_playwright and self.enable_playwright and self.sync_playwright:
-            try:
+    try:
                 logger.info(f"Attempting Playwright search for {identifier}")
 
                 playwright_result = self.sync_playwright.search_property_enhanced(
@@ -191,13 +188,13 @@ class EnhancedMaricopaAPIClient(UnifiedMaricopaAPIClient):
                         f"Playwright search failed for {identifier}: {playwright_result.error}"
                     )
 
-            except Exception as e:
+    except Exception as e:
                 warnings.append(f"Playwright error: {str(e)}")
                 logger.error(f"Playwright search error for {identifier}: {str(e)}")
 
         # Strategy 2: Fallback to API client (always try for comparison/backup)
         if enable_fallback or not data_collected:
-            try:
+    try:
                 logger.info(f"Attempting API search for {identifier}")
 
                 if search_type == "apn":
@@ -234,13 +231,13 @@ class EnhancedMaricopaAPIClient(UnifiedMaricopaAPIClient):
                     )
                     logger.warning(f"API search failed for {identifier}")
 
-            except Exception as e:
+    except Exception as e:
                 warnings.append(f"API error: {str(e)}")
                 logger.error(f"API search error for {identifier}: {str(e)}")
 
         # Strategy 3: Fallback to traditional web scraping (if available)
         if enable_fallback and not data_collected and hasattr(self, "web_scraper"):
-            try:
+    try:
                 logger.info(f"Attempting web scraping fallback for {identifier}")
 
                 scraper_result = self.web_scraper.scrape_property_data(
@@ -262,7 +259,7 @@ class EnhancedMaricopaAPIClient(UnifiedMaricopaAPIClient):
                 else:
                     warnings.append("Web scraping fallback failed")
 
-            except Exception as e:
+    except Exception as e:
                 warnings.append(f"Web scraping error: {str(e)}")
                 logger.error(f"Web scraping error for {identifier}: {str(e)}")
 
@@ -294,7 +291,6 @@ class EnhancedMaricopaAPIClient(UnifiedMaricopaAPIClient):
             logger.error(f"All search methods failed for {identifier}")
 
         return result
-
     def batch_search_enhanced(
         self,
         requests: List[EnhancedSearchRequest],
@@ -336,11 +332,11 @@ class EnhancedMaricopaAPIClient(UnifiedMaricopaAPIClient):
             for future in as_completed(future_to_request):
                 request = future_to_request[future]
 
-                try:
+    try:
                     result = future.result(timeout=request.timeout)
                     results.append(result)
 
-                except Exception as e:
+    except Exception as e:
                     # Create error result
                     error_result = EnhancedSearchResult(
                         identifier=request.identifier,
@@ -365,7 +361,6 @@ class EnhancedMaricopaAPIClient(UnifiedMaricopaAPIClient):
         )
 
         return results
-
     def search_with_complex_criteria(
         self,
         criteria: Dict[str, Any],
@@ -394,7 +389,7 @@ class EnhancedMaricopaAPIClient(UnifiedMaricopaAPIClient):
                 execution_time=time.time() - start_time,
             )
 
-        try:
+    try:
             logger.info(f"Performing complex search with criteria: {criteria}")
 
             playwright_result = self.sync_playwright.automate_complex_search(
@@ -424,7 +419,7 @@ class EnhancedMaricopaAPIClient(UnifiedMaricopaAPIClient):
                     execution_time=execution_time,
                 )
 
-        except Exception as e:
+    except Exception as e:
             execution_time = time.time() - start_time
 
             logger.error(f"Complex search failed: {str(e)}")
@@ -436,7 +431,6 @@ class EnhancedMaricopaAPIClient(UnifiedMaricopaAPIClient):
                 error=str(e),
                 execution_time=execution_time,
             )
-
     def get_enhanced_statistics(self) -> Dict[str, Any]:
         """Get comprehensive statistics including enhanced features"""
         base_stats = self.get_statistics()
@@ -452,7 +446,6 @@ class EnhancedMaricopaAPIClient(UnifiedMaricopaAPIClient):
             "playwright_service": playwright_stats,
             "playwright_enabled": self.enable_playwright,
         }
-
     def cleanup(self):
         """Clean up resources including Playwright service"""
         # Clean up base client resources
@@ -464,10 +457,10 @@ class EnhancedMaricopaAPIClient(UnifiedMaricopaAPIClient):
 
         if self.playwright_service:
             # This requires async cleanup - schedule for next event loop
-            try:
+    try:
                 loop = asyncio.get_event_loop()
                 loop.create_task(self.playwright_service.cleanup())
-            except RuntimeError:
+    except RuntimeError:
                 # If no event loop is running, use run_until_complete
                 asyncio.run(self.playwright_service.cleanup())
 
@@ -475,7 +468,7 @@ class EnhancedMaricopaAPIClient(UnifiedMaricopaAPIClient):
 
 
 # Convenience functions for common enhanced operations
-def enhanced_property_search(
+    def enhanced_property_search(
     identifier: str,
     search_type: str = "apn",
     enable_playwright: bool = True,
@@ -504,9 +497,7 @@ def enhanced_property_search(
         )
     finally:
         client.cleanup()
-
-
-def enhanced_batch_search(
+    def enhanced_batch_search(
     identifiers: List[str],
     search_type: str = "apn",
     enable_playwright: bool = True,

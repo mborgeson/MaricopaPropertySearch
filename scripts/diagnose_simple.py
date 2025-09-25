@@ -4,20 +4,18 @@ Simple Tax and Sales History Data Flow Diagnostic
 
 Tests the basic components of the tax and sales data flow.
 """
-
-import sys
 import os
+import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch")
 sys.path.insert(0, str(PROJECT_ROOT))
-
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
 def test_database_connection():
     """Test basic database connection"""
-    print("1. TESTING DATABASE CONNECTION...")
+        print("1. TESTING DATABASE CONNECTION...")
 
     db_config = {
         'host': 'localhost',
@@ -27,7 +25,7 @@ def test_database_connection():
         'password': 'Wildcats777!!'
     }
 
-    try:
+try:
         conn = psycopg2.connect(**db_config)
         cursor = conn.cursor()
         cursor.execute("SELECT 1")
@@ -35,19 +33,18 @@ def test_database_connection():
         conn.close()
 
         if result[0] == 1:
-            print("   [PASS] Database connection successful")
+        print("   [PASS] Database connection successful")
             return True
         else:
-            print("   [FAIL] Database connection failed - unexpected result")
+        print("   [FAIL] Database connection failed - unexpected result")
             return False
 
-    except Exception as e:
+except Exception as e:
         print(f"   [FAIL] Database connection failed: {e}")
         return False
-
-def check_tables_and_data(test_apn="11727002"):
+    def check_tables_and_data(test_apn="11727002"):
     """Check if tables exist and contain data"""
-    print(f"\n2. CHECKING TABLES AND DATA (APN: {test_apn})...")
+        print(f"\n2. CHECKING TABLES AND DATA (APN: {test_apn})...")
 
     db_config = {
         'host': 'localhost',
@@ -57,7 +54,7 @@ def check_tables_and_data(test_apn="11727002"):
         'password': 'Wildcats777!!'
     }
 
-    try:
+try:
         conn = psycopg2.connect(**db_config, cursor_factory=RealDictCursor)
         cursor = conn.cursor()
 
@@ -74,15 +71,14 @@ def check_tables_and_data(test_apn="11727002"):
         print(f"   Tables found: {tables}")
 
         if 'properties' not in tables:
-            print("   [FAIL] Properties table missing")
+        print("   [FAIL] Properties table missing")
             return False
         if 'tax_history' not in tables:
-            print("   [FAIL] Tax_history table missing")
+        print("   [FAIL] Tax_history table missing")
             return False
         if 'sales_history' not in tables:
-            print("   [FAIL] Sales_history table missing")
+        print("   [FAIL] Sales_history table missing")
             return False
-
         print("   [PASS] All required tables exist")
 
         # Check data for test APN
@@ -102,35 +98,33 @@ def check_tables_and_data(test_apn="11727002"):
         if tax_count > 0:
             cursor.execute("SELECT tax_year, assessed_value, tax_amount FROM tax_history WHERE apn = %s ORDER BY tax_year DESC LIMIT 3", (test_apn,))
             tax_records = cursor.fetchall()
-            print("   Sample tax records:")
+        print("   Sample tax records:")
             for record in tax_records:
-                print(f"     - Year {record['tax_year']}: Assessed ${record.get('assessed_value', 'N/A')}, Tax ${record.get('tax_amount', 'N/A')}")
+        print(f"     - Year {record['tax_year']}: Assessed ${record.get('assessed_value', 'N/A')}, Tax ${record.get('tax_amount', 'N/A')}")
 
         if sales_count > 0:
             cursor.execute("SELECT sale_date, sale_price FROM sales_history WHERE apn = %s ORDER BY sale_date DESC LIMIT 3", (test_apn,))
             sales_records = cursor.fetchall()
-            print("   Sample sales records:")
+        print("   Sample sales records:")
             for record in sales_records:
-                print(f"     - {record['sale_date']}: ${record.get('sale_price', 'N/A')}")
+        print(f"     - {record['sale_date']}: ${record.get('sale_price', 'N/A')}")
 
         conn.close()
         return True
 
-    except Exception as e:
+except Exception as e:
         print(f"   [FAIL] Error checking tables: {e}")
         return False
-
-def test_api_client():
+    def test_api_client():
     """Test if API client can be imported and has required methods"""
-    print("\n3. TESTING API CLIENT...")
+        print("\n3. TESTING API CLIENT...")
 
-    try:
+try:
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         # MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 
         config_manager = EnhancedConfigManager()
         api_client = UnifiedMaricopaAPIClient(config_manager)
-
         print("   [PASS] API Client imported successfully")
 
         # Check for required methods
@@ -139,31 +133,29 @@ def test_api_client():
 
         for method in methods:
             if hasattr(api_client, method):
-                print(f"   [PASS] Method {method} exists")
+        print(f"   [PASS] Method {method} exists")
             else:
-                print(f"   [FAIL] Method {method} missing")
+        print(f"   [FAIL] Method {method} missing")
                 missing_methods.append(method)
 
         return len(missing_methods) == 0
 
-    except ImportError as e:
+except ImportError as e:
         print(f"   [FAIL] Cannot import API client: {e}")
         return False
-    except Exception as e:
+except Exception as e:
         print(f"   [FAIL] Error testing API client: {e}")
         return False
-
-def test_database_manager():
+    def test_database_manager():
     """Test if database manager can be imported and has required methods"""
-    print("\n4. TESTING DATABASE MANAGER...")
+        print("\n4. TESTING DATABASE MANAGER...")
 
-    try:
+try:
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         # MIGRATED: # MIGRATED: # MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
         config_manager = EnhancedConfigManager()
         db_manager = ThreadSafeDatabaseManager(config_manager)
-
         print("   [PASS] Database Manager imported successfully")
 
         # Check for required methods
@@ -172,25 +164,24 @@ def test_database_manager():
 
         for method in methods:
             if hasattr(db_manager, method):
-                print(f"   [PASS] Method {method} exists")
+        print(f"   [PASS] Method {method} exists")
             else:
-                print(f"   [FAIL] Method {method} missing")
+        print(f"   [FAIL] Method {method} missing")
                 missing_methods.append(method)
 
         return len(missing_methods) == 0
 
-    except ImportError as e:
+except ImportError as e:
         print(f"   [FAIL] Cannot import database manager: {e}")
         return False
-    except Exception as e:
+except Exception as e:
         print(f"   [FAIL] Error testing database manager: {e}")
         return False
-
-def test_data_retrieval(test_apn="11727002"):
+    def test_data_retrieval(test_apn="11727002"):
     """Test data retrieval through database manager"""
-    print(f"\n5. TESTING DATA RETRIEVAL (APN: {test_apn})...")
+        print(f"\n5. TESTING DATA RETRIEVAL (APN: {test_apn})...")
 
-    try:
+try:
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         # MIGRATED: # MIGRATED: # MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
@@ -202,35 +193,34 @@ def test_data_retrieval(test_apn="11727002"):
         print(f"   Tax history retrieval: {len(tax_history)} records")
 
         if tax_history:
-            print("   Sample tax data:")
+        print("   Sample tax data:")
             for record in tax_history[:2]:
-                print(f"     - Year {record.get('tax_year')}: ${record.get('assessed_value', 'N/A')}")
+        print(f"     - Year {record.get('tax_year')}: ${record.get('assessed_value', 'N/A')}")
 
         # Test sales history retrieval
         sales_history = db_manager.get_sales_history(test_apn)
         print(f"   Sales history retrieval: {len(sales_history)} records")
 
         if sales_history:
-            print("   Sample sales data:")
+        print("   Sample sales data:")
             for record in sales_history[:2]:
-                print(f"     - {record.get('sale_date')}: ${record.get('sale_price', 'N/A')}")
+        print(f"     - {record.get('sale_date')}: ${record.get('sale_price', 'N/A')}")
 
         return len(tax_history) > 0 or len(sales_history) > 0
 
-    except Exception as e:
+except Exception as e:
         print(f"   [FAIL] Error testing data retrieval: {e}")
         return False
-
-def test_insert_sample_data(test_apn="11727002"):
+    def test_insert_sample_data(test_apn="11727002"):
     """Test inserting and retrieving sample data"""
-    print(f"\n6. TESTING SAMPLE DATA INSERTION (APN: {test_apn})...")
+        print(f"\n6. TESTING SAMPLE DATA INSERTION (APN: {test_apn})...")
 
-    try:
+try:
         # MIGRATED: # MIGRATED: # MIGRATED: # MIGRATED: from src.config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
         # MIGRATED: # MIGRATED: # MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.enhanced_config_manager import EnhancedConfigManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
         config_manager = EnhancedConfigManager()
         db_manager = ThreadSafeDatabaseManager(config_manager)
@@ -268,8 +258,7 @@ from src.enhanced_config_manager import EnhancedConfigManager
         if tax_inserted or sales_inserted:
             tax_history = db_manager.get_tax_history(test_apn)
             sales_history = db_manager.get_sales_history(test_apn)
-
-            print(f"   After insertion - Tax: {len(tax_history)}, Sales: {len(sales_history)}")
+        print(f"   After insertion - Tax: {len(tax_history)}, Sales: {len(sales_history)}")
 
             # Clean up test data
             cleanup_test_data(test_apn)
@@ -278,13 +267,12 @@ from src.enhanced_config_manager import EnhancedConfigManager
 
         return False
 
-    except Exception as e:
+except Exception as e:
         print(f"   [FAIL] Error testing data insertion: {e}")
         return False
-
-def cleanup_test_data(test_apn):
+    def cleanup_test_data(test_apn):
     """Clean up test data"""
-    try:
+try:
         db_config = {
             'host': 'localhost',
             'port': 5433,
@@ -303,13 +291,12 @@ def cleanup_test_data(test_apn):
         conn.close()
         print("   [CLEANUP] Test data removed")
 
-    except Exception as e:
+except Exception as e:
         print(f"   [CLEANUP FAIL] {e}")
-
-def main():
-    print("=" * 50)
-    print("TAX AND SALES DATA FLOW DIAGNOSTIC")
-    print("=" * 50)
+    def main():
+        print("=" * 50)
+        print("TAX AND SALES DATA FLOW DIAGNOSTIC")
+        print("=" * 50)
 
     test_apn = sys.argv[1] if len(sys.argv) > 1 else "11727002"
 
@@ -320,15 +307,13 @@ def main():
     results.append(test_database_manager())
     results.append(test_data_retrieval(test_apn))
     results.append(test_insert_sample_data(test_apn))
-
-    print("\n" + "=" * 50)
-    print("SUMMARY")
-    print("=" * 50)
+        print("\n" + "=" * 50)
+        print("SUMMARY")
+        print("=" * 50)
 
     passed = sum(results)
     total = len(results)
-
-    print(f"Tests passed: {passed}/{total}")
+        print(f"Tests passed: {passed}/{total}")
 
     if passed == total:
         print("\n[SUCCESS] All components working correctly!")

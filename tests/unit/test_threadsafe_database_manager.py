@@ -4,21 +4,21 @@ Unit tests for ThreadSafeDatabaseManager
 Tests the consolidated database manager that provides thread-safe operations,
 connection pooling, and support for PostgreSQL, SQLite, and mock modes.
 """
-
-import pytest
-import threading
-import time
 import sqlite3
-from unittest.mock import Mock, patch, MagicMock
-from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # Import the component under test
 import sys
+import threading
+import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
-from threadsafe_database_manager import ThreadSafeDatabaseManager, DatabaseManager
+from threadsafe_database_manager import DatabaseManager, ThreadSafeDatabaseManager
 
 
 class TestThreadSafeDatabaseManager:
@@ -285,9 +285,8 @@ class TestThreadSafeDatabaseManager:
         """Test thread safety with concurrent database access."""
         results = []
         errors = []
-
-        def worker_thread(thread_id):
-            try:
+    def worker_thread(thread_id):
+    try:
                 for i in range(10):
                     # Get connection
                     conn = db_manager.get_connection()
@@ -299,7 +298,7 @@ class TestThreadSafeDatabaseManager:
                     db_manager.release_connection(conn)
 
                     results.append(f"thread_{thread_id}_op_{i}")
-            except Exception as e:
+    except Exception as e:
                 errors.append(str(e))
 
         # Start multiple threads
@@ -321,8 +320,7 @@ class TestThreadSafeDatabaseManager:
     @pytest.mark.performance
     def test_performance_concurrent_queries(self, db_manager, performance_timer):
         """Test performance under concurrent load."""
-
-        def execute_query_worker():
+    def execute_query_worker():
             return db_manager.execute_query("SELECT * FROM properties LIMIT 1", ())
 
         # Measure concurrent query performance
@@ -345,10 +343,10 @@ class TestThreadSafeDatabaseManager:
 
         # Attempt to acquire more connections than pool size
         for i in range(20):  # More than typical pool size
-            try:
+    try:
                 conn = db_manager.get_connection()
                 connections.append(conn)
-            except Exception as e:
+    except Exception as e:
                 # Pool exhaustion should be handled gracefully
                 assert "pool" in str(e).lower() or "connection" in str(e).lower()
 
@@ -486,10 +484,10 @@ class TestThreadSafeDatabaseManager:
         invalid_config = {"host": "localhost"}
 
         with patch("threadsafe_database_manager.get_logger"):
-            try:
+    try:
                 manager = ThreadSafeDatabaseManager(config=invalid_config)
                 # Should handle missing configuration gracefully
                 assert manager is not None
-            except Exception as e:
+    except Exception as e:
                 # Or raise appropriate error for invalid config
                 assert "config" in str(e).lower() or "database" in str(e).lower()

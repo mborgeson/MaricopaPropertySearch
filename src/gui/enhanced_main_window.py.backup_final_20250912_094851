@@ -4,45 +4,85 @@ Enhanced Main Window with Background Data Collection
 Integrates automatic background data collection for seamless user experience
 """
 
-import sys
-from PyQt5.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QLineEdit, QPushButton, QTabWidget, QTableWidget, 
-    QTableWidgetItem, QTextEdit, QProgressBar, QMessageBox,
-    QComboBox, QSpinBox, QCheckBox, QGroupBox, QSplitter,
-    QHeaderView, QApplication, QMenuBar, QMenu,
-    QAction, QFileDialog, QDialog, QFrame, QSizePolicy,
-    QSlider, QFormLayout, QListWidget, QListWidgetItem,
-    QPushButton, QButtonGroup, QRadioButton, QScrollArea, QShortcut, QToolBar, QMenu
-)
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer, QObject, QSettings
-from PyQt5.QtGui import QFont, QIcon, QPixmap, QColor, QPalette, QKeySequence
-from typing import Dict, List, Optional, Any
-import json
 import csv
-from pathlib import Path
-from datetime import datetime
+import json
+import sys
 import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
 
-# Import application modules
-from src.database_manager import DatabaseManager
-from src.api_client import MaricopaAPIClient, MockMaricopaAPIClient
-from src.web_scraper import WebScraperManager, MockWebScraperManager
-from src.background_data_collector import BackgroundDataCollectionManager, JobPriority
-from src.user_action_logger import UserActionLogger, get_user_action_logger
-
-# Import centralized logging
-from src.logging_config import get_logger, get_search_logger, get_performance_logger, log_exception
-
-# Import GUI enhancement dialogs
-from src.gui.gui_enhancements_dialogs import (
-    ApplicationSettingsDialog, DataCollectionSettingsDialog, CacheManagementDialog,
-    BatchSearchDialog, ParallelProcessingDialog, DataSourceConfigurationDialog
+from PyQt5.QtCore import QObject, QSettings, Qt, QThread, QTimer, pyqtSignal
+from PyQt5.QtGui import QColor, QFont, QIcon, QKeySequence, QPalette, QPixmap
+from PyQt5.QtWidgets import (
+    QAction,
+    QApplication,
+    QButtonGroup,
+    QCheckBox,
+    QComboBox,
+    QDialog,
+    QFileDialog,
+    QFormLayout,
+    QFrame,
+    QGridLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QLineEdit,
+    QListWidget,
+    QListWidgetItem,
+    QMainWindow,
+    QMenu,
+    QMenuBar,
+    QMessageBox,
+    QProgressBar,
+    QPushButton,
+    QRadioButton,
+    QScrollArea,
+    QShortcut,
+    QSizePolicy,
+    QSlider,
+    QSpinBox,
+    QSplitter,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QTextEdit,
+    QToolBar,
+    QVBoxLayout,
+    QWidget,
 )
+
+from src.api_client import MaricopaAPIClient, MockMaricopaAPIClient
+from src.background_data_collector import BackgroundDataCollectionManager, JobPriority
 
 # Import enhanced batch search integration
 from src.batch_search_integration import BatchSearchIntegrationManager
+
+# Import application modules
+from src.database_manager import DatabaseManager
 from src.enhanced_batch_search_dialog import EnhancedBatchSearchDialog
+
+# Import GUI enhancement dialogs
+from src.gui.gui_enhancements_dialogs import (
+    ApplicationSettingsDialog,
+    BatchSearchDialog,
+    CacheManagementDialog,
+    DataCollectionSettingsDialog,
+    DataSourceConfigurationDialog,
+    ParallelProcessingDialog,
+)
+
+# Import centralized logging
+from src.logging_config import (
+    get_logger,
+    get_performance_logger,
+    get_search_logger,
+    log_exception,
+)
+from src.user_action_logger import UserActionLogger, get_user_action_logger
+from src.web_scraper import MockWebScraperManager, WebScraperManager
 
 logger = get_logger(__name__)
 search_logger = get_search_logger(__name__)
@@ -881,8 +921,8 @@ class PropertyDetailsDialog(QDialog):
             return
         
         # Show progress dialog
-        from PyQt5.QtWidgets import QProgressDialog
         from PyQt5.QtCore import Qt
+        from PyQt5.QtWidgets import QProgressDialog
         
         progress = QProgressDialog("Collecting property data...", "Cancel", 0, 100, self)
         progress.setWindowModality(Qt.WindowModal)
@@ -1091,8 +1131,8 @@ class PropertyDetailsDialog(QDialog):
             logger.info(f"Cleared cache for APN {apn}")
         
         # Show progress dialog
-        from PyQt5.QtWidgets import QProgressDialog
         from PyQt5.QtCore import Qt
+        from PyQt5.QtWidgets import QProgressDialog
         
         progress = QProgressDialog("Refreshing property data...", "Cancel", 0, 100, self)
         progress.setWindowModality(Qt.WindowModal)

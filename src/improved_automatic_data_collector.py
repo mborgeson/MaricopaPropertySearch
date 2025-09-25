@@ -6,7 +6,6 @@ CONSOLIDATED into unified_data_collector.py
 This file provides backward compatibility imports.
 All functionality has been integrated into the unified data collector.
 """
-
 import logging
 
 logger = logging.getLogger(__name__)
@@ -33,15 +32,16 @@ class ImprovedMaricopaDataCollector:
             "ImprovedMaricopaDataCollector: Using unified data collector for comprehensive data collection"
         )
 
-    def collect_data_for_apn_sync(self, apn: str):
-        """
-        Comprehensive data collection using unified collector
-        Runs ALL Maricopa County organization scripts automatically
-        """
-        logger.info(
-            f"Improved automatic data collection (via unified collector) for APN: {apn}"
-        )
-        return self.unified_collector.collect_data_for_apn_sync(apn)
+
+def collect_data_for_apn_sync(self, apn: str):
+    """
+    Comprehensive data collection using unified collector
+    Runs ALL Maricopa County organization scripts automatically
+    """
+    logger.info(
+        f"Improved automatic data collection (via unified collector) for APN: {apn}"
+    )
+    return self.unified_collector.collect_data_for_apn_sync(apn)
 
 
 # Export for backward compatibility

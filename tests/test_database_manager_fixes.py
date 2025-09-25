@@ -3,9 +3,8 @@
 Comprehensive DatabaseManager Test Suite
 Tests all database functionality and ConfigManager integration
 """
-
-import sys
 import os
+import sys
 import traceback
 from pathlib import Path
 
@@ -17,23 +16,24 @@ try:
     # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
     # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
     from logging_config import get_logger, setup_logging
-    import time
-    import json
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
+import json
+import time
+
 from src.enhanced_config_manager import EnhancedConfigManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 
     # Initialize logging
     setup_logging()
     logger = get_logger(__name__)
 
 except ImportError as e:
-    print(f"Import error: {e}")
-    print("Current Python path:", sys.path)
+        print(f"Import error: {e}")
+        print("Current Python path:", sys.path)
     sys.exit(1)
 
 class DatabaseManagerTester:
     """Comprehensive test suite for DatabaseManager"""
-
     def __init__(self):
         self.config_manager = None
         self.db_manager = None
@@ -47,14 +47,13 @@ class DatabaseManagerTester:
             'errors': []
         }
         self.test_apn = "12345678"
-
     def run_all_tests(self):
         """Run complete test suite"""
         print("=" * 80)
         print("DATABASE MANAGER COMPREHENSIVE TEST SUITE")
         print("=" * 80)
 
-        try:
+    try:
             # Test 1: Initialization
             self.test_initialization()
 
@@ -79,70 +78,67 @@ class DatabaseManagerTester:
                     self.test_crud_operations()
 
                 else:
-                    print("⚠️ Skipping database-dependent tests due to connectivity issues")
+        print("⚠️ Skipping database-dependent tests due to connectivity issues")
             else:
-                print("❌ Skipping all tests due to initialization failure")
+        print("❌ Skipping all tests due to initialization failure")
 
-        except Exception as e:
+    except Exception as e:
             self.test_results['errors'].append(f"Test suite error: {str(e)}")
-            print(f"❌ Test suite failed with error: {e}")
-            traceback.print_exc()
+        print(f"❌ Test suite failed with error: {e}")
+        traceback.print_exc()
 
-        finally:
+    finally:
             self.cleanup()
             self.generate_report()
-
     def test_initialization(self):
         """Test 1ThreadSafeDatabaseManager initialization with ConfigManager"""
         print("\n[TEST 1] DatabaseManager Initialization")
         print("-" * 50)
 
-        try:
+    try:
             # Test ConfigManager creation
-            print("Creating EnhancedConfigManager...")
+        print("Creating EnhancedConfigManager...")
             self.config_manager = EnhancedConfigManager()
-            print(f"[PASS] ConfigManager created successfully")
+        print(f"[PASS] ConfigManager created successfully")
 
             # Test database config retrieval
             db_config = self.config_manager.get_db_config()
-            print(f"[PASS] Database config retrieved: {db_config.get('host')}:{db_config.get('port')}")
+        print(f"[PASS] Database config retrieved: {db_config.get('host')}:{db_config.get('port')}")
 
             # Test DatabaseManager creation with ConfigManager
-            print("Creating DatabaseManager with EnhancedConfigManager...")
+        print("Creating DatabaseManager with EnhancedConfigManager...")
             self.db_manager = ThreadSafeDatabaseManager(self.config_manager)
-            print("[PASS] DatabaseManager created successfully with ConfigManager integration")
+        print("[PASS] DatabaseManager created successfully with ConfigManager integration")
 
             self.test_results['initialization'] = True
 
-        except Exception as e:
+    except Exception as e:
             error_msg = f"Initialization failed: {str(e)}"
             self.test_results['errors'].append(error_msg)
-            print(f"❌ {error_msg}")
-            traceback.print_exc()
-
+        print(f"❌ {error_msg}")
+        traceback.print_exc()
     def test_connectivity(self):
         """Test 2: Database connectivity"""
         print("\n🔌 TEST 2: Database Connectivity")
         print("-" * 50)
 
-        try:
+    try:
             start_time = time.time()
             is_connected = self.db_manager.test_connection()
             connection_time = time.time() - start_time
 
             if is_connected:
-                print(f"✅ Database connection successful ({connection_time:.3f}s)")
+        print(f"✅ Database connection successful ({connection_time:.3f}s)")
                 self.test_results['connectivity'] = True
                 self.test_results['performance']['connection_time'] = connection_time
             else:
-                print("❌ Database connection failed")
+        print("❌ Database connection failed")
                 self.test_results['errors'].append("Database connection test failed")
 
-        except Exception as e:
+    except Exception as e:
             error_msg = f"Connectivity test failed: {str(e)}"
             self.test_results['errors'].append(error_msg)
-            print(f"❌ {error_msg}")
-
+        print(f"❌ {error_msg}")
     def test_property_operations(self):
         """Test 3: Property CRUD operations"""
         print("\n🏠 TEST 3: Property Operations")
@@ -166,50 +162,48 @@ class DatabaseManagerTester:
             'raw_data': {'test': 'data'}
         }
 
-        try:
+    try:
             # Test property insertion
-            print(f"Inserting test property (APN: {self.test_apn})...")
+        print(f"Inserting test property (APN: {self.test_apn})...")
             insert_result = self.db_manager.insert_property(test_property)
-            print(f"✅ Property insertion: {'Success' if insert_result else 'Failed'}")
+        print(f"✅ Property insertion: {'Success' if insert_result else 'Failed'}")
             self.test_results['property_operations']['insert'] = insert_result
 
             if insert_result:
                 # Test property retrieval by APN (new method)
-                print("Testing get_property_by_apn...")
+        print("Testing get_property_by_apn...")
                 property_data = self.db_manager.get_property_by_apn(self.test_apn)
                 if property_data and property_data.get('apn') == self.test_apn:
-                    print(f"✅ get_property_by_apn successful")
+        print(f"✅ get_property_by_apn successful")
                     self.test_results['property_operations']['get_by_apn'] = True
                 else:
-                    print(f"❌ get_property_by_apn failed")
+        print(f"❌ get_property_by_apn failed")
                     self.test_results['property_operations']['get_by_apn'] = False
 
                 # Test property details retrieval (alias method)
-                print("Testing get_property_details (alias)...")
+        print("Testing get_property_details (alias)...")
                 property_details = self.db_manager.get_property_details(self.test_apn)
                 if property_details and property_details.get('apn') == self.test_apn:
-                    print(f"✅ get_property_details successful")
+        print(f"✅ get_property_details successful")
                     self.test_results['property_operations']['get_details'] = True
                 else:
-                    print(f"❌ get_property_details failed")
+        print(f"❌ get_property_details failed")
                     self.test_results['property_operations']['get_details'] = False
 
                 # Test search operations
-                print("Testing search by owner...")
+        print("Testing search by owner...")
                 owner_search = self.db_manager.search_properties_by_owner('Test Owner')
-                print(f"✅ Owner search returned {len(owner_search)} results")
+        print(f"✅ Owner search returned {len(owner_search)} results")
                 self.test_results['property_operations']['search_owner'] = len(owner_search) > 0
-
-                print("Testing search by address...")
+        print("Testing search by address...")
                 address_search = self.db_manager.search_properties_by_address('Test Street')
-                print(f"✅ Address search returned {len(address_search)} results")
+        print(f"✅ Address search returned {len(address_search)} results")
                 self.test_results['property_operations']['search_address'] = len(address_search) > 0
 
-        except Exception as e:
+    except Exception as e:
             error_msg = f"Property operations test failed: {str(e)}"
             self.test_results['errors'].append(error_msg)
-            print(f"❌ {error_msg}")
-
+        print(f"❌ {error_msg}")
     def test_tax_operations(self):
         """Test 4: Tax history operations"""
         print("\n💰 TEST 4: Tax History Operations")
@@ -226,30 +220,29 @@ class DatabaseManagerTester:
             'raw_data': {'test': 'tax_data'}
         }
 
-        try:
+    try:
             # Test tax history insertion
-            print(f"Inserting tax history for APN {self.test_apn}...")
+        print(f"Inserting tax history for APN {self.test_apn}...")
             tax_insert = self.db_manager.insert_tax_history(test_tax_data)
-            print(f"✅ Tax history insertion: {'Success' if tax_insert else 'Failed'}")
+        print(f"✅ Tax history insertion: {'Success' if tax_insert else 'Failed'}")
             self.test_results['tax_operations']['insert'] = tax_insert
 
             if tax_insert:
                 # Test tax history retrieval
-                print("Retrieving tax history...")
+        print("Retrieving tax history...")
                 tax_history = self.db_manager.get_tax_history(self.test_apn)
-                print(f"✅ Tax history retrieval: {len(tax_history)} records found")
+        print(f"✅ Tax history retrieval: {len(tax_history)} records found")
                 self.test_results['tax_operations']['retrieve'] = len(tax_history) > 0
 
                 if tax_history:
                     latest_tax = tax_history[0]
-                    print(f"   Latest tax year: {latest_tax.get('tax_year')}")
-                    print(f"   Assessed value: ${latest_tax.get('assessed_value'):,}")
+        print(f"   Latest tax year: {latest_tax.get('tax_year')}")
+        print(f"   Assessed value: ${latest_tax.get('assessed_value'):,}")
 
-        except Exception as e:
+    except Exception as e:
             error_msg = f"Tax operations test failed: {str(e)}"
             self.test_results['errors'].append(error_msg)
-            print(f"❌ {error_msg}")
-
+        print(f"❌ {error_msg}")
     def test_sales_operations(self):
         """Test 5: Sales history operations"""
         print("\n🏷️ TEST 5: Sales History Operations")
@@ -265,50 +258,48 @@ class DatabaseManagerTester:
             'recording_number': 'REC2023001234'
         }
 
-        try:
+    try:
             # Test sales history insertion
-            print(f"Inserting sales history for APN {self.test_apn}...")
+        print(f"Inserting sales history for APN {self.test_apn}...")
             sales_insert = self.db_manager.insert_sales_history(test_sales_data)
-            print(f"✅ Sales history insertion: {'Success' if sales_insert else 'Failed'}")
+        print(f"✅ Sales history insertion: {'Success' if sales_insert else 'Failed'}")
             self.test_results['sales_operations']['insert'] = sales_insert
 
             if sales_insert:
                 # Test sales history retrieval
-                print("Retrieving sales history...")
+        print("Retrieving sales history...")
                 sales_history = self.db_manager.get_sales_history(self.test_apn)
-                print(f"✅ Sales history retrieval: {len(sales_history)} records found")
+        print(f"✅ Sales history retrieval: {len(sales_history)} records found")
                 self.test_results['sales_operations']['retrieve'] = len(sales_history) > 0
 
                 if sales_history:
                     latest_sale = sales_history[0]
-                    print(f"   Sale date: {latest_sale.get('sale_date')}")
-                    print(f"   Sale price: ${latest_sale.get('sale_price'):,}")
+        print(f"   Sale date: {latest_sale.get('sale_date')}")
+        print(f"   Sale price: ${latest_sale.get('sale_price'):,}")
 
-        except Exception as e:
+    except Exception as e:
             error_msg = f"Sales operations test failed: {str(e)}"
             self.test_results['errors'].append(error_msg)
-            print(f"❌ {error_msg}")
-
+        print(f"❌ {error_msg}")
     def test_performance(self):
         """Test 6: Database performance metrics"""
         print("\n⚡ TEST 6: Performance Testing")
         print("-" * 50)
 
-        try:
+    try:
             # Test database statistics
             start_time = time.time()
             stats = self.db_manager.get_database_stats()
             stats_time = time.time() - start_time
-
-            print(f"✅ Database statistics retrieved ({stats_time:.3f}s):")
+        print(f"✅ Database statistics retrieved ({stats_time:.3f}s):")
             for key, value in stats.items():
-                print(f"   {key}: {value:,}")
+        print(f"   {key}: {value:,}")
 
             self.test_results['performance']['stats_time'] = stats_time
             self.test_results['performance']['database_stats'] = stats
 
             # Test connection pool stability
-            print("Testing connection pool stability...")
+        print("Testing connection pool stability...")
             connection_tests = []
             for i in range(5):
                 start = time.time()
@@ -317,27 +308,26 @@ class DatabaseManagerTester:
                 connection_tests.append(duration)
 
             avg_connection_time = sum(connection_tests) / len(connection_tests)
-            print(f"✅ Average connection time over 5 tests: {avg_connection_time:.3f}s")
+        print(f"✅ Average connection time over 5 tests: {avg_connection_time:.3f}s")
             self.test_results['performance']['avg_connection_time'] = avg_connection_time
 
-        except Exception as e:
+    except Exception as e:
             error_msg = f"Performance test failed: {str(e)}"
             self.test_results['errors'].append(error_msg)
-            print(f"❌ {error_msg}")
-
+        print(f"❌ {error_msg}")
     def test_crud_operations(self):
         """Test 7: Complete CRUD operations"""
         print("\n🔄 TEST 7: CRUD Operations Verification")
         print("-" * 50)
 
-        try:
+    try:
             # CREATE (already tested in property operations)
             create_success = self.test_results['property_operations'].get('insert', False)
-            print(f"✅ CREATE operation: {'Success' if create_success else 'Failed'}")
+        print(f"✅ CREATE operation: {'Success' if create_success else 'Failed'}")
 
             # READ (already tested)
             read_success = self.test_results['property_operations'].get('get_by_apn', False)
-            print(f"✅ READ operation: {'Success' if read_success else 'Failed'}")
+        print(f"✅ READ operation: {'Success' if read_success else 'Failed'}")
 
             # UPDATE (test updating existing property)
             if create_success:
@@ -353,34 +343,32 @@ class DatabaseManagerTester:
                     # Verify update
                     updated_data = self.db_manager.get_property_by_apn(self.test_apn)
                     if updated_data and updated_data.get('owner_name') == 'Updated Test Owner':
-                        print(f"✅ UPDATE operation: Success")
+        print(f"✅ UPDATE operation: Success")
                         self.test_results['property_operations']['update'] = True
                     else:
-                        print(f"❌ UPDATE operation: Failed to verify update")
+        print(f"❌ UPDATE operation: Failed to verify update")
                         self.test_results['property_operations']['update'] = False
                 else:
-                    print(f"❌ UPDATE operation: Failed")
+        print(f"❌ UPDATE operation: Failed")
                     self.test_results['property_operations']['update'] = False
 
             # DELETE is not implemented in current schema, but we can test search analytics
-            print("Testing search analytics logging...")
+        print("Testing search analytics logging...")
             self.db_manager.log_search('apn', self.test_apn, 1, '127.0.0.1')
-            print(f"✅ Analytics logging: Success")
+        print(f"✅ Analytics logging: Success")
 
-        except Exception as e:
+    except Exception as e:
             error_msg = f"CRUD operations test failed: {str(e)}"
             self.test_results['errors'].append(error_msg)
-            print(f"❌ {error_msg}")
-
+        print(f"❌ {error_msg}")
     def cleanup(self):
         """Clean up test resources"""
-        try:
+    try:
             if self.db_manager:
                 self.db_manager.close()
-                print("\n🧹 Database connections closed")
-        except Exception as e:
-            print(f"⚠️ Cleanup warning: {e}")
-
+        print("\n🧹 Database connections closed")
+    except Exception as e:
+        print(f"⚠️ Cleanup warning: {e}")
     def generate_report(self):
         """Generate comprehensive test report"""
         print("\n" + "=" * 80)
@@ -390,22 +378,21 @@ class DatabaseManagerTester:
         # Summary statistics
         total_tests = 0
         passed_tests = 0
-
         print("\n📊 TEST RESULTS SUMMARY:")
         print("-" * 30)
 
         if self.test_results['initialization']:
-            print("✅ DatabaseManager Initialization: PASSED")
+        print("✅ DatabaseManager Initialization: PASSED")
             passed_tests += 1
         else:
-            print("❌ DatabaseManager Initialization: FAILED")
+        print("❌ DatabaseManager Initialization: FAILED")
         total_tests += 1
 
         if self.test_results['connectivity']:
-            print("✅ Database Connectivity: PASSED")
+        print("✅ Database Connectivity: PASSED")
             passed_tests += 1
         else:
-            print("❌ Database Connectivity: FAILED")
+        print("❌ Database Connectivity: FAILED")
         total_tests += 1
 
         # Property operations
@@ -413,7 +400,7 @@ class DatabaseManagerTester:
         prop_passed = sum(1 for v in prop_ops.values() if v is True)
         prop_total = len(prop_ops)
         if prop_total > 0:
-            print(f"🏠 Property Operations: {prop_passed}/{prop_total} PASSED")
+        print(f"🏠 Property Operations: {prop_passed}/{prop_total} PASSED")
             total_tests += prop_total
             passed_tests += prop_passed
 
@@ -422,7 +409,7 @@ class DatabaseManagerTester:
         tax_passed = sum(1 for v in tax_ops.values() if v is True)
         tax_total = len(tax_ops)
         if tax_total > 0:
-            print(f"💰 Tax Operations: {tax_passed}/{tax_total} PASSED")
+        print(f"💰 Tax Operations: {tax_passed}/{tax_total} PASSED")
             total_tests += tax_total
             passed_tests += tax_passed
 
@@ -431,19 +418,18 @@ class DatabaseManagerTester:
         sales_passed = sum(1 for v in sales_ops.values() if v is True)
         sales_total = len(sales_ops)
         if sales_total > 0:
-            print(f"🏷️ Sales Operations: {sales_passed}/{sales_total} PASSED")
+        print(f"🏷️ Sales Operations: {sales_passed}/{sales_total} PASSED")
             total_tests += sales_total
             passed_tests += sales_passed
-
         print(f"\n📈 OVERALL SCORE: {passed_tests}/{total_tests} ({(passed_tests/total_tests*100):.1f}%)")
 
         # Performance metrics
         perf = self.test_results['performance']
         if perf:
-            print(f"\n⚡ PERFORMANCE METRICS:")
-            print(f"   Connection Time: {perf.get('connection_time', 0):.3f}s")
-            print(f"   Stats Query Time: {perf.get('stats_time', 0):.3f}s")
-            print(f"   Avg Connection Time (5 tests): {perf.get('avg_connection_time', 0):.3f}s")
+        print(f"\n⚡ PERFORMANCE METRICS:")
+        print(f"   Connection Time: {perf.get('connection_time', 0):.3f}s")
+        print(f"   Stats Query Time: {perf.get('stats_time', 0):.3f}s")
+        print(f"   Avg Connection Time (5 tests): {perf.get('avg_connection_time', 0):.3f}s")
 
         # Key fixes verification
         print(f"\n🔧 KEY FIXES VERIFICATION:")
@@ -460,32 +446,30 @@ class DatabaseManagerTester:
 
         # Error summary
         if self.test_results['errors']:
-            print(f"\n❌ ERRORS ENCOUNTERED:")
+        print(f"\n❌ ERRORS ENCOUNTERED:")
             for i, error in enumerate(self.test_results['errors'], 1):
-                print(f"   {i}. {error}")
+        print(f"   {i}. {error}")
         else:
-            print(f"\n✅ NO ERRORS ENCOUNTERED")
+        print(f"\n✅ NO ERRORS ENCOUNTERED")
 
         # Recommendations
         print(f"\n💡 RECOMMENDATIONS:")
         print("-" * 20)
 
         if not self.test_results['initialization']:
-            print("   • Fix ConfigManager integration issues")
+        print("   • Fix ConfigManager integration issues")
 
         if not self.test_results['connectivity']:
-            print("   • Check database connection settings in config.ini")
-            print("   • Verify PostgreSQL service is running")
+        print("   • Check database connection settings in config.ini")
+        print("   • Verify PostgreSQL service is running")
 
         if len(self.test_results['errors']) > 0:
-            print("   • Review error logs for detailed troubleshooting")
+        print("   • Review error logs for detailed troubleshooting")
 
         if passed_tests == total_tests:
-            print("   • 🎉 All tests passed! DatabaseManager is working correctly.")
-
+        print("   • 🎉 All tests passed! DatabaseManager is working correctly.")
         print("\n" + "=" * 80)
-
-def main():
+    def main():
     """Main test execution function"""
     tester = DatabaseManagerTester()
     tester.run_all_tests()

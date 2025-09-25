@@ -3,7 +3,6 @@
 Populate database with real Maricopa County property samples for testing
 This uses real property data format but sample records for demonstration
 """
-
 import sys
 from pathlib import Path
 
@@ -11,11 +10,11 @@ PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySea
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
+from src.enhanced_config_manager import EnhancedConfigManager
+
 # MIGRATED: from config_manager import ConfigManager  # → from src.enhanced_config_manager import EnhancedConfigManager
 # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.threadsafe_database_manager import ThreadSafeDatabaseManager
-from src.enhanced_config_manager import EnhancedConfigManager
-
 
 def populate_sample_properties():
     """Add real-format sample properties for testing"""
@@ -162,47 +161,42 @@ def populate_sample_properties():
             "recording_number": "DOC-2019-0722001",
         },
     ]
-
-    print("Populating database with sample property data...")
+        print("Populating database with sample property data...")
 
     # Insert properties
     success_count = 0
     for property_data in sample_properties:
         if db.insert_property(property_data):
             success_count += 1
-            print(
+        print(
                 f"✓ Inserted property: {property_data['apn']} - {property_data['property_address']}"
             )
         else:
-            print(f"✗ Failed to insert property: {property_data['apn']}")
-
-    print(f"\nProperties inserted: {success_count}/{len(sample_properties)}")
+        print(f"✗ Failed to insert property: {property_data['apn']}")
+        print(f"\nProperties inserted: {success_count}/{len(sample_properties)}")
 
     # Insert tax history
     tax_success = 0
     for tax_data in sample_tax_history:
         if db.insert_tax_history(tax_data):
             tax_success += 1
-
-    print(f"Tax records inserted: {tax_success}/{len(sample_tax_history)}")
+        print(f"Tax records inserted: {tax_success}/{len(sample_tax_history)}")
 
     # Insert sales history
     sales_success = 0
     for sales_data in sample_sales_history:
         if db.insert_sales_history(sales_data):
             sales_success += 1
-
-    print(f"Sales records inserted: {sales_success}/{len(sample_sales_history)}")
+        print(f"Sales records inserted: {sales_success}/{len(sample_sales_history)}")
 
     db.close()
-
-    print(f"\n🎉 Sample data population complete!")
-    print(f"✓ {success_count} properties available for search testing")
-    print(f"✓ Database now has real-format property data")
-    print(f"\nTest searches:")
-    print(f"- Owner: 'SMITH' or 'APACHE' or 'JOHNSON'")
-    print(f"- Address: '1811 E APACHE' or 'UNIVERSITY DR' or 'MAIN ST'")
-    print(f"- APN: '117-01-001A' or '118-01-001A'")
+        print(f"\n🎉 Sample data population complete!")
+        print(f"✓ {success_count} properties available for search testing")
+        print(f"✓ Database now has real-format property data")
+        print(f"\nTest searches:")
+        print(f"- Owner: 'SMITH' or 'APACHE' or 'JOHNSON'")
+        print(f"- Address: '1811 E APACHE' or 'UNIVERSITY DR' or 'MAIN ST'")
+        print(f"- APN: '117-01-001A' or '118-01-001A'")
 
 
 if __name__ == "__main__":

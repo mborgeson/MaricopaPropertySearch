@@ -2,17 +2,15 @@
 """
 Investigate actual API endpoints used by the Maricopa County website
 """
-
 import sys
 from pathlib import Path
 
 PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch")
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
-
-import requests
 import json
 
+import requests
 
 def investigate_endpoints():
     """Test various potential API endpoint patterns"""
@@ -46,23 +44,21 @@ def investigate_endpoints():
         "/rest/v1/properties",
         "/public-api/properties",
     ]
-
-    print("Investigating Real API Endpoints")
-    print("=" * 50)
-    print(f"Token: {token[:12]}...")
-    print()
+        print("Investigating Real API Endpoints")
+        print("=" * 50)
+        print(f"Token: {token[:12]}...")
+        print()
 
     working_endpoints = []
 
     for endpoint in test_endpoints:
-        try:
+try:
             # Handle full URLs vs relative paths
             if endpoint.startswith("https://"):
                 url = endpoint
             else:
                 url = base_url + endpoint
-
-            print(f"Testing: {endpoint}")
+        print(f"Testing: {endpoint}")
 
             # Test GET request
             response = requests.get(url, headers=headers, timeout=10)
@@ -71,30 +67,30 @@ def investigate_endpoints():
 
             if response.status_code == 200:
                 if "application/json" in content_type:
-                    try:
+try:
                         data = response.json()
-                        print(f"  SUCCESS - JSON Response!")
-                        print(
+        print(f"  SUCCESS - JSON Response!")
+        print(
                             f"  Keys: {list(data.keys()) if isinstance(data, dict) else f'Array({len(data)})'}"
                         )
                         working_endpoints.append((endpoint, "GET", data))
-                    except:
-                        print(f"  Invalid JSON but claims application/json")
+except:
+                            print(f"  Invalid JSON but claims application/json")
                 elif "text/html" in content_type:
-                    print(f"  HTML response (likely error page)")
+        print(f"  HTML response (likely error page)")
                 else:
-                    print(f"  Status 200, Content-Type: {content_type}")
+        print(f"  Status 200, Content-Type: {content_type}")
             elif response.status_code == 401:
-                print(f"  UNAUTHORIZED (401) - Token issue")
+        print(f"  UNAUTHORIZED (401) - Token issue")
             elif response.status_code == 403:
-                print(f"  FORBIDDEN (403) - Access denied")
+        print(f"  FORBIDDEN (403) - Access denied")
             elif response.status_code == 404:
-                print(f"  NOT FOUND (404)")
+        print(f"  NOT FOUND (404)")
             elif response.status_code == 405:
-                print(f"  METHOD NOT ALLOWED (405) - Try POST?")
+        print(f"  METHOD NOT ALLOWED (405) - Try POST?")
 
                 # Try POST if GET is not allowed
-                try:
+try:
                     post_response = requests.post(
                         url, headers=headers, json={"q": "117-01-001A"}, timeout=10
                     )
@@ -102,45 +98,43 @@ def investigate_endpoints():
                         if "application/json" in post_response.headers.get(
                             "content-type", ""
                         ):
-                            try:
+try:
                                 post_data = post_response.json()
-                                print(f"    POST SUCCESS - JSON Response!")
-                                print(
+        print(f"    POST SUCCESS - JSON Response!")
+        print(
                                     f"    Keys: {list(post_data.keys()) if isinstance(post_data, dict) else f'Array({len(post_data)})'}"
                                 )
                                 working_endpoints.append((endpoint, "POST", post_data))
-                            except:
-                                print(f"    POST returned invalid JSON")
+except:
+                                    print(f"    POST returned invalid JSON")
                         else:
-                            print(
+        print(
                                 f"    POST returned: {post_response.headers.get('content-type')}"
                             )
                     else:
-                        print(f"    POST Status: {post_response.status_code}")
-                except Exception as e:
-                    print(f"    POST failed: {e}")
+        print(f"    POST Status: {post_response.status_code}")
+except Exception as e:
+        print(f"    POST failed: {e}")
             else:
-                print(f"  Status: {response.status_code}")
+        print(f"  Status: {response.status_code}")
 
-        except requests.exceptions.Timeout:
-            print(f"  TIMEOUT")
-        except requests.exceptions.RequestException as e:
-            print(f"  ERROR: {e}")
-
+except requests.exceptions.Timeout:
+        print(f"  TIMEOUT")
+except requests.exceptions.RequestException as e:
+        print(f"  ERROR: {e}")
         print()
-
-    print("=" * 50)
-    print("SUMMARY")
-    print("=" * 50)
+        print("=" * 50)
+        print("SUMMARY")
+        print("=" * 50)
 
     if working_endpoints:
         print("WORKING ENDPOINTS FOUND:")
         for endpoint, method, data in working_endpoints:
-            print(f"  {method} {endpoint}")
+        print(f"  {method} {endpoint}")
             if isinstance(data, dict):
                 for key in list(data.keys())[:3]:
-                    print(f"    {key}: {str(data[key])[:50]}...")
-            print()
+        print(f"    {key}: {str(data[key])[:50]}...")
+        print()
     else:
         print("NO WORKING ENDPOINTS FOUND")
         print("\nPossible issues:")

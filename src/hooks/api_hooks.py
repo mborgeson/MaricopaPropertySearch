@@ -2,21 +2,20 @@
 API Operation Hooks
 Handles API request/response lifecycle, rate limiting, and monitoring
 """
-
 import asyncio
 import hashlib
 import json
 import time
 from collections import deque
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional, Deque
+from typing import Any, Deque, Dict, List, Optional
 
 from hook_manager import (
     Hook,
     HookContext,
+    HookPriority,
     HookResult,
     HookStatus,
-    HookPriority,
     get_hook_manager,
 )
 from logging_config import get_logger, log_exception
@@ -26,7 +25,6 @@ logger = get_logger(__name__)
 
 class APIRateLimitHook(Hook):
     """Hook for API rate limiting and throttling"""
-
     def __init__(self):
         super().__init__("api_rate_limit", HookPriority.HIGHEST)
         self.request_history: Deque[float] = deque(maxlen=1000)
@@ -103,7 +101,6 @@ class APIRateLimitHook(Hook):
         except Exception as e:
             logger.error(f"API rate limit hook error: {e}")
             return HookResult(status=HookStatus.FAILED, error=e)
-
     def _check_rate_limits(self, current_time: float) -> List[str]:
         """Check if any rate limits are violated"""
         violations = []
@@ -132,7 +129,6 @@ class APIRateLimitHook(Hook):
             )
 
         return violations
-
     def _calculate_backoff(self, violations: List[str]) -> float:
         """Calculate backoff time based on violations"""
         base_backoff = 1.0
@@ -144,7 +140,6 @@ class APIRateLimitHook(Hook):
         severity_multiplier = len(violations)
 
         return base_backoff * backoff_multiplier * severity_multiplier
-
     def _get_rate_limit_info(self, current_time: float) -> Dict[str, int]:
         """Get current rate limit usage"""
         return {
@@ -158,14 +153,12 @@ class APIRateLimitHook(Hook):
                 [t for t in self.request_history if current_time - t <= 3600.0]
             ),
         }
-
-    def reset_violations(self):
+def reset_violations(self):
         """Reset violation count (for testing or manual intervention)"""
         self.violation_count = 0
         self.blocked_until = None
         logger.info("API rate limit violations reset")
-
-    def update_rate_limits(self, new_limits: Dict[str, int]):
+def update_rate_limits(self, new_limits: Dict[str, int]):
         """Update rate limits"""
         self.rate_limits.update(new_limits)
         logger.info(f"API rate limits updated: {self.rate_limits}")
@@ -173,7 +166,6 @@ class APIRateLimitHook(Hook):
 
 class APIRequestResponseHook(Hook):
     """Hook for monitoring API requests and responses"""
-
     def __init__(self):
         super().__init__("api_request_response", HookPriority.NORMAL)
         self.request_stats = {
@@ -351,7 +343,6 @@ class APIRequestResponseHook(Hook):
             return HookResult(
                 status=HookStatus.SUCCESS, result={"warning": "Unknown request"}
             )
-
     def _extract_endpoint(self, url: str) -> str:
         """Extract endpoint pattern from URL"""
         try:
@@ -365,14 +356,13 @@ class APIRequestResponseHook(Hook):
                 path = path[:-1]
 
             # Replace IDs with placeholder
-            import re
+import re
 
             path = re.sub(r"/\d+", "/{id}", path)
 
             return path or "/"
         except Exception:
             return url
-
     def get_api_stats(self) -> Dict[str, Any]:
         """Get API statistics"""
         total_requests = self.request_stats["total_requests"]
@@ -396,7 +386,6 @@ class APIRequestResponseHook(Hook):
             "status_codes": dict(self.request_stats["status_codes"]),
             "top_endpoints": self._get_top_endpoints(),
         }
-
     def _get_top_endpoints(self, limit: int = 5) -> List[Dict[str, Any]]:
         """Get top endpoints by request count"""
         sorted_endpoints = sorted(
@@ -418,7 +407,6 @@ class APIRequestResponseHook(Hook):
 
 class APICacheHook(Hook):
     """Hook for API response caching"""
-
     def __init__(self):
         super().__init__("api_cache", HookPriority.HIGH)
         self.cache = {}
@@ -516,7 +504,6 @@ class APICacheHook(Hook):
             result={"cached": True, "cache_key": cache_key},
             metadata={"cached": True},
         )
-
     def _generate_cache_key(self, request_data: Dict) -> str:
         """Generate cache key from request parameters"""
         key_parts = [
@@ -526,8 +513,7 @@ class APICacheHook(Hook):
         ]
         key_string = "|".join(key_parts)
         return hashlib.md5(key_string.encode()).hexdigest()
-
-    def _manage_cache_size(self):
+def _manage_cache_size(self):
         """Manage cache size by removing oldest entries"""
         if len(self.cache) >= self.max_cache_size:
             # Remove oldest 10% of cache
@@ -541,7 +527,6 @@ class APICacheHook(Hook):
                 del self.cache[key]
 
             logger.debug(f"API cache cleanup: removed {remove_count} old entries")
-
     def get_cache_stats(self) -> Dict[str, Any]:
         """Get cache statistics"""
         total_requests = self.cache_stats["hits"] + self.cache_stats["misses"]
@@ -554,8 +539,7 @@ class APICacheHook(Hook):
             "cache_size": self.cache_stats["size"],
             "max_cache_size": self.max_cache_size,
         }
-
-    def clear_cache(self):
+def clear_cache(self):
         """Clear all cached responses"""
         self.cache.clear()
         self.cache_stats["size"] = 0
@@ -581,7 +565,7 @@ def register_api_hooks():
 
 
 # Convenience functions for triggering API events
-def trigger_api_request(
+    def trigger_api_request(
     request_id: str, url: str, method: str = "GET", params: Dict = None
 ):
     """Trigger API request hook"""
@@ -595,9 +579,7 @@ def trigger_api_request(
         method=method,
         params=params or {},
     )
-
-
-def trigger_api_response(
+    def trigger_api_response(
     request_id: str,
     status_code: int,
     response_data: Any,
@@ -616,8 +598,6 @@ def trigger_api_response(
         response_time=response_time,
         response_size=response_size,
     )
-
-
 def trigger_api_error(request_id: str, error: Exception):
     """Trigger API error hook"""
     from hook_manager import emit_hook

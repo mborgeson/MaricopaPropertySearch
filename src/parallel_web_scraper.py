@@ -3,34 +3,33 @@
 Parallel Web Scraper Manager
 Advanced parallel web scraping with multiple browser instances and intelligent load balancing
 """
-
 import asyncio
-import time
+import json
 import logging
+import queue
+import threading
+import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
-from typing import Dict, List, Optional, Any, Set, Callable
-from threading import Lock, RLock, Event, Semaphore
-import threading
-import queue
-import json
 from pathlib import Path
+from threading import Event, Lock, RLock, Semaphore
+from typing import Any, Callable, Dict, List, Optional, Set
 
 # Optional selenium imports
 try:
     from selenium import webdriver
-    from selenium.webdriver.chrome.service import Service
-    from selenium.webdriver.chrome.options import Options
-    from selenium.webdriver.common.by import By
-    from selenium.webdriver.support.ui import WebDriverWait
-    from selenium.webdriver.support import expected_conditions as EC
     from selenium.common.exceptions import (
-        TimeoutException,
         NoSuchElementException,
+        TimeoutException,
         WebDriverException,
     )
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.chrome.service import Service
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support import expected_conditions as EC
+    from selenium.webdriver.support.ui import WebDriverWait
 
     SELENIUM_AVAILABLE = True
 except ImportError:
@@ -49,8 +48,8 @@ except ImportError:
 from PyQt5.QtCore import QThread, pyqtSignal
 
 from logging_config import get_logger, get_performance_logger
-from tax_scraper import MaricopaTaxScraper
 from recorder_scraper import MaricopaRecorderScraper
+from tax_scraper import MaricopaTaxScraper
 
 logger = get_logger(__name__)
 perf_logger = get_performance_logger(__name__)
@@ -81,10 +80,8 @@ class ScrapingRequest:
     retry_count: int = 0
     max_retries: int = 2
     timeout: float = 30.0
-
     def __hash__(self):
         return hash((self.task_type, self.identifier))
-
     def __eq__(self, other):
         if not isinstance(other, ScrapingRequest):
             return False
@@ -93,7 +90,6 @@ class ScrapingRequest:
 
 class BrowserPool:
     """Pool of browser instances for parallel scraping"""
-
     def __init__(
         self,
         chrome_driver_path: str,
@@ -133,21 +129,19 @@ class BrowserPool:
         logger.info(
             f"Browser pool initialized with {pool_size} browsers (headless: {headless})"
         )
-
     def _initialize_pool(self):
         """Pre-create some browser instances"""
         initial_count = min(2, self.pool_size)  # Start with 2 browsers
 
         for _ in range(initial_count):
-            try:
+    try:
                 browser = self._create_browser()
                 self.browser_queue.put(browser, block=False)
                 self.total_browsers += 1
                 logger.debug("Pre-created browser instance")
-            except Exception as e:
+    except Exception as e:
                 logger.warning(f"Failed to pre-create browser: {e}")
                 break
-
     def _create_browser(self) -> webdriver.Chrome:
         """Create a new Chrome browser instance"""
         options = Options()
@@ -182,7 +176,7 @@ class BrowserPool:
         }
         options.add_experimental_option("prefs", prefs)
 
-        try:
+    try:
             service = Service(self.chrome_driver_path)
             driver = webdriver.Chrome(service=service, options=options)
 
@@ -201,51 +195,49 @@ class BrowserPool:
 
             return driver
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Failed to create browser: {e}")
             raise
-
     def acquire_browser(self, timeout: float = 10.0) -> webdriver.Chrome:
         """Get a browser from the pool"""
         start_time = time.time()
 
         while time.time() - start_time < timeout:
-            try:
+    try:
                 # Try to get existing browser
                 browser = self.browser_queue.get(timeout=1.0)
 
                 # Verify browser is still responsive
-                try:
+    try:
                     browser.current_url  # Simple check
                     with self.lock:
                         self.active_browsers.add(browser)
                     return browser
-                except Exception as e:
+    except Exception as e:
                     logger.warning(f"Browser not responsive, creating new one: {e}")
-                    try:
+    try:
                         browser.quit()
-                    except:
-                        pass
+    except:
+            pass
 
-            except queue.Empty:
+    except queue.Empty:
                 pass
 
             # Create new browser if pool is empty and we haven't hit limit
             with self.lock:
                 if self.total_browsers < self.pool_size:
-                    try:
+    try:
                         browser = self._create_browser()
                         self.total_browsers += 1
                         self.active_browsers.add(browser)
                         return browser
-                    except Exception as e:
+    except Exception as e:
                         logger.error(f"Failed to create browser on demand: {e}")
                         continue
 
             time.sleep(0.5)  # Brief wait before retry
 
         raise TimeoutError(f"Could not acquire browser within {timeout} seconds")
-
     def release_browser(self, browser: webdriver.Chrome):
         """Return browser to pool"""
         if not browser:
@@ -254,7 +246,7 @@ class BrowserPool:
         with self.lock:
             self.active_browsers.discard(browser)
 
-            try:
+    try:
                 # Basic cleanup
                 browser.delete_all_cookies()
                 browser.execute_script("window.localStorage.clear();")
@@ -268,38 +260,36 @@ class BrowserPool:
                     browser.quit()
                     self.total_browsers -= 1
 
-            except Exception as e:
+    except Exception as e:
                 logger.warning(f"Error returning browser to pool: {e}")
-                try:
+    try:
                     browser.quit()
                     self.total_browsers -= 1
-                except:
-                    pass
-
+    except:
+            pass
     def close_all(self):
         """Close all browsers in pool"""
         logger.info("Closing all browsers in pool")
 
         # Close browsers in queue
         while not self.browser_queue.empty():
-            try:
+    try:
                 browser = self.browser_queue.get(timeout=1.0)
                 browser.quit()
-            except:
-                pass
+    except:
+            pass
 
         # Close active browsers
         with self.lock:
             for browser in list(self.active_browsers):
-                try:
+    try:
                     browser.quit()
-                except:
-                    pass
+    except:
+            pass
             self.active_browsers.clear()
             self.total_browsers = 0
 
         logger.info("All browsers closed")
-
     def get_pool_status(self) -> Dict[str, int]:
         """Get current pool status"""
         with self.lock:
@@ -313,7 +303,6 @@ class BrowserPool:
 
 class ParallelWebScraperManager:
     """Advanced parallel web scraper with multiple browser instances"""
-
     def __init__(
         self,
         config_manager,
@@ -375,7 +364,6 @@ class ParallelWebScraperManager:
         logger.info(
             f"Parallel web scraper initialized - Max concurrent: {max_concurrent_scrapers}"
         )
-
     def submit_scraping_requests(self, requests: List[ScrapingRequest]) -> List[str]:
         """Submit multiple scraping requests for parallel processing"""
         request_ids = []
@@ -399,22 +387,20 @@ class ParallelWebScraperManager:
 
         logger.info(f"Submitted {len(requests)} scraping requests")
         return request_ids
-
     def _process_pending_requests(self):
         """Process pending requests in thread pool"""
         # Submit processing task to executor
         self.executor.submit(self._request_processor_worker)
-
     def _request_processor_worker(self):
         """Background worker to process scraping requests"""
         while not self.shutdown_event.is_set():
-            try:
+    try:
                 # Get next request with timeout
-                try:
+    try:
                     priority_tuple, request_id, request = self.pending_requests.get(
                         timeout=5.0
                     )
-                except queue.Empty:
+    except queue.Empty:
                     continue
 
                 # Execute request with rate limiting
@@ -428,10 +414,9 @@ class ParallelWebScraperManager:
                 # Don't overwhelm - brief pause
                 time.sleep(0.1)
 
-            except Exception as e:
+    except Exception as e:
                 logger.error(f"Error in request processor: {e}")
                 time.sleep(1.0)
-
     def _execute_scraping_request(self, request_id: str, request: ScrapingRequest):
         """Execute a single scraping request"""
         start_time = time.time()
@@ -444,7 +429,7 @@ class ParallelWebScraperManager:
             self._apply_rate_limit(request.task_type)
 
             browser = None
-            try:
+    try:
                 # Acquire browser
                 browser = self.browser_pool.acquire_browser(timeout=15.0)
 
@@ -480,7 +465,7 @@ class ParallelWebScraperManager:
                     f"Scraping request completed successfully: {request_id} in {processing_time:.2f}s"
                 )
 
-            except Exception as e:
+    except Exception as e:
                 request.error = str(e)
                 request.completed_at = datetime.now()
 
@@ -493,7 +478,7 @@ class ParallelWebScraperManager:
                     f"Scraping request failed: {request_id} after {processing_time:.2f}s - {e}"
                 )
 
-            finally:
+    finally:
                 # Release browser back to pool
                 if browser:
                     self.browser_pool.release_browser(browser)
@@ -503,7 +488,6 @@ class ParallelWebScraperManager:
                     if request_id in self.active_requests:
                         del self.active_requests[request_id]
                     self.completed_requests[request_id] = request
-
     def _apply_rate_limit(self, task_type: ScrapingTask):
         """Apply rate limiting based on task type"""
         # Determine target domain
@@ -525,7 +509,6 @@ class ParallelWebScraperManager:
             time.sleep(sleep_time)
 
         self.last_request_times[domain] = time.time()
-
     def _scrape_tax_information(
         self, browser: webdriver.Chrome, apn: str
     ) -> Dict[str, Any]:
@@ -533,7 +516,7 @@ class ParallelWebScraperManager:
         if not self.enable_tax_scraping:
             raise ValueError("Tax scraping is disabled")
 
-        try:
+    try:
             # Navigate to tax site
             tax_url = f"https://treasurer.maricopa.gov/Parcel/{apn}"
             browser.get(tax_url)
@@ -549,10 +532,9 @@ class ParallelWebScraperManager:
 
             return result or {}
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Tax scraping failed for APN {apn}: {e}")
             raise
-
     def _scrape_sales_history(
         self, browser: webdriver.Chrome, apn: str
     ) -> Dict[str, Any]:
@@ -560,7 +542,7 @@ class ParallelWebScraperManager:
         if not self.enable_recorder_scraping:
             raise ValueError("Recorder scraping is disabled")
 
-        try:
+    try:
             # Navigate to recorder site
             recorder_url = f"https://recorder.maricopa.gov/recdocdata/GetDocsByParcel.aspx?parcel={apn}"
             browser.get(recorder_url)
@@ -576,10 +558,9 @@ class ParallelWebScraperManager:
 
             return result or {}
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Sales history scraping failed for APN {apn}: {e}")
             raise
-
     def _scrape_document_records(
         self, browser: webdriver.Chrome, apn: str
     ) -> Dict[str, Any]:
@@ -587,7 +568,7 @@ class ParallelWebScraperManager:
         if not self.enable_recorder_scraping:
             raise ValueError("Recorder scraping is disabled")
 
-        try:
+    try:
             # Navigate to recorder documents page
             docs_url = f"https://recorder.maricopa.gov/recdocdata/GetDocsByParcel.aspx?parcel={apn}&DocTypeCode=All"
             browser.get(docs_url)
@@ -605,15 +586,14 @@ class ParallelWebScraperManager:
 
             return result or {}
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Document records scraping failed for APN {apn}: {e}")
             raise
-
     def _scrape_property_details(
         self, browser: webdriver.Chrome, apn: str
     ) -> Dict[str, Any]:
         """Scrape detailed property information"""
-        try:
+    try:
             # Navigate to assessor's property details page
             assessor_url = (
                 f"https://mcassessor.maricopa.gov/parcel/parcel.asp?parcel={apn}"
@@ -629,7 +609,7 @@ class ParallelWebScraperManager:
             property_data = {}
 
             # Try to extract basic information
-            try:
+    try:
                 # Look for property address
                 address_elements = browser.find_elements(
                     By.XPATH,
@@ -652,20 +632,19 @@ class ParallelWebScraperManager:
                 if legal_elements:
                     property_data["legal_description"] = legal_elements[0].text.strip()
 
-            except Exception as e:
+    except Exception as e:
                 logger.warning(f"Error extracting some property details: {e}")
 
             return property_data
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Property details scraping failed for APN {apn}: {e}")
             raise
-
     def _scrape_owner_properties(
         self, browser: webdriver.Chrome, owner_name: str
     ) -> Dict[str, Any]:
         """Scrape all properties owned by a specific owner"""
-        try:
+    try:
             # Navigate to owner search page
             search_url = "https://mcassessor.maricopa.gov/search/searchownerform.asp"
             browser.get(search_url)
@@ -690,7 +669,7 @@ class ParallelWebScraperManager:
 
             # Extract property list
             properties = []
-            try:
+    try:
                 # Look for results table
                 tables = browser.find_elements(By.TAG_NAME, "table")
                 for table in tables:
@@ -704,15 +683,14 @@ class ParallelWebScraperManager:
                                 "owner_name": owner_name,
                             }
                             properties.append(property_info)
-            except Exception as e:
+    except Exception as e:
                 logger.warning(f"Error extracting owner properties: {e}")
 
             return {"properties": properties, "owner_name": owner_name}
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Owner properties scraping failed for {owner_name}: {e}")
             raise
-
     def get_request_status(self, request_id: str) -> Optional[Dict[str, Any]]:
         """Get status of a scraping request"""
         with self.requests_lock:
@@ -753,7 +731,6 @@ class ParallelWebScraperManager:
                 }
 
             return None
-
     def get_request_result(self, request_id: str) -> Optional[Dict[str, Any]]:
         """Get result from completed scraping request"""
         with self.requests_lock:
@@ -762,7 +739,6 @@ class ParallelWebScraperManager:
                 if request.result is not None:
                     return request.result
             return None
-
     def batch_scrape_tax_data(self, apns: List[str], priority: int = 5) -> List[str]:
         """Batch scrape tax data for multiple APNs"""
         requests = [
@@ -775,7 +751,6 @@ class ParallelWebScraperManager:
         ]
 
         return self.submit_scraping_requests(requests)
-
     def batch_scrape_sales_data(self, apns: List[str], priority: int = 5) -> List[str]:
         """Batch scrape sales history for multiple APNs"""
         requests = [
@@ -786,7 +761,6 @@ class ParallelWebScraperManager:
         ]
 
         return self.submit_scraping_requests(requests)
-
     def get_scraper_statistics(self) -> Dict[str, Any]:
         """Get comprehensive scraper statistics"""
         with self.stats_lock:
@@ -811,7 +785,6 @@ class ParallelWebScraperManager:
             "browser_pool": browser_stats,
             "max_concurrent_scrapers": self.max_concurrent_scrapers,
         }
-
     def shutdown(self):
         """Gracefully shutdown the parallel web scraper"""
         logger.info("Shutting down parallel web scraper...")
@@ -835,20 +808,17 @@ class ParallelWebScrapingWorker(QThread):
     scraping_completed = pyqtSignal(str, dict)  # request_id, result
     scraping_failed = pyqtSignal(str, str)  # request_id, error
     batch_completed = pyqtSignal(list)  # all_results
-
     def __init__(self, scraper_manager: ParallelWebScraperManager):
         super().__init__()
         self.scraper_manager = scraper_manager
         self.current_request_ids = []
-
     def start_batch_scraping(self, requests: List[ScrapingRequest]):
         """Start batch scraping in Qt thread"""
         self.requests = requests
         self.start()
-
     def run(self):
         """Execute batch scraping in background thread"""
-        try:
+    try:
             # Submit requests
             self.current_request_ids = self.scraper_manager.submit_scraping_requests(
                 self.requests
@@ -889,7 +859,7 @@ class ParallelWebScrapingWorker(QThread):
 
             self.batch_completed.emit(all_results)
 
-        except Exception as e:
+    except Exception as e:
             logger.error(f"Parallel web scraping worker error: {e}")
             for request_id in self.current_request_ids:
                 self.scraping_failed.emit(request_id, f"Worker error: {str(e)}")

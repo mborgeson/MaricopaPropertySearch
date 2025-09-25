@@ -2,21 +2,20 @@
 User Action Tracking Hooks
 Comprehensive user behavior analytics, session tracking, and usage patterns
 """
-
 import hashlib
 import json
 import time
 import uuid
 from collections import defaultdict, deque
 from datetime import datetime, timedelta
-from typing import Dict, Any, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set
 
 from hook_manager import (
     Hook,
     HookContext,
+    HookPriority,
     HookResult,
     HookStatus,
-    HookPriority,
     get_hook_manager,
 )
 from logging_config import get_logger, log_exception
@@ -26,7 +25,6 @@ logger = get_logger(__name__)
 
 class UserSessionTrackingHook(Hook):
     """Hook for tracking user sessions and activity"""
-
     def __init__(self):
         super().__init__("user_session_tracking", HookPriority.NORMAL)
         self.active_sessions = {}
@@ -192,14 +190,12 @@ class UserSessionTrackingHook(Hook):
                 "total_actions": session_record["total_actions"],
             },
         )
-
     def _hash_ip(self, ip_address: str) -> str:
         """Hash IP address for privacy"""
         if not ip_address:
             return ""
         return hashlib.sha256(ip_address.encode()).hexdigest()[:16]
-
-    def cleanup_expired_sessions(self):
+def cleanup_expired_sessions(self):
         """Clean up expired sessions"""
         current_time = time.time()
         expired_sessions = []
@@ -228,7 +224,6 @@ class UserSessionTrackingHook(Hook):
             logger.info(f"Cleaned up {len(expired_sessions)} expired sessions")
 
         self.session_stats["active_sessions"] = len(self.active_sessions)
-
     def get_session_stats(self) -> Dict[str, Any]:
         """Get session statistics"""
         # Clean up expired sessions first
@@ -264,7 +259,6 @@ class UserSessionTrackingHook(Hook):
 
 class UserBehaviorAnalyticsHook(Hook):
     """Hook for analyzing user behavior patterns"""
-
     def __init__(self):
         super().__init__("user_behavior_analytics", HookPriority.LOW)
         self.action_patterns = defaultdict(lambda: defaultdict(int))
@@ -329,7 +323,6 @@ class UserBehaviorAnalyticsHook(Hook):
         elif action == "error":
             error_type = details.get("error_type", "unknown")
             self.error_patterns[error_type] += 1
-
     def _extract_feature_from_action(self, action: str, details: Dict) -> Optional[str]:
         """Extract feature name from action"""
         feature_map = {
@@ -343,14 +336,12 @@ class UserBehaviorAnalyticsHook(Hook):
         }
 
         return feature_map.get(action)
-
     def get_behavior_insights(self, user_id: str = None) -> Dict[str, Any]:
         """Get behavior insights for specific user or all users"""
         if user_id:
             return self._get_user_insights(user_id)
         else:
             return self._get_global_insights()
-
     def _get_user_insights(self, user_id: str) -> Dict[str, Any]:
         """Get insights for specific user"""
         if user_id not in self.action_patterns:
@@ -378,7 +369,6 @@ class UserBehaviorAnalyticsHook(Hook):
             "session_analysis": session_analysis,
             "recent_journey": journey[-10:],  # Last 10 actions
         }
-
     def _get_global_insights(self) -> Dict[str, Any]:
         """Get global behavior insights"""
         # Aggregate all user actions
@@ -404,7 +394,6 @@ class UserBehaviorAnalyticsHook(Hook):
             "search_patterns": dict(self.search_patterns),
             "error_patterns": dict(self.error_patterns),
         }
-
     def _analyze_user_sessions(self, journey: List[Dict]) -> Dict[str, Any]:
         """Analyze user session patterns from journey"""
         if not journey:
@@ -455,7 +444,6 @@ class UserBehaviorAnalyticsHook(Hook):
 
 class UsageMetricsHook(Hook):
     """Hook for collecting usage metrics and KPIs"""
-
     def __init__(self):
         super().__init__("usage_metrics", HookPriority.LOW)
         self.daily_metrics = defaultdict(lambda: defaultdict(int))
@@ -518,7 +506,6 @@ class UsageMetricsHook(Hook):
         except Exception as e:
             logger.error(f"Usage metrics hook error: {e}")
             return HookResult(status=HookStatus.FAILED, error=e)
-
     def get_usage_report(self, days: int = 7) -> Dict[str, Any]:
         """Get usage report for specified number of days"""
         end_date = datetime.now()
@@ -589,8 +576,6 @@ def track_user_session_start(session_id: str, user_id: str = None, **metadata):
         user_id=user_id or "anonymous",
         metadata=metadata,
     )
-
-
 def track_user_action(session_id: str, action: str, user_id: str = None, **details):
     """Track user action"""
     from hook_manager import emit_hook
@@ -603,8 +588,6 @@ def track_user_action(session_id: str, action: str, user_id: str = None, **detai
         action=action,
         details=details,
     )
-
-
 def track_user_session_end(session_id: str, reason: str = "explicit"):
     """Track user session end"""
     from hook_manager import emit_hook
@@ -612,9 +595,7 @@ def track_user_session_end(session_id: str, reason: str = "explicit"):
     return emit_hook(
         "user.session.end", "user_tracker", session_id=session_id, end_reason=reason
     )
-
-
-def track_feature_usage(
+    def track_feature_usage(
     feature: str, user_id: str = None, duration: float = 0, success: bool = True
 ):
     """Track feature usage"""

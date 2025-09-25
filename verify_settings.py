@@ -3,22 +3,23 @@
 Verify Settings Integration
 This script verifies that the settings fix is working correctly.
 """
-
-import sys
 import os
+import sys
+
 from PyQt5.QtCore import QSettings
 from PyQt5.QtWidgets import QApplication
 
+
 def verify_default_settings():
     """Verify that default settings are loaded correctly"""
-    print("Verifying Default Settings Integration")
-    print("=" * 50)
+        print("Verifying Default Settings Integration")
+        print("=" * 50)
     
     # Use the same QSettings key as the application
     settings = QSettings("MaricopaPropertySearch", "PropertySearch")
     
     # Clear any existing settings to test defaults
-    print("Clearing existing settings to test defaults...")
+        print("Clearing existing settings to test defaults...")
     settings.clear()
     settings.sync()
     
@@ -30,8 +31,7 @@ def verify_default_settings():
         'show_progress_details': (True, bool),
         'always_fresh_data': (True, bool)
     }
-    
-    print("\nLoading default values (same logic as application):")
+        print("\nLoading default values (same logic as application):")
     loaded_settings = {}
     
     # Use the exact same loading logic as the application
@@ -49,10 +49,9 @@ def verify_default_settings():
             loaded_settings[key] = int(stored_value) if stored_value else default_value
         else:
             loaded_settings[key] = stored_value
-    
-    print()
-    print("Settings that will be applied to UI:")
-    print("-" * 40)
+        print()
+        print("Settings that will be applied to UI:")
+        print("-" * 40)
     
     expected_defaults = {
         'auto_start_collection': True,
@@ -70,11 +69,10 @@ def verify_default_settings():
         
         if actual != expected:
             all_correct = False
-            print(f"    Expected: {expected}, Got: {actual}")
-    
-    print()
-    print("UI Application Effects:")
-    print("-" * 30)
+        print(f"    Expected: {expected}, Got: {actual}")
+        print()
+        print("UI Application Effects:")
+        print("-" * 30)
     
     if loaded_settings['always_fresh_data']:
         print("  [YES] 'Always Fresh Data' checkbox will be CHECKED")
@@ -90,8 +88,7 @@ def verify_default_settings():
         print("  [YES] Background data collection will start automatically")
     else:
         print("  [NO] Background data collection will NOT start automatically")
-    
-    print(f"  [YES] Search results will be limited to {loaded_settings['max_results']} items")
+        print(f"  [YES] Search results will be limited to {loaded_settings['max_results']} items")
     
     if loaded_settings['show_progress_details']:
         print("  [YES] Detailed progress information will be shown")
@@ -99,7 +96,6 @@ def verify_default_settings():
         print("  [NO] Detailed progress information will be hidden")
     
     return all_correct
-
 def main():
     """Run verification"""
     # Create minimal QApplication for QSettings to work
@@ -108,17 +104,15 @@ def main():
     
     try:
         success = verify_default_settings()
-        
         print()
         print("=" * 50)
         
         if success:
-            print("[SUCCESS] Settings verification PASSED!")
-            print("The application should now apply default settings correctly.")
+        print("[SUCCESS] Settings verification PASSED!")
+        print("The application should now apply default settings correctly.")
         else:
-            print("[ERROR] Settings verification FAILED!")
-            print("There may still be issues with the settings implementation.")
-        
+        print("[ERROR] Settings verification FAILED!")
+        print("There may still be issues with the settings implementation.")
         print()
         print("Next Steps:")
         print("1. Run the application: python src/maricopa_property_search.py")
@@ -128,8 +122,9 @@ def main():
         
     except Exception as e:
         print(f"[ERROR] Verification failed: {e}")
-        import traceback
+import traceback
+
         traceback.print_exc()
 
-if __name__ == "__main__":
+    if __name__ == "__main__":
     main()

@@ -5,22 +5,23 @@ Tests the consolidated GUI launcher that combines 4 previous implementations
 with features including platform detection, progressive fallback, and environment setup.
 """
 
-import pytest
 import os
-import sys
 import platform
-from unittest.mock import Mock, patch, MagicMock
+import sys
 from pathlib import Path
+from unittest.mock import MagicMock, Mock, patch
+
+import pytest
 
 # Import the component under test
 sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 from gui_launcher_unified import (
-    UnifiedGUILauncher,
-    PlatformDetector,
     EnvironmentConfigurer,
     GUILaunchManager,
     LaunchStrategy,
+    PlatformDetector,
+    UnifiedGUILauncher,
 )
 
 

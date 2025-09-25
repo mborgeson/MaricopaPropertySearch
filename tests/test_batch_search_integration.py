@@ -3,32 +3,29 @@
 Batch Search Integration Tests
 Tests the complete batch search processing system integration
 """
-
-import sys
 import os
-import unittest
+import sys
 import time
+import unittest
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
 
 # Add project root to path
 PROJECT_ROOT = Path(__file__).parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 sys.path.insert(0, str(PROJECT_ROOT / "src"))
-
+from src.batch_processing_manager import BatchProcessingManager
+from src.batch_search_engine import BatchPriority, BatchSearchEngine, SearchMode
 from src.batch_search_integration import (
     BatchSearchIntegrationManager,
     BatchSearchJobType,
     BatchSearchResult,
     BatchSearchSummary,
 )
-from src.batch_search_engine import BatchSearchEngine, SearchMode, BatchPriority
-from src.batch_processing_manager import BatchProcessingManager
 
 
 class TestBatchSearchIntegration(unittest.TestCase):
     """Test suite for batch search integration"""
-
     def setUp(self):
         """Set up test fixtures"""
         # Create mock components
@@ -51,7 +48,6 @@ class TestBatchSearchIntegration(unittest.TestCase):
             web_scraper_manager=self.mock_web_scraper,
             background_manager=self.mock_background_manager,
         )
-
     def test_integration_manager_initialization(self):
         """Test that integration manager initializes correctly"""
         self.assertIsNotNone(self.integration_manager)
@@ -59,7 +55,6 @@ class TestBatchSearchIntegration(unittest.TestCase):
         self.assertIsNotNone(self.integration_manager.batch_processing_manager)
         self.assertEqual(len(self.integration_manager.active_jobs), 0)
         self.assertEqual(len(self.integration_manager.completed_jobs), 0)
-
     def test_batch_search_job_creation(self):
         """Test creating a batch search job"""
         identifiers = ["123-45-678", "234-56-789", "345-67-890"]
@@ -85,7 +80,6 @@ class TestBatchSearchIntegration(unittest.TestCase):
             self.assertEqual(job_info["identifiers"], identifiers)
             self.assertEqual(job_info["search_type"], "apn")
             self.assertEqual(job_info["job_type"], BatchSearchJobType.BASIC_SEARCH)
-
     def test_job_status_retrieval(self):
         """Test retrieving job status"""
         # Create a test job
@@ -111,7 +105,6 @@ class TestBatchSearchIntegration(unittest.TestCase):
         self.assertEqual(status["status"], "running")
         self.assertEqual(status["progress"], 50.0)
         self.assertEqual(status["job_type"], BatchSearchJobType.BASIC_SEARCH.value)
-
     def test_batch_search_result_processing(self):
         """Test processing batch search results"""
         # Create sample raw results
@@ -148,7 +141,6 @@ class TestBatchSearchIntegration(unittest.TestCase):
         self.assertFalse(failed_result.success)
         self.assertEqual(failed_result.identifier, "234-56-789")
         self.assertEqual(failed_result.error_message, "Property not found")
-
     def test_export_functionality(self):
         """Test CSV export functionality"""
         # Create a completed job with results
@@ -190,14 +182,14 @@ class TestBatchSearchIntegration(unittest.TestCase):
         self.integration_manager.completed_jobs[job_id] = summary
 
         # Test export to temporary file
-        import tempfile
+import tempfile
 
         with tempfile.NamedTemporaryFile(
             mode="w", suffix=".csv", delete=False
         ) as temp_file:
             temp_path = temp_file.name
 
-        try:
+    try:
             success = self.integration_manager.export_results_to_csv(job_id, temp_path)
             self.assertTrue(success)
 
@@ -209,11 +201,10 @@ class TestBatchSearchIntegration(unittest.TestCase):
                 self.assertIn("234-56-789", content)
                 self.assertIn("SUMMARY", content)
 
-        finally:
+    finally:
             # Cleanup
             if os.path.exists(temp_path):
                 os.unlink(temp_path)
-
     def test_job_cancellation(self):
         """Test job cancellation functionality"""
         job_id = "test_job_cancel"
@@ -234,7 +225,6 @@ class TestBatchSearchIntegration(unittest.TestCase):
             mock_cancel.assert_called_once_with(
                 None
             )  # engine_job_id would be None in test
-
     def test_statistics_collection(self):
         """Test statistics collection and reporting"""
         # Add some test data to statistics
@@ -266,7 +256,6 @@ class TestBatchSearchIntegration(unittest.TestCase):
                 self.assertEqual(stats["average_throughput_items_per_second"], 2.5)
                 self.assertIn("batch_search_engine", stats)
                 self.assertIn("batch_processing_manager", stats)
-
     def test_different_job_types(self):
         """Test handling of different job types"""
         test_cases = [
@@ -320,7 +309,6 @@ class TestBatchSearchIntegration(unittest.TestCase):
                             mock_manager.assert_called_once()
                         else:
                             mock_manager.assert_not_called()
-
     def test_background_collection_integration(self):
         """Test integration with background data collection"""
         # Create successful search results
@@ -357,19 +345,17 @@ class TestBatchSearchIntegration(unittest.TestCase):
             self.assertIn("123-45-678", apns)
             self.assertIn("234-56-789", apns)
             self.assertIn("234-56-790", apns)
-
     def tearDown(self):
         """Clean up after tests"""
         # Shutdown the integration manager
-        try:
+    try:
             self.integration_manager.shutdown()
-        except:
+    except:
             pass
 
 
 class TestBatchSearchResultHandling(unittest.TestCase):
     """Test batch search result data structures"""
-
     def test_batch_search_result_creation(self):
         """Test creating BatchSearchResult objects"""
         result = BatchSearchResult(
@@ -389,7 +375,6 @@ class TestBatchSearchResultHandling(unittest.TestCase):
         self.assertEqual(result.processing_time, 1.5)
         self.assertEqual(result.api_calls_used, 1)
         self.assertEqual(len(result.data_sources_used), 2)
-
     def test_batch_search_summary_creation(self):
         """Test creating BatchSearchSummary objects"""
         results = [

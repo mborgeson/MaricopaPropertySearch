@@ -3,10 +3,10 @@
 Apply Crash-Safe Refresh Button Fixes
 This script applies the crash-safe fixes to the enhanced_main_window.py file
 """
-
 import re
 import shutil
 from pathlib import Path
+
 
 def apply_refresh_fixes():
     """Apply the crash-safe refresh button fixes"""
@@ -14,8 +14,7 @@ def apply_refresh_fixes():
     # Paths
     main_file = Path("src/gui/enhanced_main_window.py")
     backup_file = Path("src/gui/enhanced_main_window_before_fix.py")
-    
-    print("Applying crash-safe refresh button fixes...")
+        print("Applying crash-safe refresh button fixes...")
     
     # Create backup
     if main_file.exists():
@@ -28,8 +27,7 @@ def apply_refresh_fixes():
     # Read the current file
     with open(main_file, 'r', encoding='utf-8') as f:
         content = f.read()
-    
-    print("Replacing refresh_property_data function...")
+        print("Replacing refresh_property_data function...")
     
     # Find and replace the refresh_property_data function
     # Look for the function start and replace until the next function or end
@@ -212,8 +210,8 @@ def apply_refresh_fixes():
         except Exception as e:
             # ULTIMATE CRASH PREVENTION - catch absolutely everything
             logger.error(f"CRITICAL: Unhandled error in refresh_property_data for APN {getattr(self, 'property_data', {}).get('apn', 'unknown')}: {e}")
-            import traceback
-            traceback.print_exc()
+import traceback
+        traceback.print_exc()
             
             # Show error but keep application running
             try:
@@ -228,8 +226,7 @@ def apply_refresh_fixes():
     
     # Replace the old function with the new one
     new_content = content[:start_pos] + new_refresh_function + content[end_pos:]
-    
-    print("Replacing _update_dialog_status function...")
+        print("Replacing _update_dialog_status function...")
     
     # Now fix the _update_dialog_status function
     status_start_pattern = r'    def _update_dialog_status\(self\):'
@@ -297,10 +294,9 @@ def apply_refresh_fixes():
     # Write the fixed content back
     with open(main_file, 'w', encoding='utf-8') as f:
         f.write(new_content)
-    
-    print("SUCCESS: Crash-safe refresh button fixes applied!")
-    print(f"Original file backed up to: {backup_file}")
-    print(f"Fixed file: {main_file}")
+        print("SUCCESS: Crash-safe refresh button fixes applied!")
+        print(f"Original file backed up to: {backup_file}")
+        print(f"Fixed file: {main_file}")
     
     return True
 

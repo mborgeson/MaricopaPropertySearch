@@ -4,8 +4,8 @@ Maricopa County Property Search Application
 Main application file
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add project root to path
@@ -15,23 +15,27 @@ sys.path.insert(0, str(PROJECT_ROOT / "src"))
 
 # Windows-specific fixes
 import platform
+
 if platform.system() == 'Windows':
     import multiprocessing
+
     multiprocessing.freeze_support()
     
     # Fix for high DPI
     from PyQt5.QtCore import Qt
     from PyQt5.QtWidgets import QApplication
+
     QApplication.setAttribute(Qt.AA_EnableHighDpiScaling, True)
     QApplication.setAttribute(Qt.AA_UseHighDpiPixmaps, True)
 
+from api_client import MaricopaAPIClient
+from database_manager import DatabaseManager
+
 # Import configuration and logging
 from config_manager import ConfigManager
-from logging_config import setup_logging, get_logger, log_exception
-from database_manager import DatabaseManager
-from api_client import MaricopaAPIClient
-from web_scraper import WebScraperManager
 from gui.enhanced_main_window import EnhancedMainWindow
+from logging_config import get_logger, log_exception, setup_logging
+from web_scraper import WebScraperManager
 
 # [Rest of the application code from earlier...]
 
@@ -74,10 +78,12 @@ def main():
             logger = get_logger(__name__)
             log_exception(logger, e, "main application startup")
         except:
-            print(f"CRITICAL ERROR in main(): {e}")
+        print(f"CRITICAL ERROR in main(): {e}")
             import traceback
+
             traceback.print_exc()
-        sys.exit(1)
+
+    sys.exit(1)
 
 if __name__ == "__main__":
     main()

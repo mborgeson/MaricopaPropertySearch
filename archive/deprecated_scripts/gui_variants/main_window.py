@@ -3,31 +3,58 @@ Main Window for Maricopa Property Search Application
 PyQt5-based GUI interface
 """
 
-import sys
-from PyQt5.QtWidgets import (
-    QMainWindow, QWidget, QVBoxLayout, QHBoxLayout, QGridLayout,
-    QLabel, QLineEdit, QPushButton, QTabWidget, QTableWidget, 
-    QTableWidgetItem, QTextEdit, QProgressBar, QMessageBox,
-    QComboBox, QSpinBox, QCheckBox, QGroupBox, QSplitter,
-    QHeaderView, QApplication, QStatusBar, QMenuBar, QMenu,
-    QAction, QFileDialog, QDialog
-)
-from PyQt5.QtCore import Qt, QThread, pyqtSignal, QTimer
-from PyQt5.QtGui import QFont, QIcon, QPixmap
-from typing import Dict, List, Optional, Any
-import json
 import csv
-from pathlib import Path
-from datetime import datetime
+import json
+import sys
 import traceback
+from datetime import datetime
+from pathlib import Path
+from typing import Any, Dict, List, Optional
+
+from PyQt5.QtCore import Qt, QThread, QTimer, pyqtSignal
+from PyQt5.QtGui import QFont, QIcon, QPixmap
+from PyQt5.QtWidgets import (
+    QAction,
+    QApplication,
+    QCheckBox,
+    QComboBox,
+    QDialog,
+    QFileDialog,
+    QGridLayout,
+    QGroupBox,
+    QHBoxLayout,
+    QHeaderView,
+    QLabel,
+    QLineEdit,
+    QMainWindow,
+    QMenu,
+    QMenuBar,
+    QMessageBox,
+    QProgressBar,
+    QPushButton,
+    QSpinBox,
+    QSplitter,
+    QStatusBar,
+    QTableWidget,
+    QTableWidgetItem,
+    QTabWidget,
+    QTextEdit,
+    QVBoxLayout,
+    QWidget,
+)
+
+# Import centralized logging
+from src.logging_config import (
+    get_logger,
+    get_performance_logger,
+    get_search_logger,
+    log_exception,
+)
 
 # Import application modules
 # MIGRATED: from src.database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 # MIGRATED: from src.api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient, MockMaricopaAPIClient
-from src.web_scraper import WebScraperManager, MockWebScraperManager
-
-# Import centralized logging
-from src.logging_config import get_logger, get_search_logger, get_performance_logger, log_exception
+from src.web_scraper import MockWebScraperManager, WebScraperManager
 
 logger = get_logger(__name__)
 search_logger = get_search_logger(__name__)
@@ -319,8 +346,8 @@ class PropertyDetailsDialog(QDialog):
             return
             
         # Show progress dialog
-        from PyQt5.QtWidgets import QProgressDialog
         from PyQt5.QtCore import Qt
+        from PyQt5.QtWidgets import QProgressDialog
         
         progress = QProgressDialog("Collecting property data...", "Cancel", 0, 100, self)
         progress.setWindowModality(Qt.WindowModal)
@@ -330,6 +357,7 @@ class PropertyDetailsDialog(QDialog):
         try:
             # Import the automatic data collector
             import sys
+
             sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
             from automatic_data_collector import AutomaticDataCollector
             
@@ -353,17 +381,21 @@ class PropertyDetailsDialog(QDialog):
                 progress.setLabelText("Data collection complete!")
                 
                 from PyQt5.QtWidgets import QMessageBox
+
                 QMessageBox.information(self, "Success", 
                                       f"Successfully collected data for APN {apn}")
             else:
                 from PyQt5.QtWidgets import QMessageBox
+
                 QMessageBox.warning(self, "Warning", 
                                   f"Could not collect complete data for APN {apn}")
                                   
         except Exception as e:
             from PyQt5.QtWidgets import QMessageBox
+
 from src.api_client_unified import UnifiedMaricopaAPIClient
 from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
             QMessageBox.critical(self, "Error", f"Error collecting data: {str(e)}")
             
         finally:
@@ -646,7 +678,7 @@ class PropertySearchApp(QMainWindow):
             api_status = self.api_client.get_api_status()
             status_messages.append(f"API: {api_status.get('status', 'Unknown')}")
         except:
-            status_messages.append("API: Error")
+        status_messages.append("API: Error")
         
         self.status_bar.showMessage(" | ".join(status_messages))
     
@@ -870,7 +902,7 @@ class PropertySearchApp(QMainWindow):
             
             dialog = PropertyDetailsDialog(property_data, self.db_manager, self)
             dialog.exec_()
-    
+
     def show_log_output(self):
         """Show comprehensive log output in debug section"""
         if self.debug_text.isVisible():

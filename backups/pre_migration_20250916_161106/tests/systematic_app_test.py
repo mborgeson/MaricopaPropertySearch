@@ -4,16 +4,17 @@ Systematic Application Testing Script
 Tests each component of RUN_APPLICATION.py to identify specific issues
 """
 
-import sys
 import os
-from pathlib import Path
 import subprocess
+import sys
 import time
+from pathlib import Path
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 sys.path.insert(0, str(project_root / "src"))
+
 
 class SystematicTester:
     def __init__(self):
@@ -24,17 +25,18 @@ class SystematicTester:
     def test_startup_sequence(self):
         """Test the startup sequence step by step"""
         print("\n[TEST 1] Startup Sequence")
-        print("="*50)
+        print("=" * 50)
 
         steps = []
 
         # Step 1: Dependencies
         try:
-            import PyQt5
-            import psycopg2
-            import requests
             import bs4
             import lxml
+            import psycopg2
+            import PyQt5
+            import requests
+
             steps.append(("Dependencies", True, None))
             print("[OK] Dependencies loaded")
         except ImportError as e:
@@ -44,6 +46,7 @@ class SystematicTester:
         # Step 2: Configuration
         try:
             from src.config_manager import ConfigManager
+
             config = ConfigManager()
             steps.append(("ConfigManager", True, None))
             print("[OK] ConfigManager loaded")
@@ -67,6 +70,7 @@ class SystematicTester:
         # Step 3: Database
         try:
             from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
             db = ThreadSafeDatabaseManager(config)
             if db.test_connection():
                 steps.append(("Database", True, None))
@@ -82,6 +86,7 @@ class SystematicTester:
         # Step 4: Logging
         try:
             from src.logging_config import setup_logging
+
             setup_logging()
             steps.append(("Logging", True, None))
             print("[OK] Logging initialized")
@@ -95,13 +100,14 @@ class SystematicTester:
     def test_gui_components(self):
         """Test GUI components initialization"""
         print("\n[TEST 2] GUI Components")
-        print("="*50)
+        print("=" * 50)
 
         components = []
 
         try:
-            os.environ['QT_QPA_PLATFORM'] = 'offscreen'
+            os.environ["QT_QPA_PLATFORM"] = "offscreen"
             from PyQt5.QtWidgets import QApplication
+
             from src.config_manager import ConfigManager
             from src.gui.enhanced_main_window import EnhancedPropertySearchApp
 
@@ -144,15 +150,15 @@ class SystematicTester:
     def test_functionality(self):
         """Test core functionality"""
         print("\n[TEST 3] Core Functionality")
-        print("="*50)
+        print("=" * 50)
 
         functions = []
 
         try:
             from src.api_client import MaricopaAPIClient
-            from src.web_scraper import WebScraperManager
             from src.background_data_collector import BackgroundDataCollectionManager
             from src.config_manager import ConfigManager
+            from src.web_scraper import WebScraperManager
 
             config = ConfigManager()
 
@@ -188,12 +194,14 @@ class SystematicTester:
             print(f"[FAIL] Functionality test: {e}")
 
         self.results["functionality"] = functions
-        return all(success for name, success, _ in functions if "Web Scraper" not in name)
+        return all(
+            success for name, success, _ in functions if "Web Scraper" not in name
+        )
 
     def test_run_application(self):
         """Test actual RUN_APPLICATION.py execution"""
         print("\n[TEST 4] RUN_APPLICATION.py Execution")
-        print("="*50)
+        print("=" * 50)
 
         test_script = """
 import sys
@@ -206,6 +214,7 @@ os.environ['TESTING'] = '1'
 
 # Run the application briefly
 import subprocess
+
 result = subprocess.run(
     [sys.executable, "RUN_APPLICATION.py"],
     capture_output=True,
@@ -219,14 +228,16 @@ if "[START] Starting application..." in result.stdout:
 else:
     print("Application failed to start properly")
     print("STDOUT:", result.stdout[:500])
-""".format(root=project_root)
+""".format(
+            root=project_root
+        )
 
         try:
             result = subprocess.run(
                 [sys.executable, "-c", test_script],
                 capture_output=True,
                 text=True,
-                timeout=10
+                timeout=10,
             )
 
             if "starts successfully" in result.stdout:
@@ -246,9 +257,9 @@ else:
 
     def generate_report(self):
         """Generate comprehensive report"""
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         print(" SYSTEMATIC TEST REPORT")
-        print("="*70)
+        print("=" * 70)
 
         # Count issues
         total_tests = 0
@@ -277,7 +288,9 @@ else:
                 if "ConfigManager" in name:
                     self.fixes.append("Check config_manager.py methods")
                 elif "search_button" in name or "Missing: search_button" in error:
-                    self.fixes.append("Add search_button alias in enhanced_main_window.py")
+                    self.fixes.append(
+                        "Add search_button alias in enhanced_main_window.py"
+                    )
                 elif "Database" in name:
                     self.fixes.append("Verify database configuration in .env")
                 elif "Chrome" in str(error):
@@ -288,17 +301,17 @@ else:
             for i, fix in enumerate(set(self.fixes), 1):
                 print(f"  {i}. {fix}")
 
-        print("\n" + "="*70)
+        print("\n" + "=" * 70)
         if failed_tests == 0:
             print(" [OK] ALL TESTS PASSED - APPLICATION READY")
         else:
             print(f" [ACTION] {failed_tests} ISSUES NEED ATTENTION")
-        print("="*70)
+        print("=" * 70)
 
     def run_all_tests(self):
         """Run all systematic tests"""
         print("SYSTEMATIC APPLICATION TESTING")
-        print("="*70)
+        print("=" * 70)
 
         # Run tests
         self.test_startup_sequence()
@@ -311,6 +324,7 @@ else:
 
         return len(self.issues) == 0
 
+
 def main():
     tester = SystematicTester()
     success = tester.run_all_tests()
@@ -321,9 +335,10 @@ def main():
         print("2. Apply recommended fixes")
         print("3. Run this test again to verify")
         print("\nOr use hive-mind for automated fixing:")
-        print("  npx claude-flow hive-mind spawn \"Fix issues: [paste issues]\" --claude")
+        print('  npx claude-flow hive-mind spawn "Fix issues: [paste issues]" --claude')
 
     return 0 if success else 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

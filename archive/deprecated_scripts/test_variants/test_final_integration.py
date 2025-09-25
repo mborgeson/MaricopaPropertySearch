@@ -4,11 +4,11 @@ Final integration test for the complete Maricopa Property Search application
 Tests real API integration, logging system, and search functionality
 """
 
-import sys
-import os
-from pathlib import Path
 import logging
+import os
+import sys
 import time
+from pathlib import Path
 
 # Add project paths
 PROJECT_ROOT = Path(r"C:\Users\MattBorgeson\Development\Work\MaricopaPropertySearch")
@@ -20,8 +20,8 @@ def test_logging_system():
     print("\n=== Testing Logging System ===")
     
     try:
-        from logging_config import setup_logging, get_logger, perf_logger
-        
+        from logging_config import get_logger, perf_logger, setup_logging
+
         # Initialize logging
         setup_logging()
         logger = get_logger('test')
@@ -177,9 +177,9 @@ def test_gui_components():
     print("\n=== Testing GUI Components ===")
     
     try:
-        from PyQt5.QtWidgets import QApplication
         from PyQt5.QtCore import Qt
-        
+        from PyQt5.QtWidgets import QApplication
+
         # Check if QApplication exists
         app = QApplication.instance()
         if app is None:
@@ -223,9 +223,9 @@ def test_complete_search_flow():
         # MIGRATED: # MIGRATED: from database_manager import DatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager  # → from src.threadsafe_database_manager import ThreadSafeDatabaseManager
         # MIGRATED: # MIGRATED: from api_client import MaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
 from src.api_client_unified import UnifiedMaricopaAPIClient
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
 from src.enhanced_config_manager import EnhancedConfigManager
-        
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
         config = EnhancedConfigManager()
         db_manager = ThreadSafeDatabaseManager(config)
         

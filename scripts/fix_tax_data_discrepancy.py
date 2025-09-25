@@ -5,7 +5,6 @@ The assessed_value and tax_amount should be different values
 Assessed value = property value for tax purposes
 Tax amount = actual taxes owed (usually a percentage of assessed value)
 """
-
 import sys
 from pathlib import Path
 
@@ -19,25 +18,23 @@ from psycopg2.extras import Json
 
 def fix_tax_data_discrepancy():
     """Fix the tax data so assessed values and tax amounts are properly differentiated"""
-    print("Fixing Tax Data Discrepancy")
-    print("=" * 45)
+        print("Fixing Tax Data Discrepancy")
+        print("=" * 45)
     
     config = EnhancedConfigManager()
     db_manager = ThreadSafeDatabaseManager(config)
     
     test_apn = '13304014A'
     
-    try:
+try:
         # Get current tax records
         tax_records = db_manager.get_tax_history(test_apn)
-        
         print(f"Current tax records for APN {test_apn}:")
         for record in tax_records:
             year = record['tax_year']
             assessed_value = record.get('assessed_value', 0)
             tax_amount = record.get('tax_amount', 0)
-            print(f"  {year}: Assessed=${assessed_value:,.2f}, Tax=${tax_amount:,.2f}")
-        
+        print(f"  {year}: Assessed=${assessed_value:,.2f}, Tax=${tax_amount:,.2f}")
         print(f"\nPROBLEM: Assessed Value and Tax Amount are identical")
         print(f"SOLUTION: Update assessed values to be realistic property values")
         print("-" * 45)
@@ -51,7 +48,6 @@ def fix_tax_data_discrepancy():
             2022: {'assessed_value': 75300000, 'tax_amount': 486992.72},  # ~0.65% tax rate
             2021: {'assessed_value': 117000000, 'tax_amount': 757401.30}  # ~0.65% tax rate
         }
-        
         print("Updating with corrected values:")
         updated_count = 0
         
@@ -73,11 +69,10 @@ def fix_tax_data_discrepancy():
                 assessed = corrections['assessed_value']
                 tax = corrections['tax_amount']
                 rate = (tax / assessed) * 100
-                print(f"  [+] {tax_year}: Assessed=${assessed:,.0f}, Tax=${tax:,.2f} ({rate:.2f}% rate)")
+        print(f"  [+] {tax_year}: Assessed=${assessed:,.0f}, Tax=${tax:,.2f} ({rate:.2f}% rate)")
                 updated_count += 1
             else:
-                print(f"  [-] Failed to update {tax_year}")
-        
+        print(f"  [-] Failed to update {tax_year}")
         print(f"\nSuccessfully updated {updated_count} tax records")
         
         # Verify the fix
@@ -89,8 +84,7 @@ def fix_tax_data_discrepancy():
             assessed_value = record.get('assessed_value', 0)
             tax_amount = record.get('tax_amount', 0)
             rate = (tax_amount / assessed_value * 100) if assessed_value > 0 else 0
-            print(f"  {year}: Assessed=${assessed_value:,.0f}, Tax=${tax_amount:,.2f} ({rate:.2f}% rate)")
-        
+        print(f"  {year}: Assessed=${assessed_value:,.0f}, Tax=${tax_amount:,.2f} ({rate:.2f}% rate)")
         print("\n" + "=" * 45)
         print("TAX DATA CORRECTION COMPLETE!")
         print("The Tax History tab should now show:")
@@ -98,14 +92,16 @@ def fix_tax_data_discrepancy():
         print("- Separate tax amounts (taxes owed)")
         print("- Realistic tax rates (~0.65%)")
         
-    except Exception as e:
+except Exception as e:
         print(f"Error: {e}")
-        import traceback
-from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+import traceback
+
 from src.enhanced_config_manager import EnhancedConfigManager
+from src.threadsafe_database_manager import ThreadSafeDatabaseManager
+
         traceback.print_exc()
-        
-    finally:
+
+finally:
         db_manager.close()
 
 if __name__ == "__main__":

@@ -5,11 +5,11 @@ Apply this patch for immediate 5x-10x performance improvement
 """
 
 import concurrent.futures
-import time
 import logging
-from typing import Dict, List, Optional, Any
-from functools import lru_cache
 import threading
+import time
+from functools import lru_cache
+from typing import Any, Dict, List, Optional
 
 logger = logging.getLogger(__name__)
 
@@ -86,9 +86,9 @@ class APIClientPerformancePatch:
                         if rental_data:
                             detailed_data['rental_details'] = rental_data
                 except:
-                    pass  # Rental details are optional
+        pass  # Rental details are optional
         except:
-            pass  # Owner lookup is optional
+        pass  # Owner lookup is optional
         
         collection_time = time.time() - start_time
         logger.info(f"Parallel detailed data collection completed in {collection_time:.3f}s for APN: {apn}")
@@ -112,7 +112,7 @@ class APIClientPerformancePatch:
             try:
                 basic_info = basic_future.result(timeout=2.0)
             except:
-                basic_info = None
+        basic_info = None
                 logger.warning(f"Basic search timed out for APN {apn}, using detailed data only")
             
             # Get detailed data

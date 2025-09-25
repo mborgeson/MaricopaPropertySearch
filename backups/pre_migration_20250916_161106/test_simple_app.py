@@ -4,8 +4,8 @@ Simple test version of the Maricopa Property Search Application
 This version runs without database and with minimal dependencies
 """
 
-import sys
 import os
+import sys
 from pathlib import Path
 
 # Add src to path
@@ -16,15 +16,18 @@ print("Starting simplified application test...")
 # Import only what we need
 try:
     from src.config_manager import ConfigManager
+
     print("✓ ConfigManager imported")
 except Exception as e:
     print(f"✗ ConfigManager import failed: {e}")
 
 try:
     from src.api_client import MaricopaAPIClient
+
     print("✓ APIClient imported")
 except Exception as e:
     print(f"✗ APIClient import failed: {e}")
+
 
 # Simple test class for search functionality
 class SimplePropertySearch:
@@ -59,7 +62,9 @@ class SimplePropertySearch:
             if tax_history:
                 print(f"Found {len(tax_history)} tax records")
                 for record in tax_history[:3]:  # Show first 3
-                    print(f"  Year {record.get('tax_year')}: ${record.get('amount_due', 0):,}")
+                    print(
+                        f"  Year {record.get('tax_year')}: ${record.get('amount_due', 0):,}"
+                    )
 
             # Get sales history
             sales_history = self.api_client.get_sales_history(apn)
@@ -73,10 +78,11 @@ class SimplePropertySearch:
             print(f"History fetch error: {e}")
             return None, None
 
+
 def main():
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("MARICOPA PROPERTY SEARCH - SIMPLE TEST")
-    print("="*60)
+    print("=" * 60)
 
     try:
         # Create search instance
@@ -86,21 +92,24 @@ def main():
         test_apns = ["123-45-678", "117-01-001", "234-56-789"]
 
         for apn in test_apns:
-            print("\n" + "-"*40)
+            print("\n" + "-" * 40)
             result = search.search_by_apn(apn)
             if result:
                 # Also get tax and sales history
                 tax_history, sales_history = search.get_tax_sales_history(apn)
 
-        print("\n" + "="*60)
+        print("\n" + "=" * 60)
         print("Test completed successfully!")
         return 0
 
     except Exception as e:
         print(f"\n✗ Test failed with error: {e}")
         import traceback
+
         traceback.print_exc()
-        return 1
+
+    return 1
+
 
 if __name__ == "__main__":
     sys.exit(main())

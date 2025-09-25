@@ -3,19 +3,18 @@
 Apply GUI Integration Script
 Automatically applies the integration enhancements to enhanced_main_window.py
 """
-
 import os
 import re
 import shutil
 from datetime import datetime
 
+
 def backup_file(file_path):
     """Create a backup of the original file"""
     backup_path = f"{file_path}.backup_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
     shutil.copy2(file_path, backup_path)
-    print(f"Backup created: {backup_path}")
+        print(f"Backup created: {backup_path}")
     return backup_path
-
 def apply_integration(main_window_path):
     """Apply integration enhancements to enhanced_main_window.py"""
     
@@ -69,7 +68,7 @@ from PyQt5.QtGui import QKeySequence"""
     class_pattern = r"(class EnhancedPropertySearchApp\(QMainWindow\):.*?)(\n    def closeEvent)"
     
     new_methods = '''
-    def setup_keyboard_shortcuts(self):
+def setup_keyboard_shortcuts(self):
         """Setup additional keyboard shortcuts for power users"""
         self.shortcuts = {}
         
@@ -89,8 +88,7 @@ from PyQt5.QtGui import QKeySequence"""
             self.shortcuts[shortcut_key] = shortcut
         
         logger.info(f"Setup {len(shortcuts_config)} keyboard shortcuts")
-    
-    def setup_enhanced_toolbar(self):
+def setup_enhanced_toolbar(self):
         """Create enhanced toolbar with quick access buttons"""
         toolbar = self.addToolBar("Quick Actions")
         toolbar.setMovable(False)
@@ -190,13 +188,11 @@ from PyQt5.QtGui import QKeySequence"""
         
         self.toolbar = toolbar
         logger.info("Enhanced toolbar setup complete")
-    
-    def setup_results_table_context_menu(self):
+def setup_results_table_context_menu(self):
         """Setup context menu for results table"""
         self.results_table.setContextMenuPolicy(Qt.CustomContextMenu)
         self.results_table.customContextMenuRequested.connect(self.show_results_context_menu)
-    
-    def show_results_context_menu(self, position):
+def show_results_context_menu(self, position):
         """Show context menu for results table"""
         if not self.results_table.itemAt(position):
             return
@@ -228,8 +224,7 @@ from PyQt5.QtGui import QKeySequence"""
         copy_action.triggered.connect(self.copy_apn_to_clipboard)
         
         menu.exec_(self.results_table.mapToGlobal(position))
-    
-    def setup_enhanced_status_bar(self):
+def setup_enhanced_status_bar(self):
         """Setup enhanced status bar with detailed information"""
         # Collection status label
         self.collection_status_label = QLabel("Collection: Stopped")
@@ -253,8 +248,7 @@ from PyQt5.QtGui import QKeySequence"""
         self.enhanced_status_timer = QTimer()
         self.enhanced_status_timer.timeout.connect(self.update_enhanced_status_bar)
         self.enhanced_status_timer.start(2000)  # Update every 2 seconds
-    
-    def update_enhanced_status_bar(self):
+def update_enhanced_status_bar(self):
         """Update enhanced status bar information"""
         try:
             # Update collection status
@@ -284,13 +278,12 @@ from PyQt5.QtGui import QKeySequence"""
                     self.db_status_label.setText("DB: Connected")
                     self.db_status_label.setStyleSheet("color: green;")
                 except:
-                    self.db_status_label.setText("DB: Error")
+                        self.db_status_label.setText("DB: Error")
                     self.db_status_label.setStyleSheet("color: red; font-weight: bold;")
                     
         except Exception as e:
             logger.warning(f"Error updating enhanced status bar: {e}")
-    
-    def refresh_selected_property(self):
+def refresh_selected_property(self):
         """Refresh data for currently selected property"""
         current_row = self.results_table.currentRow()
         if current_row >= 0 and current_row < len(self.current_results):
@@ -300,8 +293,7 @@ from PyQt5.QtGui import QKeySequence"""
                 self.background_manager.add_job(apn, JobPriority.HIGH)
                 self.status_bar.showMessage(f"Refreshing data for APN: {apn}", 3000)
                 logger.info(f"User requested refresh for APN: {apn}")
-    
-    def force_collect_selected_property(self):
+def force_collect_selected_property(self):
         """Force data collection for currently selected property"""
         current_row = self.results_table.currentRow()
         if current_row >= 0 and current_row < len(self.current_results):
@@ -314,8 +306,7 @@ from PyQt5.QtGui import QKeySequence"""
                 self.background_manager.add_job(apn, JobPriority.CRITICAL)
                 self.status_bar.showMessage(f"Force collecting data for APN: {apn}", 3000)
                 logger.info(f"User requested force collection for APN: {apn}")
-    
-    def export_selected_results(self):
+def export_selected_results(self):
         """Export only selected table rows"""
         selected_rows = set()
         for item in self.results_table.selectedItems():
@@ -347,8 +338,7 @@ from PyQt5.QtGui import QKeySequence"""
             except Exception as e:
                 QMessageBox.critical(self, "Export Error", f"Failed to export results: {str(e)}")
                 logger.error(f"Failed to export selected results: {e}")
-    
-    def copy_apn_to_clipboard(self):
+def copy_apn_to_clipboard(self):
         """Copy selected property APN to clipboard"""
         current_row = self.results_table.currentRow()
         if current_row >= 0 and current_row < len(self.current_results):
@@ -358,8 +348,7 @@ from PyQt5.QtGui import QKeySequence"""
                 QApplication.clipboard().setText(apn)
                 self.status_bar.showMessage(f"Copied APN to clipboard: {apn}", 2000)
                 logger.info(f"User copied APN to clipboard: {apn}")
-    
-    def cancel_current_operation(self):
+def cancel_current_operation(self):
         """Cancel current search or background operation"""
         # Cancel search worker
         if self.search_worker and self.search_worker.isRunning():
@@ -374,8 +363,7 @@ from PyQt5.QtGui import QKeySequence"""
         if hasattr(self.bg_status_widget, 'batch_tracker'):
             self.bg_status_widget.batch_tracker.cancel_current_batch()
             logger.info("User cancelled batch operation")
-    
-    def update_toolbar_buttons_state(self):
+def update_toolbar_buttons_state(self):
         """Update toolbar button states based on current context"""
         has_results = len(self.current_results) > 0
         
@@ -384,8 +372,7 @@ from PyQt5.QtGui import QKeySequence"""
             self.toolbar_refresh_btn.setEnabled(has_results)
         if hasattr(self, 'toolbar_force_btn'):
             self.toolbar_force_btn.setEnabled(has_results)
-    
-    def keyPressEvent(self, event):
+def keyPressEvent(self, event):
         """Handle additional keyboard events"""
         from PyQt5.QtCore import Qt
         
@@ -446,39 +433,36 @@ from PyQt5.QtGui import QKeySequence"""
     # Write the modified content back to the file
     with open(main_window_path, 'w', encoding='utf-8') as f:
         f.write(content)
-    
-    print(f"Integration applied successfully!")
-    print(f"Changes made:")
+        print(f"Integration applied successfully!")
+        print(f"Changes made:")
     for change in changes_made:
         print(f"  - {change}")
     
     return True
-
 def main():
     """Main execution function"""
-    print("GUI Integration Application Script")
-    print("=" * 40)
+        print("GUI Integration Application Script")
+        print("=" * 40)
     
     # Path to the enhanced main window file
     main_window_path = "/c/Users/MattBorgeson/Development/Work/MaricopaPropertySearch/src/gui/enhanced_main_window.py"
-    
-    print(f"Applying integration to: {main_window_path}")
+        print(f"Applying integration to: {main_window_path}")
     
     try:
         success = apply_integration(main_window_path)
         
         if success:
-            print("\n✅ Integration completed successfully!")
-            print("\nNew features added:")
-            print("- Additional keyboard shortcuts (Ctrl+R, Ctrl+T, F1, Esc, etc.)")
-            print("- Enhanced toolbar with quick access buttons")
-            print("- Right-click context menu for results table")
-            print("- Enhanced status bar with system information")
-            print("- Utility methods for property management")
-            print("- Improved state management")
-            print("\nThe application is now ready to use with all enhanced features!")
+        print("\n✅ Integration completed successfully!")
+        print("\nNew features added:")
+        print("- Additional keyboard shortcuts (Ctrl+R, Ctrl+T, F1, Esc, etc.)")
+        print("- Enhanced toolbar with quick access buttons")
+        print("- Right-click context menu for results table")
+        print("- Enhanced status bar with system information")
+        print("- Utility methods for property management")
+        print("- Improved state management")
+        print("\nThe application is now ready to use with all enhanced features!")
         else:
-            print("\n❌ Integration failed. Check error messages above.")
+        print("\n❌ Integration failed. Check error messages above.")
             
     except Exception as e:
         print(f"\n❌ Error during integration: {e}")

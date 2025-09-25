@@ -1,11 +1,11 @@
 """
 Unit tests for search performance and responsiveness requirements
 """
-
-import pytest
+import asyncio
 import time
 from unittest.mock import Mock, patch
-import asyncio
+
+import pytest
 
 # Performance benchmarks (in seconds)
 DATABASE_SEARCH_LIMIT = 2.0
@@ -17,7 +17,6 @@ STARTUP_TIME_LIMIT = 3.0
 @pytest.mark.performance
 class TestSearchPerformance:
     """Test search operation performance requirements"""
-    
     def test_database_search_performance(self, test_database, performance_timer, app_config):
         """Test that database searches complete within 2 seconds"""
         
@@ -29,7 +28,6 @@ class TestSearchPerformance:
         
         assert elapsed < DATABASE_SEARCH_LIMIT, f"Database search took {elapsed:.3f}s, limit is {DATABASE_SEARCH_LIMIT}s"
         assert len(results) >= 0  # Should return valid results
-        
     def test_database_search_with_large_dataset(self, test_database, performance_timer):
         """Test database performance with larger result sets"""
         
@@ -43,7 +41,6 @@ class TestSearchPerformance:
         elapsed = performance_timer.stop()
         
         assert elapsed < DATABASE_SEARCH_LIMIT * 1.5, f"Large dataset search took {elapsed:.3f}s"
-        
     def test_apn_search_performance(self, test_database, performance_timer):
         """Test APN search performance (should be fastest due to indexing)"""
         
@@ -55,7 +52,6 @@ class TestSearchPerformance:
         
         assert elapsed < 0.5, f"APN search took {elapsed:.3f}s, should be < 0.5s"
         assert result is not None
-        
     def test_address_search_performance(self, test_database, performance_timer):
         """Test address search performance"""
         
@@ -66,10 +62,9 @@ class TestSearchPerformance:
         elapsed = performance_timer.stop()
         
         assert elapsed < DATABASE_SEARCH_LIMIT, f"Address search took {elapsed:.3f}s"
-        
     def _create_large_dataset(self, db_manager, count):
         """Helper to create larger test dataset"""
-        try:
+    try:
             with db_manager.get_connection() as conn:
                 cursor = conn.cursor()
                 
@@ -96,14 +91,13 @@ class TestSearchPerformance:
                     ))
                     
                 conn.commit()
-        except Exception as e:
-            print(f"Error creating large dataset: {e}")
+    except Exception as e:
+        print(f"Error creating large dataset: {e}")
 
 @pytest.mark.unit
 @pytest.mark.performance 
 class TestCachePerformance:
     """Test caching system performance"""
-    
     def test_cache_hit_performance(self, app_config, performance_timer):
         """Test that cache hits are extremely fast"""
         from search_cache import SearchCache
@@ -122,7 +116,6 @@ class TestCachePerformance:
         
         assert elapsed < 0.001, f"Cache hit took {elapsed:.6f}s, should be < 1ms"
         assert result == test_data
-        
     def test_cache_miss_performance(self, performance_timer):
         """Test that cache misses don't add significant overhead"""
         from search_cache import SearchCache
@@ -143,11 +136,10 @@ class TestCachePerformance:
 @pytest.mark.gui
 class TestUIResponsiveness:
     """Test UI responsiveness requirements"""
-    
     def test_search_button_response_time(self, qt_app, app_config, performance_timer):
         """Test that UI responds to search button click within 100ms"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
-        
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+
         window = EnhancedPropertySearchApp(app_config)
         
         # Mock the actual search to focus on UI response
@@ -163,11 +155,10 @@ class TestUIResponsiveness:
             mock_search.assert_called_once()
             
         window.close()
-        
     def test_search_type_change_responsiveness(self, qt_app, app_config, performance_timer):
         """Test that search type dropdown changes are responsive"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
-        
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+
         window = EnhancedPropertySearchApp(app_config)
         
         performance_timer.start()
@@ -180,11 +171,10 @@ class TestUIResponsiveness:
         assert elapsed < UI_RESPONSE_LIMIT, f"Search type change took {elapsed:.3f}s"
         
         window.close()
-        
     def test_results_table_population_speed(self, qt_app, app_config, sample_search_results, performance_timer):
         """Test that results table populates quickly"""
-        from src.gui.enhanced_main_window import EnhancedPropertySearchApp
-        
+from src.gui.enhanced_main_window import EnhancedPropertySearchApp
+
         window = EnhancedPropertySearchApp(app_config)
         
         performance_timer.start()
@@ -202,11 +192,10 @@ class TestUIResponsiveness:
 @pytest.mark.performance
 class TestBackgroundProcessing:
     """Test background data enhancement performance"""
-    
     def test_background_enhancement_non_blocking(self, app_config, performance_timer):
         """Test that background enhancement doesn't block UI"""
         from search_worker import SearchWorker
-        
+
         # Create a mock search worker
         worker = SearchWorker("owner", "SMITH", None, None, None)
         
@@ -223,7 +212,6 @@ class TestBackgroundProcessing:
         # Clean up
         worker.quit()
         worker.wait()
-        
     def test_api_enhancement_timeout(self, app_config, performance_timer):
         """Test that API enhancement respects timeout limits"""
         # MIGRATED: from src.api_client import MockMaricopaAPIClient  # → from src.api_client_unified import UnifiedMaricopaAPIClient
@@ -232,7 +220,7 @@ class TestBackgroundProcessing:
         
         # Mock a slow API response
         with patch.object(client, 'search_by_owner') as mock_search:
-            def slow_response(*args, **kwargs):
+    def slow_response(*args, **kwargs):
                 time.sleep(12)  # Longer than our limit
                 return []
                 
@@ -240,9 +228,9 @@ class TestBackgroundProcessing:
             
             performance_timer.start()
             
-            try:
+    try:
                 results = client.search_by_owner("SMITH", timeout=API_ENHANCEMENT_LIMIT)
-            except Exception:
+    except Exception:
                 pass  # Timeout expected
                 
             elapsed = performance_timer.stop()
@@ -255,12 +243,12 @@ class TestBackgroundProcessing:
 @pytest.mark.performance
 class TestMemoryUsage:
     """Test memory usage and resource management"""
-    
     def test_large_result_set_memory_usage(self, test_database):
         """Test that large result sets don't cause memory issues"""
-        import psutil
-        import os
-        
+import os
+
+import psutil
+
         process = psutil.Process(os.getpid())
         initial_memory = process.memory_info().rss / 1024 / 1024  # MB
         
@@ -273,7 +261,6 @@ class TestMemoryUsage:
         memory_growth = final_memory - initial_memory
         
         assert memory_growth < 50, f"Memory grew by {memory_growth:.2f}MB, should be < 50MB"
-        
     def test_connection_pool_efficiency(self, test_database, performance_timer):
         """Test that connection pooling improves performance"""
         
@@ -297,13 +284,13 @@ class TestMemoryUsage:
 @pytest.mark.slow
 class TestApplicationStartupPerformance:
     """Test application startup performance"""
-    
     def test_cold_startup_time(self, performance_timer):
         """Test application cold startup time"""
-        import subprocess
-        import sys
+import subprocess
+import sys
+
 from src.api_client_unified import UnifiedMaricopaAPIClient
-        
+
         performance_timer.start()
         
         # Start application process
@@ -320,7 +307,6 @@ from src.api_client_unified import UnifiedMaricopaAPIClient
         
         assert elapsed < STARTUP_TIME_LIMIT, f"Application startup took {elapsed:.3f}s"
         assert process.returncode == 0, f"Application failed to start: {stderr.decode()}"
-        
     def test_warm_startup_time(self, performance_timer):
         """Test application warm startup (second launch)"""
         # This would test startup when Python modules are cached
